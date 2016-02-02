@@ -1,5 +1,5 @@
 # Phraseanet Production Client
-[![Travis Status][trav_img]][trav_site]
+[![Build Status](https://travis-ci.org/lostdalek/Phraseanet-production-client.svg?branch=master)](https://travis-ci.org/lostdalek/Phraseanet-production-client)
 [![devDependency Status](https://david-dm.org/lostdalek/Phraseanet-production-client/dev-status.svg)](https://david-dm.org/lostdalek/Phraseanet-production-client#info=devDependencies)
 [![Dependency Status](https://david-dm.org/lostdalek/Phraseanet-production-client.svg)](https://david-dm.org/lostdalek/Phraseanet-production-client)
 
