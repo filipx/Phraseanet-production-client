@@ -43,12 +43,22 @@
 require('babel-core/register');
 
 // Webpack config for development
+/*
 import webpack from 'webpack';
 import path from 'path';
 import pkg from '../../package.json';
 import banner from '../banner';
 import WebpackNotifierPlugin from 'webpack-notifier';
 import config from '../config';
+*/
+
+
+const webpack = require('webpack');
+const path = require('path');
+const pkg = require('../../package.json');
+// const banner = require('../banner');
+const WebpackNotifierPlugin = require('webpack-notifier');
+const config = require('../config');
 
 module.exports = {
     // entry points 
@@ -84,13 +94,16 @@ module.exports = {
             alwaysNotify: true
         }),
         new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.BannerPlugin(banner),
+        // new webpack.BannerPlugin(banner),
         new webpack.DefinePlugin({
             '__DEV__': true,
             'process.env.NODE_ENV': JSON.stringify('development'),
             VERSION: JSON.stringify(pkg.version)
         })
     ],
+    externals: {
+        jquery: 'jQuery'
+    },
     eslint: {
         configFile: config.eslintDir
     }
