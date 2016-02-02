@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/lostdalek/Phraseanet-production-client.svg?branch=master)](https://travis-ci.org/lostdalek/Phraseanet-production-client)
 [![devDependency Status](https://david-dm.org/lostdalek/Phraseanet-production-client/dev-status.svg)](https://david-dm.org/lostdalek/Phraseanet-production-client#info=devDependencies)
 [![Dependency Status](https://david-dm.org/lostdalek/Phraseanet-production-client.svg)](https://david-dm.org/lostdalek/Phraseanet-production-client)
+[![Coverage Status](https://coveralls.io/repos/github/lostdalek/Phraseanet-production-client/badge.svg?branch=master)](https://coveralls.io/github/lostdalek/Phraseanet-production-client?branch=master)
 
 
 ## Requirements
