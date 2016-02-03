@@ -26,6 +26,8 @@ const setupApplication = ( translations, userConfig ) => {
     } else {
         throw new Error('implementation error: failed to configure new notification');
     }
+
+    ui(translations).attachUi();
 }
 
 const bootstrap = (configuration) => {

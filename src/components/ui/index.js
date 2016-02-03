@@ -1,7 +1,13 @@
 import $ from 'jquery';
-
+import toolbar from './toolbar';
 const ui = (translations) => {
     const language = translations;
+
+    // attach ui parts:
+
+    const attachUi = () => {
+        toolbar(language).bindEvents();
+    }
 
 
     const hideOverlay = (n) => {
@@ -55,7 +61,7 @@ const ui = (translations) => {
 
 
 
-    return { showModal };
+    return { attachUi, showModal };
 }
 
 export default ui;
