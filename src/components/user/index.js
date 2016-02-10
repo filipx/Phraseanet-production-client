@@ -3,6 +3,16 @@ import ui from '../ui';
 import notify from '../notify';
 
 const user = (translations) => {
+
+    const onUserDisconnect = (...data) => {
+        console.log('user disconnected yeap', data);
+    }
+
+
+    const subscribeToEvents = {
+        'user.disconnected': onUserDisconnect
+    }
+
     const language = translations;
     const disconnected = () => {
         ui(language).showModal('disconnected', {title: language.serverDisconnected});
@@ -19,7 +29,7 @@ const user = (translations) => {
             return false;
         }
         if (showMessages) {
-            notify().appendNotifications(data.notifications);
+            //notify().appendNotifications(data.notifications);
             // @todo put into notify component
             /*var box = $('#notification_box');
             box.empty().append(data.notifications);
@@ -86,7 +96,7 @@ const user = (translations) => {
         return true;
     }
 
-    return { manageSession };
+    return { manageSession, subscribeToEvents };
 }
 
 export default user;

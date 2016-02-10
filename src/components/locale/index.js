@@ -1,46 +1,62 @@
-/**
- * Locale singleton Class
- */
-import $ from 'jquery';
+import i18next from 'i18next';
+import Backend from 'i18next-xhr-backend';
+import * as Rx from 'rx';
 
 let instance = null;
+class LocaleService {
+    constructor(options) {
+        if (!options) {
+            options = {};
+        }
 
-class Locale {
-    language;
-
-    constructor() {
-        if(!instance){
-            console.log(instance);
-            this.fetchLang()/*.then((lang) => {
-                console.log('passed lang', lang)
-                this.language = lang;
-            });*/
+        // can be instanciated only once
+        if (!instance) {
             instance = this;
         }
 
+        if (options.locale === undefined) {
+            options.locale = 'fr';
+        }
+        this.locale = options.locale;
+        this.isCached = false;
+
+        this.configService = options.configService;
+        this.path =  this.configService.get('translations');
         return instance;
     }
 
-    getLanguage() {
-        return this.language
-    };
+    t(key) {
+        if( this.isCached && this.translate !== undefined) {
+            return this.translate(key);
+        } else {
+            throw new Error('locale not loaded');
+        }
+    }
 
-    fetchLang() {
-        return $.ajax({
-            type: "GET",
-            url: "../prod/language/",
-            dataType: 'json',
-            success: function (data) {
+    fetchTranslations(data) {
+        data = data || {};
+        this.i18n = new Promise((resolve, reject) => {
+            i18next
+                .use(Backend)
+                .init({
+                    lng: this.locale,
+                    backend: {
+                        loadPath: this.path,
 
-                // register globale:
-                if (typeof window !== 'undefined') {
-                    window.language = data;
-                }
-                this.language = data;
-                return data;
-            }
+                    }
+                }, (err, t) => {
+                    this.isCached = true;
+                    this.translate = t;
+                    resolve(instance);
+                    if( data.callback !== undefined ) {
+                        data.callback();
+                    }
+                    //resolve(this.i18n);
+                });
         });
+        this.stream = Rx.Observable.fromPromise(this.i18n);
+        return this.i18n;
     }
 }
 
-export default Locale;
+export default LocaleService;

@@ -1,10 +1,13 @@
 import $ from 'jquery';
 import notify from '../../../src/components/notify';
 
-describe('Notify Component - browser tests', () => {
+
+describe('Notify Component', () => {
     it('should exposes a public API', () => {
         const methods = Object.keys(notify())
-        expect(methods.length).to.eql(3);
+        expect(methods.length).to.eql(5);
+        expect(methods).to.contain('bindEvents');
+        expect(methods).to.contain('appendNotifications');
         expect(methods).to.contain('createNotifier');
         expect(methods).to.contain('isValid');
         expect(methods).to.contain('poll');
@@ -34,5 +37,22 @@ describe('Notify Component - browser tests', () => {
         });
 
     });
-    
+    describe('append Notification', () => {
+        const $body = $('body');
+
+        before( 'attach dom',() => {
+            $body.append('<div id="notification_box"></div>');
+        });
+
+        after('cleanup dom', () => {
+            $body.remove('#notification_box');
+        });
+
+        it('should be able to append notifications', () => {
+            const notifierInstance = notify().appendNotifications('<span class="notification"></span>');
+            const hasNotifications = $body.find('.notification');
+            expect(hasNotifications.length).to.gte(1);
+        });
+    });
+
 });

@@ -27,7 +27,7 @@ module.exports = function(config) {
             'test/**/*.spec.js': ['webpack', 'sourcemap']
         },
         // test results reporter to use
-		reporters: ['progress', 'coverage'],
+		reporters: ['progress', 'mocha','coverage'],
         coverageReporter: {
             reporters: [{
                 type: 'text'
@@ -52,6 +52,7 @@ module.exports = function(config) {
             'karma-chai',
             'karma-webpack',
             'karma-mocha',
+            'karma-mocha-reporter',
             'karma-phantomjs-launcher',
             'karma-chrome-launcher',
             'karma-firefox-launcher',

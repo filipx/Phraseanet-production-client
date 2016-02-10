@@ -1,43 +1,73 @@
 // import * as $ from 'jquery';
-import notify from './components/notify';
+import notify from './components/notify/index';
 import Locale from './components/locale';
 import ui from './components/ui';
-import config from './components/core/config.js';
+import ConfigService from './components/core/configService';
+import LocaleService from './components/locale';
+import i18next from 'i18next';
+import defaultConfig from './config';
+import Emitter from './components/core/emitter';
+import user from './components/user';
 
 
-const applicationState = {};
+class Bootstrap {
 
-const setupApplication = ( translations, userConfig ) => {
-    console.log('ok setup application', translations);
-    config(translations).setupAppConfig();
+    app;
+    configService;
+    localeService;
 
-    const notifier = notify(translations);
-    notifier.bindEvents();
-    let appProdNotification = {
-        url: userConfig.notify.url,
-        moduleId: userConfig.notify.moduleId,
-        userId: userConfig.notify.userId
-    };
+    constructor(userConfig) {
 
-    appProdNotification = notifier.createNotifier(appProdNotification);
+        const configuration = Object.assign({}, defaultConfig, userConfig);
 
-    if (notifier.isValid(appProdNotification)) {
-        notifier.poll(appProdNotification);
-    } else {
-        throw new Error('implementation error: failed to configure new notification');
+        this.appEvents = new Emitter();
+        this.appEvents.listenAll(user().subscribeToEvents)
+
+
+        this.configService = new ConfigService(configuration);
+        this.localeService = new LocaleService({
+            configService: this.configService
+        });
+
+        this.localeService.fetchTranslations()
+        .then(() => {
+            this.onConfigReady();
+        });
     }
 
-    ui(translations).attachUi();
+    onConfigReady() {
+
+        let translations = [];
+
+
+        const notifier = notify({
+            configService: this.configService,
+            localeService: this.localeService,
+            appEvents: this.appEvents
+        });
+
+        notifier.bindEvents();
+
+        let appProdNotification = {
+            url: this.configService.get('notify.url'),
+            moduleId: this.configService.get('notify.moduleId'),
+            userId: this.configService.get('notify.userId')
+        };
+
+        appProdNotification = notifier.createNotifier(appProdNotification);
+
+        if (notifier.isValid(appProdNotification)) {
+            notifier.poll(appProdNotification);
+        } else {
+            throw new Error('implementation error: failed to configure new notification');
+        }
+
+        ui(translations).attachUi();
+    }
 }
 
-const bootstrap = (configuration) => {
-
-    const haveTranslation = new Locale().fetchLang();
-
-    haveTranslation
-        .then((translations) => setupApplication(translations, configuration))
-
-    return this;
+const bootstrap = (userConfig) => {
+    return new Bootstrap(userConfig);
 };
 
 export default bootstrap;

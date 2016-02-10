@@ -70,6 +70,7 @@
     "karma-firefox-launcher": "^0.1.7",
     "karma-ie-launcher": "^0.2.0",
     "karma-mocha": "^0.2.1",
+    "karma-mocha-reporter": "^1.1.5",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-sinon": "^1.0.4",
     "karma-sinon-chai": "^1.1.0",
@@ -107,6 +108,12 @@
   "homepage": "https://github.com/lostdalek/Phraseanet-production-client",
   "license": "MIT",
   "dependencies": {
-    "jquery": "^1.11.3"
+    "axios": "^0.9.1",
+    "es6-promise": "^3.0.2",
+    "i18next": "^2.1.0",
+    "i18next-xhr-backend": "^0.3.0",
+    "jquery": "^1.11.3",
+    "rx": "^4.0.7",
+    "underscore": "^1.8.3"
   }
 }

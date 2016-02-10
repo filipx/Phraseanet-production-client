@@ -93,6 +93,7 @@ module.exports = {
         new WebpackNotifierPlugin({
             alwaysNotify: true
         }),
+
         new webpack.optimize.OccurenceOrderPlugin(),
         // new webpack.BannerPlugin(banner),
         new webpack.DefinePlugin({
