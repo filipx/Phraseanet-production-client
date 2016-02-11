@@ -8,6 +8,7 @@ import i18next from 'i18next';
 import defaultConfig from './config';
 import Emitter from './components/core/emitter';
 import user from './components/user';
+import basket from './components/basket';
 
 
 class Bootstrap {
@@ -22,6 +23,7 @@ class Bootstrap {
 
         this.appEvents = new Emitter();
         this.appEvents.listenAll(user().subscribeToEvents)
+        this.appEvents.listenAll(basket().subscribeToEvents)
 
 
         this.configService = new ConfigService(configuration);

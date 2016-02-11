@@ -48,7 +48,7 @@ const user = (translations) => {
             else
                 $('#notification_trigger .counter').css('visibility', 'hidden').empty();*/
 
-            if (data.changed.length > 0) {
+            /* moved in basket if (data.changed.length > 0) {
                 var current_open = $('.SSTT.ui-state-active');
                 var current_sstt = current_open.length > 0 ? current_open.attr('id').split('_').pop() : false;
 
@@ -71,7 +71,8 @@ const user = (translations) => {
                         }
                     }
                 }
-            }
+            }*/
+            // @todo: to be moved
             if ('' !== $.trim(data.message)) {
                 if ($('#MESSAGE').length === 0)
                     $('body').append('<div id="#MESSAGE"></div>');

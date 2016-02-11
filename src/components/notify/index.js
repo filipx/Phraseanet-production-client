@@ -58,8 +58,14 @@ const notify = (services) => {
             appEvents.emit('user.disconnected', data);
             return false;
         }
-        appEvents.emit('session.refresh', data);
 
+        // broadcast session refresh event
+        appEvents.emit('session.refresh', data);
+        // broadcast notification refresh event
+        if (data.changed.length > 0) {
+            appEvents.emit('notification.refresh', data);
+        }
+        // append notification content
         notifyLayout().addNotifications(data.notifications);
 
 /*
@@ -73,6 +79,7 @@ const notify = (services) => {
         if (data.apps && parseInt(data.apps, 10) > 1) {
             t = Math.round((Math.sqrt(parseInt(data.apps, 10) - 1) * 1.3 * 60000));
         }
+        t = defaultPollingTime;
 
         window.setTimeout(poll, t, notificationInstance);
 
