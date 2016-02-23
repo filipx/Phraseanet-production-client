@@ -16,6 +16,11 @@ const notify = (services) => {
         _isValid: false
     };
 
+    const initialize = () => {
+        console.log('initalize notifier');
+        notifyLayout().bindEvents()
+    };
+
     const createNotifier = (state) => {
         if (state === undefined) {
             return defaultConfig;
@@ -49,12 +54,11 @@ const notify = (services) => {
         notificationSource.subscribe(
             x => onPollSuccess(x, notificationInstance),
             e => onPollError(e, notificationInstance),
-            () => console.log('onCompleted')
+            () => {} // onCompleted
         );
     };
     const onPollSuccess = (data, notificationInstance) => {
         if (data.status == 'disconnected' || data.status == 'session') {
-            appEvents.emit('user.disconnected', data);
             appEvents.emit('user.disconnected', data);
             return false;
         }
@@ -93,6 +97,7 @@ const notify = (services) => {
 
 
     return {
+        initialize,
         bindEvents: () => {
             notifyLayout().bindEvents();
         },

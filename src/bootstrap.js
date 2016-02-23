@@ -16,6 +16,7 @@ class Bootstrap {
     app;
     configService;
     localeService;
+    appServices;
 
     constructor(userConfig) {
 
@@ -38,33 +39,38 @@ class Bootstrap {
     }
 
     onConfigReady() {
-
-        let translations = [];
-
-
-        const notifier = notify({
+        this.appServices = {
             configService: this.configService,
             localeService: this.localeService,
             appEvents: this.appEvents
-        });
+        };
 
-        notifier.bindEvents();
-
+        let translations = [];
         let appProdNotification = {
             url: this.configService.get('notify.url'),
             moduleId: this.configService.get('notify.moduleId'),
             userId: this.configService.get('notify.userId')
         };
 
+        /**
+         * Initialize notifier
+         * @type {{bindEvents, createNotifier, isValid, poll}}
+         */
+        const notifier = notify(this.appServices);
+        notifier.initialize();
+
+        // create a new notification poll:
         appProdNotification = notifier.createNotifier(appProdNotification);
 
         if (notifier.isValid(appProdNotification)) {
             notifier.poll(appProdNotification);
         } else {
-            throw new Error('implementation error: failed to configure new notification');
+            throw new Error('implementation error: failed to configure new notifier');
         }
 
-        ui(translations).attachUi();
+        const appUi = ui(this.appServices);
+
+        appUi.initialize();
     }
 }
 

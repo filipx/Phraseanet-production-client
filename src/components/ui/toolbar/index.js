@@ -1,24 +1,29 @@
 import $ from 'jquery';
-import moveRecordModal from '../actions/moveRecordModal';
-import recordEditModal from '../actions/recordEditModal';
-import recordDeleteModal from '../actions/recordDeleteModal';
-import recordDownloadModal from '../actions/recordDownloadModal';
-import recordPropertyModal from '../actions/recordPropertyModal';
-import recordFeedbackModal from '../actions/recordFeedbackModal';
-import recordPushModal from '../actions/recordPushModal';
-import recordPublishModal from '../actions/recordPublishModal';
-import recordToolsModal from '../actions/recordToolsModal';
-import recordPrintModal from '../actions/recordPrintModal';
-import recordBridgeModal from '../actions/recordBridgeModal';
+import moveRecords from '../actions/moveRecord';
+import recordEditModal from '../actions/recordEdit';
+import recordDeleteModal from '../actions/recordDelete';
+import recordDownloadModal from '../actions/recordDownload';
+import recordPropertyModal from '../actions/recordProperty';
+import recordFeedbackModal from '../actions/recordFeedback';
+import recordPushModal from '../actions/recordPush';
+import recordPublishModal from '../actions/recordPublish';
+import recordToolsModal from '../actions/recordTools';
+import recordPrintModal from '../actions/recordPrint';
+import recordBridge from '../actions/recordBridge';
 
-const toolbar = (translations) => {
-    const language = translations;
+const toolbar = (services) => {
+    const {configService, localeService, appEvents} = services;
     const $container = $('body');
+
+    const initialize = () => {
+        _bindEvents();
+        return true;
+    }
 
     /**
      * Active group can be a Basket or story
      */
-    const getGroupSelection = (activeGroupId = null) => {
+    const _getGroupSelection = (activeGroupId = null) => {
         let $activeGroup = $('.SSTT.active');
         if ($activeGroup.length > 0) {
             activeGroupId = $activeGroup.attr('id').split('_').slice(1, 2).pop();
@@ -26,8 +31,7 @@ const toolbar = (translations) => {
         return activeGroupId;
     };
 
-    const getSelection = (from, originalSelection) => {
-        console.log('getSelection')
+    const _getSelection = (from, originalSelection) => {
         let currentSelection = p4.Results.Selection.get(),
             newSelection = {
                 list: [],
@@ -40,7 +44,7 @@ const toolbar = (translations) => {
                     newSelection.list = p4.Results.Selection.serialize();
                 }
                 else {
-                    newSelection.group = getGroupSelection();
+                    newSelection.group = _getGroupSelection();
                 }
 
                 break;
@@ -49,7 +53,7 @@ const toolbar = (translations) => {
                     newSelection.list = p4.WorkZone.Selection.serialize();
                 }
                 else {
-                    newSelection.group = getGroupSelection();
+                    newSelection.group = _getGroupSelection();
                     newSelection.type = 'basket';
                 }
                 break;
@@ -58,19 +62,19 @@ const toolbar = (translations) => {
                     newSelection.list = p4.WorkZone.Selection.serialize();
                 }
                 else {
-                    newSelection.group = getGroupSelection();
+                    newSelection.group = _getGroupSelection();
                     newSelection.type = 'story';
                 }
                 break;
             default:
-                newSelection.group = getGroupSelection();
+                newSelection.group = _getGroupSelection();
 
         }
         //return originalSelection.concat(newSelection);
         return Object.assign({}, originalSelection, newSelection);
     };
 
-    const prepareParams = (selection) => {
+    const _prepareParams = (selection) => {
         let params = {};
 
         if (selection.list.length > 0) {
@@ -92,99 +96,101 @@ const toolbar = (translations) => {
         return false;
     };
 
-    const triggerModal = (event, actionFn) => {
+    const _triggerModal = (event, actionFn) => {
         event.preventDefault();
         const $el = $(event.currentTarget);
         const selectionSource = $el.data('selection-source');
 
-        let selection = getSelection(selectionSource, {});
-        let params = prepareParams(selection);
+        let selection = _getSelection(selectionSource, {});
+        let params = _prepareParams(selection);
 
         // require a list of records a basket group or a story
         if (params !== false) {
-            return actionFn.apply(null, [language, params]);
+            return actionFn.apply(null, [params]);
         } else {
-            alert(language.nodocselected);
+            alert(localeService.t('nodocselected'));
         }
     };
 
 
-    const bindEvents = () => {
+    const _bindEvents = () => {
+        console.log('1 > bnd toolbar event')
         /**
          * tools > Edit > Move
          */
         $container.on('click', '.TOOL_chgcoll_btn', function (event) {
-            triggerModal(event, moveRecordModal);
+            //let moveRecordsInstance = moveRecords(services);
+            _triggerModal(event, moveRecords(services).openModal);
         });
 
         /**
          * tools > Edit > Properties
          */
         $container.on('click', '.TOOL_chgstatus_btn', function (event) {
-            triggerModal(event, recordPropertyModal);
+            _triggerModal(event, recordPropertyModal(services).openModal);
         });
 
         /**
          * tools > Push
          */
         $container.on('click', '.TOOL_pushdoc_btn', function (event) {
-            triggerModal(event, recordPushModal);
+            _triggerModal(event, recordPushModal(services).openModal);
         });
         /**
          * tools > Push > Feedback
          */
         $container.on('click', '.TOOL_feedback_btn', function (event) {
 
-            triggerModal(event, recordFeedbackModal);
+            _triggerModal(event, recordFeedbackModal(services).openModal);
         });
         /**
          * tools > Tools
          */
         $container.on('click', '.TOOL_imgtools_btn', function (event) {
-            triggerModal(event, recordToolsModal);
+            _triggerModal(event, recordToolsModal(services).openModal);
         });
         /**
          * tools > Export
          */
         $container.on('click', '.TOOL_disktt_btn', function (event) {
-            triggerModal(event, recordDownloadModal);
+            // can't be fully refactored
+            _triggerModal(event, recordDownloadModal(services).openModal);
         });
         /**
          * tools > Export > Print
          */
         $container.on('click', '.TOOL_print_btn', function (event) {
-            triggerModal(event, recordPrintModal);
+            _triggerModal(event, recordPrintModal(services).openModal);
         });
         /**
          * tools > Push > Bridge
          */
         $container.on('click', '.TOOL_bridge_btn', function (event) {
-            event.preventDefault();
-            triggerModal(event, recordBridgeModal);
+            _triggerModal(event, recordBridge(services).openModal);
 
         });
         /**
          * tools > Push > Publish
          */
         $container.on('click', '.TOOL_publish_btn', function (event) {
-            triggerModal(event, recordPublishModal);
+            _triggerModal(event, recordPublishModal(services).openModal);
 
         });
         /**
          * tools > Delete
          */
         $container.on('click', '.TOOL_trash_btn', function (event) {
-            triggerModal(event, recordDeleteModal);
+            _triggerModal(event, recordDeleteModal(services).openModal);
         });
         /**
          * tools > Edit
          */
         $container.on('click', '.TOOL_ppen_btn', function (event) {
-            triggerModal(event, recordEditModal);
+            _triggerModal(event, recordEditModal(services).openModal);
         });
     };
 
-    return {bindEvents};
+    return {initialize};
 };
 
 export default toolbar;

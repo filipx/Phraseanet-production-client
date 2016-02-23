@@ -1,7 +1,7 @@
 import {Observable} from 'rx';
 import {ajax} from 'jQuery';
 
-let notifyService = (services) => {
+let recordService = (services) => {
     const {configService} = services;
     const url = configService.get('baseUrl');
     const notificationEndPoint = 'session/notifications/';
@@ -9,12 +9,6 @@ let notifyService = (services) => {
     };
 
     let getNotification = (data) => {
-        /*return ajax({
-            type: 'POST',
-            url: `${notificationEndPoint}`,
-            data: data,
-            dataType: 'json'
-        }).promise();*/
         return new Promise((resolve, reject) => {
             ajax({
                 type: 'POST',
@@ -23,15 +17,16 @@ let notifyService = (services) => {
                 dataType: 'json'
             }).done((data) => {
                     data.status = data.status || false;
-                if( data.status === 'ok') {
-                    resolve(data)
-                } else {
-                    reject(data);
-                }
-            })
-            .fail((data) => {
-                reject(data)
-            })
+                    console.log('data', data)
+                    if( data.status === 'ok') {
+                        resolve(data)
+                    } else {
+                        reject(data);
+                    }
+                })
+                .fail((data) => {
+                    reject(data)
+                })
         });
     }
 
@@ -42,4 +37,4 @@ let notifyService = (services) => {
         stream
     }
 }
-export default notifyService;
+export default recordService;

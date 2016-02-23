@@ -1,14 +1,11 @@
 import $ from 'jquery';
 import toolbar from './toolbar';
-const ui = (translations) => {
-    const language = translations;
+const ui = (services) => {
+    const {configService, localeService, appEvents} = services;
 
-    // attach ui parts:
-
-    const attachUi = () => {
-        toolbar(language).bindEvents();
-    }
-
+    const initialize = () => {
+        toolbar(services).initialize();
+    };
 
     const hideOverlay = (n) => {
         var div = "OVERLAY";
@@ -33,13 +30,13 @@ const ui = (translations) => {
 
         switch (cas) {
             case 'timeout':
-                content = language.serverTimeout;
+                content = localeService.t('serverTimeout');
                 break;
             case 'error':
-                content = language.serverError;
+                content = localeService.t('serverError');
                 break;
             case 'disconnected':
-                content = language.serverDisconnected;
+                content = localeService.t('serverDisconnected');
                 escape = false;
                 callback = function (e) {
                     self.location.replace(self.location.href);
@@ -50,7 +47,7 @@ const ui = (translations) => {
         }
 
         if(typeof(p4.Alerts) == "undefined") {
-            alert(language.serverDisconnected);
+            alert(localeService.t('serverDisconnected'));
             self.location.replace(self.location.href);
         }
         else {
@@ -61,7 +58,7 @@ const ui = (translations) => {
 
 
 
-    return { attachUi, showModal };
+    return { initialize, showModal };
 }
 
 export default ui;
