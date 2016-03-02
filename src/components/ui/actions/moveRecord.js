@@ -10,7 +10,7 @@ const moveRecords = (services) => {
     const postMovableRecordsEndPoint = 'prod/records/movecollection/apply/';
 
     const openModal = (datas) => {
-        $dialog = dialog.Create({
+        $dialog = dialog.create({
             size: 'Small',
             title: localeService.t('move'),
             closeButton: true,
@@ -61,7 +61,7 @@ const moveRecords = (services) => {
 
             _postMovableRecords(datas).then(
                 (data) => {
-                    $dialog.Close();
+                    $dialog.close();
                     if (data.success) {
                         humane.info(data.message);
                     } else {

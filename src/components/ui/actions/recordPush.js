@@ -9,7 +9,7 @@ const recordPushModal = (services, datas) => {
 
     const openModal = (datas) => {
 
-        let $dialog = p4.Dialog.Create({
+        let $dialog = dialogModule.dialog.create({
             size: 'Full',
             title: language.push
         });

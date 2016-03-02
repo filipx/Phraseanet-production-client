@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import dialog from '../../utils/dialog';
 
 const recordBridge = (services) => {
@@ -8,7 +7,7 @@ const recordBridge = (services) => {
 
     const openModal = (datas) => {
 
-        const $dialog = dialog.Create({
+        const $dialog = dialog.create({
             size: 'Full',
             title: 'Bridge',
             loading: false

@@ -20,7 +20,7 @@ module.exports = Object.assign({}, webpackConfig, {
         path: config.distDir,
         filename: config._app + '.min.js',
         libraryTarget: 'umd',
-        library: console._app
+        library: config._app
     },
     plugins: [
         // Notifier

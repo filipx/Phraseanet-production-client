@@ -9,7 +9,7 @@ const recordDeleteModal = (services) => {
 
     const openModal = (datas) => {
         // @REFACTORING - should use local dialog
-        var $dialog = p4.Dialog.Create({
+        var $dialog = dialogModule.dialog.create({
             size: 'Small',
             title: localeService.t('deleteRecords')
         });

@@ -1,10 +1,14 @@
 import $ from 'jquery';
 import toolbar from './toolbar';
+import mainMenu from './mainMenu';
 const ui = (services) => {
     const {configService, localeService, appEvents} = services;
 
     const initialize = () => {
+        // init state navigation
+
         toolbar(services).initialize();
+        mainMenu(services).initialize();
     };
 
     const hideOverlay = (n) => {

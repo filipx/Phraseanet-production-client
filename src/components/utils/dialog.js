@@ -1,3 +1,39 @@
+// @TODO enable lints
+/* eslint-disable max-len*/
+/* eslint-disable object-shorthand*/
+/* eslint-disable dot-notation*/
+/* eslint-disable vars-on-top*/
+/* eslint-disable prefer-template*/
+/* eslint-disable prefer-const*/
+/* eslint-disable spaced-comment*/
+/* eslint-disable curly*/
+/* eslint-disable object-curly-spacing*/
+/* eslint-disable spaced-comment*/
+/* eslint-disable prefer-arrow-callback*/
+/* eslint-disable one-var*/
+/* eslint-disable space-in-parens*/
+/* eslint-disable camelcase*/
+/* eslint-disable no-undef*/
+/* eslint-disable quote-props*/
+/* eslint-disable no-shadow*/
+/* eslint-disable no-param-reassign*/
+/* eslint-disable no-unused-expressions*/
+/* eslint-disable no-shadow*/
+/* eslint-disable no-implied-eval*/
+/* eslint-disable brace-style*/
+/* eslint-disable no-unused-vars*/
+/* eslint-disable brace-style*/
+/* eslint-disable no-lonely-if*/
+/* eslint-disable no-inline-comments*/
+/* eslint-disable default-case*/
+/* eslint-disable one-var*/
+/* eslint-disable semi*/
+/* eslint-disable no-throw-literal*/
+/* eslint-disable no-sequences*/
+/* eslint-disable consistent-this*/
+/* eslint-disable no-dupe-keys*/
+/* eslint-disable semi*/
+/* eslint-disable no-loop-func*/
 import $ from 'jquery';
 // jquery ui dependency
 
@@ -19,12 +55,12 @@ function getId(level) {
 function addButtons(buttons, dialog) {
     if (dialog.options.closeButton === true) {
         buttons[dialog.options.localeService.t('fermer')] = function () {
-            dialog.Close();
+            dialog.close();
         };
     }
     if (dialog.options.cancelButton === true) {
         buttons[dialog.options.localeService.t('annuler')] = function () {
-            dialog.Close();
+            dialog.close();
         };
     }
 
@@ -116,7 +152,7 @@ var phraseaDialog = function (options, level) {
 
         if ($this.closing === false) {
             $this.closing = true;
-            $this.Close();
+            $this.close();
         }
     };
 
@@ -165,8 +201,8 @@ var phraseaDialog = function (options, level) {
 };
 
 phraseaDialog.prototype = {
-    Close: function () {
-        dialog.Close(this.level);
+    close: function () {
+        dialog.close(this.level);
     },
     setContent: function (content) {
         this.$dialog.removeClass('loading').empty().append(content);
@@ -232,10 +268,10 @@ var Dialog = function () {
 };
 
 Dialog.prototype = {
-    Create: function (options, level) {
+    create: function (options, level) {
 
         if (this.get(level) instanceof phraseaDialog) {
-            this.get(level).Close();
+            this.get(level).close();
         }
 
         let $dialog = new phraseaDialog(options, level);
@@ -254,7 +290,7 @@ Dialog.prototype = {
 
         return null;
     },
-    Close: function (level) {
+    close: function (level) {
 
         $(window).unbind('resize.DIALOG' + getLevel(level));
 

@@ -10,7 +10,7 @@ const recordEditModal = (services, datas) => {
     const openModal = (datas) => {
 
         $('#idFrameE').empty().addClass('loading');
-        showOverlay(2);
+        commonModule.showOverlay(2);
 
         $('#EDITWINDOW').show();
 
@@ -20,7 +20,7 @@ const recordEditModal = (services, datas) => {
             dataType: "html",
             data: datas,
             success: function (data) {
-                initializeEdit();
+                recordEditorModule.initialize();
                 $('#idFrameE').removeClass('loading').empty().html(data);
                 $('#tooltip').hide();
                 return;

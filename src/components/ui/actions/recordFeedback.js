@@ -9,7 +9,7 @@ const recordFeedbackModal = (services, datas) => {
 
     const openModal = (datas) => {
         /* disable push closeonescape as an over dialog may exist (add user) */
-        let $dialog = dialog.Create({
+        let $dialog = dialog.create({
             size: 'Full',
             title: localeService.t('feedback')
         });

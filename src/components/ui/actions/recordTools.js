@@ -10,7 +10,7 @@ const recordToolsModal = (services, datas, activeTab) => {
 
     const openModal = (datas) => {
 
-        let $dialog = dialog.Create({
+        let $dialog = dialog.create({
             size: 'Medium',
             title: localeService.t('toolbox'),
             loading: true

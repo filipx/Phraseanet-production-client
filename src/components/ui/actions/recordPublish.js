@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import dialog from '../../utils/dialog';
+import publication from '../../publication';
 
 const recordPublishModal = (services, datas) => {
     const {configService, localeService, appEvents} = services;
@@ -12,7 +13,7 @@ const recordPublishModal = (services, datas) => {
             , datas
             , function (data) {
 
-                return publicationModule.openModal(data);
+                return publication(services).openModal(data);
             });
 
         return true;
