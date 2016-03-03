@@ -1,13 +1,17 @@
-const workzoneFacets =  () => {
-    var selectedFacetValues = [];
-    var getSelectedFacets = function() {
+const workzoneFacets =  (services) => {
+    const {configService, localeService, appEvents} = services;
+    let selectedFacetValues = [];
+
+    /*var getSelectedFacets = function() {
         return selectedFacetValues;
-    }
+    };*/
+
     var resetSelectedFacets = function() {
         selectedFacetValues = [];
         return selectedFacetValues;
     };
     var loadFacets = function(facets) {
+        console.log('should load facets', facets)
         // Convert facets data to fancytree source format
         var treeSource = _.map(facets, function(facet) {
             // Values
@@ -151,11 +155,20 @@ const workzoneFacets =  () => {
             q += q_facet;
         }
 
-        searchModule.checkFilters();
-        searchModule.newSearch(q);
+        appEvents.emit('search.doCheckFilters')
+        appEvents.emit('search.doNewSearch', q);
+        // searchModule.newSearch(q);
     }
 
-    return { loadFacets: loadFacets, getSelectedFacets: getSelectedFacets, resetSelectedFacets: resetSelectedFacets}
+    appEvents.listenAll({
+        'facets.doLoadFacets': loadFacets,
+        'facets.doResetSelectedFacets': resetSelectedFacets
+    });
+
+    return {
+        loadFacets,
+        resetSelectedFacets
+    }
 
 }
 

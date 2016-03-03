@@ -53,7 +53,7 @@ const publication = (services) => {
                             });
                         }
                     }
-                    searchModule.afterSearch();
+                    appEvents.emit('search.doAfterSearch');
                 });
 
         });
@@ -316,7 +316,7 @@ const publication = (services) => {
                     container: $answers
                 });
 
-                searchModule.afterSearch();
+                appEvents.emit('search.doAfterSearch');
                 if (page > 0) {
                     $answers.stop().animate({
                         scrollTop: $answers.scrollTop() + $answers.height()

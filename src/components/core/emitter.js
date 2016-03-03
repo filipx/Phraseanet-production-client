@@ -13,6 +13,8 @@ Emitter.prototype.emit = function (name, data) {
     var fnName = createName(name);
     this.subjects[fnName] || (this.subjects[fnName] = new Rx.Subject());
     this.subjects[fnName].onNext(data);
+
+    return this.subjects[fnName];
 };
 
 Emitter.prototype.listen = function (name, handler) {
@@ -21,15 +23,12 @@ Emitter.prototype.listen = function (name, handler) {
     return this.subjects[fnName].subscribe(handler);
 };
 Emitter.prototype.listenAll = function (group, name, handler) {
-    console.log('loop', group)
     for (var prop in group) {
         console.log('add event', prop)
         var fnName = createName(prop);
         this.subjects[fnName] || (this.subjects[fnName] = new Rx.Subject());
         this.subjects[fnName].subscribe(group[prop]);
     }
-
-
 };
 
 Emitter.prototype.dispose = function () {

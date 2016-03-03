@@ -1,5 +1,5 @@
-const workzoneBaskets =  () => {
-
+const workzoneBaskets =  (services) => {
+    const {configService, localeService, appEvents} = services;
     function archiveBasket(basket_id) {
         $.ajax({
             type: "POST",
@@ -94,12 +94,18 @@ const workzoneBaskets =  () => {
         }).dialog('open');
     }
 
+    appEvents.listenAll({
+        'baskets.doDeleteBasket': deleteBasket,
+        'baskets.doArchiveBasket': archiveBasket,
+        'baskets.doOpenBasketPreferences': openBasketPreferences
+    });
+
 
 
     return {
-        archiveBasket: archiveBasket,
-        deleteBasket: deleteBasket,
-        openBasketPreferences: openBasketPreferences
+        archiveBasket,
+        deleteBasket,
+        openBasketPreferences
 
     }
 }
