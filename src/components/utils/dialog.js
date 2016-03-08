@@ -54,12 +54,12 @@ function getId(level) {
 
 function addButtons(buttons, dialog) {
     if (dialog.options.closeButton === true) {
-        buttons[dialog.options.localeService.t('fermer')] = function () {
+        buttons[dialog.services.localeService.t('fermer')] = function () {
             dialog.close();
         };
     }
     if (dialog.options.cancelButton === true) {
-        buttons[dialog.options.localeService.t('annuler')] = function () {
+        buttons[dialog.services.localeService.t('annuler')] = function () {
             dialog.close();
         };
     }
@@ -67,8 +67,8 @@ function addButtons(buttons, dialog) {
     return buttons;
 }
 
-var phraseaDialog = function (options, level) {
-
+var phraseaDialog = function (services, options, level) {
+    const {configService, localeService, appEvents} = services;
     var createDialog = function (level) {
 
         var $dialog = $('#' + getId(level));
@@ -103,6 +103,8 @@ var phraseaDialog = function (options, level) {
     this.closing = false;
 
     this.options = $.extend(defaults, options);
+
+    this.services = services;
 
     this.level = getLevel(level);
 
@@ -143,7 +145,7 @@ var phraseaDialog = function (options, level) {
      *
      **/
     this.$dialog = createDialog(this.level);
-    this.zIndex = Math.min(this.level * 5000 + 5000, 32767);
+    this.zIndex = 5000 + parseInt(this.level, 10); //Math.min(this.level * 2000 + 5000, 32767);
 
     var CloseCallback = function () {
         if (typeof $this.options.closeCallback === 'function') {
@@ -171,7 +173,7 @@ var phraseaDialog = function (options, level) {
             width: width,
             height: height,
             open: (event) => {
-                console.log('open dialog', event);
+                console.log('open dialog', this.zIndex, this.level);
                 const $dialogEl = $(event.currentTarget);
                 //$(this)
                 $dialogEl.dialog("widget").css("z-index", this.zIndex);
@@ -268,13 +270,13 @@ var Dialog = function () {
 };
 
 Dialog.prototype = {
-    create: function (options, level) {
+    create: function (services, options, level) {
 
         if (this.get(level) instanceof phraseaDialog) {
             this.get(level).close();
         }
 
-        let $dialog = new phraseaDialog(options, level);
+        let $dialog = new phraseaDialog(services, options, level);
 
         this.currentStack[$dialog.getId()] = $dialog;
 

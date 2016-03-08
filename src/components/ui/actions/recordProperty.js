@@ -9,7 +9,7 @@ const recordPropertyModal = (services, datas) => {
 
     const openModal = (datas) => {
 
-        let $dialog = dialogModule.dialog.create();
+        let $dialog = dialog.create(services);
         $dialog.load(`${url}${propertyTemplateEndPoint}`, 'GET', datas);
     };
 

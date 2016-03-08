@@ -6,6 +6,8 @@ import * as AppCommons from 'phraseanet-common';
 import cgu from './components/cgu';
 import preferences from './components/preferences';
 import publication from './components/publication';
+import preview from './components/ui/recordPreview';
+
 import workzone from './components/ui/workzone';
 //import { dialogModule } from 'phraseanet-common';
 import notify from './components/notify/index';
@@ -19,7 +21,7 @@ import Emitter from './components/core/emitter';
 import user from './components/user';
 import basket from './components/basket';
 import search from './components/search';
-
+import utils from './components/utils/utils';
 
 class Bootstrap {
 
@@ -53,6 +55,7 @@ class Bootstrap {
         .then(() => {
             this.onConfigReady();
         });
+        this.utils = utils;
 
         return this;
     }
@@ -148,8 +151,9 @@ class Bootstrap {
             humane.error = humane.spawn({addnCls: 'humane-libnotify-error', timeout: 1000});
             humane.forceNew = true;
             // cguModule.activateCgus();
-            $('body').on('click', 'a.dialog', function (event) {
-                var $this = $(this), size = 'Medium';
+            $('body').on('click', 'a.dialog', (event) => {
+
+                var $this = $(event.currentTarget), size = 'Medium';
 
                 if ($this.hasClass('small-dialog')) {
                     size = 'Small';
@@ -164,7 +168,7 @@ class Bootstrap {
                     closeOnEscape: true
                 };
 
-                $dialog = dialogModule.dialog.create(options);
+                $dialog = utils.dialog.create(this.appServices, options);
 
                 $.ajax({
                     type: "GET",
@@ -211,26 +215,18 @@ class Bootstrap {
                 width: '70%'
             }, 450);
 
-
-
-            $('#search_submit').on('mousedown', function (event) {
-                return false;
-            });
-
-            $('#history-queries ul li').on('mouseover',function () {
+            /*$('#history-queries ul li').on('mouseover',function () {
                 $(this).addClass('hover');
             }).on('mouseout', function () {
                 $(this).removeClass('hover');
-            });
+            });*/
 
             startThesaurus();
             this.appEvents.emit('search.doCheckFilters')
             this.appUi.activeZoning();
             //prodModule._activeZoning();
 
-            $('.shortcuts-trigger').bind('click', function () {
-                prodModule._triggerShortcuts();
-            });
+
 
 
 
@@ -271,7 +267,45 @@ class Bootstrap {
              });*/
 
             $('.tools .answer_selector').bind('click',function () {
-                prodModule._answerSelector($(this));
+                let el = $(this);
+                let p4 = window.p4;
+                if (el.hasClass('all_selector')) {
+                    p4.Results.Selection.selectAll();
+                }
+                else {
+                    if (el.hasClass('none_selector')) {
+                        p4.Results.Selection.empty();
+                    }
+                    else {
+                        if (el.hasClass('starred_selector')) {
+
+                        }
+                        else {
+                            if (el.hasClass('video_selector')) {
+                                p4.Results.Selection.empty();
+                                p4.Results.Selection.select('.type-video');
+                            }
+                            else {
+                                if (el.hasClass('image_selector')) {
+                                    p4.Results.Selection.empty();
+                                    p4.Results.Selection.select('.type-image');
+                                }
+                                else {
+                                    if (el.hasClass('document_selector')) {
+                                        p4.Results.Selection.empty();
+                                        p4.Results.Selection.select('.type-document');
+                                    }
+                                    else {
+                                        if (el.hasClass('audio_selector')) {
+                                            p4.Results.Selection.empty();
+                                            p4.Results.Selection.select('.type-audio');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
             }).bind('mouseover',function (event) {
                 if (utilsModule.is_ctrl_key(event)) {
@@ -333,6 +367,7 @@ class Bootstrap {
                     }
                     else {
                         if (p4.preview.open) {
+                            /* handled in preview module
                             if (($('#dialog_dwnl:visible').length === 0 && $('#DIALOG1').length === 0 && $('#DIALOG2').length === 0)) {
                                 switch (event.keyCode) {
                                     case 39:
@@ -354,7 +389,7 @@ class Bootstrap {
                                         cancelKey = shortCut = true;
                                         break;
                                 }
-                            }
+                            }*/
                         }
                         else {
                             if ($('#EDIT_query').hasClass('focused'))

@@ -1,0 +1,130 @@
+// import * as $ from 'jquery';
+import dialog from '../utils/dialog';
+
+const deleteBasket = (services) => {
+    const {configService, localeService, appEvents} = services;
+    let $container = null;
+    const initialize = () => {
+        $container = $('body');
+        $container.on('click', '.delete-basket-action', function (event) {
+            event.preventDefault();
+            let $el = $(event.currentTarget);
+            deleteConfirmation($el, $el.data('context'));
+        });
+    }
+
+    const deleteConfirmation = ($el, type) => {
+        console.log('delete confirmation', $el, type)
+        switch (type) {
+            case "IMGT":
+            case "CHIM":
+
+                var lst = '';
+
+                if (type === 'IMGT')
+                    lst = p4.Results.Selection.serialize();
+                if (type === 'CHIM')
+                    lst = p4.WorkZone.Selection.serialize();
+
+                _deleteRecords(lst);
+
+                return;
+                break;
+
+
+            case "SSTT":
+
+                var buttons = {};
+                buttons[localeService.t('valider')] = function (e) {
+                    _deleteBasket($el);
+                    //prodApp.appEvents.emit('baskets.doDeleteBasket', $el);
+                };
+
+                $('#DIALOG').empty().append(localeService.t('confirmDel')).attr('title', localeService.t('attention')).dialog({
+                    autoOpen: false,
+                    resizable: false,
+                    modal: true,
+                    draggable: false
+                }).dialog('open').dialog('option', 'buttons', buttons);
+                $('#tooltip').hide();
+                return;
+                break;
+            case "STORY":
+                lst = $el.val();
+                _deleteRecords(lst);
+                break;
+
+        }
+    }
+
+    const _deleteBasket = (item) => {
+        if ($("#DIALOG").data("ui-dialog")) {
+            $("#DIALOG").dialog('destroy');
+        }
+
+        var k = $(item).attr('id').split('_').slice(1, 2).pop();	// id de chutier
+        $.ajax({
+            type: "POST",
+            url: "../prod/baskets/" + k + '/delete/',
+            dataType: 'json',
+            beforeSend: function () {
+
+            },
+            success: function (data) {
+                if (data.success) {
+                    var basket = $('#SSTT_' + k);
+                    var next = basket.next();
+
+                    if (next.data("ui-droppable")) {
+                        next.droppable('destroy');
+                    }
+
+                    next.slideUp().remove();
+
+                    if (basket.data("ui-droppable")) {
+                        basket.droppable('destroy');
+                    }
+
+                    basket.slideUp().remove();
+
+                    if ($('#baskets .SSTT').length === 0) {
+                        return p4.WorkZone.refresh(false);
+                    }
+                }
+                else {
+                    alert(data.message);
+                }
+                return;
+            }
+        });
+    }
+
+    const _deleteRecords = (lst) => {
+        if (lst.split(';').length === 0) {
+            alert(localeService.t('nodocselected'));
+            return false;
+        }
+
+        var $dialog = dialog.create(services, {
+            size: 'Small',
+            title: localeService.t('deleteRecords'),
+            localeService: localeService
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "../prod/records/delete/what/",
+            dataType: 'html',
+            data: {lst: lst},
+            success: function (data) {
+                $dialog.setContent(data);
+            }
+        });
+
+        return false;
+    }
+
+    return {initialize, deleteConfirmation};
+}
+
+export default deleteBasket;

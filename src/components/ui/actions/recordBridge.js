@@ -1,24 +1,33 @@
 import dialog from '../../utils/dialog';
+import recordBridge from '../recordBridge';
 
-const recordBridge = (services) => {
+const bridgeRecord = (services) => {
     const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     const bridgeTemplateEndPoint = 'prod/bridge/manager/';
 
     const openModal = (datas) => {
 
-        const $dialog = dialog.create({
+        const $dialog = dialog.create(services, {
             size: 'Full',
             title: 'Bridge',
             loading: false
         });
     
-        $dialog.load(`${url}${bridgeTemplateEndPoint}`, 'POST', datas);
-    
-        return true;
+        //$dialog.load(`${url}${bridgeTemplateEndPoint}`, 'POST', datas);
+
+        return $.post(`${url}${bridgeTemplateEndPoint}`, datas, function (data) {
+            $dialog.setContent(data);
+            _onDialogReady();
+            return;
+        });
     };
+
+    const _onDialogReady = () => {
+        recordBridge(services).initialize();
+    }
     
     return {openModal};
 };
 
-export default recordBridge;
+export default bridgeRecord;

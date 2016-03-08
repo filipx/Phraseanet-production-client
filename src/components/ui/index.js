@@ -1,15 +1,33 @@
 import $ from 'jquery';
 import toolbar from './toolbar';
 import mainMenu from './mainMenu';
+import keyboard from './keyboard';
+import editRecord from '../record/edit';
+import exportRecord from '../record/export';
+import printRecord from '../record/print';
+import previewRecord from './recordPreview';
 const ui = (services) => {
     const {configService, localeService, appEvents} = services;
     let activeZone = false;
 
     const initialize = () => {
         // init state navigation
+        // records and baskets actions in global interface:
+        exportRecord(services).initialize();
+        printRecord(services).initialize();
+        editRecord(services).initialize();
+        previewRecord(services).initialize();
 
+        // add interface components:
         toolbar(services).initialize();
         mainMenu(services).initialize();
+        keyboard(services).initialize();
+
+
+        // main menu > help context menu
+        $('.shortcuts-trigger').bind('click', function () {
+            keyboard(services).openModal();
+        });
     };
 
     const hideOverlay = (n) => {
@@ -92,8 +110,7 @@ const ui = (services) => {
         var bodyW = bodySize.x - 2;
         //$('#desktop').height(bodyY).width(bodyW);
 
-        if (p4.preview.open)
-            recordPreviewModule.resizePreview();
+        appEvents.emit('preview.doResize');
 
         if ($('#idFrameC').data('ui-resizable')) {
             $('#idFrameC').resizable('option', 'maxWidth', (480));
@@ -150,6 +167,7 @@ const ui = (services) => {
 
     appEvents.listenAll({
         'ui.resizeAll': resizeAll,
+        'ui.answerSizer': answerSizer,
         'ui.linearizeUi': linearizeUi
     });
 

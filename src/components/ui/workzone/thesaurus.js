@@ -1,7 +1,8 @@
-const workzoneThesaurus = () => {
-
-    $(document).ready(function () {
-
+const workzoneThesaurus = (services) => {
+    const {configService, localeService, appEvents} = services;
+    let $container = null;
+    const initialize = () => {
+        $container = $('body');
         $('#thesaurus_tab .input-medium').on('keyup', function(){
             if($('#thesaurus_tab .input-medium').val() != ''){
                 $('#thesaurus_tab .th_clear').show();
@@ -25,6 +26,8 @@ const workzoneThesaurus = () => {
                 $(this).removeClass('active');
             }
         });
+    };
 
-    });
+    return {initialize};
 };
+export default workzoneThesaurus;

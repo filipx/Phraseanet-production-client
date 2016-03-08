@@ -185,8 +185,9 @@ const publication = (services) => {
             beforeSend: function () {
                 if (ajaxState.isRunning && ajaxState.query.abort)
                     answAjax.abort();
-                if (page === 0)
-                    searchModule.clearAnswers();
+                if (page === 0) {
+                    appEvents.emit('search.doClearSearch');
+                }
                 ajaxState.isRunning = true;
                 $answers.addClass('loading');
             },
@@ -272,7 +273,7 @@ const publication = (services) => {
             dialog.close(1);
         };
 
-        var modal = dialog.create({
+        var modal = dialog.create(services, {
             size: 'Full',
             closeOnEscape: true,
             closeButton: true,

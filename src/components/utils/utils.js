@@ -1,3 +1,5 @@
+import * as AppCommons from 'phraseanet-common';
+
 const entityMap = {
     '&': '&amp;',
     '<': '&lt;',
@@ -12,6 +14,6 @@ const escapeHtml = function (string) {
     });
 };
 
-export {
+export default Object.assign({
     escapeHtml
-}
+}, AppCommons.utilsModule);

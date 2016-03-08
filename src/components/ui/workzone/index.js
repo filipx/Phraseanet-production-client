@@ -1,6 +1,6 @@
 import workzoneThesaurus from './thesaurus';
 import workzoneFacets from './facets';
-import workzoneBaskets from './baskets';
+import workzoneBaskets from './baskets/index';
 
 
 
@@ -9,7 +9,8 @@ const workzone = (services) => {
     const {configService, localeService, appEvents} = services;
 
     workzoneFacets(services);
-    workzoneBaskets(services);
+    workzoneBaskets(services).initialize();
+    workzoneThesaurus(services).initialize();
 
 
     var nextBasketScroll = false;
@@ -172,8 +173,8 @@ const workzone = (services) => {
                         300,
                         'linear',
                         function () {
-                            prodModule.answerSizer();
-                            prodModule.linearizeUi();
+                            appEvents.emit('ui.answerSizer');
+                            appEvents.emit('ui.linearizeUi');
                             $('#answers').trigger('resize');
                         });
                     frame.addClass('closed');
@@ -189,8 +190,8 @@ const workzone = (services) => {
                 if (frame.hasClass('closed')) {
                     var width = frame.data('openwidth') ? frame.data('openwidth') : 300;
                     frame.css({width: width});
-                    prodModule.answerSizer();
-                    prodModule.linearizeUi();
+                    appEvents.emit('ui.answerSizer');
+                    appEvents.emit('ui.linearizeUi');
                     frame.removeClass('closed');
                     $('.escamote', frame).show();
                     frame.unbind('click.escamote');
@@ -352,7 +353,7 @@ const workzone = (services) => {
                             // click next item
                             selectedItem.next().find("img").trigger("click");
                         } else {
-                            recordPreviewModule.closePreview();
+                            appEvents.emit('preview.close');
                         }
 
                         selectedItem.remove();
@@ -576,7 +577,7 @@ const workzone = (services) => {
 
                     }
                 });
-                prodModule.answerSizer();
+                appEvents.emit('ui.answerSizer');
                 return;
             }
         });

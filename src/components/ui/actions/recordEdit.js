@@ -20,7 +20,7 @@ const recordEditModal = (services, datas) => {
             dataType: "html",
             data: datas,
             success: function (data) {
-                recordEditorModule.initialize();
+                recordEditor(services).initialize();
                 $('#idFrameE').removeClass('loading').empty().html(data);
                 $('#tooltip').hide();
                 return;

@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import dialog from '../../utils/dialog';
+import pushRecord from '../recordPush';
 
 const recordPushModal = (services, datas) => {
     const {configService, localeService, appEvents} = services;
@@ -9,9 +10,10 @@ const recordPushModal = (services, datas) => {
 
     const openModal = (datas) => {
 
-        let $dialog = dialogModule.dialog.create({
+        let $dialog = dialog.create(services, {
             size: 'Full',
-            title: language.push
+            title: language.push,
+            localeService: localeService
         });
 
         $.post(`${url}${pushTemplateEndPoint}`, datas, function (data) {
@@ -22,11 +24,24 @@ const recordPushModal = (services, datas) => {
                 p4.ListManager = new ListManager($('#ListManager'));
 
             });*/
+            _onDialogReady();
                 return;
         });
 
         return true;
     };
+
+    const _onDialogReady = () => {
+        pushRecord(services).initialize({
+            feedback: {
+                containerId: '#PushBox',
+                context: 'Push'//'{{ context }}'
+            },
+            listManager: {
+                containerId: '#ListManager',
+            }
+        }); // initialization is remote controled
+    }
 
 
     return {openModal};

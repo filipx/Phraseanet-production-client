@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import dialog from '../utils/dialog';
 
 const search = (services) => {
     const {configService, localeService, appEvents} = services;
@@ -49,7 +50,7 @@ const search = (services) => {
                 }
             };
 
-            $dialog = dialogModule.dialog.create(options);
+            $dialog = dialog.create(services, options);
 
             $searchForm.appendTo($dialog.getDomElement());
 
@@ -551,6 +552,7 @@ const search = (services) => {
         'search.doNewSearch': newSearch,
         'search.doAfterSearch': afterSearch,
         'search.doResetSearch': resetSearch,
+        'search.doClearSearch': clearAnswers,
         'search.doToggleDatabase': toggleDatabase,
         'search.doCheckFilters': checkFilters,
         'search.doSpecialSearch': onSpecialSearch,

@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import moveRecords from '../actions/moveRecord';
-import recordEditModal from '../actions/recordEdit';
+import editRecord from '../../record/edit';
+//import recordEditModal from '../actions/recordEdit';
 import recordDeleteModal from '../actions/recordDelete';
 import recordDownloadModal from '../actions/recordDownload';
 import recordPropertyModal from '../actions/recordProperty';
@@ -186,7 +187,7 @@ const toolbar = (services) => {
          * tools > Edit
          */
         $container.on('click', '.TOOL_ppen_btn', function (event) {
-            _triggerModal(event, recordEditModal(services).openModal);
+            _triggerModal(event, editRecord(services).openModal);
         });
     };
 

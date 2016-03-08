@@ -10,11 +10,10 @@ const moveRecords = (services) => {
     const postMovableRecordsEndPoint = 'prod/records/movecollection/apply/';
 
     const openModal = (datas) => {
-        $dialog = dialog.create({
+        $dialog = dialog.create(services, {
             size: 'Small',
             title: localeService.t('move'),
-            closeButton: true,
-            localeService: localeService
+            closeButton: true
         });
 
         return _getMovableRecords(datas)
