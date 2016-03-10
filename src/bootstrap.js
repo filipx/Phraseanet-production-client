@@ -1,7 +1,7 @@
 // import * as $ from 'jquery';
 let $ = require('jquery');
 const humane = require('humane-js');
-
+require('imports?define=>false&exports=>false!./components/utils/jquery-plugins/colorAnimation');
 // let dialogModule = require('../node_modules/phraseanet-common/src/components/dialog.js');
 import * as AppCommons from 'phraseanet-common';
 
@@ -9,9 +9,7 @@ import cgu from './components/cgu';
 import preferences from './components/preferences';
 import publication from './components/publication';
 import preview from './components/ui/recordPreview';
-
 import workzone from './components/ui/workzone';
-//import { dialogModule } from 'phraseanet-common';
 import notify from './components/notify/index';
 import Locale from './components/locale';
 import ui from './components/ui';
@@ -26,7 +24,6 @@ import search from './components/search';
 import utils from './components/utils/utils';
 import dialog from './components/utils/dialog';
 import Selectable from './components/utils/selectable';
-
 class Bootstrap {
 
     app;
@@ -96,6 +93,18 @@ class Bootstrap {
             throw new Error('implementation error: failed to configure new notifier');
         }
 
+        // register some global variables,
+        window.bodySize = {
+            x: 0,
+            y: 0
+        };
+        window.baskAjax = null; window.baskAjaxrunning = false;
+        window.answAjax = null; window.answAjaxrunning = false;
+        window.searchAjax = null; window.searchAjaxRunning = false;
+
+        /**
+         * add components
+         */
         this.appUi = ui(this.appServices);
         this.appCgu = cgu(this.appServices);
         this.appSearch = search(this.appServices);
@@ -245,8 +254,6 @@ class Bootstrap {
             //startThesaurus();
             this.appEvents.emit('search.doCheckFilters')
             this.appUi.activeZoning();
-            //prodModule._activeZoning();
-
             this.appEvents.emit('ui.resizeAll');
 
             $(window).bind('resize', () => {

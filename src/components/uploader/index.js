@@ -1,18 +1,25 @@
-import UploaderManager from './uploaderService';
+//import UploaderManager from './uploaderService';
 import dialog from '../utils/dialog';
+import Alerts from '../utils/alert';
+import * as _ from 'underscore';
 
 const uploader = (services) => {
     const {configService, localeService, appEvents} = services;
-
+    let UploaderManager;
     const initialize = () => {
         $('body').on('click', '.uploader-open-action', (event) => {
             event.preventDefault();
-            openModal(event);
+            var $this = $(event.currentTarget);
+
+            require.ensure([], () => {
+                // load uploader manager dep
+                UploaderManager = require('./uploaderService').default;
+                openModal($this);
+            });
         })
     };
 
-    const openModal = (event) => {
-        var $this = $(event.currentTarget);
+    const openModal = ($this) => {
         var options = {
             size: 'Full',
             loading: true,
@@ -21,21 +28,20 @@ const uploader = (services) => {
         };
 
         let $dialog = dialog.create(services, options);
-
         $.ajax({
             type: "GET",
             url: $this.attr('href'),
             dataType: 'html',
             success: function (data) {
                 $dialog.setContent(data);
-                onOpenModal();
+                $(document).ready( () => onOpenModal());
                 return;
             }
         });
     }
     const onOpenModal = () => {
 
-
+        // @TODO replace with feature detection:
         var iev=0;
         var ieold = (/MSIE (\d+\.\d+);/.test(navigator.userAgent));
         var trident = !!navigator.userAgent.match(/Trident\/7.0/);
@@ -173,7 +179,7 @@ const uploader = (services) => {
                 //prevent dialog box from being closed while files are being downloaded
                 $dialog.getDomElement().bind("dialogbeforeclose", function(event, ui) {
                     if ( ! uploaderInstance.Queue.isEmpty()) {
-                        p4.Alerts(language.warning, language.fileBeingDownloaded);
+                        Alerts(language.warning, language.fileBeingDownloaded);
                         return false;
                     }
                 });
@@ -217,11 +223,11 @@ const uploader = (services) => {
 
                     if (file.error) {
                         var params = $.extend({}, file, {error: language.errorFileApi, language: language});
-                        var html = _.template($("#upload_items_error_tpl").html(), params);
+                        var html = _.template($("#upload_items_error_tpl").html())(params);
                         uploaderInstance.getUploadBox().append(html);
                     } else if(file.size > maxFileSize){
                         var params = $.extend({}, file, {error: language.errorFileApiTooBig, language: language});
-                        var html = _.template($("#upload_items_error_tpl").html(), params);
+                        var html = _.template($("#upload_items_error_tpl").html())(params);
                         uploaderInstance.getUploadBox().append(html);
                     } else {
                         // Add data to Queue
@@ -238,7 +244,7 @@ const uploader = (services) => {
                         };
 
                         //Set context in upload-box
-                        var html = _.template($("#upload_items_tpl").html(), formatedFile);
+                        var html = _.template($("#upload_items_tpl").html())(formatedFile);
                         uploaderInstance.getUploadBox().append(html);
 
                         var context = $("li", uploaderInstance.getUploadBox()).last();
@@ -317,7 +323,7 @@ const uploader = (services) => {
             //Set new context in download-box
             $.each(data.files, function (index, file) {
                 var params = $.extend({}, file, {language: language, id:'file-'+index});
-                var html = _.template($("#download_items_tpl").html(), params);
+                var html = _.template($("#download_items_tpl").html())( params);
 
                 uploaderInstance.getDownloadBox().append(html);
 
@@ -332,15 +338,15 @@ const uploader = (services) => {
                         if(response.success){
                             //case record
                             if(response.element === 'record'){
-                                var html = _.template($("#download_finish_tpl").html(), {heading:response.message, reasons: response.reasons});
+                                var html = _.template($("#download_finish_tpl").html())( {heading:response.message, reasons: response.reasons});
                                 data.context.find('.upload-record p.success').append(html).show();
                             } else { //case quarantine
-                                var html = _.template($("#download_finish_tpl").html(), {heading:response.message, reasons: response.reasons});
+                                var html = _.template($("#download_finish_tpl").html())( {heading:response.message, reasons: response.reasons});
                                 data.context.find('.upload-record p.error').append(html).show();
                             }
                         } else {
                             //fail
-                            var html = _.template($("#download_finish_tpl").html(), {heading:response.message, reasons: response.reasons});
+                            var html = _.template($("#download_finish_tpl").html())( {heading:response.message, reasons: response.reasons});
                             data.context.find('.upload-record p.error').append(html).show();
                         }
                     })

@@ -8,11 +8,12 @@ import addToBasket from '../record/addToBasket';
 import removeFromBasket from '../record/removeFromBasket';
 import printRecord from '../record/print';
 import previewRecordService from './recordPreview';
-
+import Alerts from '../utils/alert';
 import uploader from '../uploader';
 const ui = (services) => {
     const {configService, localeService, appEvents} = services;
     let activeZone = false;
+
 
     const initialize = () => {
         // init state navigation
@@ -255,12 +256,12 @@ const ui = (services) => {
                 break;
         }
 
-        if(typeof(p4.Alerts) == "undefined") {
+        if(typeof(Alerts) == "undefined") {
             alert(localeService.t('serverDisconnected'));
             self.location.replace(self.location.href);
         }
         else {
-            p4.Alerts(options.title, content, callback);
+            Alerts(options.title, content, callback);
         }
         return;
     }

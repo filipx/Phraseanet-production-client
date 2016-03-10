@@ -1,7 +1,8 @@
-import workzoneThesaurus from './thesaurus';
-import workzoneFacets from './facets';
+import workzoneThesaurus from './thesaurus/index';
+import workzoneFacets from './facets/index';
 import workzoneBaskets from './baskets/index';
 import Selectable from '../../utils/selectable';
+import Alerts from '../../utils/alert';
 let humane = require('humane-js');
 
 
@@ -655,7 +656,7 @@ const workzone = (services) => {
                 }
 
                 if (sameSbas === false) {
-                    return p4.Alerts('', language.reg_wrong_sbas);
+                    return Alerts('', language.reg_wrong_sbas);
                 }
 
                 break;

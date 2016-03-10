@@ -1,3 +1,4 @@
+import {sprintf} from 'sprintf-js';
 import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
 //var p4 = p4 || {};
@@ -1844,7 +1845,7 @@ console.log('try to append', options.T_records[r].preview)
             for (var rec_i in options.T_records) {
                 if (options.T_records[rec_i].fields[options.curField].hasValue(value, vocabularyId)) {
                     $("#idEditDiaButtonsP_" + rec_i).hide();
-                    var talt = $.sprintf(localeService.t('editDelSimple'), value);
+                    var talt = sprintf(localeService.t('editDelSimple'), value);
                     $("#idEditDiaButtonsM_" + rec_i).show()
                         .attr('alt', talt)
                         .attr('Title', talt)
@@ -1856,7 +1857,7 @@ console.log('try to append', options.T_records[r].preview)
                 else {
                     $("#idEditDiaButtonsM_" + rec_i).hide();
                     $("#idEditDiaButtonsP_" + rec_i).show();
-                    var talt = $.sprintf(localeService.t('editAddSimple'), value);
+                    var talt = sprintf(localeService.t('editAddSimple'), value);
                     $("#idEditDiaButtonsP_" + rec_i).show().attr('alt', talt)
                         .attr('Title', talt)
                         .unbind('click').bind('click', function () {

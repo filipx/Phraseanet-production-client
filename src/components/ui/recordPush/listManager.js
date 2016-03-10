@@ -2,6 +2,7 @@ import Lists from '../../list';
 import listEditor from './listEditor';
 import listShare from './listShare';
 import dialog from '../../utils/dialog';
+import * as _ from 'underscore';
 var ListManager = function (services, options) {
     const {configService, localeService, appEvents} = services;
     let $container, {containerId} = options;
@@ -123,7 +124,6 @@ var ListManager = function (services, options) {
             };
 
             var html = _.template($("#list_editor_dialog_add_tpl").html());
-            console.log('template >>>>>> ',$("#list_editor_dialog_add_tpl").html())
             makeDialog(html);
 
             return false;

@@ -1,5 +1,5 @@
 import dialog from '../../utils/dialog';
-
+import * as _ from 'underscore';
 const listShare = (services, options) => {
     const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
@@ -140,7 +140,7 @@ const listShare = (services, options) => {
             })
             .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
             if(item.type === 'USER') {
-                var html = _.template($("#list_user_tpl").html(), {
+                var html = _.template($("#list_user_tpl").html())( {
                     item: item
                 });
 

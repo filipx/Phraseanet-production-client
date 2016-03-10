@@ -71,7 +71,8 @@ module.exports = {
         path: config.distDir,
         filename: config.dev,
         libraryTarget: 'umd',
-        library: config._app
+        library: config._app,
+        publicPath: '/assets/production/'
     },
     module: {
         preLoaders: [{
@@ -107,7 +108,8 @@ module.exports = {
         })
     ],
     externals: {
-        jquery: 'jQuery'
+        jquery: 'jQuery',
+        ui: 'jQuery.ui'
     },
     eslint: {
         configFile: config.eslintDir

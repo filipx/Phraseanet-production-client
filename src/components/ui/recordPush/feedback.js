@@ -1,6 +1,6 @@
 import dialog from '../../utils/dialog';
 import Selectable from '../../utils/selectable';
-
+import * as _ from 'underscore';
 var Feedback = function (services, options) {
     const {configService, localeService, appEvents} = services;
     console.log('init feedback with', options);
@@ -317,12 +317,12 @@ var Feedback = function (services, options) {
         var html = "";
 
         if (item.type === 'USER') {
-            html = _.template($("#list_user_tpl").html(), {
+            html = _.template($("#list_user_tpl").html())( {
 
                 item: item
             });
         } else if (item.type === 'LIST') {
-            html = _.template($("#list_list_tpl").html(), {
+            html = _.template($("#list_list_tpl").html())( {
                 item: item
             });
         }
@@ -345,7 +345,7 @@ Feedback.prototype = {
             return;
         }
 
-        var html = _.template($("#" + this.Context.toLowerCase() + "_badge_tpl").html(), {
+        var html = _.template($("#" + this.Context.toLowerCase() + "_badge_tpl").html())( {
             user: user
         });
 

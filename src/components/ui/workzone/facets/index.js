@@ -1,3 +1,4 @@
+require('jquery.fancytree/src/jquery.fancytree');
 import * as _ from 'underscore';
 const workzoneFacets =  (services) => {
     const {configService, localeService, appEvents} = services;

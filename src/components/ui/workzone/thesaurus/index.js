@@ -1,4 +1,4 @@
-import thesaurus from '../../thesaurus';
+import thesaurus from '../../../thesaurus';
 
 const workzoneThesaurus = (services) => {
     const {configService, localeService, appEvents} = services;

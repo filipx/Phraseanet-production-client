@@ -1,3 +1,4 @@
+import {sprintf} from 'sprintf-js';
 const thesaurusService = (services) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
@@ -181,7 +182,7 @@ const thesaurusService = (services) => {
 
         trees.C._toReplace = { 'sbas':sbas, 'cid':cid, 'replaceby':f };
 
-        var msg = $.sprintf(config.replaceMessage, {'from':term, 'to':f});
+        var msg = sprintf(config.replaceMessage, {'from':term, 'to':f});
 
         var confirmBox = dialogModule.dialog.create({
             size : 'Alert',
@@ -498,11 +499,11 @@ const thesaurusService = (services) => {
         if(lisel.length == 1)
         {
             var term = lisel.eq(0).find("span span").html();
-            msg = $.sprintf(config.candidateUniqueMsg, term);
+            msg = sprintf(config.candidateUniqueMsg, term);
         }
         else
         {
-            msg = $.sprintf(config.candidateManyMsg, lisel.length);
+            msg = sprintf(config.candidateManyMsg, lisel.length);
         }
 
         trees.C._toAccept.type = type;
@@ -556,11 +557,11 @@ const thesaurusService = (services) => {
 
                 if(trees.C._selInfos.n == 1)
                 {
-                    msg = $.sprintf(config.acceptCandidateUniqueMsg, menu._srcElement.find("span").html());
+                    msg = sprintf(config.acceptCandidateUniqueMsg, menu._srcElement.find("span").html());
                 }
                 else
                 {
-                    msg = $.sprintf(config.acceptCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(config.acceptCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 // set the content of the wizard
@@ -579,11 +580,11 @@ const thesaurusService = (services) => {
                 if(trees.C._selInfos.n == 1)
                 {
                     var term = trees.C._selInfos.sel.eq(0).find("span span").html();
-                    msg = $.sprintf(replaceCandidateUniqueMsg, term);
+                    msg = sprintf(replaceCandidateUniqueMsg, term);
                 }
                 else
                 {
-                    msg = $.sprintf(replaceCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(replaceCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 options.tabs.tabs('option', 'active', 0);
@@ -603,11 +604,11 @@ const thesaurusService = (services) => {
                 if(trees.C._selInfos.n == 1)
                 {
                     var term = trees.C._selInfos.sel.eq(0).find("span span").html();
-                    msg = $.sprintf(deleteCandidateUniqueMsg, term);
+                    msg = sprintf(deleteCandidateUniqueMsg, term);
                 }
                 else
                 {
-                    msg = $.sprintf(deleteCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(deleteCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 var confirmBox = dialogModule.dialog.create({

@@ -112,14 +112,18 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.9.1",
+    "blueimp-file-upload": "^9.12.1",
+    "blueimp-load-image": "^2.6.0",
     "es6-promise": "^3.0.2",
     "humane-js": "^3.2.2",
     "i18next": "^2.1.0",
     "i18next-xhr-backend": "^0.3.0",
     "jquery": "^1.11.3",
     "jquery-lazyload": "^1.9.7",
+    "jquery.fancytree": "^2.15.0",
     "phraseanet-common": "^0.1.0",
     "rx": "^4.0.7",
+    "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3"
   }
 }
