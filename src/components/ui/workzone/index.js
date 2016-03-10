@@ -1,13 +1,14 @@
 import workzoneThesaurus from './thesaurus';
 import workzoneFacets from './facets';
 import workzoneBaskets from './baskets/index';
-
-
+import Selectable from '../../utils/selectable';
+let humane = require('humane-js');
 
 
 const workzone = (services) => {
     const {configService, localeService, appEvents} = services;
-
+    let workzoneOptions = {};
+    let searchSelection = { asArray: [], serialized: ''};
     workzoneFacets(services);
     workzoneBaskets(services).initialize();
     workzoneThesaurus(services).initialize();
@@ -16,6 +17,10 @@ const workzone = (services) => {
     var nextBasketScroll = false;
     var warnOnRemove = true;
     $(document).ready(function () {
+    });
+
+
+    const initialize = () => {
         $('#idFrameC').resizable({
             handles: 'e',
             resize: function () {
@@ -102,7 +107,7 @@ const workzone = (services) => {
             }
 
             event.stopImmediatePropagation();
-            //p4.WorkZone.close();
+            //workzoneOptions.close();
             return false;
         });
 
@@ -125,13 +130,13 @@ const workzone = (services) => {
         $('#idFrameC .tabs').tabs({
             activate: function (event, ui) {
                 if (ui.newTab.context.hash == "#thesaurus_tab") {
-                    thesau_show();
+                    appEvents.emit('thesaurus.show')
                 }
-                p4.WorkZone.open();
+                workzoneOptions.open();
             }
         });
         $('.basket_refresher').on('click', function () {
-            return p4.WorkZone.refresh('current');
+            return workzoneOptions.refresh('current');
             return false;
         });
         activeBaskets();
@@ -141,11 +146,13 @@ const workzone = (services) => {
 
             return false;
         });
-
-        p4.WorkZone = {
-            'Selection': new Selectable($('#baskets'), {selector: '.CHIM'}),
+        // workzoneOptions 
+        workzoneOptions = {
+            'selection': new Selectable($('#baskets'), {selector: '.CHIM'}),
             'refresh': refreshBaskets,
-            'addElementToBasket': function (sbas_id, record_id, event, singleSelection) {
+            'addElementToBasket': function (options) {
+                let {sbas_id, record_id, event, singleSelection} = options;
+                console.log('try to add to basket')
                 singleSelection = !!singleSelection || false;
 
                 if ($('#baskets .SSTT.active').length === 1) {
@@ -201,14 +208,18 @@ const workzone = (services) => {
                 }
             }
         };
-    });
 
-    function refreshBaskets(baskId, sort, scrolltobottom, type) {
+    }
+    const getResultSelectionStream = () => workzoneOptions.selection.stream;
+
+    function refreshBaskets(options) {
+        console.log('refresh basket', options)
+        let {basketId, sort, scrolltobottom, type} = options;
         type = typeof type === 'undefined' ? 'basket' : type;
 
         var active = $('#baskets .SSTT.ui-state-active');
-        if (baskId === 'current' && active.length > 0) {
-            baskId = active.attr('id').split('_').slice(1, 2).pop();
+        if (basketId === 'current' && active.length > 0) {
+            basketId = active.attr('id').split('_').slice(1, 2).pop();
         }
         sort = ($.inArray(sort, ['date', 'name']) >= 0) ? sort : '';
 
@@ -218,7 +229,7 @@ const workzone = (services) => {
             type: "GET",
             url: "../prod/WorkZone/",
             data: {
-                id: baskId,
+                id: basketId,
                 sort: sort,
                 type: type
             },
@@ -326,7 +337,7 @@ const workzone = (services) => {
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
-                    p4.WorkZone.Selection.remove(id);
+                    workzoneOptions.selection.remove(id);
 
                     if ($('.wrapCHIM_' + id).find('.CHIM').data("ui-draggable")) {
                         $('.wrapCHIM_' + id).find('.CHIM').draggable('destroy');
@@ -358,7 +369,7 @@ const workzone = (services) => {
 
                         selectedItem.remove();
                     } else {
-                        return p4.WorkZone.reloadCurrent();
+                        return workzoneOptions.reloadCurrent();
                     }
                 } else {
                     humane.error(data.message);
@@ -406,7 +417,7 @@ const workzone = (services) => {
 
                 uiactive.addClass('ui-state-focus active');
 
-                p4.WorkZone.Selection.empty();
+                workzoneOptions.selection.empty();
 
                 getContent(uiactive);
 
@@ -542,7 +553,7 @@ const workzone = (services) => {
                             'style="position:absolute;z-index:9999;background:red;' +
                             '-moz-border-radius:8px;-webkit-border-radius:8px;">' +
                             '<div style="padding:2px 5px;font-weight:bold;">' +
-                            p4.WorkZone.Selection.length() + '</div></div>');
+                            workzoneOptions.selection.length() + '</div></div>');
                         return $('#dragDropCursor');
                     },
                     scope: "objects",
@@ -571,9 +582,9 @@ const workzone = (services) => {
                     },
                     drag: function (event, ui) {
                         if (utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping'))
-                            $('#dragDropCursor div').empty().append('+ ' + p4.WorkZone.Selection.length());
+                            $('#dragDropCursor div').empty().append('+ ' + workzoneOptions.selection.length());
                         else
-                            $('#dragDropCursor div').empty().append(p4.WorkZone.Selection.length());
+                            $('#dragDropCursor div').empty().append(workzoneOptions.selection.length());
 
                     }
                 });
@@ -618,13 +629,13 @@ const workzone = (services) => {
                     lstbr = [$(from).selector.split('_').slice(1, 3).join('_')];
                 }
             } else {
-                lstbr = p4.Results.Selection.get();
+                lstbr = searchSelection.asArray; //p4.Results.Selection.get();
             }
         } else {
-            sselcont = $.map(p4.WorkZone.Selection.get(), function (n, i) {
+            sselcont = $.map(workzoneOptions.selection.get(), function (n, i) {
                 return $('.CHIM_' + n, $('#baskets .content:visible')).attr('id').split('_').slice(1, 2).pop();
             });
-            lstbr = p4.WorkZone.Selection.get();
+            lstbr = workzoneOptions.selection.get();
         }
 
         switch (action) {
@@ -696,8 +707,8 @@ const workzone = (services) => {
                 }
                 if (act === 'MOV' || $(destKey).next().is(':visible') === true || $(destKey).hasClass('content') === true) {
                     $('.CHIM.selected:visible').fadeOut();
-                    p4.WorkZone.Selection.empty();
-                    return p4.WorkZone.reloadCurrent();
+                    workzoneOptions.selection.empty();
+                    return workzoneOptions.reloadCurrent();
                 }
 
                 return;
@@ -709,11 +720,11 @@ const workzone = (services) => {
         $.ajax({
             type: "POST",
             url: "../prod/WorkZone/attachStories/",
-            data: {stories: p4.Results.Selection.get()},
+            data: {stories: searchSelection.asArray},
             dataType: "json",
             success: function (data) {
                 humane.info(data.message);
-                p4.WorkZone.refresh();
+                workzoneOptions.refresh();
             }
         });
     }
@@ -725,7 +736,7 @@ const workzone = (services) => {
             dataType: "json",
             success: function (data) {
                 humane.info(data.message);
-                p4.WorkZone.refresh();
+                workzoneOptions.refresh();
             }
         });
     }
@@ -741,13 +752,19 @@ const workzone = (services) => {
     }
 
     appEvents.listenAll({
+        'broadcast.searchResultSelection': (selection) => {
+            searchSelection = selection;
+        },
+        'workzone.refresh': refreshBaskets,
+        'workzone.doAddToBasket': (options) => { workzoneOptions.addElementToBasket(options)},
+        'workzone.doRemoveFromBasket': (options) => { WorkZoneElementRemover(options.event, options.confirm) },
         'workzone.doRemoveWarning': setRemoveWarning,
         'workzone.doToggleRemoveWarning': toggleRemoveWarning
     });
 
     return {
-        workzoneFacets, workzoneBaskets, workzoneThesaurus, setRemoveWarning,
-        toggleRemoveWarning
+        initialize, workzoneFacets, workzoneBaskets, workzoneThesaurus, setRemoveWarning,
+        toggleRemoveWarning, getResultSelectionStream
     }
 };
 export default workzone;

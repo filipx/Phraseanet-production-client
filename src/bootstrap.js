@@ -1,5 +1,7 @@
 // import * as $ from 'jquery';
 let $ = require('jquery');
+const humane = require('humane-js');
+
 // let dialogModule = require('../node_modules/phraseanet-common/src/components/dialog.js');
 import * as AppCommons from 'phraseanet-common';
 
@@ -22,6 +24,8 @@ import user from './components/user';
 import basket from './components/basket';
 import search from './components/search';
 import utils from './components/utils/utils';
+import dialog from './components/utils/dialog';
+import Selectable from './components/utils/selectable';
 
 class Bootstrap {
 
@@ -99,16 +103,39 @@ class Bootstrap {
         this.appPreferences = preferences(this.appServices);
         this.appWorkzone = workzone(this.appServices);
 
+        //
+
         $(document).ready(() => {
             let $body = $('body');
             // trigger default route
-            this.initState();
             this.initJqueryPlugins();
             this.initDom();
-            this.appUi.initialize();
 
+            this.appWorkzone.initialize();
+            // proxy selection
+            this.appSearch.getResultSelectionStream().subscribe((data) => {
+                console.log('subscribed to search result stream', data)
+                this.appEvents.emit('broadcast.searchResultSelection', data)
+            })
+            // on navigation object changes
+            this.appSearch.getResultNavigationStream().subscribe((data) => {
+                console.log('navigation Changed', data)
+                this.appEvents.emit('broadcast.searchResultNavigation', data.object)
+            })
+
+
+            this.appWorkzone.getResultSelectionStream().subscribe((data) => {
+                console.log('subscribed to search result stream', data)
+                this.appEvents.emit('broadcast.workzoneResultSelection', data)
+            })
+
+
+            // should be loaded after dom ready:
+            this.initState();
+            this.appUi.initialize();
+            //this.appSearch.initialize();
             // init cgu modal:
-            this.appCgu.initialize(this.appServices);
+            this.appCgu.initialize();
             // init preferences modal:
             this.appPreferences.initialize( {$container: $body});
         });
@@ -151,8 +178,10 @@ class Bootstrap {
             humane.error = humane.spawn({addnCls: 'humane-libnotify-error', timeout: 1000});
             humane.forceNew = true;
             // cguModule.activateCgus();
-            $('body').on('click', 'a.dialog', (event) => {
 
+            // catch main menu links
+            $('body').on('click', 'a.dialog', (event) => {
+                event.preventDefault();
                 var $this = $(event.currentTarget), size = 'Medium';
 
                 if ($this.hasClass('small-dialog')) {
@@ -168,7 +197,7 @@ class Bootstrap {
                     closeOnEscape: true
                 };
 
-                $dialog = utils.dialog.create(this.appServices, options);
+                let $dialog = dialog.create(this.appServices, options);
 
                 $.ajax({
                     type: "GET",
@@ -179,8 +208,6 @@ class Bootstrap {
                         return;
                     }
                 });
-
-                return false;
             });
 
 
@@ -215,21 +242,10 @@ class Bootstrap {
                 width: '70%'
             }, 450);
 
-            /*$('#history-queries ul li').on('mouseover',function () {
-                $(this).addClass('hover');
-            }).on('mouseout', function () {
-                $(this).removeClass('hover');
-            });*/
-
-            startThesaurus();
+            //startThesaurus();
             this.appEvents.emit('search.doCheckFilters')
             this.appUi.activeZoning();
             //prodModule._activeZoning();
-
-
-
-
-
 
             this.appEvents.emit('ui.resizeAll');
 
@@ -246,25 +262,6 @@ class Bootstrap {
                 changeMonth: true,
                 dateFormat: 'yy/mm/dd'
             });
-
-            /*$.ajaxSetup({
-
-             error: function (jqXHR, textStatus, errorThrown) {
-             //Request is aborted
-             if (errorThrown === 'abort') {
-             return false;
-             } else {
-             showModal('error', {
-             title: language.errorAjaxRequest + ' ' + jqXHR.responseText
-             });
-             }
-             },
-             timeout: function () {
-             showModal('timeout', {
-             title: 'Server not responding'
-             });
-             }
-             });*/
 
             $('.tools .answer_selector').bind('click',function () {
                 let el = $(this);
@@ -319,212 +316,12 @@ class Bootstrap {
             });
 
             // getLanguage();
-            this.appSearch.initAnswerForm();
+            this.appSearch.initialize();
             // prodModule._initAnswerForm();
 
             // setTimeout("pollNotifications();", 10000);
 
-            $(this).bind('keydown', function (event) {
-                var cancelKey = false;
-                var shortCut = false;
 
-                if ($('#MODALDL').is(':visible')) {
-                    switch (event.keyCode) {
-                        case 27:
-                            // hide download
-                            commonModule.hideOverlay(2);
-                            $('#MODALDL').css({
-                                'display': 'none'
-                            });
-                            break;
-                    }
-                }
-                else {
-                    if ($('#EDITWINDOW').is(':visible')) {
-
-                        switch (event.keyCode) {
-                            case 9:	// tab ou shift-tab
-                                recordEditorModule.edit_chgFld(event, utilsModule.is_shift_key(event) ? -1 : 1);
-                                cancelKey = shortCut = true;
-                                break;
-                            case 27:
-                                recordEditorModule.edit_cancelMultiDesc(event);
-                                shortCut = true;
-                                break;
-
-                            case 33:	// pg up
-                                if (!p4.edit.textareaIsDirty || recordEditorModule.edit_validField(event, "ask_ok"))
-                                    recordEditorModule.skipImage(event, 1);
-                                cancelKey = true;
-                                break;
-                            case 34:	// pg dn
-                                if (!p4.edit.textareaIsDirty || recordEditorModule.edit_validField(event, "ask_ok"))
-                                    recordEditorModule.skipImage(event, -1);
-                                cancelKey = true;
-                                break;
-                        }
-
-                    }
-                    else {
-                        if (p4.preview.open) {
-                            /* handled in preview module
-                            if (($('#dialog_dwnl:visible').length === 0 && $('#DIALOG1').length === 0 && $('#DIALOG2').length === 0)) {
-                                switch (event.keyCode) {
-                                    case 39:
-                                        recordPreviewModule.getNext();
-                                        cancelKey = shortCut = true;
-                                        break;
-                                    case 37:
-                                        recordPreviewModule.getPrevious();
-                                        cancelKey = shortCut = true;
-                                        break;
-                                    case 27://escape
-                                        recordPreviewModule.closePreview();
-                                        break;
-                                    case 32:
-                                        if (p4.slideShow)
-                                            recordPreviewModule.stopSlide();
-                                        else
-                                            recordPreviewModule.startSlide();
-                                        cancelKey = shortCut = true;
-                                        break;
-                                }
-                            }*/
-                        }
-                        else {
-                            if ($('#EDIT_query').hasClass('focused'))
-                                return true;
-
-                            if ($('.overlay').is(':visible'))
-                                return true;
-
-                            if ($('.ui-widget-overlay').is(':visible'))
-                                return true;
-
-                            switch (p4.active_zone) {
-                                case 'rightFrame':
-                                    switch (event.keyCode) {
-                                        case 65:	// a
-                                            if (utilsModule.is_ctrl_key(event)) {
-                                                $('.tools .answer_selector.all_selector').trigger('click');
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                        case 80://P
-                                            if (utilsModule.is_ctrl_key(event)) {
-                                                _onOpenPrintModal("lst=" + p4.Results.Selection.serialize());
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                        case 69://e
-                                            if (utilsModule.is_ctrl_key(event)) {
-                                                openRecordEditor('IMGT', p4.Results.Selection.serialize());
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                        case 40:	// down arrow
-                                            $('#answers').scrollTop($('#answers').scrollTop() + 30);
-                                            cancelKey = shortCut = true;
-                                            break;
-                                        case 38:	// down arrow
-                                            $('#answers').scrollTop($('#answers').scrollTop() - 30);
-                                            cancelKey = shortCut = true;
-                                            break;
-                                        case 37://previous page
-                                            $('#PREV_PAGE').trigger('click');
-                                            shortCut = true;
-                                            break;
-                                        case 39://previous page
-                                            $('#NEXT_PAGE').trigger('click');
-                                            shortCut = true;
-                                            break;
-                                        case 9://tab
-                                            if (!utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
-                                                document.getElementById('EDIT_query').focus();
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                    }
-                                    break;
-
-
-                                case 'idFrameC':
-                                    switch (event.keyCode) {
-                                        case 65:	// a
-                                            if (utilsModule.is_ctrl_key(event)) {
-                                                p4.WorkZone.Selection.selectAll();
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                        case 80://P
-                                            if (utilsModule.is_ctrl_key(event)) {
-                                                _onOpenPrintModal("lst=" + p4.WorkZone.Selection.serialize());
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                        case 69://e
-                                            if (utilsModule.is_ctrl_key(event)) {
-                                                openRecordEditor('IMGT', p4.WorkZone.Selection.serialize());
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                        //						case 46://del
-                                        //								_deleteRecords(p4.Results.Selection.serialize());
-                                        //								cancelKey = true;
-                                        //							break;
-                                        case 40:	// down arrow
-                                            $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() + 30);
-                                            cancelKey = shortCut = true;
-                                            break;
-                                        case 38:	// down arrow
-                                            $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() - 30);
-                                            cancelKey = shortCut = true;
-                                            break;
-                                        //								case 37://previous page
-                                        //									$('#PREV_PAGE').trigger('click');
-                                        //									break;
-                                        //								case 39://previous page
-                                        //									$('#NEXT_PAGE').trigger('click');
-                                        //									break;
-                                        case 9://tab
-                                            if (!utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
-                                                document.getElementById('EDIT_query').focus();
-                                                cancelKey = shortCut = true;
-                                            }
-                                            break;
-                                    }
-                                    break;
-
-
-                                case 'mainMenu':
-                                    break;
-
-
-                                case 'headBlock':
-                                    break;
-
-                                default:
-                                    break;
-
-                            }
-                        }
-                    }
-                }
-
-                if (!$('#EDIT_query').hasClass('focused') && event.keyCode !== 17) {
-
-                    if ($('#keyboard-dialog.auto').length > 0 && shortCut) {
-                        prodModule._triggerShortcuts();
-                    }
-                }
-                if (cancelKey) {
-                    event.cancelBubble = true;
-                    if (event.stopPropagation)
-                        event.stopPropagation();
-                    return(false);
-                }
-                return(true);
-            });
 
 
             $('#EDIT_query').bind('focus',function () {

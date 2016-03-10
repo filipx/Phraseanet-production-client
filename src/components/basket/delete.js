@@ -6,7 +6,7 @@ const deleteBasket = (services) => {
     let $container = null;
     const initialize = () => {
         $container = $('body');
-        $container.on('click', '.delete-basket-action', function (event) {
+        $container.on('click', '.basket-delete-action', function (event) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             deleteConfirmation($el, $el.data('context'));
@@ -88,7 +88,7 @@ const deleteBasket = (services) => {
                     basket.slideUp().remove();
 
                     if ($('#baskets .SSTT').length === 0) {
-                        return p4.WorkZone.refresh(false);
+                        appEvents.emit('workzone.refresh');
                     }
                 }
                 else {

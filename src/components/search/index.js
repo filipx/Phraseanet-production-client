@@ -1,17 +1,54 @@
+import * as Rx from 'rx';
 import $ from 'jquery';
 import dialog from '../utils/dialog';
+import Selectable from '../utils/selectable';
+let lazyload = require('jquery-lazyload');
 
 const search = (services) => {
     const {configService, localeService, appEvents} = services;
+
+    let searchResult = {
+        selection: false,
+        navigation: {
+            tot: 0, // p4.tot in record preview
+            tot_options: false, //datas.form; // p4.tot_options common/tooltip
+            tot_query: false, //datas.query; // p4.tot_query
+            perPage: 0,
+            page: 0
+        }
+    };
     let $searchForm = null;
-    $(document).ready(function(){
+    let $searchResult = null;
+
+    const initialize = () => {
         $searchForm = $('#searchForm');
+        $searchResult = $('#answers');
+        console.log('search form should be here', $searchForm.get(0))
+
+        searchResult.selection = new Selectable($searchResult, {
+                selector: '.IMGT',
+                limit: 800,
+                selectStart: function (event, selection) {
+                    $('#answercontextwrap table:visible').hide();
+                },
+                selectStop: function (event, selection) {
+                    prodApp.appEvents.emit('search.doRefreshSelection')
+                },
+                callbackSelection: function (element) {
+                    console.log(element);
+                    var elements = $(element).attr('id').split('_');
+
+                    return elements.slice(elements.length - 2, elements.length).join('_');
+                }
+            });
+
+        /*searchResult.selection.stream.subscribe(function(data){
+            console.log('subscribed to stream', data)
+        });*/
 
         $searchForm.on('click', '.toggle-collection', (event) => {
             let $el = $(event.currentTarget);
-            let collectionId = $el.data('database');
-            let $elContent= $(`.sbascont_${collectionId}`);
-            toggleCollection($el, $elContent)
+            toggleCollection($el, $($el.data('toggle-content')))
         });
 
         $searchForm.on('click', '.toggle-database', (event) => {
@@ -35,6 +72,33 @@ const search = (services) => {
             checkFilters(shouldSave)
         });
 
+        $searchResult
+
+            .on('click', '.search-navigate-action', (event) => {
+                event.preventDefault();
+                let $el = $(event.currentTarget);
+                console.log('passs page', $el.attr('data-page'))
+                navigate($el.data('page'))
+            })
+            .on('keypress', '.search-navigate-input-action', (event) => {
+                // event.preventDefault();
+                let $el = $(event.currentTarget);
+                let inputPage = $el.val();
+                let initialPage = $el.data('initial-value');
+                let totalPages = $el.data('total-pages');
+
+                if( isNaN(inputPage)) {
+                    event.preventDefault();
+                }
+                if( event.keyCode == 13) {
+                    if (inputPage > 0 && inputPage <= totalPages) {
+                        navigate(inputPage)
+                    } else{
+                        $el.val(initialPage);
+                    }
+                }
+            });
+
         $('.adv_search_button').on('click', function () {
             var parent = $searchForm.parent();
 
@@ -50,7 +114,7 @@ const search = (services) => {
                 }
             };
 
-            $dialog = dialog.create(services, options);
+            let $dialog = dialog.create(services, options);
 
             $searchForm.appendTo($dialog.getDomElement());
 
@@ -80,7 +144,11 @@ const search = (services) => {
             }
         });
 
-    });
+        initAnswerForm();
+    }
+
+    const getResultSelectionStream = () => searchResult.selection.stream;
+    const getResultNavigationStream = () => Rx.Observable.ofObjectChanges(searchResult.navigation);
 
     const onSpecialSearch = (data) => {
         let {qry, allbase} = data;
@@ -94,8 +162,6 @@ const search = (services) => {
     }
 
     const initAnswerForm = () => {
-        console.log('init answer form')
-        let p4  = window.p4;
         $('button[type="submit"]', $searchForm).bind('click', function () {
             prodApp.appEvents.emit('facets.doResetSelectedFacets');
             console.log('trigger search')
@@ -119,8 +185,8 @@ const search = (services) => {
     }
 
     const newSearch = (query) => {
-        let p4 = window.p4;
-        p4.Results.Selection.empty();
+
+        searchResult.selection.empty();
 
         clearAnswers();
         $('#SENT_query').val(query);
@@ -182,18 +248,22 @@ const search = (services) => {
                 $('#tool_results').empty().append(datas.infos);
                 $('#tool_navigate').empty().append(datas.navigationTpl);
 
-                $.each(p4.Results.Selection.get(), function (i, el) {
+                $.each(searchResult.selection.get(), function (i, el) {
                     $('#IMGT_' + el).addClass('selected');
                 });
 
-                p4.tot = datas.total_answers;
-                p4.tot_options = datas.form;
-                p4.tot_query = datas.query;
-                p4.navigation = datas.navigation;
+                // searchResult.tot = datas.total_answers;
+                // searchResult.tot_options = datas.form;
+                // searchResult.tot_query = datas.query;
+                searchResult.navigation = Object.assign(searchResult.navigation, datas.navigation, {
+                    tot: datas.total_answers,
+                    tot_options: datas.form,
+                    tot_query: datas.query
+                });
 
                 if (datas.next_page) {
                     $("#NEXT_PAGE, #answersNext").bind('click', function () {
-                        searchResultModule.gotopage(datas.next_page);
+                        navigate(datas.next_page);
                     });
                 }
                 else {
@@ -202,7 +272,7 @@ const search = (services) => {
 
                 if (datas.prev_page) {
                     $("#PREV_PAGE").bind('click', function () {
-                        searchResultModule.gotopage(datas.prev_page);
+                        navigate(datas.prev_page);
                     });
                 }
                 else {
@@ -272,7 +342,7 @@ const search = (services) => {
         viewNbSelect();
         $('#answers div.IMGT').draggable({
             helper: function () {
-                $('body').append('<div id="dragDropCursor" style="position:absolute;z-index:9999;background:red;-moz-border-radius:8px;-webkit-border-radius:8px;"><div style="padding:2px 5px;font-weight:bold;">' + p4.Results.Selection.length() + '</div></div>');
+                $('body').append('<div id="dragDropCursor" style="position:absolute;z-index:9999;background:red;-moz-border-radius:8px;-webkit-border-radius:8px;"><div style="padding:2px 5px;font-weight:bold;">' + searchResult.selection.length() + '</div></div>');
                 return $('#dragDropCursor');
             },
             scope: "objects",
@@ -520,7 +590,7 @@ const search = (services) => {
     }
 
     const viewNbSelect = () => {
-        $("#nbrecsel").empty().append(p4.Results.Selection.length());
+        $("#nbrecsel").empty().append(searchResult.selection.length());
     }
 
     const selectDatabase = ($el, sbas_id) => {
@@ -546,6 +616,14 @@ const search = (services) => {
 
 
 
+    const navigate = (page) => {
+        console.log('pass',page)
+        $('#searchForm input[name="sel"]').val(searchResult.selection.serialize());
+        $('#formAnswerPage').val(page);
+        console.log('answer', $('#formAnswerPage').val())
+        $('#searchForm').submit();
+    }
+
 
     appEvents.listenAll({
         'search.doSearch': onSearch,
@@ -553,15 +631,19 @@ const search = (services) => {
         'search.doAfterSearch': afterSearch,
         'search.doResetSearch': resetSearch,
         'search.doClearSearch': clearAnswers,
-        'search.doToggleDatabase': toggleDatabase,
         'search.doCheckFilters': checkFilters,
         'search.doSpecialSearch': onSpecialSearch,
         'search.doRefreshSelection': viewNbSelect,
         'search.doSelectDatabase': selectDatabase,
-        'search.doToggleCollection': toggleCollection
+        'search.doToggleCollection': toggleCollection,
+        'search.doNavigate': navigate,
+        /*'search.getResultSelection': () => {
+            console.log('ok requesting result selection')
+            return searchResult.selection.stream
+        }*/
     });
 
-    return { initAnswerForm };
+    return { initialize, getResultSelectionStream, getResultNavigationStream };
 }
 
 export default search;

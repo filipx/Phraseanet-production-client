@@ -3,7 +3,7 @@ const archiveBasket = (services) => {
     let $container = null;
     const initialize = () => {
         $container = $('body');
-        $container.on('click', '.archive-basket-action', function (event) {
+        $container.on('click', '.basket-archive-action', function (event) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             doArchive($el.data('basket-id'));
@@ -36,7 +36,7 @@ const archiveBasket = (services) => {
                     basket.slideUp().remove();
 
                     if ($('#baskets .SSTT').length === 0) {
-                        return p4.WorkZone.refresh(false);
+                        appEvents.emit('workzone.refresh');
                     }
                 }
                 else {

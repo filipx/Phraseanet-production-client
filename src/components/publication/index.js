@@ -1,4 +1,5 @@
 let $ = require('jquery');
+let lazyload = require('jquery-lazyload');
 import dialog from '../utils/dialog';
 
 const publication = (services) => {

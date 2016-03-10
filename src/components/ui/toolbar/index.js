@@ -15,9 +15,23 @@ import recordBridge from '../actions/recordBridge';
 const toolbar = (services) => {
     const {configService, localeService, appEvents} = services;
     const $container = $('body');
+    let workzoneSelection = [];
+    let searchSelection = []
+
+    appEvents.listenAll({
+        'broadcast.searchResultSelection': (selection) => {
+            searchSelection = selection.serialized;
+            console.log('ok jsut received a updated selection from search', selection)
+        },
+        'broadcast.workzoneResultSelection': (selection) => {
+            workzoneSelection = selection.serialized;
+            console.log('ok jsut received a updated selection from workzone', selection)
+        }
+    })
 
     const initialize = () => {
         _bindEvents();
+
         return true;
     }
 
@@ -33,16 +47,15 @@ const toolbar = (services) => {
     };
 
     const _getSelection = (from, originalSelection) => {
-        let currentSelection = p4.Results.Selection.get(),
-            newSelection = {
+        let newSelection = {
                 list: [],
                 group: null, //
                 type: null // story | basket
             };
         switch (from) {
             case 'search-result':
-                if (p4.Results.Selection.length() > 0) {
-                    newSelection.list = p4.Results.Selection.serialize();
+                if (searchSelection.length > 0) {
+                    newSelection.list = searchSelection;
                 }
                 else {
                     newSelection.group = _getGroupSelection();
@@ -50,8 +63,8 @@ const toolbar = (services) => {
 
                 break;
             case 'basket':
-                if (p4.WorkZone.Selection.length() > 0) {
-                    newSelection.list = p4.WorkZone.Selection.serialize();
+                if (workzoneSelection.length > 0) {
+                    newSelection.list = workzoneSelection;
                 }
                 else {
                     newSelection.group = _getGroupSelection();
@@ -59,8 +72,8 @@ const toolbar = (services) => {
                 }
                 break;
             case 'story':
-                if (p4.WorkZone.Selection.length() > 0) {
-                    newSelection.list = p4.WorkZone.Selection.serialize();
+                if (workzoneSelection.length > 0) {
+                    newSelection.list = workzoneSelection;
                 }
                 else {
                     newSelection.group = _getGroupSelection();

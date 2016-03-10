@@ -3,7 +3,7 @@ const printRecord = (services) => {
     let $container = null;
     const initialize = () => {
         $container = $('body');
-        $container.on('click', '.print-record-action', function (event) {
+        $container.on('click', '.record-print-action', function (event) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             let key = '';

@@ -4,7 +4,7 @@ const exportRecord = (services) => {
     let $container = null;
     const initialize = () => {
         $container = $('body');
-        $container.on('click', '.export-record-action', function (event) {
+        $container.on('click', '.record-export-action', function (event) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             let key = '';
@@ -25,15 +25,15 @@ const exportRecord = (services) => {
     }
 
     function doExport(datas) {
-        var dialog = dialog.create(services, {title: language['export']});
+        var $dialog = dialog.create(services, {title: language['export']});
 
         $.post("../prod/export/multi-export/", datas, function (data) {
 
-            dialog.setContent(data);
+            $dialog.setContent(data);
 
-            $('.tabs', dialog.getDomElement()).tabs();
+            $('.tabs', $dialog.getDomElement()).tabs();
 
-            $('.close_button', dialog.getDomElement()).bind('click', function () {
+            $('.close_button', $dialog.getDomElement()).bind('click', function () {
                 dialog.close();
             });
 

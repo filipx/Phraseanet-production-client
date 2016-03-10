@@ -1,24 +1,31 @@
 let $ = require('jquery');
+import * as Rx from 'rx';
 
-const previewRecord = (services) => {
+const previewRecordService = (services) => {
     const {configService, localeService, appEvents} = services;
     let $bodyContainer = null;
     let $previewContainer = null;
     var prevAjax, prevAjaxrunning;
     prevAjaxrunning = false;
-
-    let previewer = {
+    let stream = new Rx.Subject();
+    let options = {
         open: false,
         current: false,
-        slideShow: false
+        slideShow: false,
+        navigation: {
+            perPage: 0,
+            page: 0
+        }
     };
+    const getPreviewOptionStream = () => Rx.Observable.ofObjectChanges(options);
     const initialize = () => {
         $bodyContainer = $('body');
         $previewContainer = $('#PREVIEWBOX');
 
         $('#PREVIEWIMGDESC').tabs();
 
-        $('#PREVIEWBOX .gui_vsplitter', p4.edit.editBox).draggable({
+        // if contained in record editor (p4.edit.editBox):
+        $('#PREVIEWBOX .gui_vsplitter').draggable({
             axis: 'x',
             containment: 'parent',
             drag: function (event, ui) {
@@ -44,7 +51,6 @@ const previewRecord = (services) => {
             .on('dblclick', '.open-preview-action', (event) => {
                 let $el = $(event.currentTarget);
                 // env, pos, contId, reload
-                console.log('select record action yay dbl click')
                 let reload = $el.data('reload') === true ? true : false;
                 _openPreview($el.data('kind'), $el.data('position'), $el.data('id'), $el.data('kind'));
             })
@@ -61,43 +67,49 @@ const previewRecord = (services) => {
             .on('click', '.preview-stop-slideshow-action', (event) => {
                 event.preventDefault();
                 stopSlide();
-            })
+            });
+    };
 
+    /**
+     * Handle global keydown event if preview is open
+     * @param event
+     */
+    const onGlobalKeydown = (event, specialKeyState) => {
+        if( specialKeyState === undefined ) {
+            let specialKeyState = {
+                isCancelKey: false,
+                isShortcutKey: false
+            }
+        }
+        if (options.open) {
+            if (($('#dialog_dwnl:visible').length === 0 && $('#DIALOG1').length === 0 && $('#DIALOG2').length === 0)) {
 
-        $bodyContainer.bind('keydown', (event) => {
-            var cancelKey = false;
-            var shortCut = false;
-            if (previewer.open) {
-                console.log('ok catch keydown', event.keyCode)
-                if (($('#dialog_dwnl:visible').length === 0 && $('#DIALOG1').length === 0 && $('#DIALOG2').length === 0)) {
-
-                    switch (event.keyCode) {
-                        // next
-                        case 39:
-                            getNext();
-                            cancelKey = shortCut = true;
-                            break;
-                        // previous
-                        case 37:
-                            getPrevious();
-                            cancelKey = shortCut = true;
-                            break;
-                        case 27://escape
-                            closePreview();
-                            break;
-                        case 32:
-                            if (previewer.slideShow)
-                                stopSlide();
-                            else
-                                startSlide();
-                            cancelKey = shortCut = true;
-                            break;
-                    }
+                switch (event.keyCode) {
+                    // next
+                    case 39:
+                        getNext();
+                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                        break;
+                    // previous
+                    case 37:
+                        getPrevious();
+                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                        break;
+                    case 27://escape
+                        closePreview();
+                        break;
+                    case 32:
+                        if (options.slideShow)
+                            stopSlide();
+                        else
+                            startSlide();
+                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                        break;
                 }
             }
-            }
-        );
-    };
+        }
+        return specialKeyState
+    }
 
     /**
      *
@@ -113,7 +125,7 @@ const previewRecord = (services) => {
         var roll = 0;
         var justOpen = false;
 
-        if (!previewer.open) {
+        if (!options.open) {
             commonModule.showOverlay();
 
             $('#PREVIEWIMGCONT').disableSelection();
@@ -131,8 +143,8 @@ const previewRecord = (services) => {
                     'opacity': 1
                 });
             }
-            previewer.open = true;
-            previewer.nCurrent = 5;
+            options.open = true;
+            options.nCurrent = 5;
             $('#PREVIEWCURRENT, #PREVIEWOTHERSINNER, #SPANTITLE').empty();
             resizePreview();
             if (env == 'BASK')
@@ -150,14 +162,13 @@ const previewRecord = (services) => {
 
         $('#PREVIEWIMGCONT').empty();
 
-        var options_serial = p4.tot_options;
-        var query = p4.tot_query;
-        var navigation = p4.navigation;
+        var options_serial = options.navigation.tot_options;
+        var query = options.navigation.tot_query;
 
         // keep relative position for answer train:
         var relativePos = pos;
         // update real absolute position with pagination:
-        var absolutePos = parseInt(navigation.perPage,10) * (parseInt(navigation.page, 10) - 1) + parseInt(pos,10);
+        var absolutePos = parseInt(options.navigation.perPage,10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos,10);
 
         // if comes from story, work with relative positionning
         if (env == 'REG') {
@@ -229,11 +240,11 @@ const previewRecord = (services) => {
                     BitlyClient.stats($('#popularity .bitly_link').html(), 'BitlyCB.statsResponse');
                 }
 
-                previewer.current = {};
-                previewer.current.width = parseInt($('#PREVIEWIMGCONT input[name=width]').val());
-                previewer.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val());
-                previewer.current.tot = data.tot;
-                previewer.current.pos = relativePos;
+                options.current = {};
+                options.current.width = parseInt($('#PREVIEWIMGCONT input[name=width]').val());
+                options.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val());
+                options.current.tot = data.tot;
+                options.current.pos = relativePos;
 
                 if ($('#PREVIEWBOX img.record.zoomable').length > 0) {
                     $('#PREVIEWBOX img.record.zoomable').draggable();
@@ -271,10 +282,10 @@ const previewRecord = (services) => {
                     'display': 'none'
                 });
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').removeClass('loading');
-                if (!justOpen || (previewer.mode != env))
+                if (!justOpen || (options.mode != env))
                     resizePreview();
 
-                previewer.mode = env;
+                options.mode = env;
                 $('#EDIT_query').focus();
 
                 $('#PREVIEWOTHERSINNER .otherBaskToolTip').tooltip();
@@ -287,7 +298,7 @@ const previewRecord = (services) => {
     }
 
     function closePreview() {
-        previewer.open = false;
+        options.open = false;
         commonModule.hideOverlay();
 
         $('#PREVIEWBOX').fadeTo(500, 0);
@@ -302,22 +313,22 @@ const previewRecord = (services) => {
     }
 
     function startSlide() {
-        if (!previewer.slideShow) {
-            previewer.slideShow = true;
+        if (!options.slideShow) {
+            options.slideShow = true;
         }
-        if (previewer.slideShowCancel) {
-            previewer.slideShowCancel = false;
-            previewer.slideShow = false;
+        if (options.slideShowCancel) {
+            options.slideShowCancel = false;
+            options.slideShow = false;
             $('#start_slide').show();
             $('#stop_slide').hide();
         }
-        if (!previewer.open) {
-            previewer.slideShowCancel = false;
-            previewer.slideShow = false;
+        if (!options.open) {
+            options.slideShowCancel = false;
+            options.slideShow = false;
             $('#start_slide').show();
             $('#stop_slide').hide();
         }
-        if (previewer.slideShow) {
+        if (options.slideShow) {
             $('#start_slide').hide();
             $('#stop_slide').show();
             getNext();
@@ -326,18 +337,18 @@ const previewRecord = (services) => {
     }
 
     function stopSlide() {
-        previewer.slideShowCancel = true;
+        options.slideShowCancel = true;
         $('#start_slide').show();
         $('#stop_slide').hide();
     }
 
     function getNext() {
-        if (previewer.mode == 'REG' && parseInt(previewer.current.pos) === 0)
+        if (options.mode == 'REG' && parseInt(options.current.pos) === 0)
             $('#PREVIEWCURRENTCONT li img:first').trigger("click");
         else {
-            if (previewer.mode == 'RESULT') {
-                let posAsk = parseInt(previewer.current.pos) + 1;
-                posAsk = (posAsk >= parseInt(p4.tot) || isNaN(posAsk)) ? 0 : posAsk;
+            if (options.mode == 'RESULT') {
+                let posAsk = parseInt(options.current.pos) + 1;
+                posAsk = (posAsk >= parseInt(options.navigation.tot) || isNaN(posAsk)) ? 0 : posAsk;
                 _openPreview('RESULT', posAsk, '', false);
             }
             else {
@@ -351,9 +362,9 @@ const previewRecord = (services) => {
     }
 
     function getPrevious() {
-        if (previewer.mode == 'RESULT') {
-            let posAsk = parseInt(previewer.current.pos) - 1;
-            posAsk = (posAsk < 0) ? ((parseInt(p4.tot) - 1)) : posAsk;
+        if (options.mode == 'RESULT') {
+            let posAsk = parseInt(options.current.pos) - 1;
+            posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot) - 1)) : posAsk;
             _openPreview('RESULT', posAsk, '', false);
         }
         else {
@@ -365,15 +376,15 @@ const previewRecord = (services) => {
     }
 
     function _setPreview() {
-        if (!previewer.current)
+        if (!options.current)
             return;
 
         var zoomable = $('img.record.zoomable');
         if (zoomable.length > 0 && zoomable.hasClass('zoomed'))
             return;
 
-        var h = parseInt(previewer.current.height);
-        var w = parseInt(previewer.current.width);
+        var h = parseInt(options.current.height);
+        var w = parseInt(options.current.width);
         var t = 20;
         var de = 0;
 
@@ -386,24 +397,24 @@ const previewRecord = (services) => {
         }
 
         var ratioP = w / h;
-        var ratioD = parseInt(previewer.width) / parseInt(previewer.height);
+        var ratioD = parseInt(options.width) / parseInt(options.height);
 
         if (ratioD > ratioP) {
             //je regle la hauteur d'abord
-            if ((parseInt(h) + margY) > parseInt(previewer.height)) {
-                h = Math.round(parseInt(previewer.height) - margY);
+            if ((parseInt(h) + margY) > parseInt(options.height)) {
+                h = Math.round(parseInt(options.height) - margY);
                 w = Math.round(h * ratioP);
             }
         }
         else {
-            if ((parseInt(w) + margX) > parseInt(previewer.width)) {
-                w = Math.round(parseInt(previewer.width) - margX);
+            if ((parseInt(w) + margX) > parseInt(options.width)) {
+                w = Math.round(parseInt(options.width) - margX);
                 h = Math.round(w / ratioP);
             }
         }
 
-        t = Math.round((parseInt(previewer.height) - h - de) / 2);
-        var l = Math.round((parseInt(previewer.width) - w) / 2);
+        t = Math.round((parseInt(options.height) - h - de) / 2);
+        var l = Math.round((parseInt(options.width) - w) / 2);
         $('#PREVIEWIMGCONT .record').css({
             width: w,
             height: h,
@@ -427,7 +438,7 @@ const previewRecord = (services) => {
                     _viewCurrent($(this).parent());
                     // convert abssolute to relative position
                     var absolutePos = jsopt[1];
-                    var relativePos = parseInt(absolutePos, 10) - parseInt(p4.navigation.perPage, 10) * (parseInt(p4.navigation.page, 10) - 1);
+                    var relativePos = parseInt(absolutePos, 10) - parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1);
                     // keep relative position for answer train:
                     _openPreview(jsopt[0], relativePos, jsopt[2],false);
                 });
@@ -453,7 +464,7 @@ const previewRecord = (services) => {
         // keep relative position for answer train:
         var relativePos = pos;
         // update real absolute position with pagination:
-        var absolutePos = parseInt(p4.navigation.perPage,10) * (parseInt(p4.navigation.page, 10) - 1) + parseInt(pos,10);
+        var absolutePos = parseInt(options.navigation.perPage,10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos,10);
 
         $('#PREVIEWCURRENTCONT').fadeOut('fast');
         $.ajax({
@@ -496,7 +507,7 @@ const previewRecord = (services) => {
     function _cancelPreview() {
         $('#PREVIEWIMGDESCINNER').empty();
         $('#PREVIEWIMGCONT').empty();
-        previewer.current = false;
+        options.current = false;
     }
 
     function _setOthers(others) {
@@ -511,7 +522,7 @@ const previewRecord = (services) => {
 
     function _setTools(tools) {
         $('#PREVIEWTOOL').empty().append(tools);
-        if (!previewer.slideShowCancel && previewer.slideShow) {
+        if (!options.slideShowCancel && options.slideShow) {
             $('#start_slide').hide();
             $('#stop_slide').show();
         } else {
@@ -521,24 +532,29 @@ const previewRecord = (services) => {
     }
 
     function resizePreview() {
-        previewer.height = $('#PREVIEWIMGCONT').height();
-        previewer.width = $('#PREVIEWIMGCONT').width();
+        options.height = $('#PREVIEWIMGCONT').height();
+        options.width = $('#PREVIEWIMGCONT').width();
         _setPreview();
     }
 
     const shouldResize = () => {
-        if( previewer.open) {
+        if( options.open) {
             resizePreview();
         }
     };
 
     const shouldReload = () => {
-        if( previewer.open) {
+        if( options.open) {
             reloadPreview();
         }
     };
 
+    const onNavigationChanged = (navigation = {}) => {
+        options.navigation = Object.assign(options.navigation, navigation);
+    };
+
     appEvents.listenAll({
+        'broadcast.searchResultNavigation': onNavigationChanged,
         'preview.doResize': shouldResize,
         'preview.doReload': shouldReload,
         'preview.close': closePreview
@@ -546,6 +562,8 @@ const previewRecord = (services) => {
 
     return {
         initialize,
+        onGlobalKeydown,
+        getPreviewOptionStream,
         //_openPreview,
         startSlide,
         stopSlide,
@@ -555,4 +573,4 @@ const previewRecord = (services) => {
         resizePreview
     }
 };
-export default previewRecord;
+export default previewRecordService;

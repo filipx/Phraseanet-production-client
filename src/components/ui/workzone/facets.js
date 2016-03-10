@@ -1,3 +1,4 @@
+import * as _ from 'underscore';
 const workzoneFacets =  (services) => {
     const {configService, localeService, appEvents} = services;
     let selectedFacetValues = [];
@@ -52,11 +53,10 @@ const workzoneFacets =  (services) => {
     }
 
     function _sortByPredefinedFacets(source, field, predefinedFieldOrder) {
-        var filteredSource = source,
+        var filteredSource = source.slice(),
             ordered = [];
-
-        _.forEach(predefinedFieldOrder, function (fieldValue, index) {
-            _.forEach(source, function (facet, facetIndex) {
+        _.each(predefinedFieldOrder, function (fieldValue, index) {
+            _.each(source, function (facet, facetIndex) {
                 if (facet[field] !== undefined) {
                     if (facet[field] === fieldValue) {
                         ordered.push(facet);

@@ -85,6 +85,9 @@ module.exports = {
             //exclude: /node_modules\/(?!phraseanet-common)/,
             include: path.join(__dirname, '../../src'),
             loader: 'babel-loader'
+        }, {
+            test: require.resolve('jquery-lazyload'),
+            loader: "imports?this=>window&$=jquery"
         }]
     },
     resolve: {

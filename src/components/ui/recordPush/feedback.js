@@ -1,4 +1,6 @@
 import dialog from '../../utils/dialog';
+import Selectable from '../../utils/selectable';
+
 var Feedback = function (services, options) {
     const {configService, localeService, appEvents} = services;
     console.log('init feedback with', options);
@@ -120,7 +122,7 @@ var Feedback = function (services, options) {
                 if (data.success) {
                     humane.info(data.message);
                     dialog.close(1);
-                    p4.WorkZone.refresh();
+                    appEvents.emit('workzone.refresh');
                 }
                 else {
                     humane.error(data.message);

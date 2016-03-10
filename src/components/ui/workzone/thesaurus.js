@@ -1,8 +1,13 @@
+import thesaurus from '../../thesaurus';
+
 const workzoneThesaurus = (services) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
+    let thesaurusService = thesaurus(services);
     const initialize = () => {
-        $container = $('body');
+        $container = $('#thesaurus_tab');
+        thesaurusService.initialize({$container});
+
         $('#thesaurus_tab .input-medium').on('keyup', function(){
             if($('#thesaurus_tab .input-medium').val() != ''){
                 $('#thesaurus_tab .th_clear').show();
@@ -27,6 +32,10 @@ const workzoneThesaurus = (services) => {
             }
         });
     };
+
+    appEvents.listenAll({
+        'thesaurus.show': thesaurusService.show
+    })
 
     return {initialize};
 };

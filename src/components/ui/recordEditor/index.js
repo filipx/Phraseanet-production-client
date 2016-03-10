@@ -1,11 +1,12 @@
 import * as recordModel from '../../record/model';
-
+import * as Rx from 'rx';
 //var p4 = p4 || {};
 
 const recordEditor = (services) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
-    let editor = {};
+    let options = {};
+    let stream = new Rx.Subject();
     let ETHSeeker;
     var $editorContainer = null;
     $(document).ready(function () {
@@ -22,20 +23,20 @@ const recordEditor = (services) => {
     let $ztextStatus;
     let $editTextArea;
     const initialize = () => {
-        editor = {};
-        editor.curField = '?'; //"?";
-        editor.$container = $('#idFrameE');
-        editor.textareaIsDirty = false;
-        editor.fieldLastValue = "";
-        editor.lastClickId = null;
-        editor.sbas_id = false;
-        editor.what = false;
+        options = {};
+        options.curField = '?'; //"?";
+        options.$container = $('#idFrameE');
+        options.textareaIsDirty = false;
+        options.fieldLastValue = "";
+        options.lastClickId = null;
+        options.sbas_id = false;
+        options.what = false;
         //editor.regbasprid = false;
-        editor.newrepresent = false;
+        options.newrepresent = false;
         //editor.ssel = false;
 
-        $ztextStatus = $("#ZTextStatus", editor.$container);
-        $editTextArea = $("#idEditZTextArea", editor.$container);
+        $ztextStatus = $("#ZTextStatus", options.$container);
+        $editTextArea = $("#idEditZTextArea", options.$container);
         _bindEvents();
     };
 
@@ -58,7 +59,7 @@ const recordEditor = (services) => {
                 event.cancelBubble = true;
                 event.stopPropagation();
 
-                if (!editor.textareaIsDirty || edit_validField(event, "ask_ok") == true) {
+                if (!options.textareaIsDirty || edit_validField(event, "ask_ok") == true) {
                     _editStatus(event);
                 }
                 return false;
@@ -67,7 +68,7 @@ const recordEditor = (services) => {
             .on('click', '.edit-field-action', (event) => {
                 console.log('ok catch event for edit-field-by-name-action')
                 let $el = $(event.currentTarget);
-                if (!editor.textareaIsDirty || edit_validField(event, "ask_ok") == true) {
+                if (!options.textareaIsDirty || edit_validField(event, "ask_ok") == true) {
                     _editField(event, $el.data('id'));
                 }
                 return false;
@@ -149,35 +150,66 @@ const recordEditor = (services) => {
 
     };
 
-    function startThisEditing(options) {//sbas_id, what, regbasprid, ssel) {
-        let {databoxId, mode, state} = options;
+    const onGlobalKeydown = (event, specialKeyState) => {
+        if( specialKeyState === undefined ) {
+            let specialKeyState = {
+                isCancelKey: false,
+                isShortcutKey: false
+            }
+        }
+        switch (event.keyCode) {
+            case 9:	// tab ou shift-tab
+                fieldNavigate(event, utilsModule.is_shift_key(event) ? -1 : 1);
+                specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                break;
+            case 27:
+                edit_cancelMultiDesc(event);
+                specialKeyState.isShortcutKey = true;
+                break;
 
-        editor.sbas_id = databoxId;
-        editor.what = mode;
-        editor = Object.assign(editor, state);
+            case 33:	// pg up
+                if (!options.textareaIsDirty || edit_validField(event, "ask_ok"))
+                    skipImage(event, 1);
+                specialKeyState.isCancelKey = true;
+                break;
+            case 34:	// pg dn
+                if (!options.textareaIsDirty || edit_validField(event, "ask_ok"))
+                    skipImage(event, -1);
+                specialKeyState.isCancelKey = true;
+                break;
+        }
+        return specialKeyState
+    };
+
+    function startThisEditing(params) {//sbas_id, what, regbasprid, ssel) {
+        let {databoxId, mode, state} = params;
+
+        options.sbas_id = databoxId;
+        options.what = mode;
+        options = Object.assign(options, state);
         //editor.regbasprid = regbasprid;
         //editor.ssel = ssel;
-        $editTextArea = $("#idEditZTextArea", editor.$container);
+        $editTextArea = $("#idEditZTextArea", options.$container);
 
-        let recordCollection = editor.T_records;
+        let recordCollection = options.T_records;
         for (var r in recordCollection) {
             var fields = {};
 
-            for (var f in editor.T_records[r].fields) {
+            for (var f in options.T_records[r].fields) {
 
-                var meta_struct_id = editor.T_records[r].fields[f].meta_struct_id;
+                var meta_struct_id = options.T_records[r].fields[f].meta_struct_id;
 
-                var name = editor.T_fields[meta_struct_id].name;
-                var label = editor.T_fields[meta_struct_id].label;
-                var multi = editor.T_fields[meta_struct_id].multi;
-                var required = editor.T_fields[meta_struct_id].required;
-                var readonly = editor.T_fields[meta_struct_id].readonly;
-                var maxLength = editor.T_fields[meta_struct_id].maxLength;
-                var minLength = editor.T_fields[meta_struct_id].minLength;
-                var type = editor.T_fields[meta_struct_id].type;
-                var separator = editor.T_fields[meta_struct_id].separator;
-                var vocabularyControl = editor.T_fields[meta_struct_id].vocabularyControl || null;
-                var vocabularyRestricted = editor.T_fields[meta_struct_id].vocabularyRestricted  || null;
+                var name = options.T_fields[meta_struct_id].name;
+                var label = options.T_fields[meta_struct_id].label;
+                var multi = options.T_fields[meta_struct_id].multi;
+                var required = options.T_fields[meta_struct_id].required;
+                var readonly = options.T_fields[meta_struct_id].readonly;
+                var maxLength = options.T_fields[meta_struct_id].maxLength;
+                var minLength = options.T_fields[meta_struct_id].minLength;
+                var type = options.T_fields[meta_struct_id].type;
+                var separator = options.T_fields[meta_struct_id].separator;
+                var vocabularyControl = options.T_fields[meta_struct_id].vocabularyControl || null;
+                var vocabularyRestricted = options.T_fields[meta_struct_id].vocabularyRestricted  || null;
 
                 var fieldOptions = {
                     multi: multi,
@@ -195,10 +227,10 @@ const recordEditor = (services) => {
 
                 var values = [];
 
-                for (var v in editor.T_records[r].fields[f].values) {
-                    var meta_id = editor.T_records[r].fields[f].values[v].meta_id;
-                    var value = editor.T_records[r].fields[f].values[v].value;
-                    var vocabularyId = editor.T_records[r].fields[f].values[v].vocabularyId;
+                for (var v in options.T_records[r].fields[f].values) {
+                    var meta_id = options.T_records[r].fields[f].values[v].meta_id;
+                    var value = options.T_records[r].fields[f].values[v].value;
+                    var vocabularyId = options.T_records[r].fields[f].values[v].vocabularyId;
 
                     values.push(new recordModel.recordFieldValue(meta_id, value, vocabularyId));
                 }
@@ -206,8 +238,8 @@ const recordEditor = (services) => {
                 fields[f] = new recordModel.recordField(databoxField, values);
             }
 
-            editor.T_records[r].fields = fields;
-            editor.fields = fields;
+            options.T_records[r].fields = fields;
+            options.fields = fields;
 
         }
 
@@ -231,20 +263,20 @@ const recordEditor = (services) => {
 
 
         // if is a group, only select the group
-        if (editor.what === 'GRP') {
+        if (options.what === 'GRP') {
             _toggleGroupSelection();
         } else {
             _edit_select_all();
         }
 
 
-        $('.previewTips, .DCESTips, .fieldTips', editor.$container).tooltip({
+        $('.previewTips, .DCESTips, .fieldTips', options.$container).tooltip({
             fixable: true,
             fixableIndex: 1200
         });
-        $('.infoTips', editor.$container).tooltip();
+        $('.infoTips', options.$container).tooltip();
 
-        if (editor.what == 'GRP') {
+        if (options.what == 'GRP') {
             $('#EDIT_FILM2 .reg_opts').show();
 
             $.each($('#EDIT_FILM2 .contextMenuTrigger'), function () {
@@ -266,7 +298,7 @@ const recordEditor = (services) => {
         _vsplit2();
         _vsplit1();
 
-        $('#EDIT_TOP', editor.$container).resizable({
+        $('#EDIT_TOP', options.$container).resizable({
             handles: 's',
             minHeight: 100,
             resize: function () {
@@ -280,7 +312,7 @@ const recordEditor = (services) => {
             }
         });
 
-        $('#divS_wrapper', editor.$container).resizable({
+        $('#divS_wrapper', options.$container).resizable({
             handles: 'e',
             minWidth: 200,
             resize: function () {
@@ -310,17 +342,17 @@ const recordEditor = (services) => {
                 }
             });
 
-        $('#EDIT_ZOOMSLIDER', editor.$container).slider({
+        $('#EDIT_ZOOMSLIDER', options.$container).slider({
             min: 60,
             max: 300,
-            value: editor.diapoSize,
+            value: options.diapoSize,
             slide: function (event, ui) {
                 var v = $(ui.value)[0];
-                $('#EDIT_FILM2 .diapo', editor.$container).width(v).height(v);
+                $('#EDIT_FILM2 .diapo', options.$container).width(v).height(v);
             },
             change: function (event, ui) {
-                editor.diapoSize = $(ui.value)[0];
-                userModule.setPref("editing_images_size", editor.diapoSize);
+                options.diapoSize = $(ui.value)[0];
+                userModule.setPref("editing_images_size", options.diapoSize);
             }
         });
 
@@ -334,7 +366,7 @@ const recordEditor = (services) => {
             edit_cancelMultiDesc(e);
         };
 
-        $("#EDIT_CLOSEDIALOG", editor.$container).dialog({
+        $("#EDIT_CLOSEDIALOG", options.$container).dialog({
             autoOpen: false,
             closeOnEscape: true,
             resizable: false,
@@ -360,19 +392,19 @@ const recordEditor = (services) => {
                 if ($el.is(":checked")) {
                     var val = $el.val();
                     var field = {
-                        name: editor.T_fields[val].name,
+                        name: options.T_fields[val].name,
                         value: []
                     };
                     var tval;
-                    if (editor.T_fields[val].multi) {
+                    if (options.T_fields[val].multi) {
                         field.value = $.map(
-                            editor.T_fields[val]._value.split(";"),
+                            options.T_fields[val]._value.split(";"),
                             function(obj, idx){
                                 return obj.trim();
                             }
                         );
                     } else {
-                        field.value = [editor.T_fields[val]._value.trim()];
+                        field.value = [options.T_fields[val]._value.trim()];
                     }
                     fields.push(field);
                 }
@@ -382,7 +414,7 @@ const recordEditor = (services) => {
                 type: 'POST',
                 url: "../prod/records/edit/presets",
                 data: {
-                    sbas_id: editor.sbas_id,
+                    sbas_id: options.sbas_id,
                     title: jtitle.val(),
                     fields: fields
                 },
@@ -402,7 +434,7 @@ const recordEditor = (services) => {
 
         };
 
-        $("#Edit_copyPreset_dlg", editor.$container).dialog({
+        $("#Edit_copyPreset_dlg", options.$container).dialog({
             stack: true,
             closeOnEscape: true,
             resizable: false,
@@ -421,7 +453,7 @@ const recordEditor = (services) => {
             buttons: buttons
         });
 
-        $('#idEditDateZone', editor.$container).datepicker({
+        $('#idEditDateZone', options.$container).datepicker({
             changeYear: true,
             changeMonth: true,
             dateFormat: 'yy/mm/dd',
@@ -437,7 +469,7 @@ const recordEditor = (services) => {
             }
         });
 
-        ETHSeeker = new _EditThesaurusSeeker(editor.sbas_id);
+        ETHSeeker = new _EditThesaurusSeeker(options.sbas_id);
 
         _setSizeLimits();
 
@@ -445,7 +477,7 @@ const recordEditor = (services) => {
             type: 'GET',
             url: "../prod/records/edit/presets",
             data: {
-                sbas_id: editor.sbas_id
+                sbas_id: options.sbas_id
             },
             dataType: 'json',
             success: function (data, textStatus) {
@@ -474,7 +506,7 @@ const recordEditor = (services) => {
     }
 
     function _preset_paint(data) {
-        $(".EDIT_presets_list", editor.$container).html(data.html);
+        $(".EDIT_presets_list", options.$container).html(data.html);
         $(".EDIT_presets_list A.triangle").click(
             function () {
                 $(this).parent().parent().toggleClass("opened");
@@ -506,15 +538,15 @@ const recordEditor = (services) => {
 
     function _preset_copy() {
         var html = "";
-        for (i in editor.T_fields) {
-            if (editor.T_fields[i]._status == 1) {
-                if (editor.T_fields[i].readonly) {
+        for (i in options.T_fields) {
+            if (options.T_fields[i]._status == 1) {
+                if (options.T_fields[i].readonly) {
                     continue;
                 }
-                var c = editor.T_fields[i]._value === "" ? "" : "checked=\"1\"";
-                var v = editor.T_fields[i]._value;
-                html += "<div><label class=\"checkbox\" for=\"new_preset_" + editor.T_fields[i].name + "\"><input type=\"checkbox\" class=\"checkbox\" id=\"new_preset_" + editor.T_fields[i].name + "\" value=\"" + i + "\" " + c + "/>" + "<b>" + editor.T_fields[i].label + " : </b></label> ";
-                html += _cleanTags(editor.T_fields[i]._value) + "</div>";
+                var c = options.T_fields[i]._value === "" ? "" : "checked=\"1\"";
+                var v = options.T_fields[i]._value;
+                html += "<div><label class=\"checkbox\" for=\"new_preset_" + options.T_fields[i].name + "\"><input type=\"checkbox\" class=\"checkbox\" id=\"new_preset_" + options.T_fields[i].name + "\" value=\"" + i + "\" " + c + "/>" + "<b>" + options.T_fields[i].label + " : </b></label> ";
+                html += _cleanTags(options.T_fields[i]._value) + "</div>";
             }
         }
         $("#Edit_copyPreset_dlg FORM DIV").html(html);
@@ -549,21 +581,21 @@ const recordEditor = (services) => {
                     $("#Edit_copyPreset_dlg").dialog("close");
                 }
 
-                for (i in editor.T_fields) {
-                    editor.T_fields[i].preset = null;
-                    if (typeof(data.fields[editor.T_fields[i].name]) != "undefined") {
-                        editor.T_fields[i].preset = data.fields[editor.T_fields[i].name];
+                for (i in options.T_fields) {
+                    options.T_fields[i].preset = null;
+                    if (typeof(data.fields[options.T_fields[i].name]) != "undefined") {
+                        options.T_fields[i].preset = data.fields[options.T_fields[i].name];
                     }
                 }
-                for (var r = 0; r < editor.T_records.length; r++) {
-                    if (!editor.T_records[r]._selected)
+                for (var r = 0; r < options.T_records.length; r++) {
+                    if (!options.T_records[r]._selected)
                         continue;
 
-                    for (i in editor.T_fields) {
-                        if (editor.T_fields[i].preset != null) {
-                            for (val in editor.T_fields[i].preset) {
+                    for (i in options.T_fields) {
+                        if (options.T_fields[i].preset != null) {
+                            for (val in options.T_fields[i].preset) {
                                 // fix : some (old, malformed) presets values may need trim()
-                                editor.T_records[r].fields["" + i].addValue(editor.T_fields[i].preset[val].trim(), false, null);
+                                options.T_records[r].fields["" + i].addValue(options.T_fields[i].preset[val].trim(), false, null);
                             }
                         }
                     }
@@ -655,9 +687,9 @@ const recordEditor = (services) => {
     }
 
     function _previewEdit(r) {
-console.log('try to append', editor.T_records[r].preview)
+console.log('try to append', options.T_records[r].preview)
 
-        $('#TH_Opreview .PNB10').empty().append(editor.T_records[r].preview);
+        $('#TH_Opreview .PNB10').empty().append(options.T_records[r].preview);
 
         if ($('img.PREVIEW_PIC.zoomable').length > 0) {
             $('img.PREVIEW_PIC.zoomable').draggable();
@@ -684,7 +716,7 @@ console.log('try to append', editor.T_records[r].preview)
     }
 
     function setRegDefault(n, record_id) {
-        editor.newrepresent = record_id;
+        options.newrepresent = record_id;
 
         var src = $('#idEditDiapo_' + n).find('img.edit_IMGT').attr('src');
         var style = $('#idEditDiapo_' + n).find('img.edit_IMGT').attr('style');
@@ -699,30 +731,30 @@ console.log('try to append', editor.T_records[r].preview)
     function _editField(evt, meta_struct_id) {
         document.getElementById('idEditZTextArea').blur();
         document.getElementById('EditTextMultiValued').blur();
-        $(".editDiaButtons", editor.$container).hide();
+        $(".editDiaButtons", options.$container).hide();
 
         $('#idEditZTextArea, #EditTextMultiValued').unbind('keyup.maxLength');
 
 
-        editor.curField = meta_struct_id;
+        options.curField = meta_struct_id;
 
         if (meta_struct_id >= 0 ) {
 
 
             let field = null;
-            if( editor.T_fields === undefined ) {
+            if( options.T_fields === undefined ) {
                 return;
             }
 
-            if( editor.T_fields[meta_struct_id] !== undefined ) {
-                field = editor.T_fields[meta_struct_id];
+            if( options.T_fields[meta_struct_id] !== undefined ) {
+                field = options.T_fields[meta_struct_id];
 
                 var name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
 
-                $("#idFieldNameEdit", editor.$container).html(name);
+                $("#idFieldNameEdit", options.$container).html(name);
 
 
-                var vocabType = editor.T_fields[meta_struct_id].vocabularyControl;
+                var vocabType = options.T_fields[meta_struct_id].vocabularyControl;
 
                 $('#idEditZTextArea, #EditTextMultiValued').autocomplete({
                     minLength: 2,
@@ -732,7 +764,7 @@ console.log('try to append', editor.T_records[r].preview)
                             url: '../prod/records/edit/vocabulary/' + vocabType + '/',
                             dataType: "json",
                             data: {
-                                sbas_id: editor.sbas_id,
+                                sbas_id: options.sbas_id,
                                 query: request.term
                             },
                             success: function (data) {
@@ -749,13 +781,13 @@ console.log('try to append', editor.T_records[r].preview)
                 });
 
 
-                if (editor.T_fields[meta_struct_id].maxLength > 0) {
+                if (options.T_fields[meta_struct_id].maxLength > 0) {
                     var idexplain = $("#idExplain");
                     idexplain.html('');
 
                     $('#idEditZTextArea, #EditTextMultiValued').bind('keyup.maxLength',function () {
-                        var remaining = Math.max((editor.T_fields[meta_struct_id].maxLength - $(this).val().length), 0);
-                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + editor.sbas_id + "/" + meta_struct_id + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + "</span>");
+                        var remaining = Math.max((options.T_fields[meta_struct_id].maxLength - $(this).val().length), 0);
+                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + "/" + meta_struct_id + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + "</span>");
                         $('.metadatas_restrictionsTips', idexplain).tooltip();
                     }).trigger('keyup.maxLength');
                 }
@@ -763,37 +795,37 @@ console.log('try to append', editor.T_records[r].preview)
                     $("#idExplain").html("");
                 }
 
-                if (!editor.T_fields[meta_struct_id].multi) {
+                if (!options.T_fields[meta_struct_id].multi) {
                     // champ monovalue : textarea
-                    $(".editDiaButtons", editor.$container).hide();
+                    $(".editDiaButtons", options.$container).hide();
 
-                    if (editor.T_fields[meta_struct_id].type == "date") {
+                    if (options.T_fields[meta_struct_id].type == "date") {
                         $editTextArea.css("height", "16px");
-                        $("#idEditDateZone", editor.$container).show();
+                        $("#idEditDateZone", options.$container).show();
                     }
                     else {
-                        $("#idEditDateZone", editor.$container).hide();
+                        $("#idEditDateZone", options.$container).hide();
                         $editTextArea.css("height", "100%");
                     }
 
                     $ztextStatus.hide();
-                    $("#ZTextMultiValued", editor.$container).hide();
-                    $("#ZTextMonoValued", editor.$container).show();
+                    $("#ZTextMultiValued", options.$container).hide();
+                    $("#ZTextMonoValued", options.$container).show();
 
-                    if (editor.T_fields[meta_struct_id]._status == 2) {
+                    if (options.T_fields[meta_struct_id]._status == 2) {
                         // heterogene
-                        $editTextArea.val(editor.fieldLastValue = "");
+                        $editTextArea.val(options.fieldLastValue = "");
                         $editTextArea.addClass("hetero");
-                        $("#idDivButtons", editor.$container).show();	// valeurs h�t�rog�nes : les 3 boutons remplacer/ajouter/annuler
+                        $("#idDivButtons", options.$container).show();	// valeurs h�t�rog�nes : les 3 boutons remplacer/ajouter/annuler
                     }
                     else {
                         // homogene
-                        $editTextArea.val(editor.fieldLastValue = editor.T_fields[meta_struct_id]._value);
+                        $editTextArea.val(options.fieldLastValue = options.T_fields[meta_struct_id]._value);
                         $editTextArea.removeClass("hetero");
 
-                        $("#idDivButtons", editor.$container).hide();	// valeurs homog�nes
-                        if (editor.T_fields[meta_struct_id].type == "date") {
-                            var v = editor.T_fields[meta_struct_id]._value.split(' ');
+                        $("#idDivButtons", options.$container).hide();	// valeurs homog�nes
+                        if (options.T_fields[meta_struct_id].type == "date") {
+                            var v = options.T_fields[meta_struct_id]._value.split(' ');
                             d = v[0].split('/');
                             var dateObj = new Date();
                             if (d.length == 3) {
@@ -802,14 +834,14 @@ console.log('try to append', editor.T_records[r].preview)
                                 dateObj.setDate(d[2]);
                             }
 
-                            if ($("#idEditDateZone", editor.$container).data("ui-datepicker")) {
-                                $("#idEditDateZone", editor.$container).datepicker('setDate', dateObj);
+                            if ($("#idEditDateZone", options.$container).data("ui-datepicker")) {
+                                $("#idEditDateZone", options.$container).datepicker('setDate', dateObj);
                             }
                         }
                     }
-                    editor.textareaIsDirty = false;
+                    options.textareaIsDirty = false;
 
-                    $("#idEditZone", editor.$container).show();
+                    $("#idEditZone", options.$container).show();
 
                     $('#idEditZTextArea').trigger('keyup.maxLength');
 
@@ -818,15 +850,15 @@ console.log('try to append', editor.T_records[r].preview)
                 else {
                     // champ multivalue : liste
                     $ztextStatus.hide();
-                    $("#ZTextMonoValued", editor.$container).hide();
-                    $("#ZTextMultiValued", editor.$container).show();
+                    $("#ZTextMonoValued", options.$container).hide();
+                    $("#ZTextMultiValued", options.$container).show();
 
-                    $("#idDivButtons", editor.$container).hide();	// valeurs homogenes
+                    $("#idDivButtons", options.$container).hide();	// valeurs homogenes
 
                     _updateCurrentMval(meta_struct_id);
 
-                    $('#EditTextMultiValued', editor.$container).val("");
-                    $('#idEditZone', editor.$container).show();
+                    $('#EditTextMultiValued', options.$container).val("");
+                    $('#idEditZone', options.$container).show();
 
                     $('#EditTextMultiValued').trigger('keyup.maxLength');
 
@@ -838,34 +870,34 @@ console.log('try to append', editor.T_records[r].preview)
         }
         else {
             // pas de champ, masquer la zone du textarea
-            $("#idEditZone", editor.$container).hide();
-            $(".editDiaButtons", editor.$container).hide();
+            $("#idEditZone", options.$container).hide();
+            $(".editDiaButtons", options.$container).hide();
 
         }
         _activeField();
     }
 
     function _updateEditSelectedRecords(evt) {
-        $(".editDiaButtons", editor.$container).hide();
+        $(".editDiaButtons", options.$container).hide();
 
-        for (var n in editor.T_statbits)	// tous les statusbits de la base
+        for (var n in options.T_statbits)	// tous les statusbits de la base
         {
-            editor.T_statbits[n]._value = "-1";			// val unknown
-            for (var i in editor.T_records) {
-                if (!editor.T_records[i]._selected)
+            options.T_statbits[n]._value = "-1";			// val unknown
+            for (var i in options.T_records) {
+                if (!options.T_records[i]._selected)
                     continue;
-                if (editor.T_records[i].statbits.length === 0)
+                if (options.T_records[i].statbits.length === 0)
                     continue;
 
-                if (editor.T_statbits[n]._value == "-1")
-                    editor.T_statbits[n]._value = editor.T_records[i].statbits[n].value;
-                else if (editor.T_statbits[n]._value != editor.T_records[i].statbits[n].value)
-                    editor.T_statbits[n]._value = "2";
+                if (options.T_statbits[n]._value == "-1")
+                    options.T_statbits[n]._value = options.T_records[i].statbits[n].value;
+                else if (options.T_statbits[n]._value != options.T_records[i].statbits[n].value)
+                    options.T_statbits[n]._value = "2";
             }
             var ck0 = $("#idCheckboxStatbit0_" + n);
             var ck1 = $("#idCheckboxStatbit1_" + n);
 
-            switch (editor.T_statbits[n]._value) {
+            switch (options.T_statbits[n]._value) {
                 case "0":
                 case 0:
                     ck0.removeClass('gui_ckbox_0 gui_ckbox_2').addClass("gui_ckbox_1");
@@ -884,7 +916,7 @@ console.log('try to append', editor.T_records[r].preview)
         }
 
 
-        var nostatus = $('.diapo.selected.nostatus', editor.$container).length;
+        var nostatus = $('.diapo.selected.nostatus', options.$container).length;
         var status_box = $('#ZTextStatus');
         $('.nostatus, .somestatus, .displaystatus', status_box).hide();
 
@@ -892,7 +924,7 @@ console.log('try to append', editor.T_records[r].preview)
             $('.displaystatus', status_box).show();
         }
         else {
-            var yesstatus = $('.diapo.selected', editor.$container).length;
+            var yesstatus = $('.diapo.selected', options.$container).length;
             if (nostatus == yesstatus) {
                 $('.nostatus', status_box).show();
             }
@@ -902,28 +934,28 @@ console.log('try to append', editor.T_records[r].preview)
         }
 
         // calcul des valeurs suggerees COMMUNES aux records (collections) selectionnes //
-        for (var f in editor.T_fields)	// tous les champs de la base
-            editor.T_fields[f]._sgval = [];
+        for (var f in options.T_fields)	// tous les champs de la base
+            options.T_fields[f]._sgval = [];
         var t_lsgval = {};
         var t_selcol = {};		// les bases (coll) dont au - une thumb est selectionnee
         var ncolsel = 0;
         var nrecsel = 0;
-        for (var i in editor.T_records) {
-            if (!editor.T_records[i]._selected)
+        for (var i in options.T_records) {
+            if (!options.T_records[i]._selected)
                 continue;
             nrecsel++;
 
-            var bid = "b" + editor.T_records[i].bid;
+            var bid = "b" + options.T_records[i].bid;
             if (t_selcol[bid])
                 continue;
 
             t_selcol[bid] = 1;
             ncolsel++;
-            for (var f in editor.T_sgval[bid]) {
+            for (var f in options.T_sgval[bid]) {
                 if (!t_lsgval[f])
                     t_lsgval[f] = {};
-                for (var ivs in editor.T_sgval[bid][f]) {
-                    vs = editor.T_sgval[bid][f][ivs];
+                for (var ivs in options.T_sgval[bid][f]) {
+                    vs = options.T_sgval[bid][f][ivs];
                     if (!t_lsgval[f][vs])
                         t_lsgval[f][vs] = 0;
                     t_lsgval[f][vs]++;
@@ -934,13 +966,13 @@ console.log('try to append', editor.T_records[r].preview)
         for (var f in t_lsgval) {
             for (var sv in t_lsgval[f]) {
                 if (t_lsgval[f][sv] == ncolsel) {
-                    editor.T_fields[f]._sgval.push({
+                    options.T_fields[f]._sgval.push({
                             label: sv,
                             onclick: function (menuItem, menu, e, label) {
-                                if (editor.T_fields[editor.curField].multi) {
-                                    $("#EditTextMultiValued", editor.$container).val(label);
+                                if (options.T_fields[options.curField].multi) {
+                                    $("#EditTextMultiValued", options.$container).val(label);
                                     $('#EditTextMultiValued').trigger('keyup.maxLength');
-                                    _addMultivaluedField($('#EditTextMultiValued', editor.$container).val(), null);
+                                    _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
                                 }
                                 else {
                                     if (utilsModule.is_ctrl_key(e)) {
@@ -951,8 +983,8 @@ console.log('try to append', editor.T_records[r].preview)
                                         $editTextArea.val(label);
                                     }
                                     $('#idEditZTextArea').trigger('keyup.maxLength');
-                                    editor.textareaIsDirty = true;
-                                    if (editor.T_fields[editor.curField]._status != 2)
+                                    options.textareaIsDirty = true;
+                                    if (options.T_fields[options.curField]._status != 2)
                                         edit_validField(evt, "ask_ok");
                                 }
                             }
@@ -960,17 +992,17 @@ console.log('try to append', editor.T_records[r].preview)
                     );
                 }
             }
-            if (editor.T_fields[f]._sgval.length > 0) {
-                $("#editSGtri_" + f, editor.$container).css("visibility", "visible");
-                $("#editSGtri_" + f, editor.$container).unbind();
-                $("#editSGtri_" + f, editor.$container).contextMenu(
-                    editor.T_fields[f]._sgval,
+            if (options.T_fields[f]._sgval.length > 0) {
+                $("#editSGtri_" + f, options.$container).css("visibility", "visible");
+                $("#editSGtri_" + f, options.$container).unbind();
+                $("#editSGtri_" + f, options.$container).contextMenu(
+                    options.T_fields[f]._sgval,
                     {
                         theme: 'vista',
                         openEvt: "click",
                         beforeShow: function (a, b, c, d) {
                             var fid = this.target.getAttribute('id').substr(10);
-                            if (!editor.textareaIsDirty || edit_validField(null, "ask_ok") == true) {
+                            if (!options.textareaIsDirty || edit_validField(null, "ask_ok") == true) {
                                 _editField(null, fid);
                                 return(true);
                             }
@@ -982,7 +1014,7 @@ console.log('try to append', editor.T_records[r].preview)
                 );
             }
             else {
-                $("#editSGtri_" + f, editor.$container).css("visibility", "hidden");
+                $("#editSGtri_" + f, options.$container).css("visibility", "hidden");
             }
         }
 
@@ -990,52 +1022,52 @@ console.log('try to append', editor.T_records[r].preview)
 
         _updateFieldDisplay();
 
-        if (editor.curField == -1)
+        if (options.curField == -1)
             _editStatus(evt);
         else
-            _editField(evt, editor.curField);
+            _editField(evt, options.curField);
     }
 
     function _updateFieldDisplay() {
-        for (var f in editor.T_fields)	// tous les champs de la base
+        for (var f in options.T_fields)	// tous les champs de la base
         {
-            editor.T_fields[f]._status = 0;			// val unknown
-            for (var i in editor.T_records) {
-                if (!editor.T_records[i]._selected)
+            options.T_fields[f]._status = 0;			// val unknown
+            for (var i in options.T_records) {
+                if (!options.T_records[i]._selected)
                     continue;
 
 
-                if (editor.T_records[i].fields[f].isEmpty()) {
+                if (options.T_records[i].fields[f].isEmpty()) {
                     var v = "";
                 }
                 else {
                     // le champ existe dans la fiche
-                    if (editor.T_fields[f].multi) {
+                    if (options.T_fields[f].multi) {
                         // champ multi : on compare la concat des valeurs
-                        var v = editor.T_records[i].fields[f].getSerializedValues()
+                        var v = options.T_records[i].fields[f].getSerializedValues()
                     }
                     else {
-                        var v = editor.T_records[i].fields[f].getValue().getValue();
+                        var v = options.T_records[i].fields[f].getValue().getValue();
                     }
                 }
 
-                if (editor.T_fields[f]._status == 0) {
-                    editor.T_fields[f]._value = v;
-                    editor.T_fields[f]._status = 1;
+                if (options.T_fields[f]._status == 0) {
+                    options.T_fields[f]._value = v;
+                    options.T_fields[f]._status = 1;
                 }
-                else if (editor.T_fields[f]._status == 1 && editor.T_fields[f]._value != v) {
-                    editor.T_fields[f]._value = "*****";
-                    editor.T_fields[f]._status = 2;
+                else if (options.T_fields[f]._status == 1 && options.T_fields[f]._value != v) {
+                    options.T_fields[f]._value = "*****";
+                    options.T_fields[f]._status = 2;
                     break;	// plus la peine de verifier le champ sur les autres records
                 }
             }
             var o = document.getElementById("idEditField_" + f);
 
             if (o) {
-                if (editor.T_fields[f]._status == 2)	// mixed
+                if (options.T_fields[f]._status == 2)	// mixed
                     o.innerHTML = "<span class='hetero'>xxxxx</span>";
                 else {
-                    var v = editor.T_fields[f]._value;
+                    var v = options.T_fields[f]._value;
                     v = (v instanceof(Array)) ? v.join(";") : v;
                     o.innerHTML = _cleanTags(v).replace(/\n/gm, "<span style='color:#0080ff'>&para;</span><br/>");
                 }
@@ -1046,39 +1078,39 @@ console.log('try to append', editor.T_records[r].preview)
 // on active le pseudo champ 'status'
 // ---------------------------------------------------------------------------
     function _editStatus(evt) {
-        $(".editDiaButtons", editor.$container).hide();
+        $(".editDiaButtons", options.$container).hide();
 
         document.getElementById('idEditZTextArea').blur();
         document.getElementById('EditTextMultiValued').blur();
 
-        $("#idFieldNameEdit", editor.$container).html("[STATUS]");
-        $("#idExplain", editor.$container).html("&nbsp;");
+        $("#idFieldNameEdit", options.$container).html("[STATUS]");
+        $("#idExplain", options.$container).html("&nbsp;");
 
-        $("#ZTextMultiValued", editor.$container).hide();
-        $("#ZTextMonoValued", editor.$container).hide();
+        $("#ZTextMultiValued", options.$container).hide();
+        $("#ZTextMonoValued", options.$container).hide();
         $ztextStatus.show();
 
-        $("#idEditZone", editor.$container).show();
+        $("#idEditZone", options.$container).show();
 
         document.getElementById("editFakefocus").focus();
-        editor.curField = -1;
+        options.curField = -1;
         _activeField();
     }
 
     function _updateCurrentMval(meta_struct_id, HighlightValue, vocabularyId) {
 
         // on compare toutes les valeurs de chaque fiche selectionnee
-        editor.T_mval = [];			// tab des mots, pour trier
+        options.T_mval = [];			// tab des mots, pour trier
         var a = [];		// key : mot ; val : nbr d'occurences distinctes
         var n = 0;					// le nbr de records selectionnes
 
-        for (var r in editor.T_records) {
-            if (!editor.T_records[r]._selected)
+        for (var r in options.T_records) {
+            if (!options.T_records[r]._selected)
                 continue;
 
-            editor.T_records[r].fields[meta_struct_id].sort(_sortCompareMetas);
+            options.T_records[r].fields[meta_struct_id].sort(_sortCompareMetas);
 
-            var values = editor.T_records[r].fields[meta_struct_id].getValues();
+            var values = options.T_records[r].fields[meta_struct_id].getValues();
 
             for (var v in values) {
                 var word = values[v].getValue();
@@ -1089,7 +1121,7 @@ console.log('try to append', editor.T_records[r].preview)
                         'n': 0,
                         'f': new Array()
                     };	// n:nbr d'occurences DISTINCTES du mot ; f:flag presence mot dans r
-                    editor.T_mval.push(values[v]);
+                    options.T_mval.push(values[v]);
                 }
 
                 if (!a[key].f[r])
@@ -1101,23 +1133,23 @@ console.log('try to append', editor.T_records[r].preview)
             n++;
         }
 
-        editor.T_mval.sort(_sortCompareMetas);
+        options.T_mval.sort(_sortCompareMetas);
 
         var t = "";
-        for (var i in editor.T_mval)	// pour lire le tableau 'a' dans l'ordre trie par 'editor.T_mval'
+        for (var i in options.T_mval)	// pour lire le tableau 'a' dans l'ordre trie par 'editor.T_mval'
         {
-            var value = editor.T_mval[i];
+            var value = options.T_mval[i];
             var word = value.getValue();
             var key = value.getVocabularyId() + '%' + word;
 
             var extra = value.getVocabularyId() ? '<img src="/assets/common/images/icons/ressource16.png" /> ' : '';
 
             if (i > 0) {
-                if (value.getVocabularyId() !== null && editor.T_mval[i - 1].getVocabularyId() == value.getVocabularyId()) {
+                if (value.getVocabularyId() !== null && options.T_mval[i - 1].getVocabularyId() == value.getVocabularyId()) {
                     continue;
                 }
-                if (value.getVocabularyId() === null && editor.T_mval[i - 1].getVocabularyId() === null) {
-                    if (editor.T_mval[i - 1].getValue() == value.getValue()) {
+                if (value.getVocabularyId() === null && options.T_mval[i - 1].getVocabularyId() === null) {
+                    if (options.T_mval[i - 1].getValue() == value.getValue()) {
                         continue;	// on n'accepte pas les doublons
                     }
                 }
@@ -1136,9 +1168,9 @@ console.log('try to append', editor.T_records[r].preview)
                 + "</td></tr></table>"
                 + "</div>";
         }
-        $('#ZTextMultiValued_values', editor.$container).html(t);
+        $('#ZTextMultiValued_values', options.$container).html(t);
 
-        $('#ZTextMultiValued_values .add_all', editor.$container).unbind('click').bind('click', function () {
+        $('#ZTextMultiValued_values .add_all', options.$container).unbind('click').bind('click', function () {
             var container = $(this).closest('div');
 
             var span = $('span.value', container)
@@ -1150,7 +1182,7 @@ console.log('try to append', editor.T_records[r].preview)
             _updateFieldDisplay();
             return false;
         });
-        $('#ZTextMultiValued_values .remove_all', editor.$container).unbind('click').bind('click', function () {
+        $('#ZTextMultiValued_values .remove_all', options.$container).unbind('click').bind('click', function () {
             var container = $(this).closest('div');
 
             var span = $('span.value', container)
@@ -1172,49 +1204,49 @@ console.log('try to append', editor.T_records[r].preview)
 // ---------------------------------------------------------------------------------------------------------
     function edit_validField(evt, action) {
         // action : 'ok', 'fusion' ou 'cancel'
-        if (editor.curField == "?")
+        if (options.curField == "?")
             return(true);
 
         if (action == "cancel") {
             // on restore le contenu du champ
-            $editTextArea.val(editor.fieldLastValue);
+            $editTextArea.val(options.fieldLastValue);
             $('#idEditZTextArea').trigger('keyup.maxLength');
-            editor.textareaIsDirty = false;
+            options.textareaIsDirty = false;
             return(true);
         }
 
-        if (action == "ask_ok" && editor.textareaIsDirty && editor.T_fields[editor.curField]._status == 2) {
+        if (action == "ask_ok" && options.textareaIsDirty && options.T_fields[options.curField]._status == 2) {
             alert(localeService.t('edit_hetero'));
             return(false);
         }
         var o, newvalue;
-        if (o = document.getElementById("idEditField_" + editor.curField)) {
+        if (o = document.getElementById("idEditField_" + options.curField)) {
             console.log('should find value',  $editTextArea, $editTextArea.val())
             let t = $editTextArea.val();
 
             let status = 0;
             let firstvalue = "";
-            for (var i = 0; i < editor.T_records.length; i++) {
-                if (!editor.T_records[i]._selected)
+            for (var i = 0; i < options.T_records.length; i++) {
+                if (!options.T_records[i]._selected)
                     continue;			// on ne modifie pas les fiches non selectionnees
 
                 if (action == "ok" || action == "ask_ok") {
-                    editor.T_records[i].fields[editor.curField].addValue(t, false, null);
+                    options.T_records[i].fields[options.curField].addValue(t, false, null);
                 }
                 else if (action == "fusion" || action == "ask_fusion") {
-                    editor.T_records[i].fields[editor.curField].addValue(t, true, null);
+                    options.T_records[i].fields[options.curField].addValue(t, true, null);
                 }
 
-                _check_required(i, editor.curField);
+                _check_required(i, options.curField);
             }
         }
 
         _updateFieldDisplay();
 
-        editor.textareaIsDirty = false;
+        options.textareaIsDirty = false;
 
 
-        _editField(evt, editor.curField);
+        _editField(evt, options.curField);
         return(true);
     }
 
@@ -1235,14 +1267,14 @@ console.log('try to append', editor.T_records[r].preview)
                 break;
         }
 
-        for (var id in editor.T_records) {
-            if (editor.T_records[id]._selected)	// toutes les fiches selectionnees
+        for (var id in options.T_records) {
+            if (options.T_records[id]._selected)	// toutes les fiches selectionnees
             {
                 if ($('#idEditDiapo_' + id).hasClass('nostatus'))
                     continue;
 
-                editor.T_records[id].statbits[bit].value = val;
-                editor.T_records[id].statbits[bit].dirty = true;
+                options.T_records[id].statbits[bit].value = val;
+                options.T_records[id].statbits[bit].dirty = true;
             }
         }
     }
@@ -1251,19 +1283,19 @@ console.log('try to append', editor.T_records[r].preview)
 // on a clique sur une thumbnail
 // ---------------------------------------------------------------------------
     function _onSelectRecord(evt, i) {
-        if (editor.curField >= 0) {
-            if (editor.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
+        if (options.curField >= 0) {
+            if (options.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
                 return;
         }
 
         // guideline : si on mousedown sur une selection, c'est qu'on risque de draguer, donc on ne desectionne pas
-        if (evt && evt.type == "mousedown" && editor.T_records[i]._selected)
+        if (evt && evt.type == "mousedown" && options.T_records[i]._selected)
             return;
 
-        if (evt && utilsModule.is_shift_key(evt) && editor.lastClickId != null) {
+        if (evt && utilsModule.is_shift_key(evt) && options.lastClickId != null) {
             // shift donc on sel du editor.lastClickId a ici
-            var pos_from = editor.T_pos[editor.lastClickId];
-            var pos_to = editor.T_pos[i];
+            var pos_from = options.T_pos[options.lastClickId];
+            var pos_to = options.T_pos[i];
             if (pos_from > pos_to) {
                 var tmp = pos_from;
                 pos_from = pos_to;
@@ -1271,11 +1303,11 @@ console.log('try to append', editor.T_records[r].preview)
             }
 
             for (var pos = pos_from; pos <= pos_to; pos++) {
-                var id = editor.T_id[pos];
-                if (!editor.T_records[id]._selected)	// toutes les fiches selectionnees
+                var id = options.T_id[pos];
+                if (!options.T_records[id]._selected)	// toutes les fiches selectionnees
                 {
-                    editor.T_records[id]._selected = true;
-                    $("#idEditDiapo_" + id, editor.$container).addClass('selected');
+                    options.T_records[id]._selected = true;
+                    $("#idEditDiapo_" + id, options.$container).addClass('selected');
                 }
             }
         }
@@ -1283,20 +1315,20 @@ console.log('try to append', editor.T_records[r].preview)
             if (!evt || !utilsModule.is_ctrl_key(evt)) {
                 // on deselectionne tout avant
 
-                for (var id in editor.T_records) {
-                    if (editor.T_records[id]._selected)	// toutes les fiches selectionnees
+                for (var id in options.T_records) {
+                    if (options.T_records[id]._selected)	// toutes les fiches selectionnees
                     {
-                        editor.T_records[id]._selected = false;
-                        $("#idEditDiapo_" + id, editor.$container).removeClass('selected');
+                        options.T_records[id]._selected = false;
+                        $("#idEditDiapo_" + id, options.$container).removeClass('selected');
                     }
                 }
             }
             if (i >= 0) {
-                editor.T_records[i]._selected = !editor.T_records[i]._selected;
-                if (editor.T_records[i]._selected)
-                    $("#idEditDiapo_" + i, editor.$container).addClass('selected');
+                options.T_records[i]._selected = !options.T_records[i]._selected;
+                if (options.T_records[i]._selected)
+                    $("#idEditDiapo_" + i, options.$container).addClass('selected');
                 else
-                    $("#idEditDiapo_" + i, editor.$container).removeClass('selected');
+                    $("#idEditDiapo_" + i, options.$container).removeClass('selected');
             }
         }
 
@@ -1309,7 +1341,7 @@ console.log('try to append', editor.T_records[r].preview)
             _previewEdit(r);
         }
 
-        editor.lastClickId = i;
+        options.lastClickId = i;
         _updateEditSelectedRecords(evt);
     }
 
@@ -1322,7 +1354,7 @@ console.log('try to append', editor.T_records[r].preview)
 
         var t = [];
 
-        if (editor.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
+        if (options.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
             return(false);
 
         var required_fields = _check_required();
@@ -1332,13 +1364,13 @@ console.log('try to append', editor.T_records[r].preview)
             return;
         }
 
-        $("#EDIT_ALL", editor.$container).hide();
+        $("#EDIT_ALL", options.$container).hide();
 
-        $("#EDIT_WORKING", editor.$container).show();
+        $("#EDIT_WORKING", options.$container).show();
 
-        for (var r in editor.T_records) {
+        for (var r in options.T_records) {
             var record_datas = {
-                record_id: editor.T_records[r].rid,
+                record_id: options.T_records[r].rid,
                 metadatas: [],
                 edit: 0,
                 status: null
@@ -1346,8 +1378,8 @@ console.log('try to append', editor.T_records[r].preview)
 
             var editDirty = false;
 
-            for (var f in editor.T_records[r].fields) {
-                if (!editor.T_records[r].fields[f].isDirty()) {
+            for (var f in options.T_records[r].fields) {
+                if (!options.T_records[r].fields[f].isDirty()) {
                     continue;
                 }
 
@@ -1355,7 +1387,7 @@ console.log('try to append', editor.T_records[r].preview)
                 record_datas.edit = 1;
 
                 record_datas.metadatas = record_datas.metadatas.concat(
-                    editor.T_records[r].fields[f].exportDatas()
+                    options.T_records[r].fields[f].exportDatas()
                 );
             }
 
@@ -1364,9 +1396,9 @@ console.log('try to append', editor.T_records[r].preview)
             for (var n = 0; n < 64; n++)
                 tsb[n] = 'x';
             var sb_dirty = false;
-            for (var n in editor.T_records[r].statbits) {
-                if (editor.T_records[r].statbits[n].dirty) {
-                    tsb[63 - n] = editor.T_records[r].statbits[n].value;
+            for (var n in options.T_records[r].statbits) {
+                if (options.T_records[r].statbits[n].dirty) {
+                    tsb[63 - n] = options.T_records[r].statbits[n].value;
                     sb_dirty = true;
                 }
             }
@@ -1379,27 +1411,29 @@ console.log('try to append', editor.T_records[r].preview)
             }
         }
 
-        var options = {
+        var params = {
             mds: t,
-            sbid: editor.sbas_id,
+            sbid: options.sbas_id,
             act: 'WORK',
             lst: $('#edit_lst').val(),
-            act_option: 'SAVE' + editor.what,
+            act_option: 'SAVE' + options.what,
             //regbasprid: editor.regbasprid,
-            ssel: editor.ssel
+            ssel: options.ssel
         };
-        if (editor.newrepresent != false)
-            options.newrepresent = editor.newrepresent;
+        if (options.newrepresent != false)
+            params.newrepresent = options.newrepresent;
 
         $.ajax({
             url: "../prod/records/edit/apply/",
-            data: options
+            data: params
             //    ,dataType:'json'
             ,
             type: 'POST',
             success: function (data) {
-                if (editor.what == 'GRP' || editor.what == 'SSEL') {
-                    p4.WorkZone.refresh('current');
+                if (options.what == 'GRP' || options.what == 'SSEL') {
+                    appEvents.emit('workzone.refresh', {
+                        basketId: 'current'
+                    });
                 }
                 $("#Edit_copyPreset_dlg").remove();
                 $('#EDITWINDOW').hide();
@@ -1420,24 +1454,24 @@ console.log('try to append', editor.T_records[r].preview)
         if (evt.stopPropagation)
             evt.stopPropagation();
 
-        if (editor.curField >= 0) {
-            if (editor.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
+        if (options.curField >= 0) {
+            if (options.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
                 return;
         }
 
-        for (var r in editor.T_records) {
-            for (var f in editor.T_records[r].fields) {
-                if ((dirty |= editor.T_records[r].fields[f].isDirty()))
+        for (var r in options.T_records) {
+            for (var f in options.T_records[r].fields) {
+                if ((dirty |= options.T_records[r].fields[f].isDirty()))
                     break;
             }
-            for (var n in editor.T_records[r].statbits) {
-                if ((dirty |= editor.T_records[r].statbits[n].dirty))
+            for (var n in options.T_records[r].statbits) {
+                if ((dirty |= options.T_records[r].statbits[n].dirty))
                     break;
             }
         }
         if (!dirty || confirm(localeService.t('confirm_abandon'))) {
             $("#Edit_copyPreset_dlg").remove();
-            $('#idFrameE .ww_content', editor.$container).empty();
+            $('#idFrameE .ww_content', options.$container).empty();
 
             // on reaffiche tous les thesaurus
             for (var i in p4.thesau.thlist)	// tous les thesaurus
@@ -1459,8 +1493,8 @@ console.log('try to append', editor.T_records[r].preview)
 
         var zid = ("" + sbas_id).replace(new RegExp("\\.", "g"), "\\.") + "\\.T";
 
-        this.TH_P_node = $("#TH_P\\." + zid, editor.$container);
-        this.TH_K_node = $("#TH_K\\." + zid, editor.$container);
+        this.TH_P_node = $("#TH_P\\." + zid, options.$container);
+        this.TH_K_node = $("#TH_K\\." + zid, options.$container);
 
         this._ctimer = null;
 
@@ -1527,7 +1561,7 @@ console.log('try to append', editor.T_records[r].preview)
                 data: parms,
                 success: function (ret) {
                     var zid = "#TH_K\\." + id.replace(new RegExp("\\.", "g"), "\\.");	// escape les '.' pour jquery
-                    $(zid, editor.$container).html(ret);
+                    $(zid, options.$container).html(ret);
                     me.jq = null;
                 },
                 error: function () {
@@ -1563,17 +1597,17 @@ console.log('try to append', editor.T_records[r].preview)
         if (e) {
             switch (e.id.substr(0, 4)) {
                 case "TH_W":
-                    if (editor.curField >= 0) {
+                    if (options.curField >= 0) {
                         var w = $(e).text();
-                        if (editor.T_fields[editor.curField].multi) {
-                            $("#EditTextMultiValued", editor.$container).val(w);
+                        if (options.T_fields[options.curField].multi) {
+                            $("#EditTextMultiValued", options.$container).val(w);
                             $('#EditTextMultiValued').trigger('keyup.maxLength');
-                            _addMultivaluedField($('#EditTextMultiValued', editor.$container).val(), null);
+                            _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
                         }
                         else {
                             $editTextArea.val(w);
                             $('#idEditZTextArea').trigger('keyup.maxLength');
-                            editor.textareaIsDirty = true;
+                            options.textareaIsDirty = true;
                         }
                     }
                     break;
@@ -1619,12 +1653,12 @@ console.log('try to append', editor.T_records[r].preview)
 
 
         if (ckRegExp.checked) {
-            $("#EditSR_TX", editor.$container).hide();
-            $("#EditSR_RX", editor.$container).show();
+            $("#EditSR_TX", options.$container).hide();
+            $("#EditSR_RX", options.$container).show();
         }
         else {
-            $("#EditSR_RX", editor.$container).hide();
-            $("#EditSR_TX", editor.$container).show();
+            $("#EditSR_RX", options.$container).hide();
+            $("#EditSR_TX", options.$container).show();
         }
     }
 
@@ -1651,7 +1685,7 @@ console.log('try to append', editor.T_records[r].preview)
         $(el).height(h);
         var t = $(el).offset().top + h;
 
-        $("#EDIT_MID", editor.$container).css("top", (t) + "px");
+        $("#EDIT_MID", options.$container).css("top", (t) + "px");
     }
     function _vsplit1() {
         $('#divS_wrapper').height('auto');
@@ -1662,7 +1696,7 @@ console.log('try to append', editor.T_records[r].preview)
         var a = $(el).width();
         el.width(a);
 
-        $("#idEditZone", editor.$container).css("left", (a + 20 ));
+        $("#idEditZone", options.$container).css("left", (a + 20 ));
     }
     function _vsplit2() {
         var el = $('#EDIT_MID_R');
@@ -1672,11 +1706,11 @@ console.log('try to append', editor.T_records[r].preview)
         el.width(a);
         var v = $('#EDIT_ALL').width() - a - 20;
 
-        $("#EDIT_MID_L", editor.$container).width(v);
+        $("#EDIT_MID_L", options.$container).width(v);
     }
 
     function _activeField() {
-        var meta_struct_id = parseInt(editor.curField);
+        var meta_struct_id = parseInt(options.curField);
 
         meta_struct_id = (isNaN(meta_struct_id) || meta_struct_id < 0) ? 'status' : meta_struct_id;
 
@@ -1733,16 +1767,16 @@ console.log('try to append', editor.T_records[r].preview)
         if (typeof id_f == 'undefined')
             id_f = false;
 
-        for (var f in editor.T_fields) {
+        for (var f in options.T_fields) {
             if (id_f !== false && f != id_f)
                 continue;
 
-            var name = editor.T_fields[f].name;
+            var name = options.T_fields[f].name;
 
-            if (!editor.T_fields[f].required)
+            if (!options.T_fields[f].required)
                 continue;
 
-            for (var r in editor.T_records) {
+            for (var r in options.T_records) {
                 if (id_r !== false && r != id_r)
                     continue;
 
@@ -1750,7 +1784,7 @@ console.log('try to append', editor.T_records[r].preview)
 
                 elem.hide();
 
-                if (!editor.T_records[r].fields[f]) {
+                if (!options.T_records[r].fields[f]) {
                     elem.show();
                     required_fields = true;
                 }
@@ -1759,12 +1793,12 @@ console.log('try to append', editor.T_records[r].preview)
                     var check_required = '';
 
                     // le champ existe dans la fiche
-                    if (editor.T_fields[f].multi) {
+                    if (options.T_fields[f].multi) {
                         // champ multi : on compare la concat des valeurs
-                        check_required = $.trim(editor.T_records[r].fields[f].getSerializedValues())
+                        check_required = $.trim(options.T_records[r].fields[f].getSerializedValues())
                     }
-                    else if (editor.T_records[r].fields[f].getValue()) {
-                        check_required = $.trim(editor.T_records[r].fields[f].getValue().getValue());
+                    else if (options.T_records[r].fields[f].getValue()) {
+                        check_required = $.trim(options.T_records[r].fields[f].getValue().getValue());
                     }
 
 
@@ -1781,12 +1815,12 @@ console.log('try to append', editor.T_records[r].preview)
 
 
     function _edit_select_all() {
-        $('#EDIT_FILM2 .diapo', editor.$container).addClass('selected');
+        $('#EDIT_FILM2 .diapo', options.$container).addClass('selected');
 
-        for (var i in editor.T_records)
-            editor.T_records[i]._selected = true;
+        for (var i in options.T_records)
+            options.T_records[i]._selected = true;
 
-        editor.lastClickId = 1;
+        options.lastClickId = 1;
 
         _updateEditSelectedRecords(null);		// null : no evt available
     }
@@ -1800,15 +1834,15 @@ console.log('try to append', editor.T_records[r].preview)
 
         var textZone = $('#EditTextMultiValued');
 
-        if (editor.T_fields[editor.curField].tbranch) {
+        if (options.T_fields[options.curField].tbranch) {
             if (value != "")
                 ETHSeeker.search(value);
         }
 
         if (value != "") {
             //		var nsel = 0;
-            for (var rec_i in editor.T_records) {
-                if (editor.T_records[rec_i].fields[editor.curField].hasValue(value, vocabularyId)) {
+            for (var rec_i in options.T_records) {
+                if (options.T_records[rec_i].fields[options.curField].hasValue(value, vocabularyId)) {
                     $("#idEditDiaButtonsP_" + rec_i).hide();
                     var talt = $.sprintf(localeService.t('editDelSimple'), value);
                     $("#idEditDiaButtonsM_" + rec_i).show()
@@ -1831,7 +1865,7 @@ console.log('try to append', editor.T_records[r].preview)
                     });
                 }
             }
-            $(".editDiaButtons", editor.$container).show();
+            $(".editDiaButtons", options.$container).show();
         }
 
         textZone.trigger('focus');
@@ -1842,13 +1876,13 @@ console.log('try to append', editor.T_records[r].preview)
 // on a clique sur le bouton 'supprimer' un mot dans le multi-val
 // ---------------------------------------------------------------------------
     function _edit_delmval(value, VocabularyId) {
-        var meta_struct_id = editor.curField;		// le champ en cours d'editing
+        var meta_struct_id = options.curField;		// le champ en cours d'editing
 
-        for (var r = 0; r < editor.T_records.length; r++) {
-            if (!editor.T_records[r]._selected)
+        for (var r = 0; r < options.T_records.length; r++) {
+            if (!options.T_records[r]._selected)
                 continue;
 
-            editor.T_records[r].fields[meta_struct_id].removeValue(value, VocabularyId);
+            options.T_records[r].fields[meta_struct_id].removeValue(value, VocabularyId);
         }
 
         _updateEditSelectedRecords(null);
@@ -1858,14 +1892,14 @@ console.log('try to append', editor.T_records[r].preview)
 // on a clique sur le bouton 'ajouter' un mot dans le multi-val
 // ---------------------------------------------------------------------------
     function _addMultivaluedField(value, VocabularyId) {
-        var meta_struct_id = editor.curField;		// le champ en cours d'editing
+        var meta_struct_id = options.curField;		// le champ en cours d'editing
 
         // on ajoute le mot dans tous les records selectionnes
-        for (var r = 0; r < editor.T_records.length; r++) {
-            if (!editor.T_records[r]._selected)
+        for (var r = 0; r < options.T_records.length; r++) {
+            if (!options.T_records[r]._selected)
                 continue;
 
-            editor.T_records[r].fields[meta_struct_id].addValue(value, false, VocabularyId);
+            options.T_records[r].fields[meta_struct_id].addValue(value, false, VocabularyId);
         }
 
         _updateEditSelectedRecords(null);
@@ -1877,17 +1911,17 @@ console.log('try to append', editor.T_records[r].preview)
     function _editMultivaluedField(mvaldiv, ival) {
         $(mvaldiv).parent().find('.hilighted').removeClass('hilighted');
         $(mvaldiv).addClass('hilighted');
-        _reveal_mval(editor.T_mval[ival].getValue(), editor.T_mval[ival].getVocabularyId());
+        _reveal_mval(options.T_mval[ival].getValue(), options.T_mval[ival].getVocabularyId());
     }
 
     function _edit_diabutton(record_indice, act, value, vocabularyId) {
-        var meta_struct_id = editor.curField;		// le champ en cours d'editing
+        var meta_struct_id = options.curField;		// le champ en cours d'editing
         if (act == 'del') {
-            editor.T_records[record_indice].fields[meta_struct_id].removeValue(value, vocabularyId);
+            options.T_records[record_indice].fields[meta_struct_id].removeValue(value, vocabularyId);
         }
 
         if (act == 'add') {
-            editor.T_records[record_indice].fields[meta_struct_id].addValue(value, false, vocabularyId);
+            options.T_records[record_indice].fields[meta_struct_id].addValue(value, false, vocabularyId);
         }
         _updateCurrentMval(meta_struct_id, value, vocabularyId);
         _reveal_mval(value, vocabularyId);
@@ -1937,7 +1971,7 @@ console.log('try to append', editor.T_records[r].preview)
         switch (event.keyCode) {
             case 13:
             case 10:
-                if (editor.T_fields[editor.curField].type == "date")
+                if (options.T_fields[options.curField].type == "date")
                     cancelKey = true;
         }
 
@@ -1963,9 +1997,9 @@ console.log('try to append', editor.T_records[r].preview)
         let $el = $(event.currentTarget);
         let value = $el.val();
         console.log('has valeu?', value)
-        console.log('curfield?', editor.curField)
-        console.log('t_field?', editor.T_fields)
-        if (editor.T_fields[editor.curField].tbranch) {
+        console.log('curfield?', options.curField)
+        console.log('t_field?', options.T_fields)
+        if (options.T_fields[options.curField].tbranch) {
             if (value != "")
                 ETHSeeker.search(value);
         }
@@ -1992,12 +2026,12 @@ console.log('try to append', editor.T_records[r].preview)
                 event.stopPropagation();
             return(false);
         }
-        if (!editor.textareaIsDirty && ($editTextArea.val() != editor.fieldLastValue)) {
-            editor.textareaIsDirty = true;
+        if (!options.textareaIsDirty && ($editTextArea.val() != options.fieldLastValue)) {
+            options.textareaIsDirty = true;
         }
 
         var s = $el.val(); //obj.value;
-        if (editor.T_fields[editor.curField].tbranch) {
+        if (options.T_fields[options.curField].tbranch) {
             if (s != "")
                 ETHSeeker.search(s);
         }
@@ -2011,6 +2045,7 @@ console.log('try to append', editor.T_records[r].preview)
 
     return {
         initialize: initialize,
+        onGlobalKeydown: onGlobalKeydown,
         startThisEditing: startThisEditing,
         setRegDefault: setRegDefault,
         skipImage: skipImage,

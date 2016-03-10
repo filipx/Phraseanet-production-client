@@ -74,7 +74,7 @@ const recordDeleteModal = (services) => {
                         p4.Results.Selection.remove(n);
                         if(stories.length > 0)
                         {
-                            p4.WorkZone.refresh();
+                            appEvents.emit('workzone.refresh');
                         }
                         else
                         {
