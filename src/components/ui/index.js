@@ -7,7 +7,7 @@ import exportRecord from '../record/export';
 import addToBasket from '../record/addToBasket';
 import removeFromBasket from '../record/removeFromBasket';
 import printRecord from '../record/print';
-import previewRecordService from './recordPreview';
+import previewRecordService from '../record/recordPreview';
 import Alerts from '../utils/alert';
 import uploader from '../uploader';
 const ui = (services) => {

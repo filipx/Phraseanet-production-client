@@ -1,4 +1,4 @@
-import recordEditor from '../ui/recordEditor';
+import recordEditorService from './recordEditor';
 
 const editRecord = (services) => {
     const {configService, localeService, appEvents} = services;
@@ -30,7 +30,7 @@ const editRecord = (services) => {
     const openModal = (datas) => {
 
         $('#idFrameE').empty().addClass('loading');
-        commonModule.showOverlay(2);
+        //commonModule.showOverlay(2);
 
         $('#EDITWINDOW').show();
 
@@ -40,8 +40,14 @@ const editRecord = (services) => {
             dataType: "html",
             data: datas,
             success: function (data) {
-                recordEditor(services).initialize();
+                let recordEditor = recordEditorService(services);
+
+
                 $('#idFrameE').removeClass('loading').empty().html(data);
+
+                recordEditor.initialize();
+                recordEditor.startThisEditing(window.recordEditorConfig)
+
                 $('#tooltip').hide();
                 return;
             },

@@ -1,7 +1,6 @@
 import $ from 'jquery';
 import moveRecords from '../actions/moveRecord';
 import editRecord from '../../record/edit';
-//import recordEditModal from '../actions/recordEdit';
 import recordDeleteModal from '../actions/recordDelete';
 import recordDownloadModal from '../actions/recordDownload';
 import recordPropertyModal from '../actions/recordProperty';

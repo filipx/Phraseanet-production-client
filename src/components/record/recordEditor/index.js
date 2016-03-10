@@ -3,7 +3,7 @@ import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
 //var p4 = p4 || {};
 
-const recordEditor = (services) => {
+const recordEditorService = (services) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
     let options = {};
@@ -183,7 +183,27 @@ const recordEditor = (services) => {
     };
 
     function startThisEditing(params) {//sbas_id, what, regbasprid, ssel) {
-        let {databoxId, mode, state} = params;
+        let {hasMultipleDatabases, databoxId, mode, notActionable, notActionableMsg, state} = params;
+
+        if( hasMultipleDatabases === true ) {
+            $('#EDITWINDOW').hide();
+            // commonModule.hideOverlay(2);
+            // editor can't be run
+            $( "#dialog-edit-many-sbas", options.$container ).dialog({
+                modal: true,
+                resizable:false,
+                buttons: {
+                    Ok: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+            return;
+        }
+
+        if( notActionable > 0) {
+            alert(notActionableMsg);
+        }
 
         options.sbas_id = databoxId;
         options.what = mode;
@@ -1475,14 +1495,17 @@ console.log('try to append', options.T_records[r].preview)
             $('#idFrameE .ww_content', options.$container).empty();
 
             // on reaffiche tous les thesaurus
-            for (var i in p4.thesau.thlist)	// tous les thesaurus
+            /*for (var i in p4.thesau.thlist)	// tous les thesaurus
             {
                 var bid = p4.thesau.thlist[i].sbas_id;
                 var e = document.getElementById('TH_T.' + bid + '.T');
                 if (e)
                     e.style.display = "";
-            }
-            self.setTimeout("$('#EDITWINDOW').fadeOut();commonModule.hideOverlay(2);", 100);
+            }*/
+            // display all thesaurus
+            $('.thesaurus-db-root').show();
+
+            self.setTimeout("$('#EDITWINDOW').fadeOut();", 100);
 
         }
     }
@@ -1578,13 +1601,14 @@ console.log('try to append', options.T_records[r].preview)
     function edit_clickThesaurus(event)	// onclick dans le thesaurus
     {
         // on cherche ou on a clique
-        for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode)
+        for (var e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode)
             ;
         if (e) {
             switch (e.id.substr(0, 4)) {
                 case "TH_P":	// +/- de deploiement de mot
-                    js = "recordEditorModule.edit_thesaurus_ow('" + e.id.substr(5) + "')";
-                    self.setTimeout(js, 10);
+                    edit_thesaurus_ow(e.id.substr(5) )
+                    // js = "recordEditorModule.edit_thesaurus_ow('" + e.id.substr(5) + "')";
+                    // self.setTimeout(js, 10);
                     break;
             }
         }
@@ -1593,7 +1617,7 @@ console.log('try to append', options.T_records[r].preview)
 
     function edit_dblclickThesaurus(event)	// ondblclick dans le thesaurus
     {
-        for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode)
+        for (var e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode)
             ;
         if (e) {
             switch (e.id.substr(0, 4)) {
@@ -2059,4 +2083,4 @@ console.log('try to append', options.T_records[r].preview)
         edit_thesaurus_ow: edit_thesaurus_ow
     };
 };
-export default recordEditor;
+export default recordEditorService;
