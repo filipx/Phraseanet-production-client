@@ -62,7 +62,7 @@ const recordDeleteModal = (services) => {
                             stories = $('.STORY_' + n);
                         $('.doc_infos', imgt).remove();
                         imgt.unbind('click').removeAttr('ondblclick').removeClass('selected').draggable('destroy').removeClass('IMGT').find('img').unbind();
-                        imgt.find('.thumb img').attr('src','/assets/common/images/icons/deleted.png').css({
+                        imgt.find('.thumb img').attr('src', '/assets/common/images/icons/deleted.png').css({
                             width:'100%',
                             height:'auto',
                             margin: '0 10px',

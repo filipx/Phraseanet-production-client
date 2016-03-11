@@ -464,20 +464,20 @@ const search = (services) => {
             if (nbSelectedColls === 0) {
                 // no collections checked for this databox
                 // hide the status bits
-                $("#ADVSRCH_SB_ZONE_" + sbas_id, container).hide();
+                $('#ADVSRCH_SB_ZONE_' + sbas_id, container).hide();
                 // uncheck
-                $("#ADVSRCH_SB_ZONE_" + sbas_id+' input:checkbox', container).prop('checked', false);
+                $('#ADVSRCH_SB_ZONE_' + sbas_id + ' input:checkbox', container).prop('checked', false);
             }
             else {
                 // at least one coll checked for this databox
                 // show again the relevant fields in "sort by" select
-                $(".db_" + sbas_id, fieldsSort).show().prop('disabled', false);
+                $('.db_' + sbas_id, fieldsSort).show().prop('disabled', false);
                 // show again the relevant fields in "from fields" select
-                $(".db_" + sbas_id, fieldsSelect).show().prop('disabled', false);
+                $('.db_' + sbas_id, fieldsSelect).show().prop('disabled', false);
                 // show the sb
-                $("#ADVSRCH_SB_ZONE_" + sbas_id, container).show();
+                $('#ADVSRCH_SB_ZONE_' + sbas_id, container).show();
                 // show again the relevant fields in "date field" select
-                $(".db_" + sbas_id, dateFilterSelect).show().prop('disabled', false);
+                $('.db_' + sbas_id, dateFilterSelect).show().prop('disabled', false);
             }
         });
 
@@ -538,16 +538,16 @@ const search = (services) => {
         for (var sbas_id in availableDb) {
 
             var nchecked = 0;
-            $("#ADVSRCH_SB_ZONE_" + sbas_id+' :checkbox[checked]', container).each(function () {
+            $('#ADVSRCH_SB_ZONE_' + sbas_id + ' :checkbox[checked]', container).each(function () {
                 var n = $(this).attr('n');
                 search.status[n] = $(this).val().split('_');
                 nchecked++;
             });
             if (nchecked === 0) {
-                $("#ADVSRCH_SB_ZONE_" + sbas_id, container).removeClass('danger');
+                $('#ADVSRCH_SB_ZONE_' + sbas_id, container).removeClass('danger');
             }
             else {
-                $("#ADVSRCH_SB_ZONE_" + sbas_id, container).addClass('danger');
+                $('#ADVSRCH_SB_ZONE_' + sbas_id, container).addClass('danger');
                 danger = true;
             }
         }

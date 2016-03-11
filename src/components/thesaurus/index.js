@@ -127,9 +127,9 @@ const thesaurusService = (services) => {
     function T_Gfilter(o)
     {
         var f;
-        if (o.nodeName=='FORM')
+        if (o.nodeName == 'FORM')
             f = $(o).find('input[name=search_value]').val();
-        else if (o.nodeName=='INPUT')
+        else if (o.nodeName==='INPUT')
             f = $(o).val();
 
         T_Gfilter_delayed(f, 0);
@@ -219,7 +219,7 @@ const thesaurusService = (services) => {
         timer = window.setTimeout(
             function ()
             {
-                if (mode==='ALL')
+                if (mode === 'ALL')
                 {
                     // search in every base, everywhere
                     for (var i in sbas)
@@ -254,7 +254,7 @@ const thesaurusService = (services) => {
                         });
                     }
                 }
-                else if (mode==='CANDIDATE')
+                else if (mode === 'CANDIDATE')
                 {
                     // search only on the good base and the good branch(es)
                     for (var i in sbas)
@@ -402,8 +402,8 @@ const thesaurusService = (services) => {
                     var zurl = '/xmlhttp/openbranch_prod.j.php'
                         + '?type=' + result.refresh[i].type
                         + '&sbid=' + result.refresh[i].sbid
-                        + "&id=" + encodeURIComponent(result.refresh[i].id);
-                    if (result.refresh[i].type == 'T')
+                        + '&id=' + encodeURIComponent(result.refresh[i].id);
+                    if (result.refresh[i].type === 'T')
                         zurl += '&sortsy=1' ;
 
                     $.get(zurl
@@ -451,7 +451,7 @@ const thesaurusService = (services) => {
         );
         var parms = {
             url:'/xmlhttp/replacecandidate.j.php',
-            data:{'id[]':t_ids },
+            data:{ 'id[]':t_ids },
             async:false,
             cache:false,
             dataType:'json',
@@ -636,10 +636,10 @@ const thesaurusService = (services) => {
                 var tid = tids.shift();
                 var sbid = tids.shift();
                 var type = tid.substr(0, 1);
-                if ((type == 'T' || type == 'C') && tid.substr(1, 4)=='X_P')	// TX_P ou CX_P
+                if ((type === 'T' || type === 'C') && tid.substr(1, 4) == 'X_P')	// TX_P ou CX_P
                 {
                     var ul = li.children('ul').eq(0);
-                    if (ul.css('display') == 'none' || prodApp.utils.is_ctrl_key(e))
+                    if (ul.css('display') === 'none' || prodApp.utils.is_ctrl_key(e))
                     {
                         if (prodApp.utils.is_ctrl_key(e))
                         {
@@ -651,10 +651,10 @@ const thesaurusService = (services) => {
 
                         if (!li.attr('loaded'))
                         {
-                            var zurl = "/xmlhttp/openbranch_prod.j.php?type=" + type + "&sbid=" + sbid+'&id=' + encodeURIComponent(tids.join('.'));
+                            var zurl = '/xmlhttp/openbranch_prod.j.php?type=' + type + '&sbid=' + sbid + '&id=' + encodeURIComponent(tids.join('.'));
                             if (li.hasClass('last'))
                                 zurl += '&last=1';
-                            if (type == 'T')
+                            if (type === 'T')
                                 zurl += '&sortsy=1';
                             $.get(zurl, [], function (j)
                                 {
@@ -673,7 +673,7 @@ const thesaurusService = (services) => {
                 var li = $(x).closest('li');
                 var tids = li.attr('id').split('.');
                 var type = tids[0].substr(0, 1);
-                if ((type == 'T' && tids.length > 2) || tids.length === 4) // && tids[0].substr(0, 1)=='C')
+                if ((type === 'T' && tids.length > 2) || tids.length === 4) // && tids[0].substr(0, 1)=='C')
                 {
                     tids.pop();
                     var tid3 = tids.join('.');
@@ -727,7 +727,7 @@ const thesaurusService = (services) => {
                 {
                     case 'wiz_0':				// simply browse
                         var tid = $(x).closest('li').attr('id');
-                        if (tid.substr(0, 5)=='TX_P.')
+                        if (tid.substr(0, 5)==='TX_P.')
                         {
                             var tids = tid.split('.');
                             if (tids.length > 3)
@@ -740,7 +740,7 @@ const thesaurusService = (services) => {
                         break;
                     case 'wiz_2':				// replace by
                         var tid = $(x).closest('li').attr('id');
-                        if (tid.substr(0, 5)=='TX_P.')
+                        if (tid.substr(0, 5)==='TX_P.')
                         {
                             var term = $(x).text();
                             $('#THPD_WIZARDS .wiz_2 :text').val(term);
@@ -786,9 +786,9 @@ const thesaurusService = (services) => {
             {
                 var base_id = $(n).val();
 
-                bas2sbas["b" + base_id].ckobj = this;
-                bas2sbas["b" + base_id].waschecked = this.checked;
-                if (bas2sbas["b" + base_id].sbid === sbid)
+                bas2sbas['b' + base_id].ckobj = this;
+                bas2sbas['b' + base_id].waschecked = this.checked;
+                if (bas2sbas['b' + base_id].sbid === sbid)
                 {
                     if (this.checked)
                         nck++;
@@ -799,7 +799,7 @@ const thesaurusService = (services) => {
             }
         );
 
-        if (nck === 0 || type == 'C')
+        if (nck === 0 || type === 'C')
         {
             var i;
             for (i in bas2sbas)
@@ -809,7 +809,7 @@ const thesaurusService = (services) => {
             }
         }
         let queryString = '';
-        if (type == 'T')
+        if (type === 'T')
             queryString = '[' + term + ']';
         else
             queryString = field + '="' + term + '"';
@@ -1108,15 +1108,15 @@ const thesaurusService = (services) => {
                 if (ret) // && (typeof(ret.parsed)=="undefined" || ret.parsed))
                 {
                     var htmlnodes = ret.getElementsByTagName('html');
-                    if (htmlnodes && htmlnodes.length == 1 && (htmlnode = htmlnodes.item(0).firstChild))
+                    if (htmlnodes && htmlnodes.length === 1 && (htmlnode = htmlnodes.item(0).firstChild))
                     {
-                        if (typeof (id)=='undefined')
+                        if (typeof (id)==='undefined')
                         {
                             // called from search or 'auto' : full thesaurus search
                             if (!this.tObj['TH_P'])
-                                this.tObj['TH_P'] = document.getElementById("TH_P." + this.sbas_id+'.T');
+                                this.tObj['TH_P'] = document.getElementById('TH_P.' + this.sbas_id + '.T');
                             if (!this.tObj['TH_K'])
-                                this.tObj['TH_K'] = document.getElementById("TH_K." + this.sbas_id+'.T');
+                                this.tObj['TH_K'] = document.getElementById('TH_K.' + this.sbas_id + '.T');
                             this.tObj['TH_P'].innerHTML = '...';
                             this.tObj['TH_K'].className = 'h';
                             this.tObj['TH_K'].innerHTML = htmlnode.nodeValue;
@@ -1125,14 +1125,14 @@ const thesaurusService = (services) => {
                             // called from 'openBranch'
                             //			var js = "document.getElementById('TH_K."+thid+"').innerHTML = \""+htmlnode.nodeValue+"\"";
                             //			self.setTimeout(js, 10);
-                            document.getElementById("TH_K." + id).innerHTML = htmlnode.nodeValue;
+                            document.getElementById('TH_K.' + id).innerHTML = htmlnode.nodeValue;
                         }
                     }
                 }
             }
             catch (err)
             {
-                
+
             }
         };
     }

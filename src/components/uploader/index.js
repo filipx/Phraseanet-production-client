@@ -49,7 +49,7 @@ const uploader = (services) => {
 
         if (ieold) iev = new Number(RegExp.$1);
         if (navigator.appVersion.indexOf('MSIE 10') !== -1) iev = 10;
-        if (trident && rv != -1) iev = 11;
+        if (trident && rv !== -1) iev = 11;
 
         if (iev >= 10) {
             $('#UPLOAD_FLASH_LINK').hide();

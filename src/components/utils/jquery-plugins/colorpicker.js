@@ -333,7 +333,7 @@
                     var t1 = v;
                     var t2 = (255 - s) * v / 255;
                     var t3 = (t1 - t2) * (h % 60) / 60;
-                    if (h===360) h = 0;
+                    if (h === 360) h = 0;
                     if (h < 60) {rgb.r = t1;	rgb.b = t2; rgb.g = t2 + t3;}
                     else if (h < 120) {rgb.g = t1; rgb.b = t2;	rgb.r = t1 - t3;}
                     else if (h < 180) {rgb.g = t1; rgb.r = t2;	rgb.b = t2 + t3;}
@@ -481,4 +481,4 @@
         ColorPickerShow: ColorPicker.showPicker,
         ColorPickerSetColor: ColorPicker.setColor
     });
-})(jQuery)
+})(jQuery);

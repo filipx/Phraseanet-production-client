@@ -158,7 +158,7 @@ const recordBridge = (services) => {
             return false;
         });
 
-        $(".delete-account", $panel).bind('click', function () {
+        $('.delete-account', $panel).bind('click', function () {
             account_id = $(this).val();
             var buttons = {};
 

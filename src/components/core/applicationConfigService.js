@@ -88,4 +88,4 @@ export default class ApplicationConfigService {
 
         return this._search(obj[currentPath], path.slice(1));
     }
-};
+}
