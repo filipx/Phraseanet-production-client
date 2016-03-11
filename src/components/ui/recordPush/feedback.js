@@ -2,9 +2,9 @@ import dialog from '../../utils/dialog';
 import Selectable from '../../utils/selectable';
 import * as _ from 'underscore';
 var Feedback = function (services, options) {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     console.log('init feedback with', options);
-    let $container, {containerId, context} = options;
+    let $container, { containerId, context } = options;
     console.log('init feedback with', containerId, context);
     this.container = $container = $(containerId);
 
@@ -33,7 +33,7 @@ var Feedback = function (services, options) {
         var $this = $(this);
 
         $.ajax({
-            type: "GET",
+            type: 'GET',
             url: $this.attr('href'),
             dataType: 'html',
             beforeSend: function () {
@@ -156,7 +156,7 @@ var Feedback = function (services, options) {
                     size: 'Alert',
                     closeButton: true,
                     title: language.warning
-                }
+                };
                 var $dialogAlert = dialog.create(services, options, 3);
                 $dialogAlert.setContent(language.FeedBackNameMandatory);
 
@@ -187,7 +187,7 @@ var Feedback = function (services, options) {
 
         var $FeedBackForm = $('form[name="FeedBackForm"]', $container);
 
-        var html = _.template($("#feedback_sendform_tpl").html());
+        var html = _.template($('#feedback_sendform_tpl').html());
 
         $dialog.setContent(html);
 
@@ -274,7 +274,7 @@ var Feedback = function (services, options) {
             return false;
         }
 
-        appEvents.emit('push.createList', {name: $input.val(), collection: users});
+        appEvents.emit('push.createList', { name: $input.val(), collection: users });
         $input.val('');
         /*
         p4.Lists.create($input.val(), function (list) {
@@ -290,7 +290,7 @@ var Feedback = function (services, options) {
             source: function (request, response) {
                 $.ajax({
                     url: '/prod/push/search-user/',
-                    dataType: "json",
+                    dataType: 'json',
                     data: {
                         query: request.term
                     },
@@ -313,21 +313,21 @@ var Feedback = function (services, options) {
                 return false;
             }
         })
-        .data("ui-autocomplete")._renderItem = function (ul, item) {
-        var html = "";
+        .data('ui-autocomplete')._renderItem = function (ul, item) {
+        var html = '';
 
         if (item.type === 'USER') {
-            html = _.template($("#list_user_tpl").html())( {
+            html = _.template($('#list_user_tpl').html())( {
 
                 item: item
             });
         } else if (item.type === 'LIST') {
-            html = _.template($("#list_list_tpl").html())( {
+            html = _.template($('#list_list_tpl').html())( {
                 item: item
             });
         }
 
-        return  $(html).data("ui-autocomplete-item", item).appendTo(ul);
+        return $(html).data('ui-autocomplete-item', item).appendTo(ul);
     };
 
     return this;
@@ -345,7 +345,7 @@ Feedback.prototype = {
             return;
         }
 
-        var html = _.template($("#" + this.Context.toLowerCase() + "_badge_tpl").html())( {
+        var html = _.template($('#' + this.Context.toLowerCase() + '_badge_tpl').html())( {
             user: user
         });
 

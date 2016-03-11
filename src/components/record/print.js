@@ -1,5 +1,5 @@
 const printRecord = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -7,10 +7,10 @@ const printRecord = (services) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
             let key = '';
-            let kind= $el.data('kind');
+            let kind = $el.data('kind');
             let idContent = $el.data('id');
 
-            switch(kind) {
+            switch (kind) {
                 case 'basket':
                     key = 'ssel';
                     break;
@@ -21,11 +21,11 @@ const printRecord = (services) => {
 
             doPrint(`${key}=${idContent}`);
         });
-    }
+    };
 
     function doPrint(value) {
-        if ($("#DIALOG").data("ui-dialog")) {
-            $("#DIALOG").dialog('destroy');
+        if ($('#DIALOG').data('ui-dialog')) {
+            $('#DIALOG').dialog('destroy');
         }
         $('#DIALOG').attr('title', language.print)
             .empty().addClass('loading')
@@ -36,16 +36,16 @@ const printRecord = (services) => {
                 width: '800',
                 height: '500',
                 open: function (event, ui) {
-                    $(this).dialog("widget").css("z-index", "1999");
+                    $(this).dialog('widget').css('z-index', '1999');
                 },
                 close: function (event, ui) {
-                    $(this).dialog("widget").css("z-index", "auto");
+                    $(this).dialog('widget').css('z-index', 'auto');
                 }
             })
             .dialog('open');
 
         $.ajax({
-            type: "POST",
+            type: 'POST',
             url: '../prod/printer/?' + value,
             dataType: 'html',
             beforeSend: function () {
@@ -59,7 +59,7 @@ const printRecord = (services) => {
         });
     }
 
-    return {initialize};
+    return { initialize };
 };
 
 export default printRecord;

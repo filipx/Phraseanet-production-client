@@ -30,7 +30,7 @@ export default class ApplicationConfigService {
 
     set(configKey, value) {
         if (configKey !== undefined) {
-            if( typeof this.configuration[configKey] === 'object') {
+            if ( typeof this.configuration[configKey] === 'object') {
                 // merge
                 this.configuration[configKey] = _.extend({}, this.configuration[configKey], value);
             } else {
@@ -46,8 +46,8 @@ export default class ApplicationConfigService {
         }
 
         var isStr = _.isString(configName),
-            name  = isStr ? configName : configName.name,
-            path  = configName.indexOf('.') > 0 ? true : false;
+            name = isStr ? configName : configName.name,
+            path = configName.indexOf('.') > 0 ? true : false;
 
         if (path) {
             return this._search(this.configuration, name);

@@ -46,11 +46,11 @@ function getLevel(level) {
     }
 
     return level;
-};
+}
 
 function getId(level) {
     return 'DIALOG' + getLevel(level);
-};
+}
 
 function addButtons(buttons, dialog) {
     if (dialog.options.closeButton === true) {
@@ -176,7 +176,7 @@ var phraseaDialog = function (services, options, level) {
                 console.log('open dialog', this.zIndex, this.level);
                 const $dialogEl = $(event.currentTarget);
                 //$(this)
-                $dialogEl.dialog("widget").css("z-index", this.zIndex);
+                $dialogEl.dialog('widget').css('z-index', this.zIndex);
             },
             close: CloseCallback
         })
@@ -190,7 +190,7 @@ var phraseaDialog = function (services, options, level) {
         var $this = this;
         $(window).unbind('resize.DIALOG' + getLevel(level))
             .bind('resize.DIALOG' + getLevel(level), function () {
-                if ($this.$dialog.data("ui-dialog")) {
+                if ($this.$dialog.data('ui-dialog')) {
                     $this.$dialog.dialog('option', {
                         width: bodySize.x - 30,
                         height: bodySize.y - 30
@@ -250,7 +250,7 @@ phraseaDialog.prototype = {
         return this.$dialog;
     },
     getOption: function (optionName) {
-        if (this.$dialog.data("ui-dialog")) {
+        if (this.$dialog.data('ui-dialog')) {
             return this.$dialog.dialog('option', optionName);
         }
         return null;
@@ -259,7 +259,7 @@ phraseaDialog.prototype = {
         if (optionName === 'buttons') {
             optionValue = addButtons(optionValue, this);
         }
-        if (this.$dialog.data("ui-dialog")) {
+        if (this.$dialog.data('ui-dialog')) {
             this.$dialog.dialog('option', optionName, optionValue);
         }
     }

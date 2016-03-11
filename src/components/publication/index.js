@@ -9,7 +9,7 @@ const publication = (services) => {
     };
 
     let curPage;
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const initialize = () => {
 
         var $answers = $('#answers');
@@ -17,7 +17,7 @@ const publication = (services) => {
 // refresh current view
         $answers.on('click', '.feed_reload', function (event) {
             event.preventDefault();
-            fetchPublications(curPage)
+            fetchPublications(curPage);
         });
 
 // navigate to a specific feed
@@ -36,7 +36,7 @@ const publication = (services) => {
                         }
                         $answers.append(data);
 
-                        $answers.find("img.lazyload").lazyload({
+                        $answers.find('img.lazyload').lazyload({
                             container: $answers
                         });
                     }
@@ -44,7 +44,7 @@ const publication = (services) => {
                         $('.see_more.loading', $answers).remove();
                         $answers.append(data);
 
-                        $answers.find("img.lazyload").lazyload({
+                        $answers.find('img.lazyload').lazyload({
                             container: $answers
                         });
 
@@ -64,7 +64,7 @@ const publication = (services) => {
             event.preventDefault();
             var $this = $(this);
 
-            if (typeof(renew) === 'undefined')
+            if (typeof (renew) === 'undefined')
                 renew = 'false';
             else
                 renew = renew ? 'true' : 'false';
@@ -83,15 +83,15 @@ const publication = (services) => {
             event.stopPropagation();
 
             $.ajax({
-                type: "GET",
+                type: 'GET',
                 url: $this.attr('href') + (event.renew === true ? '?renew=true' : ''),
                 dataType: 'json',
                 success: function (data) {
                     if (data.texte !== false && data.titre !== false) {
-                        if ($("#DIALOG").data("ui-dialog")) {
-                            $("#DIALOG").dialog('destroy');
+                        if ($('#DIALOG').data('ui-dialog')) {
+                            $('#DIALOG').dialog('destroy');
                         }
-                        $("#DIALOG").attr('title', data.titre)
+                        $('#DIALOG').attr('title', data.titre)
                             .empty()
                             .append(data.texte)
                             .dialog({
@@ -118,7 +118,7 @@ const publication = (services) => {
         $answers.on('click', '.feed .entry a.feed_edit', function () {
             var $this = $(this);
             $.ajax({
-                type: "GET",
+                type: 'GET',
                 url: $this.attr('href'),
                 dataType: 'html',
                 success: function (data) {
@@ -134,7 +134,7 @@ const publication = (services) => {
                 return false;
             var $this = $(this);
             $.ajax({
-                type: "POST",
+                type: 'POST',
                 url: $this.attr('href'),
                 dataType: 'json',
                 success: function (data) {
@@ -179,7 +179,7 @@ const publication = (services) => {
         }
 
         return ajaxState.query = $.ajax({
-            type: "GET",
+            type: 'GET',
             url: url,
             dataType: 'html',
             data: data,
@@ -263,7 +263,7 @@ const publication = (services) => {
 
                         container.hide().fadeIn();
 
-                        $answers.find("img.lazyload").lazyload({
+                        $answers.find('img.lazyload').lazyload({
                             container: $answers
                         });
                     }
@@ -314,7 +314,7 @@ const publication = (services) => {
 
                 $answers.append(data);
 
-                $answers.find("img.lazyload").lazyload({
+                $answers.find('img.lazyload').lazyload({
                     container: $answers
                 });
 
@@ -337,20 +337,20 @@ const publication = (services) => {
         };
 
         switch (type) {
-            case "IMGT":
-            case "CHIM":
+            case 'IMGT':
+            case 'CHIM':
                 options.lst = value;
                 break;
 
-            case "STORY":
+            case 'STORY':
                 options.story = value;
                 break;
-            case "SSTT":
+            case 'SSTT':
                 options.ssel = value;
                 break;
         }
 
-        $.post("../prod/feeds/requestavailable/"
+        $.post('../prod/feeds/requestavailable/'
             , options
             , function (data) {
 
@@ -365,7 +365,7 @@ const publication = (services) => {
         fetchPublications,
         publishRecords,
         openModal
-    }
+    };
 };
 
 export default publication;

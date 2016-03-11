@@ -1,8 +1,8 @@
-import {Observable} from 'rx';
-import {ajax} from 'jQuery';
+import { Observable } from 'rx';
+import { ajax } from 'jQuery';
 
 let notifyService = (services) => {
-    const {configService} = services;
+    const { configService } = services;
     const url = configService.get('baseUrl');
     const notificationEndPoint = 'session/notifications/';
     let initialize = () => {
@@ -23,23 +23,23 @@ let notifyService = (services) => {
                 dataType: 'json'
             }).done((data) => {
                     data.status = data.status || false;
-                if( data.status === 'ok') {
-                    resolve(data)
+                if ( data.status === 'ok') {
+                    resolve(data);
                 } else {
                     reject(data);
                 }
             })
             .fail((data) => {
-                reject(data)
-            })
+                reject(data);
+            });
         });
-    }
+    };
 
-    let stream = Observable.fromPromise(getNotification)
+    let stream = Observable.fromPromise(getNotification);
     return {
         initialize,
         getNotification,
         stream
-    }
-}
+    };
+};
 export default notifyService;

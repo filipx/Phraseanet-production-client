@@ -9,7 +9,7 @@ var Selectable = function ($container, options) {
             selectStop: null,
             limit: null
         },
-        options = (typeof options == 'object') ? options : {};
+        options = (typeof options === 'object') ? options : {};
 
     var $this = this;
 
@@ -40,7 +40,7 @@ var Selectable = function ($container, options) {
 
             var k = get_value($that, $this);
 
-            if (utilsModule.is_shift_key(event) && jQuery('.last_selected', this.$container).filter($this.options.selector).length != 0) {
+            if (utilsModule.is_shift_key(event) && jQuery('.last_selected', this.$container).filter($this.options.selector).length !== 0) {
                 var lst = jQuery($this.options.selector, this.$container);
 
                 var index1 = jQuery.inArray(jQuery('.last_selected', this.$container).filter($this.options.selector)[0], lst);
@@ -54,7 +54,7 @@ var Selectable = function ($container, options) {
 
                 var stopped = false;
 
-                if (index2 != -1 && index1 != -1) {
+                if (index2 !== -1 && index1 !== -1) {
                     var exp = $this.options.selector + ':gt(' + index1 + '):lt(' + (index2 - index1) + ')';
 
                     $.each(jQuery(exp, this.$container), function (i, n) {

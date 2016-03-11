@@ -1,7 +1,7 @@
 (function ($) {
     $.fn.extend({
         highlight: function (color) {
-            console.log('high ligh binded')
+            console.log('high ligh binded');
             if ($(this).hasClass('animating')) {
                 return;
             }

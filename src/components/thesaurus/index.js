@@ -1,12 +1,12 @@
-import {sprintf} from 'sprintf-js';
+import { sprintf } from 'sprintf-js';
 const thesaurusService = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     let options = {};
     let config = {};
     let sbas, bas2sbas, trees; // @TODO remove global
     const initialize = (options) => {
-        let {$container} = options;
+        let { $container } = options;
 
         config = configService.get('thesaurusConfig');
 
@@ -14,8 +14,8 @@ const thesaurusService = (services) => {
         options.thlist = {};
         options.tabs = null;
         for (var db of config.availableDatabases) {
-            console.log('loop throug available db', db.id)
-            options.thlist['s' + db.id ] = new ThesauThesaurusSeeker(db.id);
+            console.log('loop throug available db', db.id);
+            options.thlist['s' + db.id] = new ThesauThesaurusSeeker(db.id);
         }
 
         startThesaurus();
@@ -47,14 +47,14 @@ const thesaurusService = (services) => {
                 event.preventDefault();
                 cclicks++;
 
-                if(cclicks === 1) {
-                    cTimer = setTimeout(function() {
+                if (cclicks === 1) {
+                    cTimer = setTimeout(function () {
                         Xclick(event);
                         cclicks = 0;
                     }, cDelay);
 
                 } else {
-                    console.log('double click')
+                    console.log('double click');
                     clearTimeout(cTimer);
                     TXdblClick(event);
                     cclicks = 0;
@@ -76,47 +76,47 @@ const thesaurusService = (services) => {
             .on('submit', '.thesaurus-filter-submit-action', (event) => {
                 event.preventDefault();
                 T_Gfilter(event.currentTarget);
-            })
+            });
 
-    }
+    };
 
 
 
     function show()
     {
-        if(options.currentWizard == "???")	// first show of thesaurus
-            thesauShowWizard("wiz_0", false);
+        if (options.currentWizard === '???')	// first show of thesaurus
+            thesauShowWizard('wiz_0', false);
     }
 
     function thesauCancelWizard()
     {
-        thesauShowWizard("wiz_0", true);
+        thesauShowWizard('wiz_0', true);
     }
 
     function thesauShowWizard(wizard, refreshFilter)
     {
-        if(wizard != options.currentWizard)
+        if (wizard !== options.currentWizard)
         {
-            $("#THPD_WIZARDS DIV.wizard", options.tabs).hide();
-            $("#THPD_WIZARDS ." + wizard, options.tabs).show();
-            $("#THPD_T_treeBox", options.tabs).css('top', $("#THPD_WIZARDS", options.tabs).height());
+            $('#THPD_WIZARDS DIV.wizard', options.tabs).hide();
+            $('#THPD_WIZARDS .' + wizard, options.tabs).show();
+            $('#THPD_T_treeBox', options.tabs).css('top', $('#THPD_WIZARDS', options.tabs).height());
 
             options.currentWizard = wizard;
 
-            if(refreshFilter)
+            if (refreshFilter)
                 T_Gfilter_delayed($('#THPD_WIZARDS .gform', options.tabs).eq(0).val(), 0);
 
-            if(wizard == "wiz_0")	// browse
-                $("#THPD_WIZARDS .th_cancel", options.tabs).hide();
+            if (wizard === 'wiz_0')	// browse
+                $('#THPD_WIZARDS .th_cancel', options.tabs).hide();
             else
-                $("#THPD_WIZARDS .th_cancel", options.tabs).show();
+                $('#THPD_WIZARDS .th_cancel', options.tabs).show();
 
-            if(wizard == "wiz_1")	// accept
-                $("#THPD_WIZARDS .th_ok", options.tabs).hide();
+            if (wizard === 'wiz_1')	// accept
+                $('#THPD_WIZARDS .th_ok', options.tabs).hide();
             else
-                $("#THPD_WIZARDS .th_ok", options.tabs).show();
+                $('#THPD_WIZARDS .th_ok', options.tabs).show();
 
-            $("#THPD_WIZARDS FORM :text")[0].focus();
+            $('#THPD_WIZARDS FORM :text')[0].focus();
         }
     }
 
@@ -127,20 +127,20 @@ const thesaurusService = (services) => {
     function T_Gfilter(o)
     {
         var f;
-        if(o.nodeName=="FORM")
-            f = $(o).find("input[name=search_value]").val();
-        else if(o.nodeName=="INPUT")
+        if (o.nodeName=='FORM')
+            f = $(o).find('input[name=search_value]').val();
+        else if (o.nodeName=='INPUT')
             f = $(o).val();
 
         T_Gfilter_delayed(f, 0);
 
-        switch(options.currentWizard)
+        switch (options.currentWizard)
         {
-            case "wiz_0":	// browse
+            case 'wiz_0':	// browse
                 break;
-            case "wiz_1":	// accept
+            case 'wiz_1':	// accept
                 break;
-            case "wiz_2":	// replace
+            case 'wiz_2':	// replace
                 T_replaceBy2(f);
                 break;
             default:
@@ -151,16 +151,16 @@ const thesaurusService = (services) => {
 // here when a key is pressed in the 'filter' form
     function T_Gfilter_delayed(f, delay)
     {
-        switch(options.currentWizard)
+        switch (options.currentWizard)
         {
-            case "wiz_0":	// browse
-                T_filter_delayed2(f, delay, "ALL");
+            case 'wiz_0':	// browse
+                T_filter_delayed2(f, delay, 'ALL');
                 break;
-            case "wiz_1":	// accept
-                T_filter_delayed2(f, delay, "CANDIDATE");
+            case 'wiz_1':	// accept
+                T_filter_delayed2(f, delay, 'CANDIDATE');
                 break;
-            case "wiz_2":	// replace
-                T_filter_delayed2(f, delay, "CANDIDATE");
+            case 'wiz_2':	// replace
+                T_filter_delayed2(f, delay, 'CANDIDATE');
                 break;
             default:
                 break;
@@ -170,26 +170,26 @@ const thesaurusService = (services) => {
 
     function T_replaceBy2(f)
     {
-        if(trees.C._selInfos.n != 1)
+        if (trees.C._selInfos.n !== 1)
             return;
         var msg;
-        var term = trees.C._selInfos.sel.eq(0).find("span span").html();
+        var term = trees.C._selInfos.sel.eq(0).find('span span').html();
 
-        var cid  = trees.C._selInfos.sel[0].getAttribute('id').split('.');
+        var cid = trees.C._selInfos.sel[0].getAttribute('id').split('.');
         cid.shift();
         var sbas = cid.shift();
         cid = cid.join('.');
 
         trees.C._toReplace = { 'sbas':sbas, 'cid':cid, 'replaceby':f };
 
-        var msg = sprintf(config.replaceMessage, {'from':term, 'to':f});
+        var msg = sprintf(config.replaceMessage, { 'from':term, 'to':f });
 
         var confirmBox = dialogModule.dialog.create({
             size : 'Alert',
             closeOnEscape : true,
             cancelButton: true,
             buttons: {
-                "Ok" : function() {
+                'Ok' : function () {
                     confirmBox.close();
                     T_replaceCandidates_OK();
                 }
@@ -201,39 +201,39 @@ const thesaurusService = (services) => {
     let timer = null;
     function T_filter_delayed2(f, delay, mode)
     {
-        if(timer)
+        if (timer)
         {
             window.clearTimeout(timer);
             timer = null;
-            for(var i in sbas)
+            for (var i in sbas)
             {
-                if(sbas[i].seeker)
+                if (sbas[i].seeker)
                     sbas[i].seeker.abort();
             }
         }
 
 
-        if(delay < 10)
+        if (delay < 10)
             delay = 10;
 
         timer = window.setTimeout(
-            function()
+            function ()
             {
-                if(mode=='ALL')
+                if (mode==='ALL')
                 {
                     // search in every base, everywhere
-                    for(var i in sbas)
+                    for (var i in sbas)
                     {
-                        var zurl = "/xmlhttp/search_th_term_prod.j.php"
-                            + "?sbid=" + sbas[i].sbid
-                            + "&t=" + encodeURIComponent(f);
+                        var zurl = '/xmlhttp/search_th_term_prod.j.php'
+                            + '?sbid=' + sbas[i].sbid
+                            + '&t=' + encodeURIComponent(f);
 
                         sbas[i].seeker = $.ajax({
                             url: zurl,
                             type:'POST',
                             data: [],
                             dataType:'json',
-                            success: function(j)
+                            success: function (j)
                             {
                                 var z = '#TX_P\\.' + j.parm['sbid'] + '\\.T';
 
@@ -242,37 +242,37 @@ const thesaurusService = (services) => {
 
                                 o.replaceWith(j.html);
 
-                                if(isLast)
+                                if (isLast)
                                     $(z).addClass('last');
                             },
-                            error:function(){
+                            error: function () {
 
                             },
-                            timeout:function(){
+                            timeout: function () {
 
                             }
                         });
                     }
                 }
-                else if(mode=='CANDIDATE')
+                else if (mode==='CANDIDATE')
                 {
                     // search only on the good base and the good branch(es)
-                    for(var i in sbas)
+                    for (var i in sbas)
                     {
-                        var zurl = "/xmlhttp/search_th_term_prod.j.php"
-                            + "?sbid=" + sbas[i].sbid;
+                        var zurl = '/xmlhttp/search_th_term_prod.j.php'
+                            + '?sbid=' + sbas[i].sbid;
 
-                        if(sbas[i].sbid == trees.C._selInfos.sbas)
+                        if (sbas[i].sbid === trees.C._selInfos.sbas)
                         {
-                            zurl += "&t=" + encodeURIComponent(f)
-                                + "&field=" + encodeURIComponent(trees.C._selInfos.field);
+                            zurl += '&t=' + encodeURIComponent(f)
+                                + '&field=' + encodeURIComponent(trees.C._selInfos.field);
                         }
                         sbas[i].seeker = $.ajax({
                             url: zurl,
                             type:'POST',
                             data: [],
                             dataType:'json',
-                            success: function(j)
+                            success: function (j)
                             {
                                 var z = '#TX_P\\.' + j.parm['sbid'] + '\\.T';
 
@@ -281,13 +281,13 @@ const thesaurusService = (services) => {
 
                                 o.replaceWith(j.html);
 
-                                if(isLast)
+                                if (isLast)
                                     $(z).addClass('last');
                             },
-                            error:function(){
+                            error: function () {
 
                             },
-                            timeout:function(){
+                            timeout: function () {
 
                             }
                         });
@@ -312,24 +312,24 @@ const thesaurusService = (services) => {
         replacingBox.setContent(config.replaceInProgressMsg);
 
         var parms = {
-            url:	"/xmlhttp/replacecandidate.j.php",
+            url:	'/xmlhttp/replacecandidate.j.php',
             data:	{
-                "id[]" : trees.C._toReplace.sbas + "." + trees.C._toReplace.cid
-                , "t" : trees.C._toReplace.replaceby
-                , "debug" : '0'
+                'id[]' : trees.C._toReplace.sbas + '.' + trees.C._toReplace.cid
+                , 't' : trees.C._toReplace.replaceby
+                , 'debug' : '0'
             },
             async:		false,
             cache:		false,
-            dataType:	"json",
-            timeout:	10*60*1000,	// 10 minutes !
-            success:	function(result, textStatus)
+            dataType:	'json',
+            timeout:	10 * 60 * 1000,	// 10 minutes !
+            success:	function (result, textStatus)
             {
                 trees.C._toReplace = null;
-                thesauShowWizard("wiz_0", false);
+                thesauShowWizard('wiz_0', false);
 
                 replacingBox.close();
 
-                if(result.msg != '')
+                if (result.msg !== '')
                 {
                     var alert = dialogModule.dialog.create({
                         size : 'Alert',
@@ -339,9 +339,9 @@ const thesaurusService = (services) => {
                     alert.setContent(result.msg);
                 }
 
-                for(i in result.ctermsDeleted)
+                for (i in result.ctermsDeleted)
                 {
-                    var cid = "#CX_P\\." + result.ctermsDeleted[i].replace(new RegExp("\\.", "g"), "\\.");	// escape les '.' pour jquery
+                    var cid = '#CX_P\\.' + result.ctermsDeleted[i].replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
                     $(cid).remove();
                 }
 
@@ -368,63 +368,63 @@ const thesaurusService = (services) => {
         same_sbas = true;
         // obviously the candidates and the target already complies (same sbas, good tbranch)
         trees.C._selInfos.sel.each(
-            function()
+            function ()
             {
                 var x = this.getAttribute('id').split('.');
                 x.shift();
-                if(x.shift() != sbid)
+                if (x.shift() !== sbid)
                     same_sbas = false;
                 t_ids.push(x.join('.'));
             }
         );
 
-        if(!same_sbas)
+        if (!same_sbas)
             return;
 
         var parms = {
-            url:	"/xmlhttp/acceptcandidates.j.php",
+            url:	'/xmlhttp/acceptcandidates.j.php',
             data:	{
                 // "debug": false,
-                "sbid" : sbid,
-                "tid"  : dst,
-                "cid[]": t_ids,
-                "typ"  : trees.C._toAccept.type,
-                "piv"  : trees.C._toAccept.lng
+                'sbid' : sbid,
+                'tid'  : dst,
+                'cid[]': t_ids,
+                'typ'  : trees.C._toAccept.type,
+                'piv'  : trees.C._toAccept.lng
             },
             async:	false,
             cache:	false,
-            dataType: "json",
-            timeout:	10*60*1000,	// 10 minutes !
-            success:	function(result, textStatus)
+            dataType: 'json',
+            timeout:	10 * 60 * 1000,	// 10 minutes !
+            success:	function (result, textStatus)
             {
-                for(i in result.refresh)
+                for (i in result.refresh)
                 {
-                    var zurl = "/xmlhttp/openbranch_prod.j.php"
-                        + "?type=" + result.refresh[i].type
-                        + "&sbid=" + result.refresh[i].sbid
-                        + "&id="   + encodeURIComponent(result.refresh[i].id);
-                    if(result.refresh[i].type=='T')
-                        zurl += "&sortsy=1" ;
+                    var zurl = '/xmlhttp/openbranch_prod.j.php'
+                        + '?type=' + result.refresh[i].type
+                        + '&sbid=' + result.refresh[i].sbid
+                        + "&id=" + encodeURIComponent(result.refresh[i].id);
+                    if (result.refresh[i].type == 'T')
+                        zurl += '&sortsy=1' ;
 
                     $.get(zurl
                         , []
-                        , function(j)
+                        , function (j)
                         {
                             var z = '#' + j.parm['type']
                                 + 'X_P\\.'
                                 + j.parm['sbid'] + '\\.'
-                                + j.parm['id'].replace(new RegExp("\\.", "g"), "\\.");	// escape les '.' pour jquery
+                                + j.parm['id'].replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
 
                             $(z).children('ul').eq(0).replaceWith(j.html);
                         }
-                        , "json");
+                        , 'json');
                 }
                 trees.C._toAccept = null;
-                thesauShowWizard("wiz_0",false);
+                thesauShowWizard('wiz_0', false);
                 acceptingBox.close();
             },
-            error:function(){acceptingBox.close();},
-            timeout:function(){acceptingBox.close();},
+            error: function () {acceptingBox.close();},
+            timeout: function () {acceptingBox.close();},
             _ret: null	// private alchemy
         };
 
@@ -440,9 +440,9 @@ const thesaurusService = (services) => {
         deletingBox.setContent(config.deleteMsg);
 
         var t_ids = [];
-        var lisel = trees.C.tree.find("LI .selected");
-        trees.C.tree.find("LI .selected").each(
-            function()
+        var lisel = trees.C.tree.find('LI .selected');
+        trees.C.tree.find('LI .selected').each(
+            function ()
             {
                 var x = this.getAttribute('id').split('.');
                 x.shift();
@@ -450,17 +450,17 @@ const thesaurusService = (services) => {
             }
         );
         var parms = {
-            url:"/xmlhttp/replacecandidate.j.php",
-            data:{"id[]":t_ids},
+            url:'/xmlhttp/replacecandidate.j.php',
+            data:{'id[]':t_ids },
             async:false,
             cache:false,
-            dataType:"json",
-            timeout:10*60*1000,	// 10 minutes !
-            success: function(result, textStatus)
+            dataType:'json',
+            timeout:10 * 60 * 1000,	// 10 minutes !
+            success: function (result, textStatus)
             {
                 deletingBox.close();
 
-                if(result.msg != '')
+                if (result.msg !== '')
                 {
                     var alert = dialogModule.dialog.create({
                         size : 'Alert',
@@ -470,9 +470,9 @@ const thesaurusService = (services) => {
                     alert.setContent(result.msg);
                 }
 
-                for(i in result.ctermsDeleted)
+                for (i in result.ctermsDeleted)
                 {
-                    var cid = "#CX_P\\." + result.ctermsDeleted[i].replace(new RegExp("\\.", "g"), "\\.");	// escape les '.' pour jquery
+                    var cid = '#CX_P\\.' + result.ctermsDeleted[i].replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
                     $(cid).remove();
                 }
             },
@@ -486,35 +486,34 @@ const thesaurusService = (services) => {
 // menu option T:accept as...
     function T_acceptCandidates(menuItem, menu, type)
     {
-        var lidst = trees.T.tree.find("LI .selected");
-        if(lidst.length != 1)
+        var lidst = trees.T.tree.find('LI .selected');
+        if (lidst.length !== 1)
             return;
 
-        var lisel = trees.C.tree.find("LI .selected");
-        if(lisel.length == 0)
+        var lisel = trees.C.tree.find('LI .selected');
+        if (lisel.length === 0)
             return;
 
         var msg;
 
-        if(lisel.length == 1)
+        if (lisel.length === 1)
         {
-            var term = lisel.eq(0).find("span span").html();
+            var term = lisel.eq(0).find('span span').html();
             msg = sprintf(config.candidateUniqueMsg, term);
         }
-        else
-        {
+        else {
             msg = sprintf(config.candidateManyMsg, lisel.length);
         }
 
         trees.C._toAccept.type = type;
-        trees.C._toAccept.dst = lidst.eq(0).attr("id");
+        trees.C._toAccept.dst = lidst.eq(0).attr('id');
 
         var confirmBox = dialogModule.dialog.create({
             size : 'Alert',
             closeOnEscape : true,
             cancelButton: true,
             buttons: {
-                "Ok" : function() {
+                'Ok' : function () {
                     confirmBox.close();
                     T_acceptCandidates_OK();
                 }
@@ -528,12 +527,12 @@ const thesaurusService = (services) => {
 // menu option T:search
     function T_search(menuItem, menu, cmenu, e, label)
     {
-        if(!menu._li)
+        if (!menu._li)
             return;
-        var tcids = menu._li.attr("id").split(".");
+        var tcids = menu._li.attr('id').split('.');
         tcids.shift();
         var sbid = tcids.shift();
-        var term = menu._li.find("span span").html();
+        var term = menu._li.find('span span').html();
 
         doThesSearch('T', sbid, term, null);
     }
@@ -541,12 +540,12 @@ const thesaurusService = (services) => {
 
     function C_MenuOption(menuItem, menu, option, parm)
     {
-        if(!trees.C._selInfos)	// nothing selected in candidates ?
+        if (!trees.C._selInfos)	// nothing selected in candidates ?
             return;
 
-        trees.C._toAccept  = null;	// cancel previous 'accept' action anyway
+        trees.C._toAccept = null;	// cancel previous 'accept' action anyway
         trees.C._toReplace = null;	// cancel previous 'replace' action anyway
-        switch(option)
+        switch (option)
         {
             case 'ACCEPT':
                 // glue selection to the tree
@@ -555,20 +554,19 @@ const thesaurusService = (services) => {
                 // display helpful message into the thesaurus box...
                 var msg;
 
-                if(trees.C._selInfos.n == 1)
+                if (trees.C._selInfos.n === 1)
                 {
-                    msg = sprintf(config.acceptCandidateUniqueMsg, menu._srcElement.find("span").html());
+                    msg = sprintf(config.acceptCandidateUniqueMsg, menu._srcElement.find('span').html());
                 }
-                else
-                {
+                else {
                     msg = sprintf(config.acceptCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 // set the content of the wizard
-                $("#THPD_WIZARDS .wiz_1 .txt").html(msg);
+                $('#THPD_WIZARDS .wiz_1 .txt').html(msg);
                 // ... and switch to the thesaurus tab
                 options.tabs.tabs('option', 'active', 0);
-                thesauShowWizard("wiz_1", true);
+                thesauShowWizard('wiz_1', true);
 
                 break;
 
@@ -577,37 +575,35 @@ const thesaurusService = (services) => {
                 var msg;
 
 
-                if(trees.C._selInfos.n == 1)
+                if (trees.C._selInfos.n === 1)
                 {
-                    var term = trees.C._selInfos.sel.eq(0).find("span span").html();
+                    var term = trees.C._selInfos.sel.eq(0).find('span span').html();
                     msg = sprintf(replaceCandidateUniqueMsg, term);
                 }
-                else
-                {
+                else {
                     msg = sprintf(replaceCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 options.tabs.tabs('option', 'active', 0);
 
                 // set the content of the wizard
-                $("#THPD_WIZARDS .wiz_2 .txt").html(msg);
+                $('#THPD_WIZARDS .wiz_2 .txt').html(msg);
                 // ... and switch to the thesaurus tab
-                thesauShowWizard("wiz_2", true);
+                thesauShowWizard('wiz_2', true);
 
                 break;
 
             case 'DELETE':
-                $("#THPD_WIZARDS DIV", options.tabs).hide();
+                $('#THPD_WIZARDS DIV', options.tabs).hide();
                 // display helpful message into the thesaurus box...
 
                 var msg;
-                if(trees.C._selInfos.n == 1)
+                if (trees.C._selInfos.n === 1)
                 {
-                    var term = trees.C._selInfos.sel.eq(0).find("span span").html();
+                    var term = trees.C._selInfos.sel.eq(0).find('span span').html();
                     msg = sprintf(deleteCandidateUniqueMsg, term);
                 }
-                else
-                {
+                else {
                     msg = sprintf(deleteCandidateManyMsg, trees.C._selInfos.n);
                 }
 
@@ -616,7 +612,7 @@ const thesaurusService = (services) => {
                     closeOnEscape : true,
                     cancelButton: true,
                     buttons: {
-                        "Ok" : function() {
+                        'Ok' : function () {
                             confirmBox.close();
                             C_deleteCandidates_OK();
                         }
@@ -632,20 +628,20 @@ const thesaurusService = (services) => {
     function Xclick(e)
     {
         var x = e.srcElement ? e.srcElement : e.target;
-        switch(x.nodeName)
+        switch (x.nodeName)
         {
-            case "DIV":		// +/-
+            case 'DIV':		// +/-
                 var li = $(x).closest('li');
                 var tids = li.attr('id').split('.');
-                var tid  = tids.shift();
+                var tid = tids.shift();
                 var sbid = tids.shift();
                 var type = tid.substr(0, 1);
-                if((type=='T'||type=='C') && tid.substr(1, 4)=="X_P")	// TX_P ou CX_P
+                if ((type == 'T' || type == 'C') && tid.substr(1, 4)=='X_P')	// TX_P ou CX_P
                 {
                     var ul = li.children('ul').eq(0);
-                    if(ul.css("display")=='none' || prodApp.utils.is_ctrl_key(e))
+                    if (ul.css('display') == 'none' || prodApp.utils.is_ctrl_key(e))
                     {
-                        if(prodApp.utils.is_ctrl_key(e))
+                        if (prodApp.utils.is_ctrl_key(e))
                         {
                             ul.text(config.loadingMsg);
                             li.removeAttr('loaded');
@@ -653,67 +649,64 @@ const thesaurusService = (services) => {
 
                         ul.show();
 
-                        if(!li.attr('loaded'))
+                        if (!li.attr('loaded'))
                         {
-                            var zurl = "/xmlhttp/openbranch_prod.j.php?type="+type+"&sbid="+sbid+"&id=" + encodeURIComponent(tids.join('.'));
-                            if(li.hasClass('last'))
-                                zurl += "&last=1";
-                            if(type=='T')
-                                zurl += "&sortsy=1";
-                            $.get(zurl, [], function(j)
+                            var zurl = "/xmlhttp/openbranch_prod.j.php?type=" + type + "&sbid=" + sbid+'&id=' + encodeURIComponent(tids.join('.'));
+                            if (li.hasClass('last'))
+                                zurl += '&last=1';
+                            if (type == 'T')
+                                zurl += '&sortsy=1';
+                            $.get(zurl, [], function (j)
                                 {
                                     ul.replaceWith(j.html);
                                     li.attr('loaded', '1');
                                 }
-                                , "json");
+                                , 'json');
                         }
                     }
-                    else
-                    {
+                    else {
                         ul.hide();
                     }
                 }
                 break;
-            case "SPAN":
+            case 'SPAN':
                 var li = $(x).closest('li');
                 var tids = li.attr('id').split('.');
                 var type = tids[0].substr(0, 1);
-                if((type=='T' && tids.length>2) || tids.length == 4) // && tids[0].substr(0, 1)=='C')
+                if ((type == 'T' && tids.length > 2) || tids.length === 4) // && tids[0].substr(0, 1)=='C')
                 {
                     tids.pop();
                     var tid3 = tids.join('.');
-                    if(!utilsModule.is_ctrl_key(e) && !utilsModule.is_shift_key(e))
+                    if (!utilsModule.is_ctrl_key(e) && !utilsModule.is_shift_key(e))
                     {
-                        $("LI", trees[type].tree).removeClass('selected');
+                        $('LI', trees[type].tree).removeClass('selected');
                         options.lastClickedCandidate = null;
                     }
-                    else
-                    {
+                    else {
                         // if($("#THPD_C_treeBox")._lastClicked)
-                        if(options.lastClickedCandidate != null)
+                        if (options.lastClickedCandidate !== null)
                         {
-                            if(options.lastClickedCandidate.tid3 != tid3)
+                            if (options.lastClickedCandidate.tid3 !== tid3)
                             {
-                                $("LI", trees[type].tree).removeClass('selected');
+                                $('LI', trees[type].tree).removeClass('selected');
                                 options.lastClickedCandidate = null;
                             }
-                            else
-                            {
-                                if(e.shiftKey)
+                            else {
+                                if (e.shiftKey)
                                 {
                                     var lip = li.parent().children('li');
                                     var idx0 = lip.index(options.lastClickedCandidate.item);
                                     var idx1 = lip.index(li);
-                                    if(idx0 < idx1)
-                                        lip.filter(function(index){return(index >= idx0 && index < idx1); }).addClass('selected');
+                                    if (idx0 < idx1)
+                                        lip.filter(function (index) {return (index >= idx0 && index < idx1); }).addClass('selected');
                                     else
-                                        lip.filter(function(index){return(index > idx1 && index <= idx0); }).addClass('selected');
+                                        lip.filter(function (index) {return (index > idx1 && index <= idx0); }).addClass('selected');
                                 }
                             }
                         }
                     }
                     li.toggleClass('selected');
-                    if(type == 'C')
+                    if (type === 'C')
                     {
                         options.lastClickedCandidate = { item:li, tid3:tid3 };
                     }
@@ -727,17 +720,17 @@ const thesaurusService = (services) => {
     function TXdblClick(e)
     {
         var x = e.srcElement ? e.srcElement : e.target;
-        switch(x.nodeName)
+        switch (x.nodeName)
         {
-            case "SPAN":		// term
-                switch(options.currentWizard)
+            case 'SPAN':		// term
+                switch (options.currentWizard)
                 {
-                    case "wiz_0":				// simply browse
+                    case 'wiz_0':				// simply browse
                         var tid = $(x).closest('li').attr('id');
-                        if(tid.substr(0,5)=="TX_P.")
+                        if (tid.substr(0, 5)=='TX_P.')
                         {
-                            var tids = tid.split(".");
-                            if(tids.length > 3)
+                            var tids = tid.split('.');
+                            if (tids.length > 3)
                             {
                                 var sbid = tids[1];
                                 var term = $(x).hasClass('separator') ? $(x).prev().text() : $(x).text();
@@ -745,12 +738,12 @@ const thesaurusService = (services) => {
                             }
                         }
                         break;
-                    case "wiz_2":				// replace by
+                    case 'wiz_2':				// replace by
                         var tid = $(x).closest('li').attr('id');
-                        if(tid.substr(0,5)=="TX_P.")
+                        if (tid.substr(0, 5)=='TX_P.')
                         {
                             var term = $(x).text();
-                            $("#THPD_WIZARDS .wiz_2 :text").val(term);
+                            $('#THPD_WIZARDS .wiz_2 :text').val(term);
                             T_replaceBy2(term);
                         }
                         break;
@@ -789,35 +782,34 @@ const thesaurusService = (services) => {
     {
         var nck = 0;
         $('#searchForm .adv_options :checkbox[name="bases[]"]').each(
-            function(i,n)
+            function (i, n)
             {
                 var base_id = $(n).val();
 
-                bas2sbas["b"+base_id].ckobj = this;
-                bas2sbas["b"+base_id].waschecked = this.checked;
-                if(bas2sbas["b"+base_id].sbid == sbid)
+                bas2sbas["b" + base_id].ckobj = this;
+                bas2sbas["b" + base_id].waschecked = this.checked;
+                if (bas2sbas["b" + base_id].sbid === sbid)
                 {
-                    if(this.checked)
+                    if (this.checked)
                         nck++;
                 }
-                else
-                {
+                else {
                     this.checked = false;
                 }
             }
         );
 
-        if(nck == 0 || type=='C')
+        if (nck === 0 || type == 'C')
         {
             var i;
-            for(i in bas2sbas)
+            for (i in bas2sbas)
             {
-                if(bas2sbas[i].sbid == sbid)
+                if (bas2sbas[i].sbid === sbid)
                     bas2sbas[i].ckobj.checked = true;
             }
         }
         let queryString = '';
-        if(type=='T')
+        if (type == 'T')
             queryString = '[' + term + ']';
         else
             queryString = field + '="' + term + '"';
@@ -1038,111 +1030,109 @@ const thesaurusService = (services) => {
         this.sbas_id = sbas_id;
         this._ctimer = null;
         this._xmlhttp = null;
-        this.tObj = { 'TH_searching':null , 'TH_P':null , 'TH_K':null };
-        this.search = function(txt) {
-            if(this._ctimer)
+        this.tObj = { 'TH_searching':null, 'TH_P':null, 'TH_K':null };
+        this.search = function (txt) {
+            if (this._ctimer)
                 clearTimeout(this._ctimer);
-            var js = "options.thlist['s"+this.sbas_id+"'].search_delayed('"+txt.replace("'", "\\'")+"');" ;
+            var js = "options.thlist['s" + this.sbas_id + "'].search_delayed('" + txt.replace("'", "\\'") + "');" ;
             this._ctimer = setTimeout(js, 100);
         } ;
-        this.search_delayed = function(txt) {
+        this.search_delayed = function (txt) {
             var me = this;
-            if($this._xmlttp.abort && typeof $this._xmlttp.abort == 'function')
+            if ($this._xmlttp.abort && typeof $this._xmlttp.abort === 'function')
             {
                 this._xmlhttp.abort();
             }
-            var url = "/xmlhttp/openbranches_prod.x.php";
-            var parms  = {
+            var url = '/xmlhttp/openbranches_prod.x.php';
+            var parms = {
                 bid : this.sbas_id,
                 t : txt,
-                mod : "TREE"
+                mod : 'TREE'
             };
 
             this._xmlhttp = $.ajax({
                 url: url,
                 type:'POST',
                 data: parms,
-                success: function(ret)
+                success: function (ret)
                 {
                     me.xmlhttpstatechanged(ret);
                 },
-                error:function(){
+                error: function () {
 
                 },
-                timeout:function(){
+                timeout: function () {
 
                 }
             });
 
             this._ctimer = null;
         } ;
-        this.openBranch = function(id, thid) {
+        this.openBranch = function (id, thid) {
             var me = this;
-            if($this._xmlttp.abort && typeof $this._xmlttp.abort == 'function')
+            if ($this._xmlttp.abort && typeof $this._xmlttp.abort === 'function')
             {
                 this._xmlhttp.abort();
             }
-            var url = "/xmlhttp/getterm_prod.x.php";
-            var parms  = {
+            var url = '/xmlhttp/getterm_prod.x.php';
+            var parms = {
                 bid : this.sbas_id,
                 sortsy : 1,
                 id : thid,
-                typ : "TH"
-            }
+                typ : 'TH'
+            };
 
             this._xmlhttp = $.ajax({
                 url: url,
                 type:'POST',
                 data: parms,
-                success: function(ret)
+                success: function (ret)
                 {
                     me.xmlhttpstatechanged(ret, id);
                 },
-                error:function(){
+                error: function () {
 
                 },
-                timeout:function(){
+                timeout: function () {
 
                 }
             });
 
         };
-        this.xmlhttpstatechanged = function(ret, id) {
-            try
-            {
-                if(!this.tObj["TH_searching"])
-                    this.tObj["TH_searching"] = document.getElementById("TH_searching");
-                this.tObj["TH_searching"].src = "/assets/common/images/icons/ftp-loader-blank.gif";
+        this.xmlhttpstatechanged = function (ret, id) {
+            try {
+                if (!this.tObj['TH_searching'])
+                    this.tObj['TH_searching'] = document.getElementById('TH_searching');
+                this.tObj['TH_searching'].src = '/assets/common/images/icons/ftp-loader-blank.gif';
 
-                if(ret) // && (typeof(ret.parsed)=="undefined" || ret.parsed))
+                if (ret) // && (typeof(ret.parsed)=="undefined" || ret.parsed))
                 {
-                    var htmlnodes = ret.getElementsByTagName("html");
-                    if(htmlnodes && htmlnodes.length==1 && (htmlnode=htmlnodes.item(0).firstChild))
+                    var htmlnodes = ret.getElementsByTagName('html');
+                    if (htmlnodes && htmlnodes.length == 1 && (htmlnode = htmlnodes.item(0).firstChild))
                     {
-                        if(typeof(id)=="undefined")
+                        if (typeof (id)=='undefined')
                         {
                             // called from search or 'auto' : full thesaurus search
-                            if(!this.tObj["TH_P"])
-                                this.tObj["TH_P"] = document.getElementById("TH_P."+this.sbas_id+".T");
-                            if(!this.tObj["TH_K"])
-                                this.tObj["TH_K"] = document.getElementById("TH_K."+this.sbas_id+".T");
-                            this.tObj["TH_P"].innerHTML = "...";
-                            this.tObj["TH_K"].className = "h";
-                            this.tObj["TH_K"].innerHTML = htmlnode.nodeValue;
+                            if (!this.tObj['TH_P'])
+                                this.tObj['TH_P'] = document.getElementById("TH_P." + this.sbas_id+'.T');
+                            if (!this.tObj['TH_K'])
+                                this.tObj['TH_K'] = document.getElementById("TH_K." + this.sbas_id+'.T');
+                            this.tObj['TH_P'].innerHTML = '...';
+                            this.tObj['TH_K'].className = 'h';
+                            this.tObj['TH_K'].innerHTML = htmlnode.nodeValue;
                         }
-                        else
-                        {
+                        else {
                             // called from 'openBranch'
                             //			var js = "document.getElementById('TH_K."+thid+"').innerHTML = \""+htmlnode.nodeValue+"\"";
                             //			self.setTimeout(js, 10);
-                            document.getElementById("TH_K."+id).innerHTML = htmlnode.nodeValue;
+                            document.getElementById("TH_K." + id).innerHTML = htmlnode.nodeValue;
                         }
                     }
                 }
             }
-            catch(err)
+            catch (err)
             {
-                ;
+                
             }
         };
     }
@@ -1150,27 +1140,27 @@ const thesaurusService = (services) => {
 
 
 
-    function startThesaurus(){
+    function startThesaurus() {
 
         options.thlist = config.thlist;
-        options.currentWizard = "???";
+        options.currentWizard = '???';
 
-        sbas     = config.sbas;
-        bas2sbas = config.bas2sbas
+        sbas = config.sbas;
+        bas2sbas = config.bas2sbas;
 
         options.lastTextfocus = null;
 
         options.lastClickedCandidate = null;
 
-        options.tabs = $("#THPD_tabs");
+        options.tabs = $('#THPD_tabs');
         options.tabs.tabs();
 
         trees = {
             'T':{
-                'tree'      : $("#THPD_T_tree", options.tabs)
+                'tree'      : $('#THPD_T_tree', options.tabs)
             },
             'C':{
-                'tree'       : $("#THPD_C_tree", options.tabs)
+                'tree'       : $('#THPD_C_tree', options.tabs)
                 , '_toAccept'  : null 			// may contain : {'type', 'dst', 'lng'}
                 , '_toReplace' : null		//
                 , '_selInfos'  : null				// may contain : {'sel':lisel, 'field':field, 'sbas':sbas, 'n':lisel.length}
@@ -1181,21 +1171,21 @@ const thesaurusService = (services) => {
             [
                 {
                     label: config.searchMsg,
-                    onclick:function(menuItem, menu, cmenu, e, label)
+                    onclick: function (menuItem, menu, cmenu, e, label)
                     {
                         T_search(menuItem, menu, cmenu, e, label);
                     }
                 },
                 {
                     label: config.acceptSpecificTermMsg,
-                    onclick:function(menuItem, menu)
+                    onclick: function (menuItem, menu)
                     {
                         T_acceptCandidates(menuItem, menu, 'TS');
                     }
                 },
                 {
                     label: config.acceptSynonymeMsg,
-                    onclick:function(menuItem, menu)
+                    onclick: function (menuItem, menu)
                     {
                         T_acceptCandidates(menuItem, menu, 'SY');
                     }
@@ -1203,53 +1193,53 @@ const thesaurusService = (services) => {
             ]
             ,
             {
-                className:"THPD_TMenu",
-                beforeShow:function()
+                className:'THPD_TMenu',
+                beforeShow: function ()
                 {
-                    var menuOptions = $(this.menu).find(".context-menu-item");
-                    menuOptions.eq(1).addClass("context-menu-item-disabled");
-                    menuOptions.eq(2).addClass("context-menu-item-disabled");
+                    var menuOptions = $(this.menu).find('.context-menu-item');
+                    menuOptions.eq(1).addClass('context-menu-item-disabled');
+                    menuOptions.eq(2).addClass('context-menu-item-disabled');
 
                     var x = this._showEvent.srcElement ? this._showEvent.srcElement : this._showEvent.target;
-                    var li  = $(x).closest("li");
+                    var li = $(x).closest('li');
                     this._li = null;
-                    var tcids = li.attr("id").split(".");
-                    if(tcids.length > 2 && tcids[0] == "TX_P" && tcids[2] != 'T' && x.nodeName != "LI")
+                    var tcids = li.attr('id').split('.');
+                    if (tcids.length > 2 && tcids[0] === 'TX_P' && tcids[2] !== 'T' && x.nodeName !== 'LI')
                     {
                         this._li = li;
                         tcids.shift();
                         var sbas = tcids.shift();
 
                         // this._srcElement = li;		// private alchemy
-                        if(!li.hasClass('selected'))
+                        if (!li.hasClass('selected'))
                         {
                             // rclick OUTSIDE the selection : unselect all
-                            trees.T.tree.find("LI").removeClass('selected');
+                            trees.T.tree.find('LI').removeClass('selected');
 
-                            $("li", trees.T.tree).removeClass('selected');
+                            $('li', trees.T.tree).removeClass('selected');
                             li.addClass('selected');
                         }
 
-                        if(trees.C._selInfos && trees.C._selInfos.sbas == sbas)
+                        if (trees.C._selInfos && trees.C._selInfos.sbas === sbas)
                         {
                             // whe check if the candidates can be validated here
                             // aka does the tbranch of the field (of candidates) reaches the paste location ?
-                            var parms = {	url:"/xmlhttp/checkcandidatetarget.j.php"
-                            + "?sbid=" + sbas
-                            + "&acf=" + encodeURIComponent(trees.C._selInfos.field)
-                            + "&id=" + encodeURIComponent(tcids.join('.')) ,
+                            var parms = {	url:'/xmlhttp/checkcandidatetarget.j.php'
+                            + '?sbid=' + sbas
+                            + '&acf=' + encodeURIComponent(trees.C._selInfos.field)
+                            + '&id=' + encodeURIComponent(tcids.join('.')),
                                 data:[],
                                 async:false,
                                 cache:false,
-                                dataType:"json",
+                                dataType:'json',
                                 timeout:1000,
-                                success: function(result, textStatus)
+                                success: function (result, textStatus)
                                 {
                                     this._ret = result ;
-                                    if(result.acceptable)
+                                    if (result.acceptable)
                                     {
-                                        menuOptions.eq(1).removeClass("context-menu-item-disabled");
-                                        menuOptions.eq(2).removeClass("context-menu-item-disabled");
+                                        menuOptions.eq(1).removeClass('context-menu-item-disabled');
+                                        menuOptions.eq(2).removeClass('context-menu-item-disabled');
                                     }
                                 },
                                 _ret: null	// private alchemy
@@ -1259,27 +1249,27 @@ const thesaurusService = (services) => {
 
                         }
                     }
-                    return(true);
+                    return (true);
                 }
             }
         );
 
         var contextMenu = [];
-        for(var i= 0; i< config.langContextMenu.length;i++) {
+        for (var i = 0; i < config.langContextMenu.length;i++) {
             var langPlist = config.langContextMenu[i];
             contextMenu.push({
                 label: langPlist.label,
-                onclick:function(menuItem, menu)
+                onclick: function (menuItem, menu)
                 {
-                    C_MenuOption(menuItem, menu, "ACCEPT", {'lng':langPlist.lngCode});
+                    C_MenuOption(menuItem, menu, 'ACCEPT', { 'lng':langPlist.lngCode });
                 }
-            })
+            });
         }
 
         contextMenu.push({
             label: config.replaceWithMsg,
 //      disabled:true,
-            onclick:function(menuItem, menu)
+            onclick: function (menuItem, menu)
             {
                 C_MenuOption(menuItem, menu, 'REPLACE', null);
             }
@@ -1288,7 +1278,7 @@ const thesaurusService = (services) => {
         contextMenu.push({
             label: config.removeActionMsg,
 //      disabled:true,
-            onclick:function(menuItem, menu)
+            onclick: function (menuItem, menu)
             {
                 C_MenuOption(menuItem, menu, 'DELETE', null);
             }
@@ -1298,59 +1288,57 @@ const thesaurusService = (services) => {
             contextMenu
             ,
             {
-                beforeShow:function()
+                beforeShow: function ()
                 {
                     var ret = false;
 
                     var x = this._showEvent.srcElement ? this._showEvent.srcElement : this._showEvent.target;
-                    var li  = $(x).closest("li");
+                    var li = $(x).closest('li');
 
-                    if(!li.hasClass('selected'))
+                    if (!li.hasClass('selected'))
                     {
                         // rclick OUTSIDE the selection : unselect all
                         // lisel.removeClass('selected');
-                        trees.C.tree.find("LI").removeClass('selected');
+                        trees.C.tree.find('LI').removeClass('selected');
                         options.lastClickedCandidate = null;
                     }
-                    var tcids = li.attr("id").split(".");
-                    if(tcids.length == 4 && tcids[0] == "CX_P" && x.nodeName != "LI")
+                    var tcids = li.attr('id').split('.');
+                    if (tcids.length === 4 && tcids[0] === 'CX_P' && x.nodeName !== 'LI')
                     {
                         // candidate context menu only clicking on final term
-                        if(!li.hasClass('selected'))
+                        if (!li.hasClass('selected'))
                             li.addClass('selected');
                         //				this._cutInfos = { sbid:tcids[1], field:li.parent().attr('field') };	// private alchemy
                         this._srcElement = li;						// private alchemy
 
                         // as selection changes, compute usefull info (field, sbas)
-                        var lisel = trees.C.tree.find("LI .selected");
-                        if(lisel.length > 0)
+                        var lisel = trees.C.tree.find('LI .selected');
+                        if (lisel.length > 0)
                         {
                             // lisel are all from the same candidate field, so check the first li
-                            var li0   = lisel.eq(0);
-                            var field = li0.parent().attr("field");
-                            var sbas  = li0.attr("id").split('.')[1];
+                            var li0 = lisel.eq(0);
+                            var field = li0.parent().attr('field');
+                            var sbas = li0.attr('id').split('.')[1];
 
                             // glue selection info to the tree
-                            trees.C._selInfos = {'sel':lisel, 'field':field, 'sbas':sbas, 'n':lisel.length} ;
+                            trees.C._selInfos = { 'sel':lisel, 'field':field, 'sbas':sbas, 'n':lisel.length } ;
 
-                            if(lisel.length == 1)
+                            if (lisel.length === 1)
                             {
 
                                 $(this.menu).find('.context-menu-item').eq(config.languagesCount).removeClass('context-menu-item-disabled');
                             }
-                            else
-                            {
+                            else {
                                 $(this.menu).find('.context-menu-item').eq(config.languagesCount).addClass('context-menu-item-disabled');
                             }
                         }
-                        else
-                        {
+                        else {
                             trees.C._selInfos = null;
                         }
 
                         ret = true;
                     }
-                    return(ret);
+                    return (ret);
                 }
             }
         );
@@ -1358,7 +1346,7 @@ const thesaurusService = (services) => {
     }
 
 
-    return {initialize, show};
+    return { initialize, show };
 };
 
 export default thesaurusService;

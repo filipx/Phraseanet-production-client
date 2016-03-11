@@ -123,20 +123,20 @@ class Bootstrap {
             this.appWorkzone.initialize();
             // proxy selection
             this.appSearch.getResultSelectionStream().subscribe((data) => {
-                console.log('subscribed to search result stream', data)
-                this.appEvents.emit('broadcast.searchResultSelection', data)
-            })
+                console.log('subscribed to search result stream', data);
+                this.appEvents.emit('broadcast.searchResultSelection', data);
+            });
             // on navigation object changes
             this.appSearch.getResultNavigationStream().subscribe((data) => {
-                console.log('navigation Changed', data)
-                this.appEvents.emit('broadcast.searchResultNavigation', data.object)
-            })
+                console.log('navigation Changed', data);
+                this.appEvents.emit('broadcast.searchResultNavigation', data.object);
+            });
 
 
             this.appWorkzone.getResultSelectionStream().subscribe((data) => {
-                console.log('subscribed to search result stream', data)
-                this.appEvents.emit('broadcast.workzoneResultSelection', data)
-            })
+                console.log('subscribed to search result stream', data);
+                this.appEvents.emit('broadcast.workzoneResultSelection', data);
+            });
 
 
             // should be loaded after dom ready:
@@ -146,14 +146,14 @@ class Bootstrap {
             // init cgu modal:
             this.appCgu.initialize();
             // init preferences modal:
-            this.appPreferences.initialize( {$container: $body});
+            this.appPreferences.initialize( { $container: $body });
         });
 
     }
     initState() {
         let initialState = this.configService.get('initialState');
 
-        switch(initialState) {
+        switch (initialState) {
             case 'publication':
                 this.appPublication.initialize();
                 // window.publicationModule.fetchPublications();
@@ -169,10 +169,10 @@ class Bootstrap {
 
     initJqueryPlugins() {
         AppCommons.commonModule.initialize();
-        $.datepicker.setDefaults({showMonthAfterYear: false});
+        $.datepicker.setDefaults({ showMonthAfterYear: false });
         $.datepicker.setDefaults($.datepicker.regional[this.localeService.getLocale()]);
 
-        console.log(AppCommons.commonModule )
+        console.log(AppCommons.commonModule );
         $('#help-trigger').contextMenu('#mainMenu .helpcontextmenu', {
             openEvt: 'click', dropDown: true, theme: 'vista', dropDown: true,
             showTransition: 'slideDown',
@@ -183,8 +183,8 @@ class Bootstrap {
     initDom() {
         document.getElementById('loader_bar').style.width = '30%';
 
-            humane.info = humane.spawn({addnCls: 'humane-libnotify-info', timeout: 1000});
-            humane.error = humane.spawn({addnCls: 'humane-libnotify-error', timeout: 1000});
+            humane.info = humane.spawn({ addnCls: 'humane-libnotify-info', timeout: 1000 });
+            humane.error = humane.spawn({ addnCls: 'humane-libnotify-error', timeout: 1000 });
             humane.forceNew = true;
             // cguModule.activateCgus();
 
@@ -209,7 +209,7 @@ class Bootstrap {
                 let $dialog = dialog.create(this.appServices, options);
 
                 $.ajax({
-                    type: "GET",
+                    type: 'GET',
                     url: $this.attr('href'),
                     dataType: 'html',
                     success: function (data) {
@@ -252,7 +252,7 @@ class Bootstrap {
             }, 450);
 
             //startThesaurus();
-            this.appEvents.emit('search.doCheckFilters')
+            this.appEvents.emit('search.doCheckFilters');
             this.appUi.activeZoning();
             this.appEvents.emit('ui.resizeAll');
 
@@ -270,7 +270,7 @@ class Bootstrap {
                 dateFormat: 'yy/mm/dd'
             });
 
-            $('.tools .answer_selector').bind('click',function () {
+            $('.tools .answer_selector').bind('click', function () {
                 let el = $(this);
                 let p4 = window.p4;
                 if (el.hasClass('all_selector')) {
@@ -311,7 +311,7 @@ class Bootstrap {
                     }
                 }
 
-            }).bind('mouseover',function (event) {
+            }).bind('mouseover', function (event) {
                 if (utilsModule.is_ctrl_key(event)) {
                     $(this).addClass('add_selector');
                 }
@@ -331,7 +331,7 @@ class Bootstrap {
 
 
 
-            $('#EDIT_query').bind('focus',function () {
+            $('#EDIT_query').bind('focus', function () {
                 $(this).addClass('focused');
             }).bind('blur', function () {
                 $(this).removeClass('focused');

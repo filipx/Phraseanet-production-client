@@ -6,25 +6,25 @@ const user = (translations) => {
 
     const onUserDisconnect = (...data) => {
         console.log('user disconnected yeap', data);
-    }
+    };
 
 
     const subscribeToEvents = {
         'user.disconnected': onUserDisconnect
-    }
+    };
 
     const language = translations;
     const disconnected = () => {
-        ui(language).showModal('disconnected', {title: language.serverDisconnected});
-    }
+        ui(language).showModal('disconnected', { title: language.serverDisconnected });
+    };
 
     const manageSession = (...params) => {
         let [data, showMessages] = params;
 
-        if (typeof(showMessages) == "undefined")
+        if (typeof (showMessages) === 'undefined')
             showMessages = false;
 
-        if (data.status == 'disconnected' || data.status == 'session') {
+        if (data.status === 'disconnected' || data.status === 'session') {
             disconnected();
             return false;
         }
@@ -95,9 +95,9 @@ const user = (translations) => {
             }
         }
         return true;
-    }
+    };
 
     return { manageSession, subscribeToEvents };
-}
+};
 
 export default user;

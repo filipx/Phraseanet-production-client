@@ -14,32 +14,32 @@ var UploaderManager = function (options) {
 
     var options = options || {};
 
-    if (false === ("container" in options)) {
-        throw "missing container parameter";
+    if (false === ('container' in options)) {
+        throw 'missing container parameter';
     }
     else if (!options.container.jquery) {
-        throw "container parameter must be a jquery dom element";
+        throw 'container parameter must be a jquery dom element';
     }
 
-    if (false === ("settingsBox" in options)) {
-        throw "missing settingBox parameter";
+    if (false === ('settingsBox' in options)) {
+        throw 'missing settingBox parameter';
     }
     else if (!options.settingsBox.jquery) {
-        throw "container parameter must be a jquery dom element";
+        throw 'container parameter must be a jquery dom element';
     }
 
-    if (false === ("uploadBox" in options)) {
-        throw "missing uploadBox parameter";
+    if (false === ('uploadBox' in options)) {
+        throw 'missing uploadBox parameter';
     }
     else if (!options.uploadBox.jquery) {
-        throw "container parameter must be a jquery dom element";
+        throw 'container parameter must be a jquery dom element';
     }
 
-    if (false === ("downloadBox" in options)) {
-        throw "missing downloadBox parameter";
+    if (false === ('downloadBox' in options)) {
+        throw 'missing downloadBox parameter';
     }
     else if (!options.downloadBox.jquery) {
-        throw "container parameter must be a jquery dom element";
+        throw 'container parameter must be a jquery dom element';
     }
 
     this.recordClass = options.recordClass || 'upload-record';
@@ -102,7 +102,7 @@ UploaderManager.prototype = {
     },
     addAttributeToData: function (indexOfData, attribute, value) {
         var data = this.getData(indexOfData);
-        if ($.type(attribute) === "string") {
+        if ($.type(attribute) === 'string') {
             data[attribute] = value;
             this.Queue.set(indexOfData, data);
         }

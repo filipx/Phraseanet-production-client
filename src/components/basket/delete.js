@@ -2,7 +2,7 @@
 import dialog from '../utils/dialog';
 
 const deleteBasket = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -11,13 +11,13 @@ const deleteBasket = (services) => {
             let $el = $(event.currentTarget);
             deleteConfirmation($el, $el.data('context'));
         });
-    }
+    };
 
     const deleteConfirmation = ($el, type) => {
-        console.log('delete confirmation', $el, type)
+        console.log('delete confirmation', $el, type);
         switch (type) {
-            case "IMGT":
-            case "CHIM":
+            case 'IMGT':
+            case 'CHIM':
 
                 var lst = '';
 
@@ -32,7 +32,7 @@ const deleteBasket = (services) => {
                 break;
 
 
-            case "SSTT":
+            case 'SSTT':
 
                 var buttons = {};
                 buttons[localeService.t('valider')] = function (e) {
@@ -49,23 +49,23 @@ const deleteBasket = (services) => {
                 $('#tooltip').hide();
                 return;
                 break;
-            case "STORY":
+            case 'STORY':
                 lst = $el.val();
                 _deleteRecords(lst);
                 break;
 
         }
-    }
+    };
 
     const _deleteBasket = (item) => {
-        if ($("#DIALOG").data("ui-dialog")) {
-            $("#DIALOG").dialog('destroy');
+        if ($('#DIALOG').data('ui-dialog')) {
+            $('#DIALOG').dialog('destroy');
         }
 
         var k = $(item).attr('id').split('_').slice(1, 2).pop();	// id de chutier
         $.ajax({
-            type: "POST",
-            url: "../prod/baskets/" + k + '/delete/',
+            type: 'POST',
+            url: '../prod/baskets/' + k + '/delete/',
             dataType: 'json',
             beforeSend: function () {
 
@@ -75,13 +75,13 @@ const deleteBasket = (services) => {
                     var basket = $('#SSTT_' + k);
                     var next = basket.next();
 
-                    if (next.data("ui-droppable")) {
+                    if (next.data('ui-droppable')) {
                         next.droppable('destroy');
                     }
 
                     next.slideUp().remove();
 
-                    if (basket.data("ui-droppable")) {
+                    if (basket.data('ui-droppable')) {
                         basket.droppable('destroy');
                     }
 
@@ -97,7 +97,7 @@ const deleteBasket = (services) => {
                 return;
             }
         });
-    }
+    };
 
     const _deleteRecords = (lst) => {
         if (lst.split(';').length === 0) {
@@ -112,19 +112,19 @@ const deleteBasket = (services) => {
         });
 
         $.ajax({
-            type: "POST",
-            url: "../prod/records/delete/what/",
+            type: 'POST',
+            url: '../prod/records/delete/what/',
             dataType: 'html',
-            data: {lst: lst},
+            data: { lst: lst },
             success: function (data) {
                 $dialog.setContent(data);
             }
         });
 
         return false;
-    }
+    };
 
-    return {initialize, deleteConfirmation};
-}
+    return { initialize, deleteConfirmation };
+};
 
 export default deleteBasket;

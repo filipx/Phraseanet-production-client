@@ -21,12 +21,12 @@ class LocaleService {
         this.isCached = false;
         this.cachedTranslations = {};
         this.configService = options.configService;
-        this.path =  this.configService.get('translations');
+        this.path = this.configService.get('translations');
         return instance;
     }
 
     t(key) {
-        if( this.isCached && this.translate !== undefined) {
+        if ( this.isCached && this.translate !== undefined) {
             return this.translate(key);
         } else {
             throw new Error('locale not loaded');
@@ -56,7 +56,7 @@ class LocaleService {
                     this.cachedTranslations = i18next.getResourceBundle(this.locale);
                     resolve(instance);
                     //console.log('i18n', i18next.getResourceBundle(this.locale),t);
-                    if( data.callback !== undefined ) {
+                    if ( data.callback !== undefined ) {
                         data.callback();
                     }
                     //resolve(this.i18n);

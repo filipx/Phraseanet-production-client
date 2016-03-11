@@ -2,7 +2,7 @@ import $ from 'jquery';
 import dialog from '../../utils/dialog';
 
 const recordFeedbackModal = (services, datas) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const feedbackTemplateEndPoint = 'prod/push/validateform/';
 
@@ -23,7 +23,7 @@ const recordFeedbackModal = (services, datas) => {
         return true;
     };
 
-    return {openModal};
+    return { openModal };
 };
 
 export default recordFeedbackModal;

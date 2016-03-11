@@ -2,7 +2,7 @@ let $ = require('jquery');
 import * as Rx from 'rx';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
 const previewRecordService = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $bodyContainer = null;
     let $previewContainer = null;
     var prevAjax, prevAjaxrunning;
@@ -34,13 +34,13 @@ const previewRecordService = (services) => {
                     return false;
                 }
                 var v = $(ui.position.left)[0];
-                $("#PREVIEWLEFT").width(v);
-                $("#PREVIEWRIGHT").css("left", $(ui.position.left)[0]);
+                $('#PREVIEWLEFT').width(v);
+                $('#PREVIEWRIGHT').css('left', $(ui.position.left)[0]);
                 resizePreview();
             }
         });
         _bindEvents();
-    }
+    };
 
     const _bindEvents = () => {
         $bodyContainer
@@ -53,7 +53,7 @@ const previewRecordService = (services) => {
                 // env, pos, contId, reload
                 let reload = $el.data('reload') === true ? true : false;
                 _openPreview($el.data('kind'), $el.data('position'), $el.data('id'), $el.data('kind'));
-            })
+            });
         $previewContainer
             .on('click', '.preview-navigate-action', (event) => {
                 event.preventDefault();
@@ -75,11 +75,11 @@ const previewRecordService = (services) => {
      * @param event
      */
     const onGlobalKeydown = (event, specialKeyState) => {
-        if( specialKeyState === undefined ) {
+        if ( specialKeyState === undefined ) {
             let specialKeyState = {
                 isCancelKey: false,
                 isShortcutKey: false
-            }
+            };
         }
         if (options.open) {
             if (($('#dialog_dwnl:visible').length === 0 && $('#DIALOG1').length === 0 && $('#DIALOG2').length === 0)) {
@@ -108,8 +108,8 @@ const previewRecordService = (services) => {
                 }
             }
         }
-        return specialKeyState
-    }
+        return specialKeyState;
+    };
 
     /**
      *
@@ -120,7 +120,7 @@ const previewRecordService = (services) => {
      */
     function _openPreview(env, pos, contId, reload) {
 
-        if (contId == undefined)
+        if (contId === undefined)
             contId = '';
         var roll = 0;
         var justOpen = false;
@@ -147,7 +147,7 @@ const previewRecordService = (services) => {
             options.nCurrent = 5;
             $('#PREVIEWCURRENT, #PREVIEWOTHERSINNER, #SPANTITLE').empty();
             resizePreview();
-            if (env == 'BASK')
+            if (env === 'BASK')
                 roll = 1;
 
         }
@@ -168,10 +168,10 @@ const previewRecordService = (services) => {
         // keep relative position for answer train:
         var relativePos = pos;
         // update real absolute position with pagination:
-        var absolutePos = parseInt(options.navigation.perPage,10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos,10);
+        var absolutePos = parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos, 10);
 
         // if comes from story, work with relative positionning
-        if (env == 'REG') {
+        if (env === 'REG') {
             // @TODO - if event comes from workzone (basket|story),
             // we can use the relative position in order to display the doubleclicked records
             // except we can't know the original event in this implementation
@@ -179,8 +179,8 @@ const previewRecordService = (services) => {
         }
         let posAsk = null;
         prevAjax = $.ajax({
-            type: "POST",
-            url: "../prod/records/",
+            type: 'POST',
+            url: '../prod/records/',
             dataType: 'json',
             data: {
                 env: env,
@@ -193,7 +193,7 @@ const previewRecordService = (services) => {
             beforeSend: function () {
                 if (prevAjaxrunning)
                     prevAjax.abort();
-                if (env == 'RESULT')
+                if (env === 'RESULT')
                     $('#current_result_n').empty().append(parseInt(pos) + 1);
                 prevAjaxrunning = true;
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').addClass('loading');
@@ -223,7 +223,7 @@ const previewRecordService = (services) => {
 
                 $('#PREVIEWIMGCONT').empty().append(data.html_preview);
                 $('#PREVIEWIMGCONT .thumb_wrapper')
-                    .width('100%').height('100%').image_enhance({zoomable: true});
+                    .width('100%').height('100%').image_enhance({ zoomable: true });
 
                 $('#PREVIEWIMGDESCINNER').empty().append(data.desc);
                 $('#HISTORICOPS').empty().append(data.history);
@@ -251,12 +251,12 @@ const previewRecordService = (services) => {
                 }
 
                 $('#SPANTITLE').empty().append(data.title);
-                $("#PREVIEWTITLE_COLLLOGO").empty().append(data.collection_logo);
-                $("#PREVIEWTITLE_COLLNAME").empty().append(data.collection_name);
+                $('#PREVIEWTITLE_COLLLOGO').empty().append(data.collection_logo);
+                $('#PREVIEWTITLE_COLLNAME').empty().append(data.collection_name);
 
                 _setPreview();
 
-                if (env != 'RESULT') {
+                if (env !== 'RESULT') {
                     if (justOpen || reload) {
                         _setCurrent(data.current);
                     }
@@ -267,13 +267,13 @@ const previewRecordService = (services) => {
                         $('#PREVIEWCURRENT li.selected').removeClass('selected');
                         $('#PREVIEWCURRENTCONT li.current' + absolutePos).addClass('selected');
                     }
-                    if (justOpen || ($('#PREVIEWCURRENTCONT li.current' + absolutePos).length === 0) || ($('#PREVIEWCURRENTCONT li:last')[0] == $('#PREVIEWCURRENTCONT li.selected')[0]) || ($('#PREVIEWCURRENTCONT li:first')[0] == $('#PREVIEWCURRENTCONT li.selected')[0])) {
+                    if (justOpen || ($('#PREVIEWCURRENTCONT li.current' + absolutePos).length === 0) || ($('#PREVIEWCURRENTCONT li:last')[0] === $('#PREVIEWCURRENTCONT li.selected')[0]) || ($('#PREVIEWCURRENTCONT li:first')[0] === $('#PREVIEWCURRENTCONT li.selected')[0])) {
                         _getAnswerTrain(pos, data.tools, query, options_serial);
                     }
 
                     _viewCurrent($('#PREVIEWCURRENT li.selected'));
                 }
-                if (env == 'REG' && $('#PREVIEWCURRENT').html() === '') {
+                if (env === 'REG' && $('#PREVIEWCURRENT').html() === '') {
                     _getRegTrain(contId, pos, data.tools);
                 }
                 _setOthers(data.others);
@@ -282,7 +282,7 @@ const previewRecordService = (services) => {
                     'display': 'none'
                 });
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').removeClass('loading');
-                if (!justOpen || (options.mode != env))
+                if (!justOpen || (options.mode !== env))
                     resizePreview();
 
                 options.mode = env;
@@ -332,7 +332,7 @@ const previewRecordService = (services) => {
             $('#start_slide').hide();
             $('#stop_slide').show();
             getNext();
-            setTimeout("startSlide()", 3000);
+            setTimeout('startSlide()', 3000);
         }
     }
 
@@ -343,35 +343,35 @@ const previewRecordService = (services) => {
     }
 
     function getNext() {
-        if (options.mode == 'REG' && parseInt(options.current.pos) === 0)
-            $('#PREVIEWCURRENTCONT li img:first').trigger("click");
+        if (options.mode === 'REG' && parseInt(options.current.pos) === 0)
+            $('#PREVIEWCURRENTCONT li img:first').trigger('click');
         else {
-            if (options.mode == 'RESULT') {
+            if (options.mode === 'RESULT') {
                 let posAsk = parseInt(options.current.pos) + 1;
                 posAsk = (posAsk >= parseInt(options.navigation.tot) || isNaN(posAsk)) ? 0 : posAsk;
                 _openPreview('RESULT', posAsk, '', false);
             }
             else {
                 if (!$('#PREVIEWCURRENT li.selected').is(':last-child'))
-                    $('#PREVIEWCURRENT li.selected').next().children('img').trigger("click");
+                    $('#PREVIEWCURRENT li.selected').next().children('img').trigger('click');
                 else
-                    $('#PREVIEWCURRENT li:first-child').children('img').trigger("click");
+                    $('#PREVIEWCURRENT li:first-child').children('img').trigger('click');
             }
 
         }
     }
 
     function getPrevious() {
-        if (options.mode == 'RESULT') {
+        if (options.mode === 'RESULT') {
             let posAsk = parseInt(options.current.pos) - 1;
             posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot) - 1)) : posAsk;
             _openPreview('RESULT', posAsk, '', false);
         }
         else {
             if (!$('#PREVIEWCURRENT li.selected').is(':first-child'))
-                $('#PREVIEWCURRENT li.selected').prev().children('img').trigger("click");
+                $('#PREVIEWCURRENT li.selected').prev().children('img').trigger('click');
             else
-                $('#PREVIEWCURRENT li:last-child').children('img').trigger("click");
+                $('#PREVIEWCURRENT li:last-child').children('img').trigger('click');
         }
     }
 
@@ -440,7 +440,7 @@ const previewRecordService = (services) => {
                     var absolutePos = jsopt[1];
                     var relativePos = parseInt(absolutePos, 10) - parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1);
                     // keep relative position for answer train:
-                    _openPreview(jsopt[0], relativePos, jsopt[2],false);
+                    _openPreview(jsopt[0], relativePos, jsopt[2], false);
                 });
             });
         }
@@ -452,24 +452,24 @@ const previewRecordService = (services) => {
         }
         $('#PREVIEWCURRENT li.selected').removeClass('selected');
         el.addClass('selected');
-        $('#PREVIEWCURRENTCONT').animate({'scrollLeft': ($('#PREVIEWCURRENT li.selected').position().left + $('#PREVIEWCURRENT li.selected').width() / 2 - ($('#PREVIEWCURRENTCONT').width() / 2 ))});
+        $('#PREVIEWCURRENTCONT').animate({ 'scrollLeft': ($('#PREVIEWCURRENT li.selected').position().left + $('#PREVIEWCURRENT li.selected').width() / 2 - ($('#PREVIEWCURRENTCONT').width() / 2 )) });
         return;
     }
 
     function reloadPreview() {
-        $('#PREVIEWCURRENT li.selected img').trigger("click");
+        $('#PREVIEWCURRENT li.selected img').trigger('click');
     }
 
     function _getAnswerTrain(pos, tools, query, options_serial) {
         // keep relative position for answer train:
         var relativePos = pos;
         // update real absolute position with pagination:
-        var absolutePos = parseInt(options.navigation.perPage,10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos,10);
+        var absolutePos = parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos, 10);
 
         $('#PREVIEWCURRENTCONT').fadeOut('fast');
         $.ajax({
-            type: "POST",
-            url: "/prod/query/answer-train/",
+            type: 'POST',
+            url: '/prod/query/answer-train/',
             dataType: 'json',
             data: {
                 pos: absolutePos,
@@ -487,8 +487,8 @@ const previewRecordService = (services) => {
 
     function _getRegTrain(contId, pos, tools) {
         $.ajax({
-            type: "POST",
-            url: "/prod/query/reg-train/",
+            type: 'POST',
+            url: '/prod/query/reg-train/',
             dataType: 'json',
             data: {
                 cont: contId,
@@ -497,7 +497,7 @@ const previewRecordService = (services) => {
             success: function (data) {
                 _setCurrent(data.current);
                 _viewCurrent($('#PREVIEWCURRENT li.selected'));
-                if (typeof(tools) != 'undefined')
+                if (typeof (tools) !== 'undefined')
                     _setTools(tools);
                 return;
             }
@@ -538,13 +538,13 @@ const previewRecordService = (services) => {
     }
 
     const shouldResize = () => {
-        if( options.open) {
+        if ( options.open) {
             resizePreview();
         }
     };
 
     const shouldReload = () => {
-        if( options.open) {
+        if ( options.open) {
             reloadPreview();
         }
     };
@@ -571,6 +571,6 @@ const previewRecordService = (services) => {
         getPrevious,
         reloadPreview,
         resizePreview
-    }
+    };
 };
 export default previewRecordService;

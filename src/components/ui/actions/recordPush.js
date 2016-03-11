@@ -3,7 +3,7 @@ import dialog from '../../utils/dialog';
 import pushRecord from '../recordPush';
 
 const recordPushModal = (services, datas) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const pushTemplateEndPoint = 'prod/push/sendform/';
 
@@ -41,10 +41,10 @@ const recordPushModal = (services, datas) => {
                 containerId: '#ListManager',
             }
         }); // initialization is remote controled
-    }
+    };
 
 
-    return {openModal};
+    return { openModal };
 };
 
 export default recordPushModal;

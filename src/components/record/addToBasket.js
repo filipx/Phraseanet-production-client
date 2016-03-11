@@ -1,12 +1,12 @@
 
 
 const addToBasket = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     const initialize = () => {
         $container = $('body');
         $container.on('click', '.record-add-to-basket-action', (event) => {
-            console.log('search-record-add-basket-action')
+            console.log('search-record-add-basket-action');
             event.preventDefault();
             let $el = $(event.currentTarget);
             let dbId = $el.data('db-id');
@@ -14,10 +14,10 @@ const addToBasket = (services) => {
             appEvents.emit('workzone.doAddToBasket', {
                 dbId, recordId, event: event.currentTarget
             });
-        })
-    }
+        });
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default addToBasket;

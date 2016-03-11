@@ -1,13 +1,13 @@
 import * as Rx from 'rx';
 var hasOwnProp = {}.hasOwnProperty;
 
-function createName (name) {
+function createName(name) {
     return '$' + name;
 }
 
 let Emitter = function () {
     this.subjects = {};
-}
+};
 
 Emitter.prototype.emit = function (name, data) {
     var fnName = createName(name);
@@ -24,7 +24,7 @@ Emitter.prototype.listen = function (name, handler) {
 };
 Emitter.prototype.listenAll = function (group, name, handler) {
     for (var prop in group) {
-        console.log('add event', prop)
+        console.log('add event', prop);
         var fnName = createName(prop);
         this.subjects[fnName] || (this.subjects[fnName] = new Rx.Subject());
         this.subjects[fnName].subscribe(group[prop]);

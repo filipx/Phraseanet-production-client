@@ -1,7 +1,7 @@
 import dialog from '../../utils/dialog';
 import * as _ from 'underscore';
 const listShare = (services, options) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const shareTemplateEndPoint = 'prod/lists/list/1/share/';
     let $dialog = null;
@@ -11,7 +11,7 @@ const listShare = (services, options) => {
 
 
     const openModal = (options) => {
-        let {listId, modalOptions, modalLevel} = options;
+        let { listId, modalOptions, modalLevel } = options;
 
         $dialog = dialog.create(services, modalOptions, modalLevel);
 
@@ -28,11 +28,11 @@ const listShare = (services, options) => {
             $autocompleter = $('input[name="user"]', $completer_form),
             $dialog = dialog.get(2); //p4.Dialog.get(2);
 
-        $completer_form.bind('submit', function(){
+        $completer_form.bind('submit', function () {
             return false;
         });
 
-        $('select[name="role"]', $owners_form).bind('change', function(event){
+        $('select[name="role"]', $owners_form).bind('change', function (event) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             const userId = $el.data('user-id');
@@ -48,7 +48,7 @@ const listShare = (services, options) => {
 
             let $owner = $el.closest('.owner');
 
-            unShareWith(userId, function(data){
+            unShareWith(userId, function (data) {
                 $owner.remove();
             });
 
@@ -62,18 +62,17 @@ const listShare = (services, options) => {
 
             $.ajax({
                 type: 'POST',
-                url: '/prod/lists/list/'+listId+'/share/' + userId + '/',
+                url: '/prod/lists/list/' + listId + '/share/' + userId + '/',
                 dataType: 'json',
-                data : {role : role},
-                beforeSend:function(){
+                data : { role : role },
+                beforeSend: function () {
                 },
-                success: function(data){
-                    if(data.success)
+                success: function (data) {
+                    if (data.success)
                     {
                         humane.info(data.message);
                     }
-                    else
-                    {
+                    else {
                         humane.error(data.message);
                     }
                     $dialog.refresh();
@@ -87,29 +86,28 @@ const listShare = (services, options) => {
         {
             $.ajax({
                 type: 'POST',
-                url: '/prod/lists/list/'+listId+'/unshare/' + usr_id + '/',
+                url: '/prod/lists/list/' + listId + '/unshare/' + usr_id + '/',
                 dataType: 'json',
                 data : {},
-                beforeSend:function(){
+                beforeSend: function () {
                 },
-                success: function(data){
-                    if(data.success)
+                success: function (data) {
+                    if (data.success)
                     {
                         humane.info(data.message);
                         callback(data);
                     }
-                    else
-                    {
+                    else {
                         humane.error(data.message);
                     }
                     $dialog.refresh();
 
                     return;
                 },
-                error: function(){
+                error: function () {
                     return;
                 },
-                timeout: function(){
+                timeout: function () {
                     return;
                 }
             });
@@ -117,20 +115,20 @@ const listShare = (services, options) => {
 
         $autocompleter.autocomplete({
                 minLength: 2,
-                source: function( request, response ) {
+                source: function ( request, response ) {
                     $.ajax({
                         url: '/prod/push/search-user/',
-                        dataType: "json",
+                        dataType: 'json',
                         data: {
                             query: request.term
                         },
-                        success: function( data ) {
+                        success: function ( data ) {
                             response( data );
                         }
                     });
                 },
-                select: function( event, ui ) {
-                    if(ui.item.type === 'USER')
+                select: function ( event, ui ) {
+                    if (ui.item.type === 'USER')
                     {
                         shareWith(ui.item.usr_id);
                     }
@@ -138,23 +136,23 @@ const listShare = (services, options) => {
                     return false;
                 }
             })
-            .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-            if(item.type === 'USER') {
-                var html = _.template($("#list_user_tpl").html())( {
+            .data( 'ui-autocomplete' )._renderItem = function ( ul, item ) {
+            if (item.type === 'USER') {
+                var html = _.template($('#list_user_tpl').html())( {
                     item: item
                 });
 
-                return  $(html).data( "ui-autocomplete-item", item ).appendTo(ul);
+                return $(html).data( 'ui-autocomplete-item', item ).appendTo(ul);
             }
         };
-    }
+    };
 
 
 
 
     return {
         openModal
-    }
+    };
 };
 
 export default listShare;

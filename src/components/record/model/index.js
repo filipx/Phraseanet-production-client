@@ -60,7 +60,7 @@
                 vocabularyControl: null,
                 vocabularyRestricted: false
             },
-            options = (typeof options == 'object') ? options : {};
+            options = (typeof options === 'object') ? options : {};
 
         if (isNaN(meta_struct_id)) {
             throw 'meta_struct_id should be a number';
@@ -157,7 +157,7 @@
         }
 
         var $this = this;
-    }
+    };
     recordField.prototype = {
         getName: function () {
             return this.databoxField.getName();
@@ -264,7 +264,7 @@
                         return true;
                     }
                 }
-                else if (this.datas[d].getVocabularyId() === null && this.datas[d].getValue() == value) {
+                else if (this.datas[d].getVocabularyId() === null && this.datas[d].getValue() === value) {
                     if (window.console) {
                         console.log('already got this value');
                     }
@@ -294,7 +294,7 @@
                     console.log('loopin... ', this.datas[d].getValue());
                 }
                 if (this.datas[d].getVocabularyId() !== null) {
-                    if (this.datas[d].getVocabularyId() == vocabularyId) {
+                    if (this.datas[d].getVocabularyId() === vocabularyId) {
                         if (window.console) {
                             console.log('Found within the vocab ! removing... ');
                         }
@@ -302,7 +302,7 @@
                         this.options.dirty = true;
                     }
                 }
-                else if (this.datas[d].getValue() == value) {
+                else if (this.datas[d].getValue() === value) {
                     if (window.console) {
                         console.log('Found ! removing... ');
                     }

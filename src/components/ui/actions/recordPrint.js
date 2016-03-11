@@ -2,7 +2,7 @@ import $ from 'jquery';
 import dialog from '../../utils/dialog';
 
 const recordPrintModal = (services, datas) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const printTemplateEndPoint = 'prod/printer/?';
 
@@ -49,7 +49,7 @@ const recordPrintModal = (services, datas) => {
         return true;
     };
 
-    return {openModal};
+    return { openModal };
 };
 
 export default recordPrintModal;

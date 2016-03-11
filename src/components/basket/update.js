@@ -4,7 +4,7 @@
 import dialog from '../utils/dialog';
 
 const basketUpdate = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const endPoint = 'prod/baskets/4/reorder/';
     let basketId = false;
@@ -13,7 +13,7 @@ const basketUpdate = (services) => {
         'broadcast.searchResultSelection': (selection) => {
             searchSelectionSerialized = selection.serialized;
         }
-    })
+    });
 
     const initialize = () => {
         $('body').on('click', '.basket-update-action', (event) => {
@@ -21,13 +21,13 @@ const basketUpdate = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if( $el.attr('title') !== undefined ) {
+            if ( $el.attr('title') !== undefined ) {
                 dialogOptions.title = $el.attr('title');
             }
             basketId = $el.data('basket-id');
             openModal(dialogOptions);
-        })
-    }
+        });
+    };
 
     const openModal = (options = {}) => {
 
@@ -45,29 +45,29 @@ const basketUpdate = (services) => {
     };
 
     const _onDialogReady = () => {
-        $('form[name="basket-rename-box"]').on('submit', function(event){
+        $('form[name="basket-rename-box"]').on('submit', function (event) {
             event.preventDefault();
             onSubmitRenameForm(event);
         });
 
-        $('#basket-rename-box button').on('click', function(event){
+        $('#basket-rename-box button').on('click', function (event) {
             event.preventDefault();
             onSubmitRenameForm(event);
         });
 
-        var onSubmitRenameForm = function(event) {
+        var onSubmitRenameForm = function (event) {
             var $form = $(event.currentTarget).closest('form');
             $.ajax({
                 type: $form.attr('method'),
                 url: $form.attr('action'),
                 dataType: 'json',
                 data: $form.serializeArray(),
-                beforeSend:function(){
+                beforeSend: function () {
 
                 },
-                success: function(data){
+                success: function (data) {
                     $dialog = dialog.get(1).close();
-                    if(data.success) {
+                    if (data.success) {
                         humane.info(data.message);
                         appEvents.emit('workzone.refresh', {
                             basketId: basketId
@@ -81,9 +81,9 @@ const basketUpdate = (services) => {
 
             return false;
         };
-    }
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default basketUpdate;

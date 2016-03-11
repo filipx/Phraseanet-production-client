@@ -4,7 +4,7 @@
 import dialog from '../utils/dialog';
 
 const storyCreate = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const endPoint = 'prod/story/create/';
     let searchSelectionSerialized = '';
@@ -13,7 +13,7 @@ const storyCreate = (services) => {
         'broadcast.searchResultSelection': (selection) => {
             searchSelectionSerialized = selection.serialized;
         }
-    })
+    });
 
     const initialize = () => {
         $('body').on('click', '.story-create-action', (event) => {
@@ -21,13 +21,13 @@ const storyCreate = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if( $el.attr('title') !== undefined ) {
+            if ( $el.attr('title') !== undefined ) {
                 dialogOptions.title = $el.attr('title');
             }
 
             openModal(dialogOptions);
-        })
-    }
+        });
+    };
 
     const openModal = (options = {}) => {
 
@@ -52,13 +52,13 @@ const storyCreate = (services) => {
 
         var buttons = $dialog.getOption('buttons');
 
-        buttons[localeService.t('create')] = function(){
-            $('form', $dialogBox).trigger('submit')
+        buttons[localeService.t('create')] = function () {
+            $('form', $dialogBox).trigger('submit');
         };
 
         $dialog.setOption('buttons', buttons);
 
-        $('form', $dialogBox).bind('submit', function(event){
+        $('form', $dialogBox).bind('submit', function (event) {
 
             var $form = $(this);
             var $dialog = $dialogBox.closest('.ui-dialog');
@@ -69,11 +69,11 @@ const storyCreate = (services) => {
                 url: $form.attr('action'),
                 data: $form.serializeArray(),
                 dataType: 'json',
-                beforeSend:function(){
+                beforeSend: function () {
                     $(":button:contains('" + localeService.t('create') + "')", buttonPanel)
-                        .attr("disabled", true).addClass("ui-state-disabled");
+                        .attr('disabled', true).addClass('ui-state-disabled');
                 },
-                success: function(data){
+                success: function (data) {
 
                     appEvents.emit('workzone.refresh', {
                         basketId: data.WorkZone,
@@ -85,20 +85,20 @@ const storyCreate = (services) => {
 
                     return;
                 },
-                error: function(){
-                    $(":button:contains('" + localeService.t('create')+ "')", buttonPanel)
-                        .attr("disabled", false).removeClass("ui-state-disabled");
+                error: function () {
+                    $(":button:contains('" + localeService.t('create') + "')", buttonPanel)
+                        .attr('disabled', false).removeClass('ui-state-disabled');
                 },
-                timeout: function(){
+                timeout: function () {
 
                 }
             });
 
             return false;
         });
-    }
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default storyCreate;

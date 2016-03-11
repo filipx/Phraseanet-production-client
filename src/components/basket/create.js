@@ -4,16 +4,16 @@
 import dialog from '../utils/dialog';
 
 const basketCreate = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const endPoint = 'prod/baskets/create/';
     let searchSelectionSerialized = '';
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
             searchSelectionSerialized = selection.serialized;
-            console.log('ok jsut received a updated selection from search', selection)
+            console.log('ok jsut received a updated selection from search', selection);
         }
-    })
+    });
 
     const initialize = () => {
         $('body').on('click', '.basket-create-action', (event) => {
@@ -21,13 +21,13 @@ const basketCreate = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if( $el.attr('title') !== undefined ) {
+            if ( $el.attr('title') !== undefined ) {
                 dialogOptions.title = $el.attr('title');
             }
 
             openModal(dialogOptions);
-        })
-    }
+        });
+    };
 
     const openModal = (options = {}) => {
 
@@ -53,13 +53,13 @@ const basketCreate = (services) => {
 
         var buttons = $dialog.getOption('buttons');
 
-        buttons[localeService.t('create')] = function(){
-            $('form', $dialogBox).trigger('submit')
+        buttons[localeService.t('create')] = function () {
+            $('form', $dialogBox).trigger('submit');
         };
 
         $dialog.setOption('buttons', buttons);
 
-        $('form', $dialogBox).bind('submit', function(event){
+        $('form', $dialogBox).bind('submit', function (event) {
 
             var $form = $(this);
             var dialog = $dialogBox.closest('.ui-dialog');
@@ -71,11 +71,11 @@ const basketCreate = (services) => {
                 url: $form.attr('action'),
                 data: $form.serializeArray(),
                 dataType: 'json',
-                beforeSend:function(){
-                    $(":button:contains('" + localeService.t('create')+ "')", buttonPanel)
-                        .attr("disabled", true).addClass("ui-state-disabled");
+                beforeSend: function () {
+                    $(":button:contains('" + localeService.t('create') + "')", buttonPanel)
+                        .attr('disabled', true).addClass('ui-state-disabled');
                 },
-                success: function(data){
+                success: function (data) {
                     appEvents.emit('workzone.refresh', {
                         basketId: data.basket.id
                     });
@@ -84,20 +84,20 @@ const basketCreate = (services) => {
 
                     return;
                 },
-                error: function(){
-                    $(":button:contains('" + localeService.t('create ')+ "')", buttonPanel)
-                        .attr("disabled", false).removeClass("ui-state-disabled");
+                error: function () {
+                    $(":button:contains('" + localeService.t('create ') + "')", buttonPanel)
+                        .attr('disabled', false).removeClass('ui-state-disabled');
                 },
-                timeout: function(){
+                timeout: function () {
 
                 }
             });
 
             return false;
         });
-    }
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default basketCreate;

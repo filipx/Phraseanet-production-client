@@ -39,7 +39,7 @@ function alert(title, message, callback) {
         }).dialog('open');
 
     if (typeof callback === 'function') {
-        dialog.bind("dialogclose", function (event, ui) {
+        dialog.bind('dialogclose', function (event, ui) {
             callback();
         });
     }

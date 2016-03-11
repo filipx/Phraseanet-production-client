@@ -4,14 +4,14 @@ import listShare from './listShare';
 import dialog from '../../utils/dialog';
 import * as _ from 'underscore';
 var ListManager = function (services, options) {
-    const {configService, localeService, appEvents} = services;
-    let $container, {containerId} = options;
+    const { configService, localeService, appEvents } = services;
+    let $container, { containerId } = options;
 
     this.list = null;
     this.container = $container = $(containerId);
     this.userList = new Lists();
 
-    $container.on('click', '.back_link', function() {
+    $container.on('click', '.back_link', function () {
             $('#PushBox').show();
             $('#ListManager').hide();
             return false;
@@ -40,12 +40,12 @@ var ListManager = function (services, options) {
             });
             return false;
         })
-        .on('click', 'a.user_adder', function() {
+        .on('click', 'a.user_adder', function () {
 
             var $this = $(this);
 
             $.ajax({
-                type: "GET",
+                type: 'GET',
                 url: $this.attr('href'),
                 dataType: 'html',
                 beforeSend: function () {
@@ -74,8 +74,8 @@ var ListManager = function (services, options) {
 
 
     var initLeft = () => {
-        console.log('init left')
-        $container.on('click','.push-refresh-list-action', (event) => {
+        console.log('init left');
+        $container.on('click', '.push-refresh-list-action', (event) => {
         //$('a.list_refresh', $container).bind('click', (event) => {
             // /prod/lists/all/
             var callback = function (datas) {
@@ -90,7 +90,7 @@ var ListManager = function (services, options) {
             return false;
         });
 
-        $container.on('click','.push-add-list-action', (event) => {
+        $container.on('click', '.push-add-list-action', (event) => {
             event.preventDefault();
             var makeDialog = (box) => {
 
@@ -123,7 +123,7 @@ var ListManager = function (services, options) {
                 dialog.create(services, options, 2).setContent(box);
             };
 
-            var html = _.template($("#list_editor_dialog_add_tpl").html());
+            var html = _.template($('#list_editor_dialog_add_tpl').html());
             makeDialog(html);
 
             return false;
@@ -158,7 +158,7 @@ var ListManager = function (services, options) {
                     initRight();
                     listEditor(services, {
                         $container, listManagerInstance: this
-                    })
+                    });
                 },
                 beforeSend: function () {
                     $('.editor', $container).empty().addClass('loading');
@@ -174,12 +174,12 @@ var ListManager = function (services, options) {
 
 
 
-            var badge = $(this).closest(".badge");
+            var badge = $(this).closest('.badge');
             // var usr_id = badge.find('input[name="id"]').val();
-            this.getList().removeUser(userId, function(list, data){
+            this.getList().removeUser(userId, function (list, data) {
                 badge.remove();
             });
-        })
+        });
     };
 
     var initRight = function () {
@@ -194,7 +194,7 @@ var ListManager = function (services, options) {
             $.ajax({
                 url: $this.attr('action'),
                 type: $this.attr('method'),
-                dataType: "html",
+                dataType: 'html',
                 data: $this.serializeArray(),
                 beforeSend: function () {
                     dest.empty().addClass('loading');
@@ -257,7 +257,7 @@ var ListManager = function (services, options) {
         //button.deleter
         $('.listmanager-delete-list-action', $container).bind('click', function (event) {
 
-            var list_id = $(this).data("list-id");
+            var list_id = $(this).data('list-id');
 
             var makeDialog = function (box) {
 
@@ -283,7 +283,7 @@ var ListManager = function (services, options) {
                 dialog.create(services, options, 2).setContent(box);
             };
 
-            var html = _.template($("#list_editor_dialog_delete_tpl").html());
+            var html = _.template($('#list_editor_dialog_delete_tpl').html());
 
             makeDialog(html);
 
@@ -294,7 +294,7 @@ var ListManager = function (services, options) {
     initLeft();
 
     $('.badges a.deleter', this.container).on('click', (event) => {
-        console.log('badges deleter')
+        console.log('badges deleter');
         let $this = $(event.currentTarget);
         var badge = $this.closest('.badge');
 
@@ -327,7 +327,7 @@ ListManager.prototype = {
         $('#ListManager .badges').append(datas);
     },
     createList: function (options) {
-        let {name, collection} = options;
+        let { name, collection } = options;
 
         this.userList.create(name, function (list) {
             list.addUsers(collection);

@@ -12,12 +12,12 @@ const basket = () => {
             var current_sstt = current_open.length > 0 ? current_open.attr('id').split('_').pop() : false;
 
             var main_open = false;
-            for (var i = 0; i != data.changed.length; i++) {
+            for (var i = 0; i !== data.changed.length; i++) {
                 var sstt = $('#SSTT_' + data.changed[i]);
                 if (sstt.size() === 0) {
                     if (main_open === false) {
-                        $('#baskets .bloc').animate({'top': 30}, function () {
-                            $('#baskets .alert_datas_changed:first').show()
+                        $('#baskets .bloc').animate({ 'top': 30 }, function () {
+                            $('#baskets .alert_datas_changed:first').show();
                         });
                         main_open = true;
                     }
@@ -31,7 +31,7 @@ const basket = () => {
                 }
             }
         }
-    }
+    };
 
 
     const subscribeToEvents = {
@@ -39,6 +39,6 @@ const basket = () => {
     };
 
     return { subscribeToEvents };
-}
+};
 
 export default basket;

@@ -20,7 +20,7 @@ Lists.prototype = {
             type: 'POST',
             url: '/prod/lists/list/',
             dataType: 'json',
-            data: {name: name},
+            data: { name: name },
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
@@ -48,7 +48,7 @@ Lists.prototype = {
             dataType: type,
             data: {},
             success: function (data) {
-                if (type == 'json') {
+                if (type === 'json') {
                     if (data.success) {
                         humane.info(data.message);
 
@@ -69,7 +69,7 @@ Lists.prototype = {
         });
     }
 
-}
+};
 
 List.prototype = {
     addUsers: function (arrayUsers, callback) {
@@ -79,7 +79,7 @@ List.prototype = {
         }
 
         var $this = this;
-        var data = {usr_ids: $(arrayUsers).toArray()};
+        var data = { usr_ids: $(arrayUsers).toArray() };
 
         $.ajax({
             type: 'POST',
@@ -134,7 +134,7 @@ List.prototype = {
             type: 'POST',
             url: '/prod/lists/list/' + this.id + '/update/',
             dataType: 'json',
-            data: {name: name},
+            data: { name: name },
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
@@ -180,7 +180,7 @@ List.prototype = {
             type: 'POST',
             url: '/prod/lists/list/' + this.id + '/share/' + usr_id + '/',
             dataType: 'json',
-            data: {role: role},
+            data: { role: role },
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
@@ -241,7 +241,7 @@ List.prototype = {
             }
         });
     }
-}
+};
 
 /*p4.Lists = new Lists();
  document.List = List;*/

@@ -1,7 +1,7 @@
 
 
 const removeFromBasket = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -11,10 +11,10 @@ const removeFromBasket = (services) => {
                 event: event.currentTarget,
                 confirm: false
             });
-        })
-    }
+        });
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default removeFromBasket;

@@ -2,7 +2,7 @@ import $ from 'jquery';
 import publication from '../../publication';
 
 const mainMenu = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const $container = $('body');
 
     const initialize = () => {
@@ -27,16 +27,16 @@ const mainMenu = (services) => {
     const _stateNavigator = (...state) => {
         let [stateName, stateArgs] = state;
 
-        switch(stateName) {
+        switch (stateName) {
             case 'publication':
                 publication.fetchPublications();
                 break;
             default:
-                console.log('navigation state error: state "'+stateName+'" not found')
+                console.log('navigation state error: state "' + stateName + '" not found');
         }
 
-    }
-    return {initialize};
+    };
+    return { initialize };
 };
 
 export default mainMenu;

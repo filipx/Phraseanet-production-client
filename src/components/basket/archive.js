@@ -1,5 +1,5 @@
 const archiveBasket = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -8,12 +8,12 @@ const archiveBasket = (services) => {
             let $el = $(event.currentTarget);
             doArchive($el.data('basket-id'));
         });
-    }
+    };
 
     function doArchive(basket_id) {
         $.ajax({
-            type: "POST",
-            url: "../prod/baskets/" + basket_id + "/archive/?archive=1",
+            type: 'POST',
+            url: '../prod/baskets/' + basket_id + '/archive/?archive=1',
             dataType: 'json',
             beforeSend: function () {
 
@@ -23,13 +23,13 @@ const archiveBasket = (services) => {
                     var basket = $('#SSTT_' + basket_id);
                     var next = basket.next();
 
-                    if (next.data("ui-droppable")) {
+                    if (next.data('ui-droppable')) {
                         next.droppable('destroy');
                     }
 
                     next.slideUp().remove();
 
-                    if (basket.data("ui-droppable")) {
+                    if (basket.data('ui-droppable')) {
                         basket.droppable('destroy');
                     }
 
@@ -47,7 +47,7 @@ const archiveBasket = (services) => {
         });
     }
 
-    return {initialize};
-}
+    return { initialize };
+};
 
 export default archiveBasket;

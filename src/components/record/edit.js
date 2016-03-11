@@ -1,7 +1,7 @@
 import recordEditorService from './recordEditor';
 
 const editRecord = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const editTemplateEndPoint = 'prod/records/edit/';
     let $container = null;
@@ -11,10 +11,10 @@ const editRecord = (services) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
             let type = '';
-            let kind= $el.data('kind');
+            let kind = $el.data('kind');
             let idContent = $el.data('id');
 
-            switch(kind) {
+            switch (kind) {
                 case 'basket':
                     type = 'SSTT';
                     break;
@@ -25,7 +25,7 @@ const editRecord = (services) => {
 
             _doEdit(type, idContent);
         });
-    }
+    };
 
     const openModal = (datas) => {
 
@@ -36,8 +36,8 @@ const editRecord = (services) => {
 
         $.ajax({
             url: `${url}${editTemplateEndPoint}`,
-            type: "POST",
-            dataType: "html",
+            type: 'POST',
+            dataType: 'html',
             data: datas,
             success: function (data) {
                 let recordEditor = recordEditorService(services);
@@ -46,7 +46,7 @@ const editRecord = (services) => {
                 $('#idFrameE').removeClass('loading').empty().html(data);
 
                 recordEditor.initialize();
-                recordEditor.startThisEditing(window.recordEditorConfig)
+                recordEditor.startThisEditing(window.recordEditorConfig);
 
                 $('#tooltip').hide();
                 return;
@@ -70,15 +70,15 @@ const editRecord = (services) => {
         };
 
         switch (type) {
-            case "IMGT":
+            case 'IMGT':
                 datas.lst = value;
                 break;
 
-            case "SSTT":
+            case 'SSTT':
                 datas.ssel = value;
                 break;
 
-            case "STORY":
+            case 'STORY':
                 datas.story = value;
                 break;
         }
@@ -107,7 +107,7 @@ const editRecord = (services) => {
         return;*/
     }
 
-    return {initialize, openModal};
+    return { initialize, openModal };
 };
 
 export default editRecord;

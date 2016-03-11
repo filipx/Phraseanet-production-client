@@ -7,9 +7,9 @@ let humane = require('humane-js');
 
 
 const workzone = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let workzoneOptions = {};
-    let searchSelection = { asArray: [], serialized: ''};
+    let searchSelection = { asArray: [], serialized: '' };
     workzoneFacets(services);
     workzoneBaskets(services).initialize();
     workzoneThesaurus(services).initialize();
@@ -63,14 +63,14 @@ const workzone = (services) => {
         });
 
         $('#idFrameC .ui-tabs-nav li').on('click', function (event) {
-            if($('#idFrameC').attr('data-status') == 'closed'){
+            if ($('#idFrameC').attr('data-status') === 'closed') {
                 $('#idFrameC').width(300);
                 $('#rightFrame').css('left', 300);
-                $('#rightFrame').width($(window).width()-300);
+                $('#rightFrame').width($(window).width() - 300);
                 $('#baskets, #proposals, #thesaurus_tab').hide();
                 $('.ui-resizable-handle, #basket_menu_trigger').show();
                 var IDname = $(this).attr('aria-controls');
-                $('#'+IDname).show();
+                $('#' + IDname).show();
             }
 
             $('#idFrameC').attr('data-status', 'open');
@@ -78,26 +78,26 @@ const workzone = (services) => {
             $('#idFrameC').removeClass('closed');
         });
 
-        var previousTab = "";
+        var previousTab = '';
 
         $('#idFrameC #retractableButton').bind('click', function (event) {
 
-            if($('#idFrameC').attr('data-status') != 'closed'){
-                $(this).find('i').removeClass('icon-double-angle-left').addClass('icon-double-angle-right')
+            if ($('#idFrameC').attr('data-status') !== 'closed') {
+                $(this).find('i').removeClass('icon-double-angle-left').addClass('icon-double-angle-right');
                 $('#idFrameC').width(80);
                 $('#rightFrame').css('left', 80);
-                $('#rightFrame').width($(window).width()-80);
+                $('#rightFrame').width($(window).width() - 80);
                 $('#idFrameC').attr('data-status', 'closed');
                 $('#baskets, #proposals, #thesaurus_tab, .ui-resizable-handle, #basket_menu_trigger').hide();
                 $('#idFrameC .ui-tabs-nav li').removeClass('ui-state-active');
                 $('.WZbasketTab').css('background-position', '15px 16px');
                 $('#idFrameC').addClass('closed');
                 previousTab = $('#idFrameC .icon-menu').find('li.ui-tabs-active');
-            }else{
-                $(this).find('i').removeClass('icon-double-angle-right').addClass('icon-double-angle-left')
+            } else {
+                $(this).find('i').removeClass('icon-double-angle-right').addClass('icon-double-angle-left');
                 $('#idFrameC').width(300);
                 $('#rightFrame').css('left', 300);
-                $('#rightFrame').width($(window).width()-300);
+                $('#rightFrame').width($(window).width() - 300);
                 $('#idFrameC').attr('data-status', 'open');
                 $('.ui-resizable-handle, #basket_menu_trigger').show();
                 $('.WZbasketTab').css('background-position', '9px 16px');
@@ -121,8 +121,8 @@ const workzone = (services) => {
             shadow: false
         });
 
-        $('#basket_menu_trigger').trigger("click");
-        $('#basket_menu_trigger').trigger("click");
+        $('#basket_menu_trigger').trigger('click');
+        $('#basket_menu_trigger').trigger('click');
 
         $('.basketTips').tooltip({
             delay: 200
@@ -130,8 +130,8 @@ const workzone = (services) => {
 
         $('#idFrameC .tabs').tabs({
             activate: function (event, ui) {
-                if (ui.newTab.context.hash == "#thesaurus_tab") {
-                    appEvents.emit('thesaurus.show')
+                if (ui.newTab.context.hash === '#thesaurus_tab') {
+                    appEvents.emit('thesaurus.show');
                 }
                 workzoneOptions.open();
             }
@@ -147,13 +147,13 @@ const workzone = (services) => {
 
             return false;
         });
-        // workzoneOptions 
+        // workzoneOptions
         workzoneOptions = {
-            'selection': new Selectable($('#baskets'), {selector: '.CHIM'}),
+            'selection': new Selectable($('#baskets'), { selector: '.CHIM' }),
             'refresh': refreshBaskets,
             'addElementToBasket': function (options) {
-                let {sbas_id, record_id, event, singleSelection} = options;
-                console.log('try to add to basket')
+                let { sbas_id, record_id, event, singleSelection } = options;
+                console.log('try to add to basket');
                 singleSelection = !!singleSelection || false;
 
                 if ($('#baskets .SSTT.active').length === 1) {
@@ -162,7 +162,7 @@ const workzone = (services) => {
                     humane.info(localeService.t('noActiveBasket'));
                 }
             },
-            "removeElementFromBasket": WorkZoneElementRemover,
+            'removeElementFromBasket': WorkZoneElementRemover,
             'reloadCurrent': function () {
                 var sstt = $('#baskets .content:visible');
                 if (sstt.length === 0)
@@ -177,7 +177,7 @@ const workzone = (services) => {
                     $('#idFrameC .tabs > .ui-tabs-panel').hide();
 
                     frame.data('openwidth', frame.width());
-                    frame.animate({width: 100},
+                    frame.animate({ width: 100 },
                         300,
                         'linear',
                         function () {
@@ -197,25 +197,25 @@ const workzone = (services) => {
 
                 if (frame.hasClass('closed')) {
                     var width = frame.data('openwidth') ? frame.data('openwidth') : 300;
-                    frame.css({width: width});
+                    frame.css({ width: width });
                     appEvents.emit('ui.answerSizer');
                     appEvents.emit('ui.linearizeUi');
                     frame.removeClass('closed');
                     $('.escamote', frame).show();
                     frame.unbind('click.escamote');
                     // show tabs content
-                    var activeTabIdx = $('#idFrameC .tabs').tabs("option", "active");
+                    var activeTabIdx = $('#idFrameC .tabs').tabs('option', 'active');
                     $('#idFrameC .tabs > div:eq(' + activeTabIdx + ')').show();
                 }
             }
         };
 
-    }
+    };
     const getResultSelectionStream = () => workzoneOptions.selection.stream;
 
     function refreshBaskets(options) {
-        console.log('refresh basket', options)
-        let {basketId, sort, scrolltobottom, type} = options;
+        console.log('refresh basket', options);
+        let { basketId, sort, scrolltobottom, type } = options;
         type = typeof type === 'undefined' ? 'basket' : type;
 
         var active = $('#baskets .SSTT.ui-state-active');
@@ -227,8 +227,8 @@ const workzone = (services) => {
         scrolltobottom = typeof scrolltobottom === 'undefined' ? false : scrolltobottom;
 
         $.ajax({
-            type: "GET",
-            url: "../prod/WorkZone/",
+            type: 'GET',
+            url: '../prod/WorkZone/',
             data: {
                 id: basketId,
                 sort: sort,
@@ -238,15 +238,15 @@ const workzone = (services) => {
                 $('#basketcontextwrap').remove();
             },
             success: function (data) {
-                var cache = $("#idFrameC #baskets");
+                var cache = $('#idFrameC #baskets');
 
-                if ($(".SSTT", cache).data("ui-droppable")) {
-                    $(".SSTT", cache).droppable('destroy');
+                if ($('.SSTT', cache).data('ui-droppable')) {
+                    $('.SSTT', cache).droppable('destroy');
                 }
-                if ($(".bloc", cache).data("ui-droppable")) {
+                if ($('.bloc', cache).data('ui-droppable')) {
                     $('.bloc', cache).droppable('destroy');
                 }
-                if (cache.data("ui-accordion")) {
+                if (cache.data('ui-accordion')) {
                     cache.accordion('destroy').empty().append(data);
                 }
 
@@ -268,8 +268,8 @@ const workzone = (services) => {
 
     function setTemporaryPref(name, value) {
         $.ajax({
-            type: "POST",
-            url: "/user/preferences/temporary/",
+            type: 'POST',
+            url: '/user/preferences/temporary/',
             data: {
                 prop: name,
                 value: value
@@ -280,7 +280,7 @@ const workzone = (services) => {
         });
     }
 
-    $("#baskets div.content select[name=valid_ord]").on('change', function () {
+    $('#baskets div.content select[name=valid_ord]').on('change', function () {
         var active = $('#baskets .SSTT.ui-state-active');
         if (active.length === 0) {
             return;
@@ -298,17 +298,17 @@ const workzone = (services) => {
             var buttons = {};
 
             buttons[localeService.t('valider')] = function () {
-                $("#DIALOG-baskets").dialog('close').remove();
+                $('#DIALOG-baskets').dialog('close').remove();
                 WorkZoneElementRemover(el, true);
             };
 
             buttons[localeService.t('annuler')] = function () {
-                $("#DIALOG-baskets").dialog('close').remove();
+                $('#DIALOG-baskets').dialog('close').remove();
             };
 
-            var texte = '<p>' + localeService.t('confirmRemoveReg')+ '</p><div><input type="checkbox" onchange="prodApp.appEvents.emit(\'workzone.doRemoveWarning\', this);"/>' + localeService.t('hideMessage') + '</div>';
+            var texte = '<p>' + localeService.t('confirmRemoveReg') + '</p><div><input type="checkbox" onchange="prodApp.appEvents.emit(\'workzone.doRemoveWarning\', this);"/>' + localeService.t('hideMessage') + '</div>';
             $('body').append('<div id="DIALOG-baskets"></div>');
-            $("#DIALOG-baskets").attr('title', localeService.t('removeTitle'))
+            $('#DIALOG-baskets').attr('title', localeService.t('removeTitle'))
                 .empty()
                 .append(texte)
                 .dialog({
@@ -329,7 +329,7 @@ const workzone = (services) => {
         var id = $(el).attr('id').split('_').slice(2, 4).join('_');
 
         $.ajax({
-            type: "POST",
+            type: 'POST',
             url: $(el).attr('href'),
             dataType: 'json',
             beforeSend: function () {
@@ -340,30 +340,30 @@ const workzone = (services) => {
                     humane.info(data.message);
                     workzoneOptions.selection.remove(id);
 
-                    if ($('.wrapCHIM_' + id).find('.CHIM').data("ui-draggable")) {
+                    if ($('.wrapCHIM_' + id).find('.CHIM').data('ui-draggable')) {
                         $('.wrapCHIM_' + id).find('.CHIM').draggable('destroy');
                     }
 
                     $('.wrapCHIM_' + id).remove();
 
-                    if (context === "reg_train_basket") {
-                        var carousel = $("#PREVIEWCURRENTCONT");
+                    if (context === 'reg_train_basket') {
+                        var carousel = $('#PREVIEWCURRENTCONT');
                         var carouselItemLength = $('li', carousel).length;
-                        var selectedItem = $("li.prevTrainCurrent.selected", carousel);
+                        var selectedItem = $('li.prevTrainCurrent.selected', carousel);
                         var selectedItemIndex = $('li', carousel).index(selectedItem);
 
                         // item is first and list has at least 2 items
                         if (selectedItemIndex === 0 && carouselItemLength > 1) {
                             // click next item
-                            selectedItem.next().find("img").trigger("click");
+                            selectedItem.next().find('img').trigger('click');
                             // item is last item and list has at least 2 items
                         } else if (carouselItemLength > 1 && selectedItemIndex === (carouselItemLength - 1)) {
                             // click previous item
-                            selectedItem.prev().find("img").trigger("click");
+                            selectedItem.prev().find('img').trigger('click');
                             // Basket is empty
                         } else if (carouselItemLength > 1) {
                             // click next item
-                            selectedItem.next().find("img").trigger("click");
+                            selectedItem.next().find('img').trigger('click');
                         } else {
                             appEvents.emit('preview.close');
                         }
@@ -384,11 +384,11 @@ const workzone = (services) => {
 
 
     function activeBaskets() {
-        var cache = $("#idFrameC #baskets");
+        var cache = $('#idFrameC #baskets');
 
         cache.accordion({
             active: 'active',
-            heightStyle: "content",
+            heightStyle: 'content',
             collapsible: true,
             header: 'div.header',
             activate: function (event, ui) {
@@ -448,7 +448,7 @@ const workzone = (services) => {
             $(el).trigger('click');
         }
 
-        $(".SSTT, .content", cache)
+        $('.SSTT, .content', cache)
             .droppable({
                 scope: 'objects',
                 hoverClass: 'baskDrop',
@@ -476,7 +476,7 @@ const workzone = (services) => {
         }, function () {
             $(this).removeClass('context-menu-item-hover');
         });
-        $.each($(".SSTT", cache), function () {
+        $.each($('.SSTT', cache), function () {
             var el = $(this);
             $(this).find('.contextMenuTrigger').contextMenu('#' + $(this).attr('id') + ' .contextMenu', {
                 'appendTo': '#basketcontextwrap',
@@ -503,7 +503,7 @@ const workzone = (services) => {
         }
 
         $.ajax({
-            type: "GET",
+            type: 'GET',
             url: url,
             dataType: 'html',
             beforeSend: function () {
@@ -514,14 +514,14 @@ const workzone = (services) => {
                 header.removeClass('unread');
 
                 var dest = header.next();
-                if (dest.data("ui-droppable")) {
-                    dest.droppable('destroy')
+                if (dest.data('ui-droppable')) {
+                    dest.droppable('destroy');
                 }
                 dest.empty().removeClass('loading');
 
                 dest.append(data);
 
-                $('a.WorkZoneElementRemover', dest).bind('mousedown',function (event) {
+                $('a.WorkZoneElementRemover', dest).bind('mousedown', function (event) {
                     return false;
                 }).bind('click', function (event) {
                     return WorkZoneElementRemover($(this), false);
@@ -557,7 +557,7 @@ const workzone = (services) => {
                             workzoneOptions.selection.length() + '</div></div>');
                         return $('#dragDropCursor');
                     },
-                    scope: "objects",
+                    scope: 'objects',
                     distance: 20,
                     scroll: false,
                     refreshPositions: true,
@@ -596,9 +596,9 @@ const workzone = (services) => {
     }
 
     function dropOnBask(event, from, destKey, singleSelection) {
-        var action = "", from = $(from), dest_uri = '', lstbr = [], sselcont = [], act = "ADD";
+        var action = '', from = $(from), dest_uri = '', lstbr = [], sselcont = [], act = 'ADD';
 
-        if (from.hasClass("CHIM")) {
+        if (from.hasClass('CHIM')) {
             /* Element(s) come from an open object in the workzone */
             action = $(' #baskets .ui-state-active').hasClass('grouping') ? 'REG2' : 'CHU2';
         } else {
@@ -620,7 +620,7 @@ const workzone = (services) => {
             window.console.log('Requested action is ', action, ' and act on ', dest_uri);
         }
 
-        if (action === "IMGT2CHU" || action === "IMGT2REG") {
+        if (action === 'IMGT2CHU' || action === 'IMGT2REG') {
             if ($(from).hasClass('.baskAdder')) {
                 lstbr = [$(from).attr('id').split('_').slice(2, 4).join('_')];
             } else if (singleSelection) {
@@ -640,12 +640,12 @@ const workzone = (services) => {
         }
 
         switch (action) {
-            case "CHU2CHU" :
-                if (!utilsModule.is_ctrl_key(event)) act = "MOV";
+            case 'CHU2CHU' :
+                if (!utilsModule.is_ctrl_key(event)) act = 'MOV';
                 break;
-            case "IMGT2REG":
-            case "CHU2REG" :
-            case "REG2REG":
+            case 'IMGT2REG':
+            case 'CHU2REG' :
+            case 'REG2REG':
                 var sameSbas = true, sbas_reg = destKey.attr('sbas');
 
                 for (var i = 0; i < lstbr.length && sameSbas; i++) {
@@ -664,7 +664,7 @@ const workzone = (services) => {
 
         switch (act + action) {
             case 'MOVCHU2CHU':
-                var url = dest_uri + "stealElements/";
+                var url = dest_uri + 'stealElements/';
                 var data = {
                     elements: sselcont
                 };
@@ -675,7 +675,7 @@ const workzone = (services) => {
             case 'ADDCHU2CHU':
             case 'ADDREG2CHU':
             case 'ADDIMGT2CHU':
-                var url = dest_uri + "addElements/";
+                var url = dest_uri + 'addElements/';
                 var data = {
                     lst: lstbr.join(';')
                 };
@@ -693,7 +693,7 @@ const workzone = (services) => {
         }
 
         $.ajax({
-            type: "POST",
+            type: 'POST',
             url: url,
             data: data,
             dataType: 'json',
@@ -719,10 +719,10 @@ const workzone = (services) => {
 
     function fix() {
         $.ajax({
-            type: "POST",
-            url: "../prod/WorkZone/attachStories/",
-            data: {stories: searchSelection.asArray},
-            dataType: "json",
+            type: 'POST',
+            url: '../prod/WorkZone/attachStories/',
+            data: { stories: searchSelection.asArray },
+            dataType: 'json',
             success: function (data) {
                 humane.info(data.message);
                 workzoneOptions.refresh();
@@ -732,9 +732,9 @@ const workzone = (services) => {
 
     function unfix(link) {
         $.ajax({
-            type: "POST",
+            type: 'POST',
             url: link,
-            dataType: "json",
+            dataType: 'json',
             success: function (data) {
                 humane.info(data.message);
                 workzoneOptions.refresh();
@@ -757,8 +757,8 @@ const workzone = (services) => {
             searchSelection = selection;
         },
         'workzone.refresh': refreshBaskets,
-        'workzone.doAddToBasket': (options) => { workzoneOptions.addElementToBasket(options)},
-        'workzone.doRemoveFromBasket': (options) => { WorkZoneElementRemover(options.event, options.confirm) },
+        'workzone.doAddToBasket': (options) => { workzoneOptions.addElementToBasket(options);},
+        'workzone.doRemoveFromBasket': (options) => { WorkZoneElementRemover(options.event, options.confirm); },
         'workzone.doRemoveWarning': setRemoveWarning,
         'workzone.doToggleRemoveWarning': toggleRemoveWarning
     });
@@ -766,6 +766,6 @@ const workzone = (services) => {
     return {
         initialize, workzoneFacets, workzoneBaskets, workzoneThesaurus, setRemoveWarning,
         toggleRemoveWarning, getResultSelectionStream
-    }
+    };
 };
 export default workzone;

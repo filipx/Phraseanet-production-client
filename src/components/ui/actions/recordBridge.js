@@ -2,7 +2,7 @@ import dialog from '../../utils/dialog';
 import recordBridge from '../recordBridge';
 
 const bridgeRecord = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const bridgeTemplateEndPoint = 'prod/bridge/manager/';
 
@@ -13,7 +13,7 @@ const bridgeRecord = (services) => {
             title: 'Bridge',
             loading: false
         });
-    
+
         //$dialog.load(`${url}${bridgeTemplateEndPoint}`, 'POST', datas);
 
         return $.post(`${url}${bridgeTemplateEndPoint}`, datas, function (data) {
@@ -25,9 +25,9 @@ const bridgeRecord = (services) => {
 
     const _onDialogReady = () => {
         recordBridge(services).initialize();
-    }
-    
-    return {openModal};
+    };
+
+    return { openModal };
 };
 
 export default bridgeRecord;

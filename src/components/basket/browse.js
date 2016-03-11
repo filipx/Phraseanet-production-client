@@ -1,7 +1,7 @@
 import dialog from '../utils/dialog';
 
 const basketBrowse = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const endPoint = 'prod/WorkZone/Browse/';
 
@@ -11,13 +11,13 @@ const basketBrowse = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if( $el.attr('title') !== undefined ) {
+            if ( $el.attr('title') !== undefined ) {
                 dialogOptions.title = $el.attr('title');
             }
 
             openModal(dialogOptions);
-        })
-    }
+        });
+    };
 
     const openModal = (options = {}) => {
 
@@ -35,7 +35,7 @@ const basketBrowse = (services) => {
     };
 
     const _onDialogReady = () => {
-        var $container = $('#BasketBrowser'),results = null;
+        var $container = $('#BasketBrowser'), results = null;
 
         function loadResults(datas, url)
         {
@@ -44,18 +44,18 @@ const basketBrowse = (services) => {
                 url: url,
                 dataType: 'html',
                 data: datas,
-                beforeSend: function(){
-                    if(results && results.abort && typeof results.abort == 'function')
+                beforeSend: function () {
+                    if (results && results.abort && typeof results.abort === 'function')
                         results.abort();
                     $('.results', $container).addClass('loading').empty();
                 },
-                error: function(){
+                error: function () {
                     $('.results', $container).removeClass('loading');
                 },
-                timeout: function(){
+                timeout: function () {
                     $('.results', $container).removeClass('loading');
                 },
-                success: function(data){
+                success: function (data) {
                     var results = $('.results', $container);
                     results.removeClass('loading').append(data);
                     activateLinks(results);
@@ -74,24 +74,24 @@ const basketBrowse = (services) => {
                 type: 'GET',
                 url: url,
                 dataType: 'html',
-                beforeSend: function(){
-                    if(results && results.abort && typeof results.abort == 'function')
+                beforeSend: function () {
+                    if (results && results.abort && typeof results.abort === 'function')
                         results.abort();
                     $('.Browser', $container).hide();
                     $('.Basket', $container).addClass('loading').empty().show();
                 },
-                error: function(){
+                error: function () {
                     $('.Browser', $container).show();
                     $('.Basket', $container).removeClass('loading').hide();
                 },
-                timeout: function(){
+                timeout: function () {
                     $('.Browser', $container).show();
                     $('.Basket', $container).removeClass('loading').hide();
                 },
-                success: function(data){
+                success: function (data) {
                     $('.Basket', $container).removeClass('loading').append(data);
 
-                    $('.Basket a.back', $container).bind('click', function(){
+                    $('.Basket a.back', $container).bind('click', function () {
                         $('.Basket', $container).hide();
                         $('.Browser', $container).show();
 
@@ -107,7 +107,7 @@ const basketBrowse = (services) => {
 
         function activateLinks($scope)
         {
-            $('a.result', $scope).bind('click', function(){
+            $('a.result', $scope).bind('click', function () {
                 var $this = $(this);
 
                 loadResults({}, $this.attr('href'));
@@ -115,7 +115,7 @@ const basketBrowse = (services) => {
                 return false;
             });
 
-            $('a.basket_link', $scope).bind('click', function(){
+            $('a.basket_link', $scope).bind('click', function () {
                 var $this = $(this);
 
                 loadBasket($this.attr('href'));
@@ -123,19 +123,19 @@ const basketBrowse = (services) => {
                 return false;
             });
 
-            $('a.delete-basket', $scope).bind('click', function(event) {
+            $('a.delete-basket', $scope).bind('click', function (event) {
                 event.preventDefault();
                 var $this = $(this);
                 var buttons = {};
 
-                buttons[localeService.t('valider')] = function() {
+                buttons[localeService.t('valider')] = function () {
                     $.ajax({
-                        type: "POST",
-                        dataType: "json",
+                        type: 'POST',
+                        dataType: 'json',
                         url: $this.attr('href'),
                         data: {},
-                        success: function(datas){
-                            if(datas.success) {
+                        success: function (datas) {
+                            if (datas.success) {
                                 confirmBox.close();
                                 $('form[name="BasketBrowser"]', $container).trigger('submit');
                                 appEvents.emit('workzone.refresh');
@@ -150,7 +150,7 @@ const basketBrowse = (services) => {
                                 alertBox.setContent(datas.message);
                             }
                         },
-                        error: function() {
+                        error: function () {
                             confirmBox.close();
                             var alertBox = dialog.create({
                                 size : 'Alert',
@@ -178,48 +178,47 @@ const basketBrowse = (services) => {
 
         function active_archiver($scope)
         {
-            $('a.UserTips', $scope).bind('click', function(){
+            $('a.UserTips', $scope).bind('click', function () {
 
                 return false;
             }).tooltip();
 
             $('.infoTips, .previewTips', $scope).tooltip();
 
-            $('a.archive_toggler', $scope).bind('click', function(){
+            $('a.archive_toggler', $scope).bind('click', function () {
                 var $this = $(this), parent = $this.parent();
 
                 $.ajax({
                     type: 'POST',
                     url: $this.attr('href'),
                     dataType: 'json',
-                    beforeSend: function(){
-                        $('.loader',parent).show();
+                    beforeSend: function () {
+                        $('.loader', parent).show();
                         $('.archive_toggler:visible', parent).addClass('last_act').hide();
                     },
-                    error: function(){
-                        $('.loader',parent).hide();
+                    error: function () {
+                        $('.loader', parent).hide();
                         $('.last_act', parent).removeClass('last_act').show();
                     },
-                    timeout: function(){
-                        $('.loader',parent).hide();
+                    timeout: function () {
+                        $('.loader', parent).hide();
                         $('.last_act', parent).removeClass('last_act').show();
                     },
-                    success: function(data){
-                        $('.loader',parent).hide();
+                    success: function (data) {
+                        $('.loader', parent).hide();
                         $('.last_act', parent).removeClass('last_act');
-                        if(!data.success)
+                        if (!data.success)
                         {
                             humane.error(data.message);
 
                             return;
                         }
-                        if(data.archive === true)
+                        if (data.archive === true)
                         {
                             $('.unarchiver', parent).show();
                             $('.archiver', parent).hide();
                         }
-                        else
-                        {
+                        else {
                             $('.unarchiver', parent).hide();
                             $('.archiver', parent).show();
                         }
@@ -235,14 +234,14 @@ const basketBrowse = (services) => {
             });
         }
 
-        $('form[name="BasketBrowser"]', $container).bind('submit', function(){
+        $('form[name="BasketBrowser"]', $container).bind('submit', function () {
 
             var $this = $(this);
 
             loadResults($this.serializeArray(), $this.attr('action'));
 
             return false;
-        }).trigger('submit').find('label').bind('click', function(){
+        }).trigger('submit').find('label').bind('click', function () {
             var input = $(this).prev('input'),
                 name = input.attr('name');
 
@@ -250,11 +249,11 @@ const basketBrowse = (services) => {
             inputs.prop('checked', false).next('label').removeClass('selected');
 
             input.prop('checked', true).next('label').addClass('selected');
-            $('form[name="BasketBrowser"]', $container).trigger('submit')
+            $('form[name="BasketBrowser"]', $container).trigger('submit');
         });
-    }
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default basketBrowse;

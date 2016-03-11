@@ -4,7 +4,7 @@ import dialog from '../../utils/dialog';
 let $dialog = null;
 
 const moveRecords = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const moveRecordsEndPoint = 'prod/records/movecollection/';
     const postMovableRecordsEndPoint = 'prod/records/movecollection/apply/';
@@ -56,7 +56,7 @@ const moveRecords = (services) => {
 
 
             $(":button:contains('" + localeService.t('valider') + "')", buttonPanel)
-                .attr("disabled", true).addClass("ui-state-disabled");
+                .attr('disabled', true).addClass('ui-state-disabled');
 
             _postMovableRecords(datas).then(
                 (data) => {
@@ -67,7 +67,7 @@ const moveRecords = (services) => {
                         humane.error(data.message);
                     }
                     $(":button:contains('" + localeService.t('valider') + "')", buttonPanel)
-                        .attr("disabled", false).removeClass("ui-state-disabled");
+                        .attr('disabled', false).removeClass('ui-state-disabled');
                 },
                 () => {
 
@@ -82,7 +82,7 @@ const moveRecords = (services) => {
 
     const _getMovableRecords = (datas) => {
         return $.ajax({
-            type: "POST",
+            type: 'POST',
             url: `${url}${moveRecordsEndPoint}`,
             data: datas
         });
@@ -90,14 +90,14 @@ const moveRecords = (services) => {
 
     const _postMovableRecords = (datas) => {
         return $.ajax({
-            type: "POST",
+            type: 'POST',
             url: `${url}${postMovableRecordsEndPoint}`,
             dataType: 'json',
             data: datas
         });
     };
 
-    return {openModal};
+    return { openModal };
 };
 
 export default moveRecords; //moveRecordModal;

@@ -2,13 +2,13 @@ import $ from 'jquery';
 import dialog from '../../utils/dialog';
 
 const recordDownloadModal = (services, datas) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const downloadTemplateEndPoint = 'prod/export/multi-export/';
 
     const openModal = (datas) => {
         // @TODO: use local dialog module
-        let $dialog = dialog.create(services, {title: localeService.t('export')});
+        let $dialog = dialog.create(services, { title: localeService.t('export') });
 
         $.post(`${url}${downloadTemplateEndPoint}`, datas, function (data) {
             $dialog.setContent(data);
@@ -25,7 +25,7 @@ const recordDownloadModal = (services, datas) => {
         return true;
     };
 
-    return {openModal};
+    return { openModal };
 };
 
 export default recordDownloadModal;

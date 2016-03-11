@@ -2,14 +2,14 @@ import * as $ from 'jquery';
 
 
 const keyboard = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
 
     const initialize = () => {
 
-    }
+    };
 
     const openModal = () => {
-        console.log('open modal')
+        console.log('open modal');
         $('#keyboard-stop').bind('click', function () {
             var display = $(this).get(0).checked ? '0' : '1';
 
@@ -20,7 +20,7 @@ const keyboard = (services) => {
         var buttons = {};
 
         buttons[localeService.t('fermer')] = function () {
-            $("#keyboard-dialog").dialog('close');
+            $('#keyboard-dialog').dialog('close');
         };
 
         $('#keyboard-dialog').dialog({
@@ -35,13 +35,13 @@ const keyboard = (services) => {
                 opacity: 0.7
             },
             open: function (event, ui) {
-                $(this).dialog("widget").css("z-index", "1400");
+                $(this).dialog('widget').css('z-index', '1400');
             },
             close: function () {
-                $(this).dialog("widget").css("z-index", "auto");
+                $(this).dialog('widget').css('z-index', 'auto');
                 if ($('#keyboard-stop').get(0).checked) {
                     var dialog = $('#keyboard-dialog');
-                    if (dialog.data("ui-dialog")) {
+                    if (dialog.data('ui-dialog')) {
                         dialog.dialog('destroy');
                     }
                     dialog.remove();
@@ -50,9 +50,9 @@ const keyboard = (services) => {
         }).dialog('option', 'buttons', buttons).dialog('open');
 
         $('#keyboard-dialog').scrollTop(0);
-    }
+    };
 
-    return {initialize, openModal};
-}
+    return { initialize, openModal };
+};
 
 export default keyboard;

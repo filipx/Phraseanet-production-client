@@ -42,7 +42,7 @@
                                 $titlebar.stop().animate({
                                     'height': 0
                                 }, 150, function () {
-                                    $titlebar.hide()
+                                    $titlebar.hide();
                                 });
                             });
 
@@ -57,7 +57,7 @@
                             var $theatre_img = $('img', $theatre);
                             $(window).bind('resize.image_enhance dblclick.image_enhance', function (event) {
 
-                                if (event.type == 'dblclick') {
+                                if (event.type === 'dblclick') {
                                     $theatre_img.removeClass('zoomed');
                                 }
                                 else {
@@ -67,7 +67,7 @@
                                 var datas = calculate_sizes($(this).width(), $(this).height(), image_width, image_height, 80);
 
                                 $theatre_img.width(datas.width).height(datas.height).css('top', datas.top).css('left', datas.left);
-                            })
+                            });
                             $(window).trigger('resize.image_enhance');
                             $('.closer', $theatre).bind('click.image_enhance', function () {
                                 $theatre.remove();
@@ -97,7 +97,7 @@
                         var image_height = parseInt($('input[name="height"]', $this).val());
                         var ratio = image_width / image_height;
 
-                        $this.bind('mousewheel',function (event, delta) {
+                        $this.bind('mousewheel', function (event, delta) {
                             $image.addClass('zoomed');
                             if (delta > 0) {
                                 event.stopPropagation();
@@ -215,7 +215,7 @@
         var top = Math.round((display_height - datas.height) / 2) + 'px';
         var left = Math.round((display_width - datas.width) / 2) + 'px';
 
-        $image.width(datas.width).height(datas.height).css({top: top, left: left});
+        $image.width(datas.width).height(datas.height).css({ top: top, left: left });
         return;
     }
 

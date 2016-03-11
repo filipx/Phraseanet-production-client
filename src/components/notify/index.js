@@ -6,7 +6,7 @@ import * as Rx from 'rx';
 
 const notify = (services) => {
 
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const language = []; //services.localeService;
     const defaultPollingTime = 10000;
     const defaultConfig = {
@@ -18,7 +18,7 @@ const notify = (services) => {
 
     const initialize = () => {
         console.log('initalize notifier');
-        notifyLayout().bindEvents()
+        notifyLayout().bindEvents();
     };
 
     const createNotifier = (state) => {
@@ -58,7 +58,7 @@ const notify = (services) => {
         );
     };
     const onPollSuccess = (data, notificationInstance) => {
-        if (data.status == 'disconnected' || data.status == 'session') {
+        if (data.status === 'disconnected' || data.status === 'session') {
             appEvents.emit('user.disconnected', data);
             return false;
         }
@@ -91,9 +91,9 @@ const notify = (services) => {
     };
 
     const onPollError = (e, notificationInstance) => {
-        console.log('onError', e)
+        console.log('onError', e);
         window.setTimeout(poll, defaultPollingTime, notificationInstance);
-    }
+    };
 
 
     return {

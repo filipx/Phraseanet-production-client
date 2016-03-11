@@ -1,10 +1,10 @@
-import {sprintf} from 'sprintf-js';
+import { sprintf } from 'sprintf-js';
 import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
 //var p4 = p4 || {};
 
 const recordEditorService = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     let options = {};
     let stream = new Rx.Subject();
@@ -28,7 +28,7 @@ const recordEditorService = (services) => {
         options.curField = '?'; //"?";
         options.$container = $('#idFrameE');
         options.textareaIsDirty = false;
-        options.fieldLastValue = "";
+        options.fieldLastValue = '';
         options.lastClickId = null;
         options.sbas_id = false;
         options.what = false;
@@ -36,8 +36,8 @@ const recordEditorService = (services) => {
         options.newrepresent = false;
         //editor.ssel = false;
 
-        $ztextStatus = $("#ZTextStatus", options.$container);
-        $editTextArea = $("#idEditZTextArea", options.$container);
+        $ztextStatus = $('#ZTextStatus', options.$container);
+        $editTextArea = $('#idEditZTextArea', options.$container);
         _bindEvents();
     };
 
@@ -46,13 +46,13 @@ const recordEditorService = (services) => {
         $editorContainer
             .on('click', '.select-record-action', (event) => {
                 let $el = $(event.currentTarget);
-                console.log('select record action')
+                console.log('select record action');
                 _onSelectRecord(event, $el.data('index'));
             })
             // set grouping (regroupement) image
             .on('click', '.set-grouping-image-action', (event) => {
                 let $el = $(event.currentTarget);
-                console.log('select record action')
+                console.log('select record action');
                 setRegDefault($el.data('index'), $el.data('record-id'));
             })
             // status field edition
@@ -60,16 +60,16 @@ const recordEditorService = (services) => {
                 event.cancelBubble = true;
                 event.stopPropagation();
 
-                if (!options.textareaIsDirty || edit_validField(event, "ask_ok") == true) {
+                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok') === true) {
                     _editStatus(event);
                 }
                 return false;
             })
             // edit field by name / set active for edition
             .on('click', '.edit-field-action', (event) => {
-                console.log('ok catch event for edit-field-by-name-action')
+                console.log('ok catch event for edit-field-by-name-action');
                 let $el = $(event.currentTarget);
-                if (!options.textareaIsDirty || edit_validField(event, "ask_ok") == true) {
+                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok') === true) {
                     _editField(event, $el.data('id'));
                 }
                 return false;
@@ -86,7 +86,7 @@ const recordEditorService = (services) => {
                 let $el = $(event.currentTarget);
                 let fieldValue = $('#' + $el.data('input-id')).val();
 
-                _addMultivaluedField(fieldValue , null);
+                _addMultivaluedField(fieldValue, null);
             })
             .on('click', '.edit-multivalued-field-action', (event) => {
                 event.preventDefault();
@@ -98,38 +98,38 @@ const recordEditorService = (services) => {
                 event.preventDefault();
                 let $el = $(event.currentTarget);
                 let state = $el.data('state') === 1 ? 1 : 0;
-                edit_clkstatus(event, $el.data('bit'), state)
+                edit_clkstatus(event, $el.data('bit'), state);
             })
             .on('click', '.commit-field-action', (event) => {
                 event.preventDefault();
                 let $el = $(event.currentTarget);
-                edit_validField(event, $el.data('mode'))
+                edit_validField(event, $el.data('mode'));
             })
 
             .on('dblclick click', '.edit-thesaurus-action', (event) => {
                 event.preventDefault();
-                if( event.type === 'dblclick') {
-                    edit_dblclickThesaurus(event)
+                if ( event.type === 'dblclick') {
+                    edit_dblclickThesaurus(event);
                 } else {
-                    edit_clickThesaurus(event)
+                    edit_clickThesaurus(event);
                 }
             })
 
             .on('change', '.toggle-replace-mode-action', (event) => {
                 event.preventDefault();
-                _toggleReplaceMode(event)
+                _toggleReplaceMode(event);
             })
 
             .on('click', '.apply-multi-desc-action', (event) => {
                 event.preventDefault();
-                edit_applyMultiDesc(event)
+                edit_applyMultiDesc(event);
             })
             .on('click', '.cancel-multi-desc-action', (event) => {
                 event.preventDefault();
-                edit_cancelMultiDesc(event)
+                edit_cancelMultiDesc(event);
             })
 
-            .on('mouseup mousedown keyup keydown', '#idEditZTextArea', function(event){
+            .on('mouseup mousedown keyup keydown', '#idEditZTextArea', function (event) {
 
 
                 switch (event.type) {
@@ -152,11 +152,11 @@ const recordEditorService = (services) => {
     };
 
     const onGlobalKeydown = (event, specialKeyState) => {
-        if( specialKeyState === undefined ) {
+        if ( specialKeyState === undefined ) {
             let specialKeyState = {
                 isCancelKey: false,
                 isShortcutKey: false
-            }
+            };
         }
         switch (event.keyCode) {
             case 9:	// tab ou shift-tab
@@ -169,39 +169,39 @@ const recordEditorService = (services) => {
                 break;
 
             case 33:	// pg up
-                if (!options.textareaIsDirty || edit_validField(event, "ask_ok"))
+                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok'))
                     skipImage(event, 1);
                 specialKeyState.isCancelKey = true;
                 break;
             case 34:	// pg dn
-                if (!options.textareaIsDirty || edit_validField(event, "ask_ok"))
+                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok'))
                     skipImage(event, -1);
                 specialKeyState.isCancelKey = true;
                 break;
         }
-        return specialKeyState
+        return specialKeyState;
     };
 
     function startThisEditing(params) {//sbas_id, what, regbasprid, ssel) {
-        let {hasMultipleDatabases, databoxId, mode, notActionable, notActionableMsg, state} = params;
+        let { hasMultipleDatabases, databoxId, mode, notActionable, notActionableMsg, state } = params;
 
-        if( hasMultipleDatabases === true ) {
+        if ( hasMultipleDatabases === true ) {
             $('#EDITWINDOW').hide();
             // commonModule.hideOverlay(2);
             // editor can't be run
-            $( "#dialog-edit-many-sbas", options.$container ).dialog({
+            $( '#dialog-edit-many-sbas', options.$container ).dialog({
                 modal: true,
                 resizable:false,
                 buttons: {
-                    Ok: function() {
-                        $( this ).dialog( "close" );
+                    Ok: function () {
+                        $( this ).dialog( 'close' );
                     }
                 }
             });
             return;
         }
 
-        if( notActionable > 0) {
+        if ( notActionable > 0) {
             alert(notActionableMsg);
         }
 
@@ -210,7 +210,7 @@ const recordEditorService = (services) => {
         options = Object.assign(options, state);
         //editor.regbasprid = regbasprid;
         //editor.ssel = ssel;
-        $editTextArea = $("#idEditZTextArea", options.$container);
+        $editTextArea = $('#idEditZTextArea', options.$container);
 
         let recordCollection = options.T_records;
         for (var r in recordCollection) {
@@ -230,7 +230,7 @@ const recordEditorService = (services) => {
                 var type = options.T_fields[meta_struct_id].type;
                 var separator = options.T_fields[meta_struct_id].separator;
                 var vocabularyControl = options.T_fields[meta_struct_id].vocabularyControl || null;
-                var vocabularyRestricted = options.T_fields[meta_struct_id].vocabularyRestricted  || null;
+                var vocabularyRestricted = options.T_fields[meta_struct_id].vocabularyRestricted || null;
 
                 var fieldOptions = {
                     multi: multi,
@@ -271,7 +271,7 @@ const recordEditorService = (services) => {
         $('#EDIT_MID_R .tabs').tabs();
 
         $('#divS div.edit_field:odd').addClass('odd');
-        $('#divS div').bind('mouseover',function () {
+        $('#divS div').bind('mouseover', function () {
             $(this).addClass('hover');
         }).bind('mouseout', function () {
             $(this).removeClass('hover');
@@ -279,7 +279,7 @@ const recordEditorService = (services) => {
 
         $('#editcontextwrap').remove();
 
-        if ($('#editcontextwrap').length == 0)
+        if ($('#editcontextwrap').length === 0)
             $('body').append('<div id="editcontextwrap"></div>');
 
 
@@ -297,7 +297,7 @@ const recordEditorService = (services) => {
         });
         $('.infoTips', options.$container).tooltip();
 
-        if (options.what == 'GRP') {
+        if (options.what === 'GRP') {
             $('#EDIT_FILM2 .reg_opts').show();
 
             $.each($('#EDIT_FILM2 .contextMenuTrigger'), function () {
@@ -373,21 +373,21 @@ const recordEditorService = (services) => {
             },
             change: function (event, ui) {
                 options.diapoSize = $(ui.value)[0];
-                userModule.setPref("editing_images_size", options.diapoSize);
+                userModule.setPref('editing_images_size', options.diapoSize);
             }
         });
 
         var buttons = {};
         buttons[localeService.t('valider')] = function (e) {
-            $(this).dialog("close");
+            $(this).dialog('close');
             edit_applyMultiDesc(e);
         };
         buttons[localeService.t('annuler')] = function (e) {
-            $(this).dialog("close");
+            $(this).dialog('close');
             edit_cancelMultiDesc(e);
         };
 
-        $("#EDIT_CLOSEDIALOG", options.$container).dialog({
+        $('#EDIT_CLOSEDIALOG', options.$container).dialog({
             autoOpen: false,
             closeOnEscape: true,
             resizable: false,
@@ -399,18 +399,18 @@ const recordEditorService = (services) => {
         var buttons = {};
 
         buttons[localeService.t('valider')] = function () {
-            var form = $("#Edit_copyPreset_dlg FORM");
-            var jtitle = $(".EDIT_presetTitle", form);
-            if (jtitle.val() == '') {
+            var form = $('#Edit_copyPreset_dlg FORM');
+            var jtitle = $('.EDIT_presetTitle', form);
+            if (jtitle.val() === '') {
                 alert(localeService.t('needTitle'));
                 jtitle[0].focus();
                 return;
             }
 
             var fields = [];
-            $(":checkbox", form).each(function (idx, elem) {
+            $(':checkbox', form).each(function (idx, elem) {
                 var $el = $(elem);
-                if ($el.is(":checked")) {
+                if ($el.is(':checked')) {
                     var val = $el.val();
                     var field = {
                         name: options.T_fields[val].name,
@@ -419,8 +419,8 @@ const recordEditorService = (services) => {
                     var tval;
                     if (options.T_fields[val].multi) {
                         field.value = $.map(
-                            options.T_fields[val]._value.split(";"),
-                            function(obj, idx){
+                            options.T_fields[val]._value.split(';'),
+                            function (obj, idx) {
                                 return obj.trim();
                             }
                         );
@@ -433,7 +433,7 @@ const recordEditorService = (services) => {
 
             $.ajax({
                 type: 'POST',
-                url: "../prod/records/edit/presets",
+                url: '../prod/records/edit/presets',
                 data: {
                     sbas_id: options.sbas_id,
                     title: jtitle.val(),
@@ -443,19 +443,19 @@ const recordEditorService = (services) => {
                 success: function (data, textStatus) {
                     _preset_paint(data);
 
-                    if ($("#Edit_copyPreset_dlg").data("ui-dialog")) {
-                        $("#Edit_copyPreset_dlg").dialog("close");
+                    if ($('#Edit_copyPreset_dlg').data('ui-dialog')) {
+                        $('#Edit_copyPreset_dlg').dialog('close');
                     }
                 }
             });
         };
 
         buttons[localeService.t('annuler')] = function () {
-            $(this).dialog("close");
+            $(this).dialog('close');
 
         };
 
-        $("#Edit_copyPreset_dlg", options.$container).dialog({
+        $('#Edit_copyPreset_dlg', options.$container).dialog({
             stack: true,
             closeOnEscape: true,
             resizable: false,
@@ -465,11 +465,11 @@ const recordEditorService = (services) => {
             width: 600,
             title: localeService.t('newPreset'),
             close: function (event, ui) {
-                $(this).dialog("widget").css("z-index", "auto");
+                $(this).dialog('widget').css('z-index', 'auto');
             },
             open: function (event, ui) {
-                $(this).dialog("widget").css("z-index", "5000");
-                $(".EDIT_presetTitle")[0].focus();
+                $(this).dialog('widget').css('z-index', '5000');
+                $('.EDIT_presetTitle')[0].focus();
             },
             buttons: buttons
         });
@@ -480,7 +480,7 @@ const recordEditorService = (services) => {
             dateFormat: 'yy/mm/dd',
             onSelect: function (dateText, inst) {
                 var lval = $editTextArea.val();
-                if (lval != dateText) {
+                if (lval !== dateText) {
                     fieldLastValue = lval;
                     $editTextArea.val(dateText);
                     $('#idEditZTextArea').trigger('keyup.maxLength');
@@ -496,7 +496,7 @@ const recordEditorService = (services) => {
 
         $.ajax({
             type: 'GET',
-            url: "../prod/records/edit/presets",
+            url: '../prod/records/edit/presets',
             data: {
                 sbas_id: options.sbas_id
             },
@@ -527,29 +527,29 @@ const recordEditorService = (services) => {
     }
 
     function _preset_paint(data) {
-        $(".EDIT_presets_list", options.$container).html(data.html);
-        $(".EDIT_presets_list A.triangle").click(
+        $('.EDIT_presets_list', options.$container).html(data.html);
+        $('.EDIT_presets_list A.triangle').click(
             function () {
-                $(this).parent().parent().toggleClass("opened");
+                $(this).parent().parent().toggleClass('opened');
                 return false;
             }
         );
 
-        $(".EDIT_presets_list A.title").dblclick(
+        $('.EDIT_presets_list A.title').dblclick(
             function () {
-                var preset_id = $(this).parent().parent().attr("id");
-                if (preset_id.substr(0, 12) == "EDIT_PRESET_")
+                var preset_id = $(this).parent().parent().attr('id');
+                if (preset_id.substr(0, 12) === 'EDIT_PRESET_')
                     _preset_load(preset_id.substr(12));
                 return false;
             }
         );
 
-        $(".EDIT_presets_list A.delete").click(
+        $('.EDIT_presets_list A.delete').click(
             function () {
-                var li = $(this).closest("LI");
-                var preset_id = li.attr("id");
-                var title = $(this).parent().children(".title").html();
-                if (preset_id.substr(0, 12) == "EDIT_PRESET_" && confirm("supprimer le preset '" + title + "' ?")) {
+                var li = $(this).closest('LI');
+                var preset_id = li.attr('id');
+                var title = $(this).parent().children('.title').html();
+                if (preset_id.substr(0, 12) === 'EDIT_PRESET_' && confirm("supprimer le preset '" + title + "' ?")) {
                     _preset_delete(preset_id.substr(12), li);
                 }
                 return false;
@@ -558,31 +558,31 @@ const recordEditorService = (services) => {
     }
 
     function _preset_copy() {
-        var html = "";
+        var html = '';
         for (i in options.T_fields) {
-            if (options.T_fields[i]._status == 1) {
+            if (options.T_fields[i]._status === 1) {
                 if (options.T_fields[i].readonly) {
                     continue;
                 }
-                var c = options.T_fields[i]._value === "" ? "" : "checked=\"1\"";
+                var c = options.T_fields[i]._value === '' ? '' : 'checked="1"';
                 var v = options.T_fields[i]._value;
-                html += "<div><label class=\"checkbox\" for=\"new_preset_" + options.T_fields[i].name + "\"><input type=\"checkbox\" class=\"checkbox\" id=\"new_preset_" + options.T_fields[i].name + "\" value=\"" + i + "\" " + c + "/>" + "<b>" + options.T_fields[i].label + " : </b></label> ";
-                html += _cleanTags(options.T_fields[i]._value) + "</div>";
+                html += '<div><label class="checkbox" for="new_preset_' + options.T_fields[i].name + '"><input type="checkbox" class="checkbox" id="new_preset_' + options.T_fields[i].name + '" value="' + i + '" ' + c + '/>' + '<b>' + options.T_fields[i].label + ' : </b></label> ';
+                html += _cleanTags(options.T_fields[i]._value) + '</div>';
             }
         }
-        $("#Edit_copyPreset_dlg FORM DIV").html(html);
-        var $dialog = $("#Edit_copyPreset_dlg");
-        if ($dialog.data("ui-dialog")) {
+        $('#Edit_copyPreset_dlg FORM DIV').html(html);
+        var $dialog = $('#Edit_copyPreset_dlg');
+        if ($dialog.data('ui-dialog')) {
             // to show dialog on top of edit window
-            $dialog.dialog("widget").css("z-index", 1300);
-            $dialog.dialog("open");
+            $dialog.dialog('widget').css('z-index', 1300);
+            $dialog.dialog('open');
         }
     }
 
     function _preset_delete(preset_id, li) {
         $.ajax({
             type: 'DELETE',
-            url: "../prod/records/edit/presets/" + preset_id,
+            url: '../prod/records/edit/presets/' + preset_id,
             data: {},
             dataType: 'json',
             success: function (data, textStatus) {
@@ -594,17 +594,17 @@ const recordEditorService = (services) => {
     function _preset_load(preset_id) {
         $.ajax({
             type: 'GET',
-            url: "../prod/records/edit/presets/" + preset_id,
+            url: '../prod/records/edit/presets/' + preset_id,
             data: {},
             dataType: 'json',
             success: function (data, textStatus) {
-                if ($("#Edit_copyPreset_dlg").data("ui-dialog")) {
-                    $("#Edit_copyPreset_dlg").dialog("close");
+                if ($('#Edit_copyPreset_dlg').data('ui-dialog')) {
+                    $('#Edit_copyPreset_dlg').dialog('close');
                 }
 
                 for (i in options.T_fields) {
                     options.T_fields[i].preset = null;
-                    if (typeof(data.fields[options.T_fields[i].name]) != "undefined") {
+                    if (typeof (data.fields[options.T_fields[i].name]) !== 'undefined') {
                         options.T_fields[i].preset = data.fields[options.T_fields[i].name];
                     }
                 }
@@ -613,10 +613,10 @@ const recordEditorService = (services) => {
                         continue;
 
                     for (i in options.T_fields) {
-                        if (options.T_fields[i].preset != null) {
+                        if (options.T_fields[i].preset !== null) {
                             for (val in options.T_fields[i].preset) {
                                 // fix : some (old, malformed) presets values may need trim()
-                                options.T_records[r].fields["" + i].addValue(options.T_fields[i].preset[val].trim(), false, null);
+                                options.T_records[r].fields['' + i].addValue(options.T_fields[i].preset[val].trim(), false, null);
                             }
                         }
                     }
@@ -627,13 +627,13 @@ const recordEditorService = (services) => {
     }
 
     function _setPreviewEdit() {
-        console.log('open preview tab')
+        console.log('open preview tab');
         if (!$('#TH_Opreview').is(':visible'))
             return false;
 
         var selected = $('#EDIT_FILM2 .diapo.selected');
 
-        if (selected.length != 1) {
+        if (selected.length !== 1) {
             return;
         }
 
@@ -708,7 +708,7 @@ const recordEditorService = (services) => {
     }
 
     function _previewEdit(r) {
-console.log('try to append', options.T_records[r].preview)
+console.log('try to append', options.T_records[r].preview);
 
         $('#TH_Opreview .PNB10').empty().append(options.T_records[r].preview);
 
@@ -726,7 +726,7 @@ console.log('try to append', options.T_records[r].preview)
 
         sel.removeClass('selected');
 
-        var i = step == 1 ? (parseInt(last.attr('pos')) + 1) : (parseInt(first.attr('pos')) - 1);
+        var i = step === 1 ? (parseInt(last.attr('pos')) + 1) : (parseInt(first.attr('pos')) - 1);
 
         if (i < 0)
             i = parseInt($('.diapo:last', cache).attr('pos'));
@@ -752,7 +752,7 @@ console.log('try to append', options.T_records[r].preview)
     function _editField(evt, meta_struct_id) {
         document.getElementById('idEditZTextArea').blur();
         document.getElementById('EditTextMultiValued').blur();
-        $(".editDiaButtons", options.$container).hide();
+        $('.editDiaButtons', options.$container).hide();
 
         $('#idEditZTextArea, #EditTextMultiValued').unbind('keyup.maxLength');
 
@@ -763,27 +763,27 @@ console.log('try to append', options.T_records[r].preview)
 
 
             let field = null;
-            if( options.T_fields === undefined ) {
+            if ( options.T_fields === undefined ) {
                 return;
             }
 
-            if( options.T_fields[meta_struct_id] !== undefined ) {
+            if ( options.T_fields[meta_struct_id] !== undefined ) {
                 field = options.T_fields[meta_struct_id];
 
                 var name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
 
-                $("#idFieldNameEdit", options.$container).html(name);
+                $('#idFieldNameEdit', options.$container).html(name);
 
 
                 var vocabType = options.T_fields[meta_struct_id].vocabularyControl;
 
                 $('#idEditZTextArea, #EditTextMultiValued').autocomplete({
                     minLength: 2,
-                    appendTo: "#idEditZone",
+                    appendTo: '#idEditZone',
                     source: function (request, response) {
                         $.ajax({
                             url: '../prod/records/edit/vocabulary/' + vocabType + '/',
-                            dataType: "json",
+                            dataType: 'json',
                             data: {
                                 sbas_id: options.sbas_id,
                                 query: request.term
@@ -803,66 +803,66 @@ console.log('try to append', options.T_records[r].preview)
 
 
                 if (options.T_fields[meta_struct_id].maxLength > 0) {
-                    var idexplain = $("#idExplain");
+                    var idexplain = $('#idExplain');
                     idexplain.html('');
 
-                    $('#idEditZTextArea, #EditTextMultiValued').bind('keyup.maxLength',function () {
+                    $('#idEditZTextArea, #EditTextMultiValued').bind('keyup.maxLength', function () {
                         var remaining = Math.max((options.T_fields[meta_struct_id].maxLength - $(this).val().length), 0);
-                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + "/" + meta_struct_id + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + "</span>");
+                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + '/' + meta_struct_id + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + '</span>');
                         $('.metadatas_restrictionsTips', idexplain).tooltip();
                     }).trigger('keyup.maxLength');
                 }
                 else {
-                    $("#idExplain").html("");
+                    $('#idExplain').html('');
                 }
 
                 if (!options.T_fields[meta_struct_id].multi) {
                     // champ monovalue : textarea
-                    $(".editDiaButtons", options.$container).hide();
+                    $('.editDiaButtons', options.$container).hide();
 
-                    if (options.T_fields[meta_struct_id].type == "date") {
-                        $editTextArea.css("height", "16px");
-                        $("#idEditDateZone", options.$container).show();
+                    if (options.T_fields[meta_struct_id].type === 'date') {
+                        $editTextArea.css('height', '16px');
+                        $('#idEditDateZone', options.$container).show();
                     }
                     else {
-                        $("#idEditDateZone", options.$container).hide();
-                        $editTextArea.css("height", "100%");
+                        $('#idEditDateZone', options.$container).hide();
+                        $editTextArea.css('height', '100%');
                     }
 
                     $ztextStatus.hide();
-                    $("#ZTextMultiValued", options.$container).hide();
-                    $("#ZTextMonoValued", options.$container).show();
+                    $('#ZTextMultiValued', options.$container).hide();
+                    $('#ZTextMonoValued', options.$container).show();
 
-                    if (options.T_fields[meta_struct_id]._status == 2) {
+                    if (options.T_fields[meta_struct_id]._status === 2) {
                         // heterogene
-                        $editTextArea.val(options.fieldLastValue = "");
-                        $editTextArea.addClass("hetero");
-                        $("#idDivButtons", options.$container).show();	// valeurs h�t�rog�nes : les 3 boutons remplacer/ajouter/annuler
+                        $editTextArea.val(options.fieldLastValue = '');
+                        $editTextArea.addClass('hetero');
+                        $('#idDivButtons', options.$container).show();	// valeurs h�t�rog�nes : les 3 boutons remplacer/ajouter/annuler
                     }
                     else {
                         // homogene
                         $editTextArea.val(options.fieldLastValue = options.T_fields[meta_struct_id]._value);
-                        $editTextArea.removeClass("hetero");
+                        $editTextArea.removeClass('hetero');
 
-                        $("#idDivButtons", options.$container).hide();	// valeurs homog�nes
-                        if (options.T_fields[meta_struct_id].type == "date") {
+                        $('#idDivButtons', options.$container).hide();	// valeurs homog�nes
+                        if (options.T_fields[meta_struct_id].type === 'date') {
                             var v = options.T_fields[meta_struct_id]._value.split(' ');
                             d = v[0].split('/');
                             var dateObj = new Date();
-                            if (d.length == 3) {
+                            if (d.length === 3) {
                                 dateObj.setYear(d[0]);
                                 dateObj.setMonth((d[1] - 1));
                                 dateObj.setDate(d[2]);
                             }
 
-                            if ($("#idEditDateZone", options.$container).data("ui-datepicker")) {
-                                $("#idEditDateZone", options.$container).datepicker('setDate', dateObj);
+                            if ($('#idEditDateZone', options.$container).data('ui-datepicker')) {
+                                $('#idEditDateZone', options.$container).datepicker('setDate', dateObj);
                             }
                         }
                     }
                     options.textareaIsDirty = false;
 
-                    $("#idEditZone", options.$container).show();
+                    $('#idEditZone', options.$container).show();
 
                     $('#idEditZTextArea').trigger('keyup.maxLength');
 
@@ -871,14 +871,14 @@ console.log('try to append', options.T_records[r].preview)
                 else {
                     // champ multivalue : liste
                     $ztextStatus.hide();
-                    $("#ZTextMonoValued", options.$container).hide();
-                    $("#ZTextMultiValued", options.$container).show();
+                    $('#ZTextMonoValued', options.$container).hide();
+                    $('#ZTextMultiValued', options.$container).show();
 
-                    $("#idDivButtons", options.$container).hide();	// valeurs homogenes
+                    $('#idDivButtons', options.$container).hide();	// valeurs homogenes
 
                     _updateCurrentMval(meta_struct_id);
 
-                    $('#EditTextMultiValued', options.$container).val("");
+                    $('#EditTextMultiValued', options.$container).val('');
                     $('#idEditZone', options.$container).show();
 
                     $('#EditTextMultiValued').trigger('keyup.maxLength');
@@ -891,47 +891,47 @@ console.log('try to append', options.T_records[r].preview)
         }
         else {
             // pas de champ, masquer la zone du textarea
-            $("#idEditZone", options.$container).hide();
-            $(".editDiaButtons", options.$container).hide();
+            $('#idEditZone', options.$container).hide();
+            $('.editDiaButtons', options.$container).hide();
 
         }
         _activeField();
     }
 
     function _updateEditSelectedRecords(evt) {
-        $(".editDiaButtons", options.$container).hide();
+        $('.editDiaButtons', options.$container).hide();
 
         for (var n in options.T_statbits)	// tous les statusbits de la base
         {
-            options.T_statbits[n]._value = "-1";			// val unknown
+            options.T_statbits[n]._value = '-1';			// val unknown
             for (var i in options.T_records) {
                 if (!options.T_records[i]._selected)
                     continue;
                 if (options.T_records[i].statbits.length === 0)
                     continue;
 
-                if (options.T_statbits[n]._value == "-1")
+                if (options.T_statbits[n]._value === '-1')
                     options.T_statbits[n]._value = options.T_records[i].statbits[n].value;
-                else if (options.T_statbits[n]._value != options.T_records[i].statbits[n].value)
-                    options.T_statbits[n]._value = "2";
+                else if (options.T_statbits[n]._value !== options.T_records[i].statbits[n].value)
+                    options.T_statbits[n]._value = '2';
             }
-            var ck0 = $("#idCheckboxStatbit0_" + n);
-            var ck1 = $("#idCheckboxStatbit1_" + n);
+            var ck0 = $('#idCheckboxStatbit0_' + n);
+            var ck1 = $('#idCheckboxStatbit1_' + n);
 
             switch (options.T_statbits[n]._value) {
-                case "0":
+                case '0':
                 case 0:
-                    ck0.removeClass('gui_ckbox_0 gui_ckbox_2').addClass("gui_ckbox_1");
-                    ck1.removeClass('gui_ckbox_1 gui_ckbox_2').addClass("gui_ckbox_0");
+                    ck0.removeClass('gui_ckbox_0 gui_ckbox_2').addClass('gui_ckbox_1');
+                    ck1.removeClass('gui_ckbox_1 gui_ckbox_2').addClass('gui_ckbox_0');
                     break;
-                case "1":
+                case '1':
                 case 1:
-                    ck0.removeClass('gui_ckbox_1 gui_ckbox_2').addClass("gui_ckbox_0");
-                    ck1.removeClass('gui_ckbox_0 gui_ckbox_2').addClass("gui_ckbox_1");
+                    ck0.removeClass('gui_ckbox_1 gui_ckbox_2').addClass('gui_ckbox_0');
+                    ck1.removeClass('gui_ckbox_0 gui_ckbox_2').addClass('gui_ckbox_1');
                     break;
-                case "2":
-                    ck0.removeClass('gui_ckbox_0 gui_ckbox_1').addClass("gui_ckbox_2");
-                    ck1.removeClass('gui_ckbox_0 gui_ckbox_1').addClass("gui_ckbox_2");
+                case '2':
+                    ck0.removeClass('gui_ckbox_0 gui_ckbox_1').addClass('gui_ckbox_2');
+                    ck1.removeClass('gui_ckbox_0 gui_ckbox_1').addClass('gui_ckbox_2');
                     break;
             }
         }
@@ -941,12 +941,12 @@ console.log('try to append', options.T_records[r].preview)
         var status_box = $('#ZTextStatus');
         $('.nostatus, .somestatus, .displaystatus', status_box).hide();
 
-        if (nostatus == 0) {
+        if (nostatus === 0) {
             $('.displaystatus', status_box).show();
         }
         else {
             var yesstatus = $('.diapo.selected', options.$container).length;
-            if (nostatus == yesstatus) {
+            if (nostatus === yesstatus) {
                 $('.nostatus', status_box).show();
             }
             else {
@@ -966,7 +966,7 @@ console.log('try to append', options.T_records[r].preview)
                 continue;
             nrecsel++;
 
-            var bid = "b" + options.T_records[i].bid;
+            var bid = 'b' + options.T_records[i].bid;
             if (t_selcol[bid])
                 continue;
 
@@ -986,27 +986,27 @@ console.log('try to append', options.T_records[r].preview)
         var t_sgval = {};
         for (var f in t_lsgval) {
             for (var sv in t_lsgval[f]) {
-                if (t_lsgval[f][sv] == ncolsel) {
+                if (t_lsgval[f][sv] === ncolsel) {
                     options.T_fields[f]._sgval.push({
                             label: sv,
                             onclick: function (menuItem, menu, e, label) {
                                 if (options.T_fields[options.curField].multi) {
-                                    $("#EditTextMultiValued", options.$container).val(label);
+                                    $('#EditTextMultiValued', options.$container).val(label);
                                     $('#EditTextMultiValued').trigger('keyup.maxLength');
                                     _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
                                 }
                                 else {
                                     if (utilsModule.is_ctrl_key(e)) {
                                         var t = $editTextArea.val();
-                                        $editTextArea.val(t + (t ? " ; " : "") + label);
+                                        $editTextArea.val(t + (t ? ' ; ' : '') + label);
                                     }
                                     else {
                                         $editTextArea.val(label);
                                     }
                                     $('#idEditZTextArea').trigger('keyup.maxLength');
                                     options.textareaIsDirty = true;
-                                    if (options.T_fields[options.curField]._status != 2)
-                                        edit_validField(evt, "ask_ok");
+                                    if (options.T_fields[options.curField]._status !== 2)
+                                        edit_validField(evt, 'ask_ok');
                                 }
                             }
                         }
@@ -1014,28 +1014,28 @@ console.log('try to append', options.T_records[r].preview)
                 }
             }
             if (options.T_fields[f]._sgval.length > 0) {
-                $("#editSGtri_" + f, options.$container).css("visibility", "visible");
-                $("#editSGtri_" + f, options.$container).unbind();
-                $("#editSGtri_" + f, options.$container).contextMenu(
+                $('#editSGtri_' + f, options.$container).css('visibility', 'visible');
+                $('#editSGtri_' + f, options.$container).unbind();
+                $('#editSGtri_' + f, options.$container).contextMenu(
                     options.T_fields[f]._sgval,
                     {
                         theme: 'vista',
-                        openEvt: "click",
+                        openEvt: 'click',
                         beforeShow: function (a, b, c, d) {
                             var fid = this.target.getAttribute('id').substr(10);
-                            if (!options.textareaIsDirty || edit_validField(null, "ask_ok") == true) {
+                            if (!options.textareaIsDirty || edit_validField(null, 'ask_ok') === true) {
                                 _editField(null, fid);
-                                return(true);
+                                return (true);
                             }
                             else {
-                                return(false);
+                                return (false);
                             }
                         }
                     }
                 );
             }
             else {
-                $("#editSGtri_" + f, options.$container).css("visibility", "hidden");
+                $('#editSGtri_' + f, options.$container).css('visibility', 'hidden');
             }
         }
 
@@ -1043,7 +1043,7 @@ console.log('try to append', options.T_records[r].preview)
 
         _updateFieldDisplay();
 
-        if (options.curField == -1)
+        if (options.curField === -1)
             _editStatus(evt);
         else
             _editField(evt, options.curField);
@@ -1059,37 +1059,37 @@ console.log('try to append', options.T_records[r].preview)
 
 
                 if (options.T_records[i].fields[f].isEmpty()) {
-                    var v = "";
+                    var v = '';
                 }
                 else {
                     // le champ existe dans la fiche
                     if (options.T_fields[f].multi) {
                         // champ multi : on compare la concat des valeurs
-                        var v = options.T_records[i].fields[f].getSerializedValues()
+                        var v = options.T_records[i].fields[f].getSerializedValues();
                     }
                     else {
                         var v = options.T_records[i].fields[f].getValue().getValue();
                     }
                 }
 
-                if (options.T_fields[f]._status == 0) {
+                if (options.T_fields[f]._status === 0) {
                     options.T_fields[f]._value = v;
                     options.T_fields[f]._status = 1;
                 }
-                else if (options.T_fields[f]._status == 1 && options.T_fields[f]._value != v) {
-                    options.T_fields[f]._value = "*****";
+                else if (options.T_fields[f]._status === 1 && options.T_fields[f]._value !== v) {
+                    options.T_fields[f]._value = '*****';
                     options.T_fields[f]._status = 2;
                     break;	// plus la peine de verifier le champ sur les autres records
                 }
             }
-            var o = document.getElementById("idEditField_" + f);
+            var o = document.getElementById('idEditField_' + f);
 
             if (o) {
-                if (options.T_fields[f]._status == 2)	// mixed
+                if (options.T_fields[f]._status === 2)	// mixed
                     o.innerHTML = "<span class='hetero'>xxxxx</span>";
                 else {
                     var v = options.T_fields[f]._value;
-                    v = (v instanceof(Array)) ? v.join(";") : v;
+                    v = (v instanceof(Array)) ? v.join(';') : v;
                     o.innerHTML = _cleanTags(v).replace(/\n/gm, "<span style='color:#0080ff'>&para;</span><br/>");
                 }
             }
@@ -1099,21 +1099,21 @@ console.log('try to append', options.T_records[r].preview)
 // on active le pseudo champ 'status'
 // ---------------------------------------------------------------------------
     function _editStatus(evt) {
-        $(".editDiaButtons", options.$container).hide();
+        $('.editDiaButtons', options.$container).hide();
 
         document.getElementById('idEditZTextArea').blur();
         document.getElementById('EditTextMultiValued').blur();
 
-        $("#idFieldNameEdit", options.$container).html("[STATUS]");
-        $("#idExplain", options.$container).html("&nbsp;");
+        $('#idFieldNameEdit', options.$container).html('[STATUS]');
+        $('#idExplain', options.$container).html('&nbsp;');
 
-        $("#ZTextMultiValued", options.$container).hide();
-        $("#ZTextMonoValued", options.$container).hide();
+        $('#ZTextMultiValued', options.$container).hide();
+        $('#ZTextMonoValued', options.$container).hide();
         $ztextStatus.show();
 
-        $("#idEditZone", options.$container).show();
+        $('#idEditZone', options.$container).show();
 
-        document.getElementById("editFakefocus").focus();
+        document.getElementById('editFakefocus').focus();
         options.curField = -1;
         _activeField();
     }
@@ -1137,7 +1137,7 @@ console.log('try to append', options.T_records[r].preview)
                 var word = values[v].getValue();
                 var key = values[v].getVocabularyId() + '%' + word;
 
-                if (typeof(a[key]) == 'undefined') {
+                if (typeof (a[key]) === 'undefined') {
                     a[key] = {
                         'n': 0,
                         'f': new Array()
@@ -1156,7 +1156,7 @@ console.log('try to append', options.T_records[r].preview)
 
         options.T_mval.sort(_sortCompareMetas);
 
-        var t = "";
+        var t = '';
         for (var i in options.T_mval)	// pour lire le tableau 'a' dans l'ordre trie par 'editor.T_mval'
         {
             var value = options.T_mval[i];
@@ -1166,19 +1166,19 @@ console.log('try to append', options.T_records[r].preview)
             var extra = value.getVocabularyId() ? '<img src="/assets/common/images/icons/ressource16.png" /> ' : '';
 
             if (i > 0) {
-                if (value.getVocabularyId() !== null && options.T_mval[i - 1].getVocabularyId() == value.getVocabularyId()) {
+                if (value.getVocabularyId() !== null && options.T_mval[i - 1].getVocabularyId() === value.getVocabularyId()) {
                     continue;
                 }
                 if (value.getVocabularyId() === null && options.T_mval[i - 1].getVocabularyId() === null) {
-                    if (options.T_mval[i - 1].getValue() == value.getValue()) {
+                    if (options.T_mval[i - 1].getValue() === value.getValue()) {
                         continue;	// on n'accepte pas les doublons
                     }
                 }
             }
 
             t += '<div data-index="' + i + '" class="edit-multivalued-field-action '
-                + (((value.getVocabularyId() === null || value.getVocabularyId() == vocabularyId) && HighlightValue == word) ? ' hilighted ' : '')
-                + (a[key].n != n ? ' hetero ' : '') + '">'
+                + (((value.getVocabularyId() === null || value.getVocabularyId() === vocabularyId) && HighlightValue === word) ? ' hilighted ' : '')
+                + (a[key].n !== n ? ' hetero ' : '') + '">'
                 + '<table><tr><td>'
                 + extra
                 + '<span class="value" vocabId="' + (value.getVocabularyId() ? value.getVocabularyId() : '') + '">'
@@ -1186,15 +1186,15 @@ console.log('try to append', options.T_records[r].preview)
                 + "</span></td><td class='options'>"
                 + '<a href="#" class="add_all"><img src="/assets/common/images/icons/plus11.png"/></a> '
                 + '<a href="#" class="remove_all"><img src="/assets/common/images/icons/minus11.png"/></a>'
-                + "</td></tr></table>"
-                + "</div>";
+                + '</td></tr></table>'
+                + '</div>';
         }
         $('#ZTextMultiValued_values', options.$container).html(t);
 
         $('#ZTextMultiValued_values .add_all', options.$container).unbind('click').bind('click', function () {
             var container = $(this).closest('div');
 
-            var span = $('span.value', container)
+            var span = $('span.value', container);
 
             var value = span.text();
             var vocab_id = span.attr('vocabid');
@@ -1206,7 +1206,7 @@ console.log('try to append', options.T_records[r].preview)
         $('#ZTextMultiValued_values .remove_all', options.$container).unbind('click').bind('click', function () {
             var container = $(this).closest('div');
 
-            var span = $('span.value', container)
+            var span = $('span.value', container);
 
             var value = span.text();
             var vocab_id = span.attr('vocabid');
@@ -1225,36 +1225,36 @@ console.log('try to append', options.T_records[r].preview)
 // ---------------------------------------------------------------------------------------------------------
     function edit_validField(evt, action) {
         // action : 'ok', 'fusion' ou 'cancel'
-        if (options.curField == "?")
-            return(true);
+        if (options.curField === '?')
+            return (true);
 
-        if (action == "cancel") {
+        if (action === 'cancel') {
             // on restore le contenu du champ
             $editTextArea.val(options.fieldLastValue);
             $('#idEditZTextArea').trigger('keyup.maxLength');
             options.textareaIsDirty = false;
-            return(true);
+            return (true);
         }
 
-        if (action == "ask_ok" && options.textareaIsDirty && options.T_fields[options.curField]._status == 2) {
+        if (action === 'ask_ok' && options.textareaIsDirty && options.T_fields[options.curField]._status === 2) {
             alert(localeService.t('edit_hetero'));
-            return(false);
+            return (false);
         }
         var o, newvalue;
-        if (o = document.getElementById("idEditField_" + options.curField)) {
-            console.log('should find value',  $editTextArea, $editTextArea.val())
+        if (o = document.getElementById('idEditField_' + options.curField)) {
+            console.log('should find value', $editTextArea, $editTextArea.val());
             let t = $editTextArea.val();
 
             let status = 0;
-            let firstvalue = "";
+            let firstvalue = '';
             for (var i = 0; i < options.T_records.length; i++) {
                 if (!options.T_records[i]._selected)
                     continue;			// on ne modifie pas les fiches non selectionnees
 
-                if (action == "ok" || action == "ask_ok") {
+                if (action === 'ok' || action === 'ask_ok') {
                     options.T_records[i].fields[options.curField].addValue(t, false, null);
                 }
-                else if (action == "fusion" || action == "ask_fusion") {
+                else if (action === 'fusion' || action === 'ask_fusion') {
                     options.T_records[i].fields[options.curField].addValue(t, true, null);
                 }
 
@@ -1268,23 +1268,23 @@ console.log('try to append', options.T_records[r].preview)
 
 
         _editField(evt, options.curField);
-        return(true);
+        return (true);
     }
 
     // ---------------------------------------------------------------------------
 // on a clique sur une checkbox de status
 // ---------------------------------------------------------------------------
     function edit_clkstatus(evt, bit, val) {
-        var ck0 = $("#idCheckboxStatbit0_" + bit);
-        var ck1 = $("#idCheckboxStatbit1_" + bit);
+        var ck0 = $('#idCheckboxStatbit0_' + bit);
+        var ck1 = $('#idCheckboxStatbit1_' + bit);
         switch (val) {
             case 0:
-                ck0.attr('class', "gui_ckbox_1");
-                ck1.attr('class', "gui_ckbox_0");
+                ck0.attr('class', 'gui_ckbox_1');
+                ck1.attr('class', 'gui_ckbox_0');
                 break;
             case 1:
-                ck0.attr('class', "gui_ckbox_0");
-                ck1.attr('class', "gui_ckbox_1");
+                ck0.attr('class', 'gui_ckbox_0');
+                ck1.attr('class', 'gui_ckbox_1');
                 break;
         }
 
@@ -1305,15 +1305,15 @@ console.log('try to append', options.T_records[r].preview)
 // ---------------------------------------------------------------------------
     function _onSelectRecord(evt, i) {
         if (options.curField >= 0) {
-            if (options.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
+            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false)
                 return;
         }
 
         // guideline : si on mousedown sur une selection, c'est qu'on risque de draguer, donc on ne desectionne pas
-        if (evt && evt.type == "mousedown" && options.T_records[i]._selected)
+        if (evt && evt.type === 'mousedown' && options.T_records[i]._selected)
             return;
 
-        if (evt && utilsModule.is_shift_key(evt) && options.lastClickId != null) {
+        if (evt && utilsModule.is_shift_key(evt) && options.lastClickId !== null) {
             // shift donc on sel du editor.lastClickId a ici
             var pos_from = options.T_pos[options.lastClickId];
             var pos_to = options.T_pos[i];
@@ -1328,7 +1328,7 @@ console.log('try to append', options.T_records[r].preview)
                 if (!options.T_records[id]._selected)	// toutes les fiches selectionnees
                 {
                     options.T_records[id]._selected = true;
-                    $("#idEditDiapo_" + id, options.$container).addClass('selected');
+                    $('#idEditDiapo_' + id, options.$container).addClass('selected');
                 }
             }
         }
@@ -1340,23 +1340,23 @@ console.log('try to append', options.T_records[r].preview)
                     if (options.T_records[id]._selected)	// toutes les fiches selectionnees
                     {
                         options.T_records[id]._selected = false;
-                        $("#idEditDiapo_" + id, options.$container).removeClass('selected');
+                        $('#idEditDiapo_' + id, options.$container).removeClass('selected');
                     }
                 }
             }
             if (i >= 0) {
                 options.T_records[i]._selected = !options.T_records[i]._selected;
                 if (options.T_records[i]._selected)
-                    $("#idEditDiapo_" + i, options.$container).addClass('selected');
+                    $('#idEditDiapo_' + i, options.$container).addClass('selected');
                 else
-                    $("#idEditDiapo_" + i, options.$container).removeClass('selected');
+                    $('#idEditDiapo_' + i, options.$container).removeClass('selected');
             }
         }
 
         $('#TH_Opreview .PNB10').empty();
 
         var selected = $('#EDIT_FILM2 .diapo.selected');
-        if (selected.length == 1) {
+        if (selected.length === 1) {
 
             var r = selected.attr('id').split('_').pop();
             _previewEdit(r);
@@ -1370,13 +1370,13 @@ console.log('try to append', options.T_records[r].preview)
 // on a clique sur le 'ok' general : save
 // ----------------------------------------------------------------------------------
     function edit_applyMultiDesc(evt) {
-        var sendorder = "";
-        var sendChuOrder = "";
+        var sendorder = '';
+        var sendChuOrder = '';
 
         var t = [];
 
-        if (options.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
-            return(false);
+        if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false)
+            return (false);
 
         var required_fields = _check_required();
 
@@ -1385,9 +1385,9 @@ console.log('try to append', options.T_records[r].preview)
             return;
         }
 
-        $("#EDIT_ALL", options.$container).hide();
+        $('#EDIT_ALL', options.$container).hide();
 
-        $("#EDIT_WORKING", options.$container).show();
+        $('#EDIT_WORKING', options.$container).show();
 
         for (var r in options.T_records) {
             var record_datas = {
@@ -1426,7 +1426,7 @@ console.log('try to append', options.T_records[r].preview)
 
             if (sb_dirty || editDirty) {
                 if (sb_dirty === true)
-                    record_datas.status = tsb.join("");
+                    record_datas.status = tsb.join('');
 
                 t.push(record_datas);
             }
@@ -1441,22 +1441,22 @@ console.log('try to append', options.T_records[r].preview)
             //regbasprid: editor.regbasprid,
             ssel: options.ssel
         };
-        if (options.newrepresent != false)
+        if (options.newrepresent !== false)
             params.newrepresent = options.newrepresent;
 
         $.ajax({
-            url: "../prod/records/edit/apply/",
+            url: '../prod/records/edit/apply/',
             data: params
             //    ,dataType:'json'
             ,
             type: 'POST',
             success: function (data) {
-                if (options.what == 'GRP' || options.what == 'SSEL') {
+                if (options.what === 'GRP' || options.what === 'SSEL') {
                     appEvents.emit('workzone.refresh', {
                         basketId: 'current'
                     });
                 }
-                $("#Edit_copyPreset_dlg").remove();
+                $('#Edit_copyPreset_dlg').remove();
                 $('#EDITWINDOW').hide();
                 commonModule.hideOverlay(2);
                 appEvents.emit('preview.doReload');
@@ -1476,7 +1476,7 @@ console.log('try to append', options.T_records[r].preview)
             evt.stopPropagation();
 
         if (options.curField >= 0) {
-            if (options.textareaIsDirty && edit_validField(evt, "ask_ok") == false)
+            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false)
                 return;
         }
 
@@ -1491,7 +1491,7 @@ console.log('try to append', options.T_records[r].preview)
             }
         }
         if (!dirty || confirm(localeService.t('confirm_abandon'))) {
-            $("#Edit_copyPreset_dlg").remove();
+            $('#Edit_copyPreset_dlg').remove();
             $('#idFrameE .ww_content', options.$container).empty();
 
             // on reaffiche tous les thesaurus
@@ -1515,10 +1515,10 @@ console.log('try to append', options.T_records[r].preview)
 
         this.sbas_id = sbas_id;
 
-        var zid = ("" + sbas_id).replace(new RegExp("\\.", "g"), "\\.") + "\\.T";
+        var zid = ('' + sbas_id).replace(new RegExp('\\.', 'g'), '\\.') + '\\.T';
 
-        this.TH_P_node = $("#TH_P\\." + zid, options.$container);
-        this.TH_K_node = $("#TH_K\\." + zid, options.$container);
+        this.TH_P_node = $('#TH_P\\.' + zid, options.$container);
+        this.TH_K_node = $('#TH_K\\.' + zid, options.$container);
 
         this._ctimer = null;
 
@@ -1530,17 +1530,17 @@ console.log('try to append', options.T_records[r].preview)
         };
 
         this.search_delayed = function (txt) {
-            if (this.jq && typeof this.jq.abort == "function") {
+            if (this.jq && typeof this.jq.abort === 'function') {
                 this.jq.abort();
                 this.jq = null;
             }
             txt = txt.replace("'", "\\'");
-            var url = "/xmlhttp/openbranches_prod.h.php";
+            var url = '/xmlhttp/openbranches_prod.h.php';
             var parms = {
                 bid: this.sbas_id,
                 lng: p4.lng,
                 t: txt,
-                mod: "TREE",
+                mod: 'TREE',
                 u: Math.random()
             };
 
@@ -1551,8 +1551,8 @@ console.log('try to append', options.T_records[r].preview)
                 data: parms,
                 type: 'POST',
                 success: function (ret) {
-                    me.TH_P_node.html("...");
-                    me.TH_K_node.attr("class", "h").html(ret);
+                    me.TH_P_node.html('...');
+                    me.TH_K_node.attr('class', 'h').html(ret);
                     me.jq = null;
                 },
                 error: function () {
@@ -1569,13 +1569,13 @@ console.log('try to append', options.T_records[r].preview)
                 this.jq.abort();
                 this.jq = null;
             }
-            var url = "/xmlhttp/getterm_prod.h.php";
+            var url = '/xmlhttp/getterm_prod.h.php';
             var parms = {
                 bid: this.sbas_id,
                 lng: p4.lng,
                 sortsy: 1,
                 id: thid,
-                typ: "TH"
+                typ: 'TH'
             };
             var me = this;
 
@@ -1584,7 +1584,7 @@ console.log('try to append', options.T_records[r].preview)
                 url: url,
                 data: parms,
                 success: function (ret) {
-                    var zid = "#TH_K\\." + id.replace(new RegExp("\\.", "g"), "\\.");	// escape les '.' pour jquery
+                    var zid = '#TH_K\\.' + id.replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
                     $(zid, options.$container).html(ret);
                     me.jq = null;
                 },
@@ -1605,14 +1605,14 @@ console.log('try to append', options.T_records[r].preview)
             ;
         if (e) {
             switch (e.id.substr(0, 4)) {
-                case "TH_P":	// +/- de deploiement de mot
-                    edit_thesaurus_ow(e.id.substr(5) )
+                case 'TH_P':	// +/- de deploiement de mot
+                    edit_thesaurus_ow(e.id.substr(5) );
                     // js = "recordEditorModule.edit_thesaurus_ow('" + e.id.substr(5) + "')";
                     // self.setTimeout(js, 10);
                     break;
             }
         }
-        return(false);
+        return (false);
     }
 
     function edit_dblclickThesaurus(event)	// ondblclick dans le thesaurus
@@ -1621,11 +1621,11 @@ console.log('try to append', options.T_records[r].preview)
             ;
         if (e) {
             switch (e.id.substr(0, 4)) {
-                case "TH_W":
+                case 'TH_W':
                     if (options.curField >= 0) {
                         var w = $(e).text();
                         if (options.T_fields[options.curField].multi) {
-                            $("#EditTextMultiValued", options.$container).val(w);
+                            $('#EditTextMultiValued', options.$container).val(w);
                             $('#EditTextMultiValued').trigger('keyup.maxLength');
                             _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
                         }
@@ -1638,37 +1638,37 @@ console.log('try to append', options.T_records[r].preview)
                     break;
             }
         }
-        return(false);
+        return (false);
     }
 
     function edit_thesaurus_ow(id)	// on ouvre ou ferme une branche de thesaurus
     {
-        var o = document.getElementById("TH_K." + id);
-        if (o.className == "o") {
+        var o = document.getElementById('TH_K.' + id);
+        if (o.className === 'o') {
             // on ferme
-            o.className = "c";
-            document.getElementById("TH_P." + id).innerHTML = "+";
-            document.getElementById("TH_K." + id).innerHTML = localeService.t('loading');
+            o.className = 'c';
+            document.getElementById('TH_P.' + id).innerHTML = '+';
+            document.getElementById('TH_K.' + id).innerHTML = localeService.t('loading');
         }
-        else if (o.className == "c" || o.className == "h") {
+        else if (o.className === 'c' || o.className === 'h') {
             // on ouvre
-            o.className = "o";
-            document.getElementById("TH_P." + id).innerHTML = "-";
+            o.className = 'o';
+            document.getElementById('TH_P.' + id).innerHTML = '-';
 
-            var t_id = id.split(".");
+            var t_id = id.split('.');
             var sbas_id = t_id[0];
             t_id.shift();
-            var thid = t_id.join(".");
-            var url = "/xmlhttp/getterm_prod.x.php";
-            var parms = "bid=" + sbas_id;
-            parms += "&lng=" + p4.lng;
-            parms += "&sortsy=1";
-            parms += "&id=" + thid;
-            parms += "&typ=TH";
+            var thid = t_id.join('.');
+            var url = '/xmlhttp/getterm_prod.x.php';
+            var parms = 'bid=' + sbas_id;
+            parms += '&lng=' + p4.lng;
+            parms += '&sortsy=1';
+            parms += '&id=' + thid;
+            parms += '&typ=TH';
 
             ETHSeeker.openBranch(id, thid);
         }
-        return(false);
+        return (false);
     }
 
 
@@ -1678,12 +1678,12 @@ console.log('try to append', options.T_records[r].preview)
 
 
         if (ckRegExp.checked) {
-            $("#EditSR_TX", options.$container).hide();
-            $("#EditSR_RX", options.$container).show();
+            $('#EditSR_TX', options.$container).hide();
+            $('#EditSR_RX', options.$container).show();
         }
         else {
-            $("#EditSR_RX", options.$container).hide();
-            $("#EditSR_TX", options.$container).show();
+            $('#EditSR_RX', options.$container).hide();
+            $('#EditSR_TX', options.$container).show();
         }
     }
 
@@ -1691,47 +1691,47 @@ console.log('try to append', options.T_records[r].preview)
         if (!$('#EDITWINDOW').is(':visible'))
             return;
 
-        if ($('#EDIT_TOP').data("ui-resizable")) {
+        if ($('#EDIT_TOP').data('ui-resizable')) {
             $('#EDIT_TOP').resizable('option', 'maxHeight', ($('#EDIT_ALL').height() - $('#buttonEditing').height() - 10 - 160));
         }
-        if ($('#divS_wrapper').data("ui-resizable")) {
+        if ($('#divS_wrapper').data('ui-resizable')) {
             $('#divS_wrapper').resizable('option', 'maxWidth', ($('#EDIT_MID_L').width() - 270));
         }
-        if ($('#EDIT_MID_R').data("ui-resizable")) {
+        if ($('#EDIT_MID_R').data('ui-resizable')) {
             $('#EDIT_MID_R').resizable('option', 'maxWidth', ($('#EDIT_MID_R').width() + $('#idEditZone').width() - 240));
         }
     }
 
     function _hsplit1() {
         var el = $('#EDIT_TOP');
-        if (el.length == 0)
+        if (el.length === 0)
             return;
         var h = $(el).outerHeight();
         $(el).height(h);
         var t = $(el).offset().top + h;
 
-        $("#EDIT_MID", options.$container).css("top", (t) + "px");
+        $('#EDIT_MID', options.$container).css('top', (t) + 'px');
     }
     function _vsplit1() {
         $('#divS_wrapper').height('auto');
 
         var el = $('#divS_wrapper');
-        if (el.length == 0)
+        if (el.length === 0)
             return;
         var a = $(el).width();
         el.width(a);
 
-        $("#idEditZone", options.$container).css("left", (a + 20 ));
+        $('#idEditZone', options.$container).css('left', (a + 20 ));
     }
     function _vsplit2() {
         var el = $('#EDIT_MID_R');
-        if (el.length == 0)
+        if (el.length === 0)
             return;
         var a = $(el).width();
         el.width(a);
         var v = $('#EDIT_ALL').width() - a - 20;
 
-        $("#EDIT_MID_L", options.$container).width(v);
+        $('#EDIT_MID_L', options.$container).width(v);
     }
 
     function _activeField() {
@@ -1750,15 +1750,15 @@ console.log('try to append', options.T_records[r].preview)
         }
     }
     function _sortCompareMetas(a, b) {
-        if (typeof(a) != 'object')
-            return(-1);
-        if (typeof(b) != 'object')
-            return(1);
+        if (typeof (a) !== 'object')
+            return (-1);
+        if (typeof (b) !== 'object')
+            return (1);
         var na = a.getValue().toUpperCase();
         var nb = b.getValue().toUpperCase();
-        if (na == nb)
-            return(0);
-        return(na < nb ? -1 : 1);
+        if (na === nb)
+            return (0);
+        return (na < nb ? -1 : 1);
     }
 
     //---------------------------------------------------------------------
@@ -1767,33 +1767,33 @@ console.log('try to append', options.T_records[r].preview)
     function _cleanTags(string) {
         var chars2replace = [
             {
-                f: "&",
-                t: "&amp;"
+                f: '&',
+                t: '&amp;'
             },
             {
-                'f': "<",
-                't': "&lt;"
+                'f': '<',
+                't': '&lt;'
             },
             {
-                'f': ">",
-                't': "&gt;"
+                'f': '>',
+                't': '&gt;'
             }
         ];
         for (var c in chars2replace)
-            string = string.replace(RegExp(chars2replace[c].f, "g"), chars2replace[c].t);
+            string = string.replace(RegExp(chars2replace[c].f, 'g'), chars2replace[c].t);
         return string;
     }
 
     function _check_required(id_r, id_f) {
         var required_fields = false;
 
-        if (typeof id_r == 'undefined')
+        if (typeof id_r === 'undefined')
             id_r = false;
-        if (typeof id_f == 'undefined')
+        if (typeof id_f === 'undefined')
             id_f = false;
 
         for (var f in options.T_fields) {
-            if (id_f !== false && f != id_f)
+            if (id_f !== false && f !== id_f)
                 continue;
 
             var name = options.T_fields[f].name;
@@ -1802,7 +1802,7 @@ console.log('try to append', options.T_records[r].preview)
                 continue;
 
             for (var r in options.T_records) {
-                if (id_r !== false && r != id_r)
+                if (id_r !== false && r !== id_r)
                     continue;
 
                 var elem = $('#idEditDiapo_' + r + ' .require_alert');
@@ -1820,14 +1820,14 @@ console.log('try to append', options.T_records[r].preview)
                     // le champ existe dans la fiche
                     if (options.T_fields[f].multi) {
                         // champ multi : on compare la concat des valeurs
-                        check_required = $.trim(options.T_records[r].fields[f].getSerializedValues())
+                        check_required = $.trim(options.T_records[r].fields[f].getSerializedValues());
                     }
                     else if (options.T_records[r].fields[f].getValue()) {
                         check_required = $.trim(options.T_records[r].fields[f].getValue().getValue());
                     }
 
 
-                    if (check_required == '') {
+                    if (check_required === '') {
                         elem.show();
                         required_fields = true;
                     }
@@ -1860,17 +1860,17 @@ console.log('try to append', options.T_records[r].preview)
         var textZone = $('#EditTextMultiValued');
 
         if (options.T_fields[options.curField].tbranch) {
-            if (value != "")
+            if (value !== '')
                 ETHSeeker.search(value);
         }
 
-        if (value != "") {
+        if (value !== '') {
             //		var nsel = 0;
             for (var rec_i in options.T_records) {
                 if (options.T_records[rec_i].fields[options.curField].hasValue(value, vocabularyId)) {
-                    $("#idEditDiaButtonsP_" + rec_i).hide();
+                    $('#idEditDiaButtonsP_' + rec_i).hide();
                     var talt = sprintf(localeService.t('editDelSimple'), value);
-                    $("#idEditDiaButtonsM_" + rec_i).show()
+                    $('#idEditDiaButtonsM_' + rec_i).show()
                         .attr('alt', talt)
                         .attr('Title', talt)
                         .unbind('click').bind('click', function () {
@@ -1879,10 +1879,10 @@ console.log('try to append', options.T_records[r].preview)
                     });
                 }
                 else {
-                    $("#idEditDiaButtonsM_" + rec_i).hide();
-                    $("#idEditDiaButtonsP_" + rec_i).show();
+                    $('#idEditDiaButtonsM_' + rec_i).hide();
+                    $('#idEditDiaButtonsP_' + rec_i).show();
                     var talt = sprintf(localeService.t('editAddSimple'), value);
-                    $("#idEditDiaButtonsP_" + rec_i).show().attr('alt', talt)
+                    $('#idEditDiaButtonsP_' + rec_i).show().attr('alt', talt)
                         .attr('Title', talt)
                         .unbind('click').bind('click', function () {
                         var indice = $(this).attr('id').split('_').pop();
@@ -1890,11 +1890,11 @@ console.log('try to append', options.T_records[r].preview)
                     });
                 }
             }
-            $(".editDiaButtons", options.$container).show();
+            $('.editDiaButtons', options.$container).show();
         }
 
         textZone.trigger('focus');
-        return(true);
+        return (true);
     }
 
     // ---------------------------------------------------------------------------
@@ -1941,11 +1941,11 @@ console.log('try to append', options.T_records[r].preview)
 
     function _edit_diabutton(record_indice, act, value, vocabularyId) {
         var meta_struct_id = options.curField;		// le champ en cours d'editing
-        if (act == 'del') {
+        if (act === 'del') {
             options.T_records[record_indice].fields[meta_struct_id].removeValue(value, vocabularyId);
         }
 
-        if (act == 'add') {
+        if (act === 'add') {
             options.T_records[record_indice].fields[meta_struct_id].addValue(value, false, vocabularyId);
         }
         _updateCurrentMval(meta_struct_id, value, vocabularyId);
@@ -1959,7 +1959,7 @@ console.log('try to append', options.T_records[r].preview)
     // edit_chgFld
     function fieldNavigate(evt, dir) {
         var current_field = $('#divS .edit_field.active');
-        if (current_field.length == 0) {
+        if (current_field.length === 0) {
             current_field = $('#divS .edit_field:first');
             current_field.trigger('click');
         }
@@ -1996,7 +1996,7 @@ console.log('try to append', options.T_records[r].preview)
         switch (event.keyCode) {
             case 13:
             case 10:
-                if (options.T_fields[options.curField].type == "date")
+                if (options.T_fields[options.curField].type === 'date')
                     cancelKey = true;
         }
 
@@ -2004,9 +2004,9 @@ console.log('try to append', options.T_records[r].preview)
             event.cancelBubble = true;
             if (event.stopPropagation)
                 event.stopPropagation();
-            return(false);
+            return (false);
         }
-        return(true);
+        return (true);
     }
 
     // ----------------------------------------------------------------------------------------------
@@ -2014,21 +2014,21 @@ console.log('try to append', options.T_records[r].preview)
 // ----------------------------------------------------------------------------------------------
     function _onTextareaMouseDown(evt) {
         evt.cancelBubble = true;
-        return(true);
+        return (true);
     }
 
     // mouse up textarea
     function _onTextareaMouseUp(event, obj) {
         let $el = $(event.currentTarget);
         let value = $el.val();
-        console.log('has valeu?', value)
-        console.log('curfield?', options.curField)
-        console.log('t_field?', options.T_fields)
+        console.log('has valeu?', value);
+        console.log('curfield?', options.curField);
+        console.log('t_field?', options.T_fields);
         if (options.T_fields[options.curField].tbranch) {
-            if (value != "")
+            if (value !== '')
                 ETHSeeker.search(value);
         }
-        return(true);
+        return (true);
     }
 
     // key up textarea
@@ -2039,7 +2039,7 @@ console.log('try to append', options.T_records[r].preview)
         switch (event.keyCode) {
             case 27:	// esc : on restore la valeur avant editing
                 //			$("#btn_cancel", editor.$container).parent().css("backgroundColor", "#000000");
-                edit_validField(event, "cancel");
+                edit_validField(event, 'cancel');
                 //			self.setTimeout("document.getElementById('btn_cancel').parentNode.style.backgroundColor = '';", 100);
                 cancelKey = true;
                 break;
@@ -2049,23 +2049,23 @@ console.log('try to append', options.T_records[r].preview)
             event.cancelBubble = true;
             if (event.stopPropagation)
                 event.stopPropagation();
-            return(false);
+            return (false);
         }
-        if (!options.textareaIsDirty && ($editTextArea.val() != options.fieldLastValue)) {
+        if (!options.textareaIsDirty && ($editTextArea.val() !== options.fieldLastValue)) {
             options.textareaIsDirty = true;
         }
 
         var s = $el.val(); //obj.value;
         if (options.T_fields[options.curField].tbranch) {
-            if (s != "")
+            if (s !== '')
                 ETHSeeker.search(s);
         }
-        return(true);
+        return (true);
     }
 
     appEvents.listenAll({
         'recordEditor.start': startThisEditing
-    })
+    });
 
 
     return {

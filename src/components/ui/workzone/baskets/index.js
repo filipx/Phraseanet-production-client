@@ -7,8 +7,8 @@ import basketBrowse from './../../../basket/browse';
 import basketReorderContent from './../../../basket/reorderContent';
 import storyReorderContent from './../../../story/reorderContent';
 
-const workzoneBaskets =  (services) => {
-    const {configService, localeService, appEvents} = services;
+const workzoneBaskets = (services) => {
+    const { configService, localeService, appEvents } = services;
 
 
     const initialize = () => {
@@ -22,11 +22,11 @@ const workzoneBaskets =  (services) => {
         storyReorderContent(services).initialize();
 
         $('body').on('click', '.basket-filter-action', (event) => {
-            console.log('filter event')
+            console.log('filter event');
             event.preventDefault();
             const $el = $(event.currentTarget);
-            console.log('aa', $el.data('sort'))
-            if( $el.data('sort') !== '') {
+            console.log('aa', $el.data('sort'));
+            if ( $el.data('sort') !== '') {
                 appEvents.emit('workzone.refresh', {
                     basketId: 'current',
                     sort: $el.data('sort')
@@ -35,11 +35,11 @@ const workzoneBaskets =  (services) => {
 
         })
             .on('click', '.basket-preferences-action', (event) => {
-                console.log('filter event')
+                console.log('filter event');
                 event.preventDefault();
                 openBasketPreferences();
 
-            })
+            });
     };
 
     function openBasketPreferences() {
@@ -67,7 +67,7 @@ const workzoneBaskets =  (services) => {
         initialize,
         openBasketPreferences
 
-    }
-}
+    };
+};
 
 export default workzoneBaskets;

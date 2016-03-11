@@ -3,7 +3,7 @@ import dialog from '../../utils/dialog';
 import VideoEditor from '../../videoEditor';
 // @REFACTORING @TODO activeTab is lost tbtested
 const recordToolsModal = (services, datas, activeTab = false) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const toolsTemplateEndPoint = 'prod/tools/';
     let $dialog = null;
@@ -31,32 +31,32 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
     const _onModalReady = (template, data, activeTab) => {
 
-        var $scope = $("#prod-tool-box");
-        var tabs = $("#tool-tabs", $scope).tabs();
+        var $scope = $('#prod-tool-box');
+        var tabs = $('#tool-tabs', $scope).tabs();
         if (activeTab !== false) {
             tabs.tabs('option', 'active', activeTab);
         }
         var width = 0;
 
-        $(".iframe_submiter", $scope).bind("click", function () {
-            var form = $(this).closest("form");
+        $('.iframe_submiter', $scope).bind('click', function () {
+            var form = $(this).closest('form');
             form.submit();
             form.find('.load').empty().html(localeService.t('loading') + ' ...');
-            $("#uploadHdsub").contents().find(".content").empty();
-            $("#uploadHdsub").load(function () {
+            $('#uploadHdsub').contents().find('.content').empty();
+            $('#uploadHdsub').load(function () {
                 form.find('.load').empty();
-                var iframeContent = $("#uploadHdsub").contents().find(".content").html();
+                var iframeContent = $('#uploadHdsub').contents().find('.content').html();
                 form.closest('div').find('.resultAction').empty().append(iframeContent);
             });
         });
 
-        $(".action_submiter", $scope).bind("click", function () {
+        $('.action_submiter', $scope).bind('click', function () {
             var $this = $(this);
-            var form = $(this).closest("form");
+            var form = $(this).closest('form');
 
             $.ajax({
-                url: form.attr("action"),
-                type: form.attr("method"),
+                url: form.attr('action'),
+                type: form.attr('method'),
                 dataType: 'json',
                 data: form.serializeArray(),
                 beforeSend: function () {
@@ -77,14 +77,14 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             return false;
         });
 
-        $(".action_cancel", $scope).bind("click", function () {
+        $('.action_cancel', $scope).bind('click', function () {
             dialog.get(1).close();
 
             return false;
         });
 
         //thumbExtractor
-        var ThumbEditor = new VideoEditor("thumb_video", "thumb_canvas", {
+        var ThumbEditor = new VideoEditor('thumb_video', 'thumb_canvas', {
             altCanvas: $('#alt_canvas_container .alt_canvas')
         });
 
@@ -94,14 +94,14 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
         if (ThumbEditor.isSupported()) {
 
-            var $sliderWrapper = $("#thumb_wrapper", $scope);
+            var $sliderWrapper = $('#thumb_wrapper', $scope);
 
             $sliderWrapper.on('click', 'img', function () {
                 $('.selected', $sliderWrapper).removeClass('selected');
                 $(this).addClass('selected');
 
                 var $self = this;
-                var selectedScreenId = $self.getAttribute("id").split("_").pop();
+                var selectedScreenId = $self.getAttribute('id').split('_').pop();
                 var screenshots = ThumbEditor.store.get(selectedScreenId);
 
                 ThumbEditor.copy(screenshots.getDataURI(), screenshots.getAltScreenShots());
@@ -109,20 +109,20 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
 
             $scope.on('click', '#thumb_delete_button', function () {
-                var img = $sliderWrapper.find(".selected");
-                var id = img.attr("id").split("_").pop();
+                var img = $sliderWrapper.find('.selected');
+                var id = img.attr('id').split('_').pop();
                 var previous = img.prev();
                 var next = img.next();
 
                 if (previous.length > 0) {
-                    previous.trigger("click");
+                    previous.trigger('click');
                 }
                 else if (next.length > 0) {
-                    next.trigger("click");
+                    next.trigger('click');
                 }
                 else {
                     $(this).hide();
-                    $("#thumb_info", $scope).show();
+                    $('#thumb_info', $scope).show();
                     ThumbEditor.resetCanva();
                 }
 
@@ -131,25 +131,25 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             });
 
             $scope.on('click', '.close_action_frame', function () {
-                $(this).closest(".action_frame").hide();
+                $(this).closest('.action_frame').hide();
             });
 
 
             $scope.on('click', '#thumb_camera_button', function () {
-                $("#thumb_info", $scope).hide();
-                $("#thumb_delete_button", $scope).show();
+                $('#thumb_info', $scope).hide();
+                $('#thumb_delete_button', $scope).show();
 
                 var screenshot = ThumbEditor.screenshot();
-                var img = $("<img />");
+                var img = $('<img />');
                 $('.selected', $sliderWrapper).removeClass('selected');
                 img.addClass('selected')
                     .attr('id', 'working_' + screenshot.getId())
                     .attr('src', screenshot.getDataURI())
-                    .attr("alt", screenshot.getVideoTime())
+                    .attr('alt', screenshot.getVideoTime())
                     .appendTo($sliderWrapper);
             });
 
-            $("#thumb_canvas").on('tool_event', function () {
+            $('#thumb_canvas').on('tool_event', function () {
                 var thumbnail = $('.selected', $sliderWrapper);
 
                 if (thumbnail.length === 0) {
@@ -171,7 +171,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                         closeOnEscape: true
                     }, 3);
 
-                    var content = $("<div />").css({
+                    var content = $('<div />').css({
                         'text-align': 'center',
                         'width': '100%',
                         'font-size': '14px'
@@ -183,10 +183,10 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
                 var buttons = {};
 
-                var record_id = $("input[name=record_id]").val();
-                var sbas_id = $("input[name=sbas_id]").val();
+                var record_id = $('input[name=record_id]').val();
+                var sbas_id = $('input[name=sbas_id]').val();
 
-                var selectedScreenId = thumbnail.attr('id').split("_").pop();
+                var selectedScreenId = thumbnail.attr('id').split('_').pop();
                 var screenshots = ThumbEditor.store.get(selectedScreenId);
 
 
@@ -203,25 +203,25 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
 
                 function disableConfirmButton(dialog) {
-                    dialog.getDomElement().closest('.ui-dialog').find(".ui-dialog-buttonpane button").filter(function () {
-                        return $(this).text() == localeService.t('valider');
-                    }).addClass("ui-state-disabled").attr("disabled", true);
+                    dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
+                        return $(this).text() === localeService.t('valider');
+                    }).addClass('ui-state-disabled').attr('disabled', true);
                 }
 
 
                 function enableConfirmButton(dialog) {
-                    dialog.getDomElement().closest('.ui-dialog').find(".ui-dialog-buttonpane button").filter(function () {
-                        return $(this).text() == localeService.t('valider');
-                    }).removeClass("ui-state-disabled").attr("disabled", false);
+                    dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
+                        return $(this).text() === localeService.t('valider');
+                    }).removeClass('ui-state-disabled').attr('disabled', false);
                 }
 
                 buttons[localeService.t('valider')] = function () {
                     let confirmDialog = dialog.get(2);
-                    var buttonPanel = confirmDialog.getDomElement().closest('.ui-dialog').find(".ui-dialog-buttonpane");
+                    var buttonPanel = confirmDialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane');
                     var loadingDiv = buttonPanel.find('.info-div');
 
-                    if (loadingDiv.length == 0) {
-                        loadingDiv = $("<div />").css({
+                    if (loadingDiv.length === 0) {
+                        loadingDiv = $('<div />').css({
                             'width': '120px',
                             'height': '40px',
                             'float': 'left',
@@ -233,8 +233,8 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                     }
 
                     $.ajax({
-                        type: "POST",
-                        url: "/prod/tools/thumb-extractor/apply/",
+                        type: 'POST',
+                        url: '/prod/tools/thumb-extractor/apply/',
                         data: {
                             sub_def: subDefs,
                             record_id: record_id,
@@ -269,19 +269,19 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 }, 2);
 
                 var datas = {
-                    image: $('.selected', $sliderWrapper).attr("src"),
+                    image: $('.selected', $sliderWrapper).attr('src'),
                     sbas_id: sbas_id,
                     record_id: record_id
                 };
 
                 $.ajax({
-                    type: "POST",
-                    url: "/prod/tools/thumb-extractor/confirm-box/",
+                    type: 'POST',
+                    url: '/prod/tools/thumb-extractor/confirm-box/',
                     data: datas,
                     success: function (data) {
 
                         if (data.error) {
-                            var content = $("<div />").css({
+                            var content = $('<div />').css({
                                 'font-size': '16px',
                                 'text-align': 'center'
                             }).append(data.datas);
@@ -296,7 +296,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             });
         } else {
             //not supported
-            $("#thumbExtractor").empty().append(localeService.t('browserFeatureSupport'));
+            $('#thumbExtractor').empty().append(localeService.t('browserFeatureSupport'));
         }
 
         if (data.selectionLength === 1) {
@@ -334,7 +334,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 state = true;
 
             // inverse state
-            if ($btn.data('state') == 1) {
+            if ($btn.data('state') === 1) {
                 state = false;
             }
 
@@ -345,16 +345,16 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             }).done(function (data) {
                 // self reload tab with current active tab:
                 activeTab = tabs.tabs('option', 'active');
-                openModal($dialog.getOption('contextArgs'), activeTab)
+                openModal($dialog.getOption('contextArgs'), activeTab);
                 //openToolModal($dialog.getOption('contextArgs'), activeTab);
             }).error(function (err) {
-                alert('forbidden action')
+                alert('forbidden action');
             });
             return false;
         });
-    }
+    };
 
-    return {openModal};
+    return { openModal };
 };
 
 export default recordToolsModal;

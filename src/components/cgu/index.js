@@ -3,10 +3,10 @@ let $ = require('jquery');
 import * as appCommons from 'phraseanet-common';
 
 const cgu = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
 
     const initialize = (options = {}) => {
-        const {$container} = options;
+        const { $container } = options;
         var $this = $('.cgu-dialog:first');
         $this.dialog({
             autoOpen: true,
@@ -17,7 +17,7 @@ const cgu = (services) => {
             width: 800,
             height: 500,
             open: function () {
-                $this.parents(".ui-dialog:first").find(".ui-dialog-titlebar-close").remove();
+                $this.parents('.ui-dialog:first').find('.ui-dialog-titlebar-close').remove();
                 $('.cgus-accept', $(this)).bind('click', function () {
                     acceptCgus($('.cgus-accept', $this).attr('id'), $('.cgus-accept', $this).attr('date'));
                     $this.dialog('close').remove();
@@ -39,8 +39,8 @@ const cgu = (services) => {
     function cancelCgus(id) {
 
         $.ajax({
-            type: "POST",
-            url: "../prod/TOU/deny/" + id + "/",
+            type: 'POST',
+            url: '../prod/TOU/deny/' + id + '/',
             dataType: 'json',
             success: function (data) {
                 if (data.success) {
@@ -56,7 +56,7 @@ const cgu = (services) => {
     }
     return {
         initialize
-    }
-}
+    };
+};
 
 export default cgu;

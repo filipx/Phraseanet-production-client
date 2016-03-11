@@ -4,7 +4,7 @@
 import dialog from '../utils/dialog';
 
 const basketReorderContent = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const endPoint = 'prod/baskets/4/reorder/';
     let searchSelectionSerialized = '';
@@ -12,7 +12,7 @@ const basketReorderContent = (services) => {
         'broadcast.searchResultSelection': (selection) => {
             searchSelectionSerialized = selection.serialized;
         }
-    })
+    });
 
     const initialize = () => {
         $('body').on('click', '.basket-reorder-content-action', (event) => {
@@ -20,13 +20,13 @@ const basketReorderContent = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if( $el.attr('title') !== undefined ) {
+            if ( $el.attr('title') !== undefined ) {
                 dialogOptions.title = $el.attr('title');
             }
 
             openModal($el.data('basket-id'), dialogOptions);
-        })
-    }
+        });
+    };
 
     const openModal = (basketId, options = {}) => {
 
@@ -46,11 +46,11 @@ const basketReorderContent = (services) => {
     const _onDialogReady = () => {
         var container = $('#reorder_box');
 
-        $('button.autoorder', container).bind('click', function(){
+        $('button.autoorder', container).bind('click', function () {
             autoorder();
             return false;
         });
-        $('button.reverseorder', container).bind('click', function(){
+        $('button.reverseorder', container).bind('click', function () {
             reverse_order();
             return false;
         });
@@ -59,33 +59,33 @@ const basketReorderContent = (services) => {
         {
             var val = $.trim($('#auto_order').val());
 
-            if(val == '') {
+            if (val === '') {
                 return;
             }
 
             var diapos = [];
-            $('#reorder_box .diapo form').each(function(i,n){
+            $('#reorder_box .diapo form').each(function (i, n) {
                 diapos.push({
-                    "title": $('input[name=title]',n).val(),
-                    "order" : parseInt($('input[name=default]',n).val()),
-                    "id"  : $('input[name=id]',n).val()
+                    'title': $('input[name=title]', n).val(),
+                    'order' : parseInt($('input[name=default]', n).val()),
+                    'id'  : $('input[name=id]', n).val()
                 });
             });
 
             var sorterCallback;
 
-            if (val === "default")  {
-                sorterCallback = function(diapo) {return diapo.order;};
+            if (val === 'default') {
+                sorterCallback = function (diapo) {return diapo.order;};
             } else {
-                sorterCallback = function(diapo) {return diapo.title;};
+                sorterCallback = function (diapo) {return diapo.title;};
             }
 
             var elements = [];
 
             _.chain(diapos)
                 .sortBy(sorterCallback)
-                .each(function(diapo) {
-                    elements.push($('#ORDER_'+ diapo.id));
+                .each(function (diapo) {
+                    elements.push($('#ORDER_' + diapo.id));
                 });
 
             $('#reorder_box .elements').append(elements);
@@ -93,7 +93,7 @@ const basketReorderContent = (services) => {
 
         function reverse_order() {
             var $container = $('#reorder_box .elements');
-            $('#reorder_box .diapo').each(function() {
+            $('#reorder_box .diapo').each(function () {
                 $(this).prependTo($container);
             });
         }
@@ -110,42 +110,42 @@ const basketReorderContent = (services) => {
             scroll:true,
             scrollSensitivity:40,
             scrollSpeed:30,
-            start:function(event, ui){
-                var selected = $('.selected',container);
+            start: function (event, ui) {
+                var selected = $('.selected', container);
 
-                selected.each(function(i,n){
-                    $(n).attr('position',i);
+                selected.each(function (i, n) {
+                    $(n).attr('position', i);
                 });
 
                 var n = selected.length - 1;
 
                 $('.selected:visible', container).hide();
 
-                while(n > 0){
+                while (n > 0) {
                     $('<div style="height:130px;" class="diapo ui-sortable-placeholderfollow"></div>').after($('.diapo.ui-sortable-placeholder', container));
                     n--;
                 }
             },
-            stop:function(event, ui){
+            stop: function (event, ui) {
 
                 $('.diapo.ui-sortable-placeholderfollow', container).remove();
 
                 var main_id = $(ui.item[0]).attr('id');
 
-                var selected = $('.selected',container);
+                var selected = $('.selected', container);
                 var sorter = new Array();
 
 
-                selected.each(function(i,n){
+                selected.each(function (i, n) {
 
                     var position = parseInt($(n).attr('position'));
 
-                    if(position !== '') {
+                    if (position !== '') {
                         sorter[position] = $(n);
                     }
 
                     var id = $(n).attr('id');
-                    if(id == main_id) {
+                    if (id === main_id) {
                         return;
                     }
 
@@ -153,14 +153,14 @@ const basketReorderContent = (services) => {
 
                 var before = true;
                 var last_moved = $(ui.item[0]);
-                $(sorter).each(function(i,n){
+                $(sorter).each(function (i, n) {
                     $(n).show().removeAttr('position');
-                    if($(n).attr('id') == main_id){
+                    if ($(n).attr('id') === main_id) {
                         before = false;
                     } else {
-                        if(before){
+                        if (before) {
                             $(n).before($(ui.item[0]));
-                        } else{
+                        } else {
                             $(n).after($(last_moved));
                         }
 
@@ -169,11 +169,11 @@ const basketReorderContent = (services) => {
                 });
 
             },
-            change:function(){
+            change: function () {
                 $('.diapo.ui-sortable-placeholderfollow', container).remove();
 
                 var n = OrderSelection.length() - 1 ;
-                while(n > 0) {
+                while (n > 0) {
                     $('<div style="height:130px;" class="diapo ui-sortable-placeholderfollow"></div>').after($('.diapo.ui-sortable-placeholder', container));
                     n--;
                 }
@@ -185,15 +185,15 @@ const basketReorderContent = (services) => {
             selector : '.CHIM'
         });
 
-        $('form[name="reorder"]', container).bind('submit', function(event){
+        $('form[name="reorder"]', container).bind('submit', function (event) {
 
             //$this.SetLoader(true);
             var $form = $(this);
 
-            $('.elements form', container).each(function(i, el){
+            $('.elements form', container).each(function (i, el) {
                 var id = $('input[name="id"]', $(el)).val();
 
-                $('input[name="element[' + id + ']"]', $form).val(i+1);
+                $('input[name="element[' + id + ']"]', $form).val(i + 1);
             });
 
             $.ajax({
@@ -201,11 +201,11 @@ const basketReorderContent = (services) => {
                 url: $form.attr('action'),
                 data: $form.serializeArray(),
                 dataType: 'json',
-                beforeSend:function(){
+                beforeSend: function () {
 
                 },
-                success: function(data){
-                    if(!data.success) {
+                success: function (data) {
+                    if (!data.success) {
                         alert(data.message);
                     }
                     appEvents.emit('workzone.refresh', {
@@ -219,9 +219,9 @@ const basketReorderContent = (services) => {
 
             return false;
         });
-    }
+    };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default basketReorderContent;

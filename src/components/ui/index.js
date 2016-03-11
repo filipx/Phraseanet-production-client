@@ -11,7 +11,7 @@ import previewRecordService from '../record/recordPreview';
 import Alerts from '../utils/alert';
 import uploader from '../uploader';
 const ui = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let activeZone = false;
 
 
@@ -102,7 +102,7 @@ const ui = (services) => {
                                         break;
                                     case 80://P
                                         if (utilsModule.is_ctrl_key(event)) {
-                                            _onOpenPrintModal("lst=" + p4.Results.Selection.serialize());
+                                            _onOpenPrintModal('lst=' + p4.Results.Selection.serialize());
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
@@ -148,7 +148,7 @@ const ui = (services) => {
                                         break;
                                     case 80://P
                                         if (utilsModule.is_ctrl_key(event)) {
-                                            _onOpenPrintModal("lst=" + p4.WorkZone.Selection.serialize());
+                                            _onOpenPrintModal('lst=' + p4.WorkZone.Selection.serialize());
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
@@ -211,29 +211,29 @@ const ui = (services) => {
                 event.cancelBubble = true;
                 if (event.stopPropagation)
                     event.stopPropagation();
-                return(false);
+                return (false);
             }
-            return(true);
+            return (true);
         });
     };
 
     const hideOverlay = (n) => {
-        var div = "OVERLAY";
-        if (typeof(n) != "undefined")
+        var div = 'OVERLAY';
+        if (typeof (n) !== 'undefined')
             div += n;
         $('#' + div).hide().remove();
-    }
+    };
 
     const showModal = (cas, options) => {
 
         var content = '';
         var callback = null;
         var button = {
-            "OK": function (e) {
+            'OK': function (e) {
                 hideOverlay(3);
-                $(this).dialog("close");
+                $(this).dialog('close');
                 return;
-            }};
+            } };
         var escape = true;
         var onClose = function () {
         };
@@ -256,7 +256,7 @@ const ui = (services) => {
                 break;
         }
 
-        if(typeof(Alerts) == "undefined") {
+        if (typeof (Alerts) === 'undefined') {
             alert(localeService.t('serverDisconnected'));
             self.location.replace(self.location.href);
         }
@@ -264,15 +264,15 @@ const ui = (services) => {
             Alerts(options.title, content, callback);
         }
         return;
-    }
+    };
 
     const getActiveZone = () => {
         return activeZone;
-    }
+    };
     const setActiveZone = (zoneId) => {
         activeZone = zoneId;
         return activeZone;
-    }
+    };
 
     const activeZoning = () => {
         $('#idFrameC, #rightFrame').bind('mousedown', function (event) {
@@ -285,7 +285,7 @@ const ui = (services) => {
             $('#EDIT_query').blur();
         });
         $('#rightFrame').trigger('mousedown');
-    }
+    };
 
     const resizeAll = () => {
         var body = $('body');
@@ -308,7 +308,7 @@ const ui = (services) => {
         linearizeUi();
 
 
-    }
+    };
     const answerSizer = () => {
         var el = $('#idFrameC').outerWidth();
         if (!$.support.cssFloat) {
@@ -318,7 +318,7 @@ const ui = (services) => {
         $('#rightFrame').width(widthA);
         $('#rightFrame').css('left', $('#idFrameC').width());
 
-    }
+    };
     const linearizeUi = () => {
         var list = $('#answers .list');
         if (list.length > 0) {
@@ -350,7 +350,7 @@ const ui = (services) => {
             $('#answers .diapo').css('margin', '5px ' + (margin) + 'px');
         }
 
-    }
+    };
 
     appEvents.listenAll({
         'ui.resizeAll': resizeAll,
@@ -360,6 +360,6 @@ const ui = (services) => {
 
 
     return { initialize, showModal, activeZoning, getActiveZone, resizeAll };
-}
+};
 
 export default ui;

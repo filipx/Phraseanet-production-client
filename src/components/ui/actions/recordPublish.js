@@ -3,7 +3,7 @@ import dialog from '../../utils/dialog';
 import publication from '../../publication';
 
 const recordPublishModal = (services, datas) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const publishTemplateEndPoint = 'prod/feeds/requestavailable/';
 
@@ -19,7 +19,7 @@ const recordPublishModal = (services, datas) => {
         return true;
     };
 
-    return {openModal};
+    return { openModal };
 };
 
 export default recordPublishModal;

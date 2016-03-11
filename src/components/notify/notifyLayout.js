@@ -90,7 +90,7 @@ const notifyLayout = () => {
         var h = not.outerHeight() * n + not_t.outerHeight() * n_t;
         h = h > 350 ? 350 : h;
 
-        $notificationBoxContainer.stop().animate({height: h});
+        $notificationBoxContainer.stop().animate({ height: h });
     };
 
     const setBoxPosition = () => {
@@ -137,8 +137,8 @@ const notifyLayout = () => {
 
 
         $.ajax({
-            type: "GET",
-            url: "/user/notifications/",
+            type: 'GET',
+            url: '/user/notifications/',
             dataType: 'json',
             data: {
                 page: page
@@ -190,7 +190,7 @@ const notifyLayout = () => {
             }
         });
 
-    }
+    };
 
     const read_notifications = () => {
         var notifications = [];
@@ -200,8 +200,8 @@ const notifyLayout = () => {
         });
 
         $.ajax({
-            type: "POST",
-            url: "/user/notifications/read/",
+            type: 'POST',
+            url: '/user/notifications/read/',
             data: {
                 notifications: notifications.join('_')
             },
@@ -209,7 +209,7 @@ const notifyLayout = () => {
                 $('#notification_trigger .counter').css('visibility', 'hidden').empty();
             }
         });
-    }
+    };
 
     const clear_notifications = () => {
         var unread = $('#notification_box .unread');
@@ -224,7 +224,7 @@ const notifyLayout = () => {
     return {
         bindEvents,
         addNotifications
-    }
+    };
 };
 
 export default notifyLayout;

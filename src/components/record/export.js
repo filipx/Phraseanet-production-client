@@ -1,6 +1,6 @@
 import dialog from '../utils/dialog';
 const exportRecord = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -8,10 +8,10 @@ const exportRecord = (services) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
             let key = '';
-            let kind= $el.data('kind');
+            let kind = $el.data('kind');
             let idContent = $el.data('id');
 
-            switch(kind) {
+            switch (kind) {
                 case 'basket':
                     key = 'ssel';
                     break;
@@ -22,12 +22,12 @@ const exportRecord = (services) => {
 
             doExport(`${key}=${idContent}`);
         });
-    }
+    };
 
     function doExport(datas) {
-        var $dialog = dialog.create(services, {title: language['export']});
+        var $dialog = dialog.create(services, { title: language['export'] });
 
-        $.post("../prod/export/multi-export/", datas, function (data) {
+        $.post('../prod/export/multi-export/', datas, function (data) {
 
             $dialog.setContent(data);
 
@@ -41,7 +41,7 @@ const exportRecord = (services) => {
         });
     }
 
-    return {initialize};
+    return { initialize };
 };
 
 export default exportRecord;

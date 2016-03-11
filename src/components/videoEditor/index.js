@@ -36,8 +36,8 @@ Canva.prototype = {
             }
         }
 
-        this.domCanva.setAttribute("width", w);
-        this.domCanva.setAttribute("height", h);
+        this.domCanva.setAttribute('width', w);
+        this.domCanva.setAttribute('height', h);
 
         return this;
     },
@@ -46,13 +46,13 @@ Canva.prototype = {
         if (undefined === this.domCanva.getContext) {
             return G_vmlCanvasManager
                 .initElement(this.domCanva)
-                .getContext("2d");
+                .getContext('2d');
         }
 
         return this.domCanva.getContext('2d');
     },
     extractImage: function () {
-        return this.domCanva.toDataURL("image/png");
+        return this.domCanva.toDataURL('image/png');
     },
     reset: function () {
         var context = this.getContext2d();
@@ -172,7 +172,7 @@ var ScreenShot = function (id, canva, video, altCanvas) {
     canva.copy(video);
 
     // handle alternative canvas:
-    var altCanvas = altCanvas == undefined ? [] : altCanvas;
+    var altCanvas = altCanvas === undefined ? [] : altCanvas;
     this.altScreenShots = [];
     if (altCanvas.length > 0) {
         for (var i = 0; i < altCanvas.length; i++) {
@@ -183,7 +183,7 @@ var ScreenShot = function (id, canva, video, altCanvas) {
             this.altScreenShots.push({
                 dataURI: canvaEl.extractImage(),
                 name: altCanvas[i].name
-            })
+            });
         }
     }
 

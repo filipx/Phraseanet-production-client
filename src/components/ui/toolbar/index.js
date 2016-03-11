@@ -12,27 +12,27 @@ import recordPrintModal from '../actions/recordPrint';
 import recordBridge from '../actions/recordBridge';
 
 const toolbar = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const $container = $('body');
     let workzoneSelection = [];
-    let searchSelection = []
+    let searchSelection = [];
 
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
             searchSelection = selection.serialized;
-            console.log('ok jsut received a updated selection from search', selection)
+            console.log('ok jsut received a updated selection from search', selection);
         },
         'broadcast.workzoneResultSelection': (selection) => {
             workzoneSelection = selection.serialized;
-            console.log('ok jsut received a updated selection from workzone', selection)
+            console.log('ok jsut received a updated selection from workzone', selection);
         }
-    })
+    });
 
     const initialize = () => {
         _bindEvents();
 
         return true;
-    }
+    };
 
     /**
      * Active group can be a Basket or story
@@ -127,7 +127,7 @@ const toolbar = (services) => {
 
 
     const _bindEvents = () => {
-        console.log('1 > bnd toolbar event')
+        console.log('1 > bnd toolbar event');
         /**
          * tools > Edit > Move
          */
@@ -203,7 +203,7 @@ const toolbar = (services) => {
         });
     };
 
-    return {initialize};
+    return { initialize };
 };
 
 export default toolbar;

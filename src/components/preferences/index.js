@@ -2,9 +2,9 @@ import * as appCommons from 'phraseanet-common';
 let highlight = require('imports?$=jquery!../utils/jquery-plugins/highlight');
 let colorpicker = require('imports?$=jquery!../utils/jquery-plugins/colorpicker');
 const preferences = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const { configService, localeService, appEvents } = services;
     const initialize = (options = {}) => {
-        const {$container} = options;
+        const { $container } = options;
 
         $container.on('click', '.open-preferences', (event) => {
             event.preventDefault();
@@ -87,19 +87,19 @@ const preferences = (services) => {
             $(this).highlight('#CCCCCC');
         });
         $('#look_box .tabs').tabs();
-    }
+    };
 
 // look_box
     function setInitialStateOptions() {
         var el = $('#look_box_settings select[name=start_page]');
 
         switch (el.val()) {
-            case "LAST_QUERY":
-            case "PUBLI":
-            case "HELP":
+            case 'LAST_QUERY':
+            case 'PUBLI':
+            case 'HELP':
                 $('#look_box_settings input[name=start_page_value]').hide();
                 break;
-            case "QUERY":
+            case 'QUERY':
                 $('#look_box_settings input[name=start_page_value]').show();
                 break;
         }
@@ -122,7 +122,7 @@ const preferences = (services) => {
 
 
     function openModal(event) {
-        $("#look_box").dialog({
+        $('#look_box').dialog({
             closeOnEscape: true,
             resizable: false,
             width: 450,
@@ -138,7 +138,7 @@ const preferences = (services) => {
     return {
         initialize,
         openModal
-    }
+    };
 };
 
 export default preferences;
