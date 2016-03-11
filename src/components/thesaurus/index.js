@@ -127,9 +127,9 @@ const thesaurusService = (services) => {
     function T_Gfilter(o)
     {
         var f;
-        if (o.nodeName == 'FORM')
+        if (o.nodeName === 'FORM')
             f = $(o).find('input[name=search_value]').val();
-        else if (o.nodeName==='INPUT')
+        else if (o.nodeName === 'INPUT')
             f = $(o).val();
 
         T_Gfilter_delayed(f, 0);
@@ -636,7 +636,7 @@ const thesaurusService = (services) => {
                 var tid = tids.shift();
                 var sbid = tids.shift();
                 var type = tid.substr(0, 1);
-                if ((type === 'T' || type === 'C') && tid.substr(1, 4) == 'X_P')	// TX_P ou CX_P
+                if ((type === 'T' || type === 'C') && tid.substr(1, 4) === 'X_P')	// TX_P ou CX_P
                 {
                     var ul = li.children('ul').eq(0);
                     if (ul.css('display') === 'none' || prodApp.utils.is_ctrl_key(e))
@@ -727,7 +727,7 @@ const thesaurusService = (services) => {
                 {
                     case 'wiz_0':				// simply browse
                         var tid = $(x).closest('li').attr('id');
-                        if (tid.substr(0, 5)==='TX_P.')
+                        if (tid.substr(0, 5) === 'TX_P.')
                         {
                             var tids = tid.split('.');
                             if (tids.length > 3)
@@ -740,7 +740,7 @@ const thesaurusService = (services) => {
                         break;
                     case 'wiz_2':				// replace by
                         var tid = $(x).closest('li').attr('id');
-                        if (tid.substr(0, 5)==='TX_P.')
+                        if (tid.substr(0, 5) === 'TX_P.')
                         {
                             var term = $(x).text();
                             $('#THPD_WIZARDS .wiz_2 :text').val(term);
@@ -1110,7 +1110,7 @@ const thesaurusService = (services) => {
                     var htmlnodes = ret.getElementsByTagName('html');
                     if (htmlnodes && htmlnodes.length === 1 && (htmlnode = htmlnodes.item(0).firstChild))
                     {
-                        if (typeof (id)==='undefined')
+                        if (typeof (id) === 'undefined')
                         {
                             // called from search or 'auto' : full thesaurus search
                             if (!this.tObj['TH_P'])
