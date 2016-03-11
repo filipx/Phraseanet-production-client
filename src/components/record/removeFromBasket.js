@@ -1,4 +1,4 @@
-
+import $ from 'jquery';
 
 const removeFromBasket = (services) => {
     const { configService, localeService, appEvents } = services;

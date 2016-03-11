@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import dialog from '../utils/dialog';
 const exportRecord = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -25,7 +26,7 @@ const exportRecord = (services) => {
     };
 
     function doExport(datas) {
-        var $dialog = dialog.create(services, { title: language['export'] });
+        var $dialog = dialog.create(services, { title: localeService.t('export')});
 
         $.post('../prod/export/multi-export/', datas, function (data) {
 

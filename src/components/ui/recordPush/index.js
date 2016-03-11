@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Feedback from './feedback';
 import ListManager from './listManager';
 import dialog from '../../utils/dialog';

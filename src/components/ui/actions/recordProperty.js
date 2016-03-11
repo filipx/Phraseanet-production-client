@@ -14,8 +14,6 @@ const recordPropertyModal = (services, datas) => {
     };
 
     return { openModal };
-
-    return true;
 };
 
 export default recordPropertyModal;

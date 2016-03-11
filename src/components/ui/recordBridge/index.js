@@ -1,4 +1,4 @@
-
+import $ from 'jquery';
 
 const recordBridge = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -7,23 +7,20 @@ const recordBridge = (services) => {
     var managerUrl = container.data('url');
     const initialize = () => {
         pub_tabs.tabs({
-            beforeLoad: function ( event, ui ) {
+            beforeLoad: function (event, ui) {
                 ui.tab.html_tab = ui.tab.find('span').html();
                 ui.tab.find('span').html('<i>' + localeService.t('Loading') + '...</i>');
             },
-            load: function (event, ui)
-            {
+            load: function (event, ui) {
                 ui.tab.find('span').empty().append(ui.tab.html_tab);
                 $panel = $(ui.panel);
                 $('.container-bridge', $panel).removeClass('loading');
                 $panel.addClass('PNB');
                 $panel.wrapInner("<div class='PNB10 container-bridge' />");
                 panel_load($panel);
-            }
-            , beforeActivate: function (event, ui)
-            {
-                if ($(ui.tab).hasClass('account'))
-                {
+            },
+            beforeActivate: function (event, ui) {
+                if ($(ui.tab).hasClass('account')) {
                     var container = $('.container-bridge', ui.panel);
                     container.empty();
                     $('.container', ui.panel).addClass('loading');
@@ -68,13 +65,13 @@ const recordBridge = (services) => {
             var $panel = $('#pub_tabs .ui-tabs-panel:visible');
 
             $.ajax({
-                type : 'GET',
-                url : '/prod/bridge/upload/',
-                data : $form.serializeArray(),
-                beforeSend : function () {
+                type: 'GET',
+                url: '/prod/bridge/upload/',
+                data: $form.serializeArray(),
+                beforeSend: function () {
                     $panel.empty().addClass('loading');
                 },
-                success : function (datas) {
+                success: function (datas) {
                     $panel.removeClass('loading').append(datas);
                     panel_load($panel);
                 },
@@ -90,7 +87,6 @@ const recordBridge = (services) => {
         });
 
 
-
         $('li', pub_tabs).removeClass('ui-corner-top').addClass('ui-corner-left');
 
         $('#api_connexion').click(function () {
@@ -103,16 +99,14 @@ const recordBridge = (services) => {
 
     function popme(url) {
         var newwindow = window.open(url, 'logger', 'height=500,width=800');
-        if (window.focus)
-        {
+        if (window.focus) {
             newwindow.focus();
         }
 
         return false;
     }
 
-    function panel_load($panel)
-    {
+    function panel_load($panel) {
         $('.new_bridge_button', $panel).bind('click', function () {
             var url = $(this).parent('form').find('input[name="url"]').val();
             popme(url);
@@ -134,16 +128,16 @@ const recordBridge = (services) => {
             var $this = $(this);
 
             $.ajax({
-                type : 'GET',
-                url : $(this).attr('href'),
-                beforeSend : function () {
+                type: 'GET',
+                url: $(this).attr('href'),
+                beforeSend: function () {
                     var container = $('.container-bridge', $panel);
                     container.empty();
-                    if ( !$this.hasClass('bridge_logout')) {
+                    if (!$this.hasClass('bridge_logout')) {
                         container.addClass('loading');
                     }
                 },
-                success : function (datas) {
+                success: function (datas) {
                     $('.container-bridge', $panel).removeClass('loading').append(datas);
                     panel_load($panel);
                 },
@@ -162,7 +156,7 @@ const recordBridge = (services) => {
             account_id = $(this).val();
             var buttons = {};
 
-            buttons[language.valider] = function () {
+            buttons[localeService.t('valider')] = function () {
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -171,14 +165,14 @@ const recordBridge = (services) => {
                     success: function (datas) {
                         if (datas.success) {
                             confirmBox.close();
-                            prodApp.appEvents.emit('push.reload', managerUrl);
+                            appEvents.emit('push.reload', managerUrl);
                             // pushModule.reloadBridge(managerUrl);
                         } else {
                             confirmBox.close();
                             var alertBox = dialogModule.dialog.create({
-                                size : 'Alert',
-                                closeOnEscape : true,
-                                closeButton:true
+                                size: 'Alert',
+                                closeOnEscape: true,
+                                closeButton: true
                             }, 2);
 
                             alertBox.setContent(datas.message);
@@ -188,9 +182,9 @@ const recordBridge = (services) => {
             };
 
             var confirmBox = dialogModule.dialog.create({
-                size : 'Alert',
-                closeOnEscape : true,
-                closeButton:true,
+                size: 'Alert',
+                closeOnEscape: true,
+                closeButton: true,
                 cancelButton: true,
                 buttons: buttons
             }, 2);
@@ -205,13 +199,13 @@ const recordBridge = (services) => {
             method = $.inArray(method.toLowerCase(), ['post', 'get']) ? method : 'POST';
 
             $.ajax({
-                type : method,
-                url : $form.attr('action'),
-                data : $form.serializeArray(),
-                beforeSend : function () {
+                type: method,
+                url: $form.attr('action'),
+                data: $form.serializeArray(),
+                beforeSend: function () {
                     $panel.empty().addClass('loading');
                 },
-                success : function (datas) {
+                success: function (datas) {
                     $panel.removeClass('loading').append(datas);
                     panel_load($panel);
                 },
@@ -232,8 +226,7 @@ const recordBridge = (services) => {
             var $this = $(this);
 
             checkboxes.each(function (i, checkbox) {
-                if ($(checkbox).is(':checked') !== $this.is(':checked'))
-                {
+                if ($(checkbox).is(':checked') !== $this.is(':checked')) {
                     var event = jQuery.Event('click');
                     event.selector_all = true;
                     $(checkbox).trigger(event);
@@ -246,8 +239,7 @@ const recordBridge = (services) => {
 
                 var $this = $(this);
 
-                if (event.selector_all)
-                {
+                if (event.selector_all) {
                     $this.prop('checked', $('.bridge_all_selector', $panel).is(':checked'));
                 }
 
@@ -257,19 +249,19 @@ const recordBridge = (services) => {
                     })).join(';')
                 );
 
-                if ($this.is(':checked'))
+                if ($this.is(':checked')) {
                     $this.closest('.element').addClass('selected');
-                else
+                } else {
                     $this.closest('.element').removeClass('selected');
+                }
 
-                if (!event.selector_all)
-                {
+                if (!event.selector_all) {
                     var bool = !($('.bridge_element_selector:checked', $panel).length !== $('.bridge_element_selector', $panel).length);
                     $('.bridge_all_selector', $panel).prop('checked', bool);
-                }
-                else {
-                    if (event.stopPropagation)
+                } else {
+                    if (event.stopPropagation) {
                         event.stopPropagation();
+                    }
 
                     return false;
                 }
@@ -281,25 +273,22 @@ const recordBridge = (services) => {
             var $form = $(this).closest('form');
             var elements = $('form[name="bridge_selection"] input[name="elements_list"]', $panel).val();
 
-            if ($.trim(elements) === '')
-                var n_elements = 0;
-            else
-                var n_elements = elements.split(';').length;
+            var n_elements = 0;
+            if ($.trim(elements) !== '') {
+                n_elements = elements.split(';').length;
+            }
 
-            if (n_elements === 0 && $form.hasClass('action_works_standalone') === false)
-            {
+            if (n_elements === 0 && $form.hasClass('action_works_standalone') === false) {
                 alert('No records selected');
 
                 return false;
             }
-            if (n_elements === 1 && $form.hasClass('action_works_single_element') === false)
-            {
+            if (n_elements === 1 && $form.hasClass('action_works_single_element') === false) {
                 alert('This action works only with a single records');
 
                 return false;
             }
-            if (n_elements > 1 && $form.hasClass('action_works_many_element') === false)
-            {
+            if (n_elements > 1 && $form.hasClass('action_works_many_element') === false) {
                 alert('This action works only with many records');
 
                 return false;
@@ -308,13 +297,13 @@ const recordBridge = (services) => {
             $('input[name="elements_list"]', $form).val(elements);
 
             $.ajax({
-                type : 'GET',
-                url : $form.attr('action'),
-                data : $form.serializeArray(),
-                beforeSend : function () {
+                type: 'GET',
+                url: $form.attr('action'),
+                data: $form.serializeArray(),
+                beforeSend: function () {
                     $panel.empty().addClass('loading');
                 },
-                success : function (datas) {
+                success: function (datas) {
                     $panel.removeClass('loading').append(datas);
                     panel_load($panel);
                 },
@@ -330,7 +319,6 @@ const recordBridge = (services) => {
 
         });
     }
-
 
 
     return {

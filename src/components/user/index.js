@@ -15,7 +15,7 @@ const user = (translations) => {
 
     const language = translations;
     const disconnected = () => {
-        ui(language).showModal('disconnected', { title: language.serverDisconnected });
+        ui(language).showModal('disconnected', {title: language.serverDisconnected});
     };
 
     const manageSession = (...params) => {
@@ -32,48 +32,48 @@ const user = (translations) => {
             //notify().appendNotifications(data.notifications);
             // @todo put into notify component
             /*var box = $('#notification_box');
-            box.empty().append(data.notifications);
+             box.empty().append(data.notifications);
 
-            if (box.is(':visible'))
-                fix_notification_height();
+             if (box.is(':visible'))
+             fix_notification_height();
 
-            if ($('.notification.unread', box).length > 0) {
-                var trigger = $('#notification_trigger');
-                $('.counter', trigger)
-                    .empty()
-                    .append($('.notification.unread', box).length);
-                $('.counter', trigger).css('visibility', 'visible');
+             if ($('.notification.unread', box).length > 0) {
+             var trigger = $('#notification_trigger');
+             $('.counter', trigger)
+             .empty()
+             .append($('.notification.unread', box).length);
+             $('.counter', trigger).css('visibility', 'visible');
 
-            }
-            else
-                $('#notification_trigger .counter').css('visibility', 'hidden').empty();*/
+             }
+             else
+             $('#notification_trigger .counter').css('visibility', 'hidden').empty();*/
 
             /* moved in basket if (data.changed.length > 0) {
-                var current_open = $('.SSTT.ui-state-active');
-                var current_sstt = current_open.length > 0 ? current_open.attr('id').split('_').pop() : false;
+             var current_open = $('.SSTT.ui-state-active');
+             var current_sstt = current_open.length > 0 ? current_open.attr('id').split('_').pop() : false;
 
-                var main_open = false;
-                for (var i = 0; i != data.changed.length; i++) {
-                    var sstt = $('#SSTT_' + data.changed[i]);
-                    if (sstt.size() === 0) {
-                        if (main_open === false) {
-                            $('#baskets .bloc').animate({'top': 30}, function () {
-                                $('#baskets .alert_datas_changed:first').show()
-                            });
-                            main_open = true;
-                        }
-                    }
-                    else {
-                        if (!sstt.hasClass('active'))
-                            sstt.addClass('unread');
-                        else {
-                            $('.alert_datas_changed', $('#SSTT_content_' + data.changed[i])).show();
-                        }
-                    }
-                }
-            }*/
+             var main_open = false;
+             for (var i = 0; i != data.changed.length; i++) {
+             var sstt = $('#SSTT_' + data.changed[i]);
+             if (sstt.size() === 0) {
+             if (main_open === false) {
+             $('#baskets .bloc').animate({'top': 30}, function () {
+             $('#baskets .alert_datas_changed:first').show()
+             });
+             main_open = true;
+             }
+             }
+             else {
+             if (!sstt.hasClass('active'))
+             sstt.addClass('unread');
+             else {
+             $('.alert_datas_changed', $('#SSTT_content_' + data.changed[i])).show();
+             }
+             }
+             }
+             }*/
             // @todo: to be moved
-            if ('' !== $.trim(data.message)) {
+            if ($.trim(data.message) !== '') {
                 if ($('#MESSAGE').length === 0)
                     $('body').append('<div id="#MESSAGE"></div>');
                 $('#MESSAGE')
@@ -97,7 +97,7 @@ const user = (translations) => {
         return true;
     };
 
-    return { manageSession, subscribeToEvents };
+    return {manageSession, subscribeToEvents};
 };
 
 export default user;

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
 let highlight = require('imports?$=jquery!../utils/jquery-plugins/highlight');
 let colorpicker = require('imports?$=jquery!../utils/jquery-plugins/colorpicker');
@@ -20,7 +21,7 @@ const preferences = (services) => {
         });
 
         $('#nperpage_slider').slider({
-            value: parseInt($('#nperpage_value').val()),
+            value: parseInt($('#nperpage_value').val(), 10),
             min: 10,
             max: 100,
             step: 10,
@@ -32,7 +33,7 @@ const preferences = (services) => {
             }
         });
         $('#sizeAns_slider').slider({
-            value: parseInt($('#sizeAns_value').val()),
+            value: parseInt($('#sizeAns_value').val(), 10),
             min: 90,
             max: 270,
             step: 10,
@@ -57,8 +58,7 @@ const preferences = (services) => {
                     back_hex = '000000';
 
                     var sim_b = 0.1 * hsb.b;
-                }
-                else {
+                } else {
                     back_hex = 'FFFFFF';
 
                     var sim_b = 100 - 0.1 * (100 - hsb.b);

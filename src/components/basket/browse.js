@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import dialog from '../utils/dialog';
 
 const basketBrowse = (services) => {
@@ -11,7 +12,7 @@ const basketBrowse = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if ( $el.attr('title') !== undefined ) {
+            if ($el.attr('title') !== undefined) {
                 dialogOptions.title = $el.attr('title');
             }
 
@@ -35,29 +36,30 @@ const basketBrowse = (services) => {
     };
 
     const _onDialogReady = () => {
-        var $container = $('#BasketBrowser'), results = null;
+        const $container = $('#BasketBrowser');
+        let results = null;
 
-        function loadResults(datas, url)
-        {
+        function loadResults(datas, url) {
+            let $results = $('.results', $container);
             results = $.ajax({
                 type: 'GET',
                 url: url,
                 dataType: 'html',
                 data: datas,
                 beforeSend: function () {
-                    if (results && results.abort && typeof results.abort === 'function')
+                    if (results && results.abort && typeof results.abort === 'function') {
                         results.abort();
-                    $('.results', $container).addClass('loading').empty();
+                    }
+                    $results.addClass('loading').empty();
                 },
                 error: function () {
-                    $('.results', $container).removeClass('loading');
+                    $results.removeClass('loading');
                 },
                 timeout: function () {
-                    $('.results', $container).removeClass('loading');
+                    $results.removeClass('loading');
                 },
                 success: function (data) {
-                    var results = $('.results', $container);
-                    results.removeClass('loading').append(data);
+                    $results.removeClass('loading').append(data);
                     activateLinks(results);
                     active_archiver(results);
 
@@ -68,11 +70,10 @@ const basketBrowse = (services) => {
         }
 
 
-        function loadBasket(url)
-        {
+        function loadBasket(url) {
             results = $.ajax({
                 type: 'GET',
-                url: url,
+                url,
                 dataType: 'html',
                 beforeSend: function () {
                     if (results && results.abort && typeof results.abort === 'function')
@@ -105,8 +106,14 @@ const basketBrowse = (services) => {
             });
         }
 
-        function activateLinks($scope)
-        {
+        function activateLinks($scope) {
+            let confirmBox = dialog.create({
+                size: 'Alert',
+                closeOnEscape: true,
+                cancelButton: true,
+                buttons: buttons
+            }, 2);
+
             $('a.result', $scope).bind('click', function () {
                 var $this = $(this);
 
@@ -142,9 +149,9 @@ const basketBrowse = (services) => {
                             } else {
                                 confirmBox.close();
                                 var alertBox = dialog.create({
-                                    size : 'Alert',
-                                    closeOnEscape : true,
-                                    closeButton:true
+                                    size: 'Alert',
+                                    closeOnEscape: true,
+                                    closeButton: true
                                 }, 2);
 
                                 alertBox.setContent(datas.message);
@@ -153,9 +160,9 @@ const basketBrowse = (services) => {
                         error: function () {
                             confirmBox.close();
                             var alertBox = dialog.create({
-                                size : 'Alert',
-                                closeOnEscape : true,
-                                closeButton:true
+                                size: 'Alert',
+                                closeOnEscape: true,
+                                closeButton: true
                             }, 2);
 
                             alertBox.setContent("{{'Something wrong happened, please retry or contact an admin.'|trans|e('js') }}");
@@ -163,21 +170,13 @@ const basketBrowse = (services) => {
                     });
                 };
 
-                var confirmBox = dialog.create({
-                    size : 'Alert',
-                    closeOnEscape : true,
-                    cancelButton: true,
-                    buttons: buttons
-                }, 2);
-
                 confirmBox.setContent("{{'You are about to delete this basket. Would you like to continue ?'|trans|e('js') }}");
 
                 return false;
             });
         }
 
-        function active_archiver($scope)
-        {
+        function active_archiver($scope) {
             $('a.UserTips', $scope).bind('click', function () {
 
                 return false;
@@ -186,7 +185,8 @@ const basketBrowse = (services) => {
             $('.infoTips, .previewTips', $scope).tooltip();
 
             $('a.archive_toggler', $scope).bind('click', function () {
-                var $this = $(this), parent = $this.parent();
+                const $this = $(this);
+                const parent = $this.parent();
 
                 $.ajax({
                     type: 'POST',
@@ -207,18 +207,15 @@ const basketBrowse = (services) => {
                     success: function (data) {
                         $('.loader', parent).hide();
                         $('.last_act', parent).removeClass('last_act');
-                        if (!data.success)
-                        {
+                        if (!data.success) {
                             humane.error(data.message);
 
                             return;
                         }
-                        if (data.archive === true)
-                        {
+                        if (data.archive === true) {
                             $('.unarchiver', parent).show();
                             $('.archiver', parent).hide();
-                        }
-                        else {
+                        } else {
                             $('.unarchiver', parent).hide();
                             $('.archiver', parent).show();
                         }
@@ -242,8 +239,8 @@ const basketBrowse = (services) => {
 
             return false;
         }).trigger('submit').find('label').bind('click', function () {
-            var input = $(this).prev('input'),
-                name = input.attr('name');
+            const input = $(this).prev('input');
+            let name = input.attr('name');
 
             var inputs = $('input[name="' + $(this).prev('input').attr('name') + '"]', $container);
             inputs.prop('checked', false).next('label').removeClass('selected');
@@ -253,7 +250,7 @@ const basketBrowse = (services) => {
         });
     };
 
-    return { initialize };
+    return {initialize};
 };
 
 export default basketBrowse;

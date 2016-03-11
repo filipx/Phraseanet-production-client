@@ -100,4 +100,4 @@ const moveRecords = (services) => {
     return { openModal };
 };
 
-export default moveRecords; //moveRecordModal;
+export default moveRecords;

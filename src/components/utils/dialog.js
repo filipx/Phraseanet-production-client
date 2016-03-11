@@ -10,7 +10,7 @@
 /* eslint-disable object-curly-spacing*/
 /* eslint-disable spaced-comment*/
 /* eslint-disable prefer-arrow-callback*/
-/* eslint-disable one-var*/
+/* eslint-disable one-let*/
 /* eslint-disable space-in-parens*/
 /* eslint-disable camelcase*/
 /* eslint-disable no-undef*/
@@ -26,7 +26,7 @@
 /* eslint-disable no-lonely-if*/
 /* eslint-disable no-inline-comments*/
 /* eslint-disable default-case*/
-/* eslint-disable one-var*/
+/* eslint-disable one-let*/
 /* eslint-disable semi*/
 /* eslint-disable no-throw-literal*/
 /* eslint-disable no-sequences*/
@@ -39,7 +39,7 @@ import $ from 'jquery';
 
 function getLevel(level) {
 
-    level = parseInt(level);
+    level = parseInt(level, 10);
 
     if (isNaN(level) || level < 1) {
         return 1;
@@ -67,11 +67,11 @@ function addButtons(buttons, dialog) {
     return buttons;
 }
 
-var phraseaDialog = function (services, options, level) {
+const phraseaDialog = function (services, options, level) {
     const {configService, localeService, appEvents} = services;
-    var createDialog = function (level) {
+    const createDialog = function (level) {
 
-        var $dialog = $('#' + getId(level));
+        let $dialog = $('#' + getId(level));
 
         if ($dialog.length > 0) {
             throw 'Dialog already exists at this level';
@@ -83,7 +83,7 @@ var phraseaDialog = function (services, options, level) {
         return $dialog;
     };
 
-    var defaults = {
+    let defaults = {
             size: 'Medium',
             buttons: {},
             loading: true,
@@ -93,12 +93,13 @@ var phraseaDialog = function (services, options, level) {
             closeCallback: false,
             closeButton: false,
             cancelButton: false
-        },
-        options = typeof options === 'object' ? options : {},
-        width,
-        height,
-        $dialog,
-        $this = this;
+        };
+    let width;
+    let height;
+    let $dialog;
+    const $this = this;
+
+    options = typeof options === 'object' ? options : {};
 
     this.closing = false;
 
@@ -111,7 +112,7 @@ var phraseaDialog = function (services, options, level) {
     this.options.buttons = addButtons(this.options.buttons, this);
 
     if (/\d+x\d+/.test(this.options.size)) {
-        var dimension = this.options.size.split('x');
+        let dimension = this.options.size.split('x');
         height = dimension[1];
         width = dimension[0];
     } else {
@@ -147,7 +148,7 @@ var phraseaDialog = function (services, options, level) {
     this.$dialog = createDialog(this.level);
     this.zIndex = 5000 + parseInt(this.level, 10); //Math.min(this.level * 2000 + 5000, 32767);
 
-    var CloseCallback = function () {
+    let CloseCallback = function () {
         if (typeof $this.options.closeCallback === 'function') {
             $this.options.closeCallback($this.$dialog);
         }
@@ -187,7 +188,7 @@ var phraseaDialog = function (services, options, level) {
     }
 
     if (this.options.size === 'Full') {
-        var $this = this;
+        let $this = this;
         $(window).unbind('resize.DIALOG' + getLevel(level))
             .bind('resize.DIALOG' + getLevel(level), function () {
                 if ($this.$dialog.data('ui-dialog')) {
@@ -213,7 +214,7 @@ phraseaDialog.prototype = {
         return this.$dialog.attr('id');
     },
     load: function (url, method, params) {
-        var $this = this;
+        let $this = this;
         this.loader = {
             url: url,
             method: typeof method === 'undefined' ? 'GET' : method,
@@ -229,12 +230,6 @@ phraseaDialog.prototype = {
             },
             success: function (data) {
                 $this.setContent(data);
-                return;
-            },
-            error: function () {
-                return;
-            },
-            timeout: function () {
                 return;
             }
         });
@@ -265,7 +260,7 @@ phraseaDialog.prototype = {
     }
 };
 
-var Dialog = function () {
+const Dialog = function () {
     this.currentStack = {};
 };
 
@@ -284,7 +279,7 @@ Dialog.prototype = {
     },
     get: function (level) {
 
-        var id = getId(level);
+        const id = getId(level);
 
         if (id in this.currentStack) {
             return this.currentStack[id];
@@ -297,13 +292,13 @@ Dialog.prototype = {
         $(window).unbind('resize.DIALOG' + getLevel(level));
 
         this.get(level).closing = true;
-        var dialog = this.get(level).getDomElement();
+        let dialog = this.get(level).getDomElement();
         if (dialog.data('ui-dialog')) {
             dialog.dialog('close').dialog('destroy');
         }
         dialog.remove();
 
-        var id = this.get(level).getId();
+        const id = this.get(level).getId();
 
         if (id in this.currentStack) {
             delete this.currentStack.id;

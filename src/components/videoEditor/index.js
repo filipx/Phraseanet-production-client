@@ -1,19 +1,21 @@
-/*****************
+/**
  * Canva Object
- *****************/
-var Canva = function (domCanva) {
+ * @param domCanva
+ * @constructor
+ */
+const Canva = function (domCanva) {
     this.domCanva = domCanva;
 };
 
 Canva.prototype = {
     resize: function (elementDomNode, forceWidth) {
 
-        var w = elementDomNode.getWidth();
-        var h = null;
-        var maxH = elementDomNode.getHeight();
-        var ratio = 1;
+        let w = elementDomNode.getWidth();
+        let h = null;
+        let maxH = elementDomNode.getHeight();
+        let ratio = 1;
 
-        if ('' !== elementDomNode.getAspectRatio()) {
+        if (elementDomNode.getAspectRatio() !== '') {
             ratio = parseFloat(elementDomNode.getAspectRatio());
 
             h = Math.round(w * (1 / ratio));
@@ -55,9 +57,9 @@ Canva.prototype = {
         return this.domCanva.toDataURL('image/png');
     },
     reset: function () {
-        var context = this.getContext2d();
-        var w = this.getWidth();
-        var h = this.getHeight();
+        const context = this.getContext2d();
+        const w = this.getWidth();
+        const h = this.getHeight();
 
         context.save();
         context.setTransform(1, 0, 0, 1, 0, 0);
@@ -67,7 +69,7 @@ Canva.prototype = {
         return this;
     },
     copy: function (elementDomNode) {
-        var context = this.getContext2d();
+        const context = this.getContext2d();
 
         context.drawImage(
             elementDomNode.getDomElement()
@@ -91,10 +93,12 @@ Canva.prototype = {
 };
 
 
-/******************
- *  Image Object
- ******************/
-var Image = function (domElement) {
+/**
+ * Image Object
+ * @param domElement
+ * @constructor
+ */
+const Image = function (domElement) {
     this.domElement = domElement;
 };
 
@@ -110,11 +114,12 @@ Image.prototype = {
     }
 };
 
-/******************
- *  Video Object inherits from Image object
- ******************/
-
-var Video = function (domElement) {
+/**
+ * Video Object inherits from Image object
+ * @param domElement
+ * @constructor
+ */
+const Video = function (domElement) {
     Image.call(this, domElement);
     this.aspectRatio = domElement.getAttribute('data-ratio');
 };
@@ -128,10 +133,11 @@ Video.prototype.getAspectRatio = function () {
     return this.aspectRatio;
 };
 
-/******************
- *  Cache Object
- ******************/
-var Store = function () {
+/**
+ * Cache Object
+ * @constructor
+ */
+const Store = function () {
     this.datas = {};
 };
 
@@ -151,8 +157,8 @@ Store.prototype = {
         this.datas[id] = null;
     },
     getLength: function () {
-        var count = 0;
-        for (var k in this.datas) {
+        let count = 0;
+        for (let k in this.datas) {
             if (this.datas.hasOwnProperty(k)) {
                 ++count;
             }
@@ -161,22 +167,26 @@ Store.prototype = {
     }
 };
 
-/******************
- *  Screenshot Object
- ******************/
-var ScreenShot = function (id, canva, video, altCanvas) {
+/**
+ * Screenshot Object
+ * @param id
+ * @param canva
+ * @param video
+ * @param altCanvas
+ * @constructor
+ */
+const ScreenShot = function (id, canva, video, altCanvas) {
 
-    var date = new Date();
-    var options = options || {};
+    const date = new Date();
     canva.resize(video);
     canva.copy(video);
 
     // handle alternative canvas:
-    var altCanvas = altCanvas === undefined ? [] : altCanvas;
+    altCanvas = altCanvas === undefined ? [] : altCanvas;
     this.altScreenShots = [];
     if (altCanvas.length > 0) {
-        for (var i = 0; i < altCanvas.length; i++) {
-            var canvaEl = altCanvas[i].el;
+        for (let i = 0; i < altCanvas.length; i++) {
+            let canvaEl = altCanvas[i].el;
             canvaEl.resize(video, altCanvas[i].width);
             canvaEl.copy(video);
 
@@ -214,27 +224,32 @@ ScreenShot.prototype = {
 
 /**
  * THUMB EDITOR
+ * @param videoId
+ * @param canvaId
+ * @param outputOptions
+ * @returns {{isSupported: isSupported, screenshot: screenshot, store: Store, copy: copy, getCanvaImage: getCanvaImage, resetCanva: resetCanva, getNbScreenshot: getNbScreenshot}}
+ * @constructor
  */
-var VideoEditor = function (videoId, canvaId, outputOptions) {
+const VideoEditor = function (videoId, canvaId, outputOptions) {
+    let editorVideo;
+    const domElement = document.getElementById(videoId);
 
-    var domElement = document.getElementById(videoId);
-
-    if (null !== domElement) {
-        var editorVideo = new Video(domElement);
+    if (domElement !== null) {
+        editorVideo = new Video(domElement);
     }
-    var store = new Store();
+    const store = new Store();
 
     function getCanva() {
         return document.getElementById(canvaId);
     }
 
-    var outputOptions = outputOptions || {};
+    outputOptions = outputOptions || {};
 
     function setAltCanvas() {
-        var domElements = [],
-            altCanvas = outputOptions.altCanvas;
+        let domElements = [];
+        let altCanvas = outputOptions.altCanvas;
         if (altCanvas.length > 0) {
-            for (var i = 0; i < altCanvas.length; i++) {
+            for (let i = 0; i < altCanvas.length; i++) {
                 domElements.push({
                     el: new Canva(altCanvas[i]),
                     width: altCanvas[i].getAttribute('data-width'),
@@ -247,13 +262,13 @@ var VideoEditor = function (videoId, canvaId, outputOptions) {
 
     return {
         isSupported: function () {
-            var elem = document.createElement('canvas');
+            const elem = document.createElement('canvas');
 
             return !!document.getElementById(videoId) && document.getElementById(canvaId)
                 && !!elem.getContext && !!elem.getContext('2d');
         },
         screenshot: function () {
-            var screenshot = new ScreenShot(
+            const screenshot = new ScreenShot(
                 store.getLength() + 1,
                 new Canva(getCanva()),
                 editorVideo,
@@ -267,12 +282,12 @@ var VideoEditor = function (videoId, canvaId, outputOptions) {
         store: store,
         copy: function (mainSource, altSources) {
 
-            var elementDomNode = document.createElement('img');
+            const elementDomNode = document.createElement('img');
             elementDomNode.src = mainSource;
 
-            var element = new Image(elementDomNode);
-            var editorCanva = new Canva(getCanva());
-            var altEditorCanva = setAltCanvas();
+            const element = new Image(elementDomNode);
+            const editorCanva = new Canva(getCanva());
+            const altEditorCanva = setAltCanvas();
             editorCanva
                 .reset()
                 .resize(editorVideo)
@@ -281,12 +296,12 @@ var VideoEditor = function (videoId, canvaId, outputOptions) {
 
             // handle alternative canvas:
             if (altEditorCanva.length > 0) {
-                for (var i = 0; i < altEditorCanva.length; i++) {
+                for (let i = 0; i < altEditorCanva.length; i++) {
 
-                    var tmpEl = document.createElement('img');
+                    let tmpEl = document.createElement('img');
                     tmpEl.src = altSources[i].dataURI;
 
-                    var canvaEl = altEditorCanva[i].el;
+                    const canvaEl = altEditorCanva[i].el;
 
                     canvaEl
                         .reset()
@@ -296,12 +311,12 @@ var VideoEditor = function (videoId, canvaId, outputOptions) {
             }
         },
         getCanvaImage: function () {
-            var canva = new Canva(getCanva());
+            const canva = new Canva(getCanva());
 
             return canva.extractImage();
         },
         resetCanva: function () {
-            var editorCanva = new Canva(getCanva());
+            const editorCanva = new Canva(getCanva());
             editorCanva.reset();
         },
         getNbScreenshot: function () {
@@ -309,10 +324,5 @@ var VideoEditor = function (videoId, canvaId, outputOptions) {
         }
     };
 };
-
-/*const videoEditor = (services) => {
-    const {configService, localeService, appEvents} = services;
-    return {ThumbnailEditor}
-}*/
 
 export default VideoEditor;

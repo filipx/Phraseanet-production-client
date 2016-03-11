@@ -26,15 +26,17 @@ class LocaleService {
     }
 
     t(key) {
-        if ( this.isCached && this.translate !== undefined) {
+        if (this.isCached && this.translate !== undefined) {
             return this.translate(key);
         } else {
             throw new Error('locale not loaded');
         }
     }
+
     getLocale() {
         return this.locale;
     }
+
     getTranslations() {
         return this.cachedTranslations;
     }
@@ -56,7 +58,7 @@ class LocaleService {
                     this.cachedTranslations = i18next.getResourceBundle(this.locale);
                     resolve(instance);
                     //console.log('i18n', i18next.getResourceBundle(this.locale),t);
-                    if ( data.callback !== undefined ) {
+                    if (data.callback !== undefined) {
                         data.callback();
                     }
                     //resolve(this.i18n);

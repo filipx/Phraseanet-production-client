@@ -1,7 +1,10 @@
 /**
  * triggered via workzone > Basket > context menu
  */
+import $ from 'jquery';
+import * as _ from 'underscore';
 import dialog from '../utils/dialog';
+import Selectable from '../utils/selectable';
 
 const basketReorderContent = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -20,7 +23,7 @@ const basketReorderContent = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if ( $el.attr('title') !== undefined ) {
+            if ($el.attr('title') !== undefined) {
                 dialogOptions.title = $el.attr('title');
             }
 
@@ -55,8 +58,7 @@ const basketReorderContent = (services) => {
             return false;
         });
 
-        function autoorder()
-        {
+        function autoorder() {
             var val = $.trim($('#auto_order').val());
 
             if (val === '') {
@@ -66,18 +68,22 @@ const basketReorderContent = (services) => {
             var diapos = [];
             $('#reorder_box .diapo form').each(function (i, n) {
                 diapos.push({
-                    'title': $('input[name=title]', n).val(),
-                    'order' : parseInt($('input[name=default]', n).val()),
-                    'id'  : $('input[name=id]', n).val()
+                    title: $('input[name=title]', n).val(),
+                    order: parseInt($('input[name=default]', n).val(), 10),
+                    id: $('input[name=id]', n).val()
                 });
             });
 
             var sorterCallback;
 
             if (val === 'default') {
-                sorterCallback = function (diapo) {return diapo.order;};
+                sorterCallback = function (diapo) {
+                    return diapo.order;
+                };
             } else {
-                sorterCallback = function (diapo) {return diapo.title;};
+                sorterCallback = function (diapo) {
+                    return diapo.title;
+                };
             }
 
             var elements = [];
@@ -99,17 +105,17 @@ const basketReorderContent = (services) => {
         }
 
         $('.elements', container).sortable({
-            appendTo : container,
+            appendTo: container,
             placeholder: 'diapo ui-sortable-placeholder',
-            distance:20,
+            distance: 20,
             cursorAt: {
-                top:10,
-                left:-20
+                top: 10,
+                left: -20
             },
-            items:'div.diapo',
-            scroll:true,
-            scrollSensitivity:40,
-            scrollSpeed:30,
+            items: 'div.diapo',
+            scroll: true,
+            scrollSensitivity: 40,
+            scrollSpeed: 30,
             start: function (event, ui) {
                 var selected = $('.selected', container);
 
@@ -130,15 +136,15 @@ const basketReorderContent = (services) => {
 
                 $('.diapo.ui-sortable-placeholderfollow', container).remove();
 
-                var main_id = $(ui.item[0]).attr('id');
+                let main_id = $(ui.item[0]).attr('id');
 
-                var selected = $('.selected', container);
-                var sorter = new Array();
+                let selected = $('.selected', container);
+                let sorter = [];
 
 
                 selected.each(function (i, n) {
 
-                    var position = parseInt($(n).attr('position'));
+                    var position = parseInt($(n).attr('position'), 10);
 
                     if (position !== '') {
                         sorter[position] = $(n);
@@ -172,7 +178,7 @@ const basketReorderContent = (services) => {
             change: function () {
                 $('.diapo.ui-sortable-placeholderfollow', container).remove();
 
-                var n = OrderSelection.length() - 1 ;
+                var n = OrderSelection.length() - 1;
                 while (n > 0) {
                     $('<div style="height:130px;" class="diapo ui-sortable-placeholderfollow"></div>').after($('.diapo.ui-sortable-placeholder', container));
                     n--;
@@ -182,7 +188,7 @@ const basketReorderContent = (services) => {
         }).disableSelection();
 
         var OrderSelection = new Selectable($('.elements', container), {
-            selector : '.CHIM'
+            selector: '.CHIM'
         });
 
         $('form[name="reorder"]', container).bind('submit', function (event) {
@@ -221,7 +227,7 @@ const basketReorderContent = (services) => {
         });
     };
 
-    return { initialize };
+    return {initialize};
 };
 
 export default basketReorderContent;

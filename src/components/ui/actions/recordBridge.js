@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import dialog from '../../utils/dialog';
 import recordBridge from '../recordBridge';
 
@@ -13,8 +14,6 @@ const bridgeRecord = (services) => {
             title: 'Bridge',
             loading: false
         });
-
-        //$dialog.load(`${url}${bridgeTemplateEndPoint}`, 'POST', datas);
 
         return $.post(`${url}${bridgeTemplateEndPoint}`, datas, function (data) {
             $dialog.setContent(data);

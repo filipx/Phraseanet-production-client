@@ -1,3 +1,4 @@
+import $ from 'jquery';
 /**
  *
  * Color picker
@@ -16,17 +17,22 @@
             tpl = '<div class="colorpicker"><div class="colorpicker_color"><div><div></div></div></div><div class="colorpicker_hue"><div></div></div><div class="colorpicker_new_color"></div><div class="colorpicker_current_color"></div><div class="colorpicker_hex"><input type="text" maxlength="6" size="6" /></div><div class="colorpicker_rgb_r colorpicker_field"><input type="text" maxlength="3" size="3" /><span></span></div><div class="colorpicker_rgb_g colorpicker_field"><input type="text" maxlength="3" size="3" /><span></span></div><div class="colorpicker_rgb_b colorpicker_field"><input type="text" maxlength="3" size="3" /><span></span></div><div class="colorpicker_hsb_h colorpicker_field"><input type="text" maxlength="3" size="3" /><span></span></div><div class="colorpicker_hsb_s colorpicker_field"><input type="text" maxlength="3" size="3" /><span></span></div><div class="colorpicker_hsb_b colorpicker_field"><input type="text" maxlength="3" size="3" /><span></span></div><div class="colorpicker_submit"></div></div>',
             defaults = {
                 eventName: 'click',
-                onShow: function () {},
-                onBeforeShow: function () {},
-                onHide: function () {},
-                onChange: function () {},
-                onSubmit: function () {},
+                onShow: function () {
+                },
+                onBeforeShow: function () {
+                },
+                onHide: function () {
+                },
+                onChange: function () {
+                },
+                onSubmit: function () {
+                },
                 color: 'ff0000',
                 livePreview: true,
                 flat: false
             },
             fillRGBFields = function (hsb, cal) {
-                var rgb = HSBToRGB(hsb);
+                let rgb = _HSBToRGB(hsb);
                 $(cal).data('colorpicker').fields
                     .eq(1).val(rgb.r).end()
                     .eq(2).val(rgb.g).end()
@@ -40,10 +46,10 @@
             },
             fillHexFields = function (hsb, cal) {
                 $(cal).data('colorpicker').fields
-                    .eq(0).val(HSBToHex(hsb)).end();
+                    .eq(0).val(_HSBToHex(hsb)).end();
             },
             setSelector = function (hsb, cal) {
-                $(cal).data('colorpicker').selector.css('backgroundColor', '#' + HSBToHex({ h: hsb.h, s: 100, b: 100 }));
+                $(cal).data('colorpicker').selector.css('backgroundColor', '#' + _HSBToHex({h: hsb.h, s: 100, b: 100}));
                 $(cal).data('colorpicker').selectorIndic.css({
                     left: parseInt(150 * hsb.s / 100, 10),
                     top: parseInt(150 * (100 - hsb.b) / 100, 10)
@@ -53,10 +59,10 @@
                 $(cal).data('colorpicker').hue.css('top', parseInt(150 - 150 * hsb.h / 360, 10));
             },
             setCurrentColor = function (hsb, cal) {
-                $(cal).data('colorpicker').currentColor.css('backgroundColor', '#' + HSBToHex(hsb));
+                $(cal).data('colorpicker').currentColor.css('backgroundColor', '#' + _HSBToHex(hsb));
             },
             setNewColor = function (hsb, cal) {
-                $(cal).data('colorpicker').newColor.css('backgroundColor', '#' + HSBToHex(hsb));
+                $(cal).data('colorpicker').newColor.css('backgroundColor', '#' + _HSBToHex(hsb));
             },
             keyDown = function (ev) {
                 var pressedKey = ev.charCode || ev.keyCode || -1;
@@ -71,7 +77,7 @@
             change = function (ev) {
                 var cal = $(this).parent().parent(), col;
                 if (this.parentNode.className.indexOf('_hex') > 0) {
-                    cal.data('colorpicker').color = col = HexToHSB(fixHex(this.value));
+                    cal.data('colorpicker').color = col = _HexToHSB(fixHex(this.value));
                 } else if (this.parentNode.className.indexOf('_hsb') > 0) {
                     cal.data('colorpicker').color = col = fixHSB({
                         h: parseInt(cal.data('colorpicker').fields.eq(4).val(), 10),
@@ -79,7 +85,7 @@
                         b: parseInt(cal.data('colorpicker').fields.eq(6).val(), 10)
                     });
                 } else {
-                    cal.data('colorpicker').color = col = RGBToHSB(fixRGB({
+                    cal.data('colorpicker').color = col = _RGBToHSB(fixRGB({
                         r: parseInt(cal.data('colorpicker').fields.eq(1).val(), 10),
                         g: parseInt(cal.data('colorpicker').fields.eq(2).val(), 10),
                         b: parseInt(cal.data('colorpicker').fields.eq(3).val(), 10)
@@ -93,7 +99,7 @@
                 setSelector(col, cal.get(0));
                 setHue(col, cal.get(0));
                 setNewColor(col, cal.get(0));
-                cal.data('colorpicker').onChange.apply(cal, [col, HSBToHex(col), HSBToRGB(col)]);
+                cal.data('colorpicker').onChange.apply(cal, [col, _HSBToHex(col), _HSBToRGB(col)]);
             },
             blur = function (ev) {
                 var cal = $(this).parent().parent();
@@ -199,7 +205,7 @@
                 var col = cal.data('colorpicker').color;
                 cal.data('colorpicker').origColor = col;
                 setCurrentColor(col, cal.get(0));
-                cal.data('colorpicker').onSubmit(col, HSBToHex(col), HSBToRGB(col), cal.data('colorpicker').el);
+                cal.data('colorpicker').onSubmit(col, _HSBToHex(col), _HSBToRGB(col), cal.data('colorpicker').el);
             },
             show = function (ev) {
                 var cal = $('#' + $(this).data('colorpickerId'));
@@ -214,11 +220,11 @@
                 if (left + 356 > viewPort.l + viewPort.w) {
                     left -= 356;
                 }
-                cal.css({ left: left + 'px', top: top + 'px' });
+                cal.css({left: left + 'px', top: top + 'px'});
                 if (cal.data('colorpicker').onShow.apply(this, [cal.get(0)]) !== false) {
                     cal.show();
                 }
-                $(document).bind('mousedown', { cal: cal }, hide);
+                $(document).bind('mousedown', {cal: cal}, hide);
                 return false;
             },
             hide = function (ev) {
@@ -236,7 +242,7 @@
                 if (parentEl.contains) {
                     return parentEl.contains(el);
                 }
-                if ( parentEl.compareDocumentPosition ) {
+                if (parentEl.compareDocumentPosition) {
                     return !!(parentEl.compareDocumentPosition(el) & 16);
                 }
                 var prEl = el.parentNode;
@@ -250,10 +256,10 @@
             getViewport = function () {
                 var m = document.compatMode === 'CSS1Compat';
                 return {
-                    l : window.pageXOffset || (m ? document.documentElement.scrollLeft : document.body.scrollLeft),
-                    t : window.pageYOffset || (m ? document.documentElement.scrollTop : document.body.scrollTop),
-                    w : window.innerWidth || (m ? document.documentElement.clientWidth : document.body.clientWidth),
-                    h : window.innerHeight || (m ? document.documentElement.clientHeight : document.body.clientHeight)
+                    l: window.pageXOffset || (m ? document.documentElement.scrollLeft : document.body.scrollLeft),
+                    t: window.pageYOffset || (m ? document.documentElement.scrollTop : document.body.scrollTop),
+                    w: window.innerWidth || (m ? document.documentElement.clientWidth : document.body.clientWidth),
+                    h: window.innerHeight || (m ? document.documentElement.clientHeight : document.body.clientHeight)
                 };
             },
             fixHSB = function (hsb) {
@@ -282,14 +288,14 @@
                 }
                 return hex;
             },
-            HexToRGB = function (hex) {
+            _HexToRGB = function (hex) {
                 var hex = parseInt(((hex.indexOf('#') > -1) ? hex.substring(1) : hex), 16);
-                return { r: hex >> 16, g: (hex & 0x00FF00) >> 8, b: (hex & 0x0000FF) };
+                return {r: hex >> 16, g: (hex & 0x00FF00) >> 8, b: (hex & 0x0000FF)};
             },
-            HexToHSB = function (hex) {
-                return RGBToHSB(HexToRGB(hex));
+            _HexToHSB = function (hex) {
+                return _RGBToHSB(_HexToRGB(hex));
             },
-            RGBToHSB = function (rgb) {
+            _RGBToHSB = function (rgb) {
                 var hsb = {
                     h: 0,
                     s: 0,
@@ -322,7 +328,7 @@
                 hsb.b *= 100 / 255;
                 return hsb;
             },
-            HSBToRGB = function (hsb) {
+            _HSBToRGB = function (hsb) {
                 var rgb = {};
                 var h = Math.round(hsb.h);
                 var s = Math.round(hsb.s * 255 / 100);
@@ -333,18 +339,42 @@
                     var t1 = v;
                     var t2 = (255 - s) * v / 255;
                     var t3 = (t1 - t2) * (h % 60) / 60;
-                    if (h === 360) h = 0;
-                    if (h < 60) {rgb.r = t1;	rgb.b = t2; rgb.g = t2 + t3;}
-                    else if (h < 120) {rgb.g = t1; rgb.b = t2;	rgb.r = t1 - t3;}
-                    else if (h < 180) {rgb.g = t1; rgb.r = t2;	rgb.b = t2 + t3;}
-                    else if (h < 240) {rgb.b = t1; rgb.r = t2;	rgb.g = t1 - t3;}
-                    else if (h < 300) {rgb.b = t1; rgb.g = t2;	rgb.r = t2 + t3;}
-                    else if (h < 360) {rgb.r = t1; rgb.g = t2;	rgb.b = t1 - t3;}
-                    else {rgb.r = 0; rgb.g = 0;	rgb.b = 0;}
+                    if (h === 360) {
+                        h = 0;
+                    }
+                    if (h < 60) {
+                        rgb.r = t1;
+                        rgb.b = t2;
+                        rgb.g = t2 + t3;
+                    } else if (h < 120) {
+                        rgb.g = t1;
+                        rgb.b = t2;
+                        rgb.r = t1 - t3;
+                    } else if (h < 180) {
+                        rgb.g = t1;
+                        rgb.r = t2;
+                        rgb.b = t2 + t3;
+                    } else if (h < 240) {
+                        rgb.b = t1;
+                        rgb.r = t2;
+                        rgb.g = t1 - t3;
+                    } else if (h < 300) {
+                        rgb.b = t1;
+                        rgb.g = t2;
+                        rgb.r = t2 + t3;
+                    } else if (h < 360) {
+                        rgb.r = t1;
+                        rgb.g = t2;
+                        rgb.b = t1 - t3;
+                    } else {
+                        rgb.r = 0;
+                        rgb.g = 0;
+                        rgb.b = 0;
+                    }
                 }
-                return { r:Math.round(rgb.r), g:Math.round(rgb.g), b:Math.round(rgb.b) };
+                return {r: Math.round(rgb.r), g: Math.round(rgb.g), b: Math.round(rgb.b)};
             },
-            RGBToHex = function (rgb) {
+            _RGBToHex = function (rgb) {
                 var hex = [
                     rgb.r.toString(16),
                     rgb.g.toString(16),
@@ -357,8 +387,8 @@
                 });
                 return hex.join('');
             },
-            HSBToHex = function (hsb) {
-                return RGBToHex(HSBToRGB(hsb));
+            _HSBToHex = function (hsb) {
+                return _RGBToHex(_HSBToRGB(hsb));
             },
             restoreOriginal = function () {
                 var cal = $(this).parent();
@@ -375,9 +405,9 @@
             init: function (opt) {
                 opt = $.extend({}, defaults, opt || {});
                 if (typeof opt.color === 'string') {
-                    opt.color = HexToHSB(opt.color);
+                    opt.color = _HexToHSB(opt.color);
                 } else if (opt.color.r !== undefined && opt.color.g !== undefined && opt.color.b !== undefined) {
-                    opt.color = RGBToHSB(opt.color);
+                    opt.color = _RGBToHSB(opt.color);
                 } else if (opt.color.h !== undefined && opt.color.s !== undefined && opt.color.b !== undefined) {
                     opt.color = fixHSB(opt.color);
                 } else {
@@ -435,14 +465,14 @@
                 });
             },
             showPicker: function () {
-                return this.each( function () {
+                return this.each(function () {
                     if ($(this).data('colorpickerId')) {
                         show.apply(this);
                     }
                 });
             },
             hidePicker: function () {
-                return this.each( function () {
+                return this.each(function () {
                     if ($(this).data('colorpickerId')) {
                         $('#' + $(this).data('colorpickerId')).hide();
                     }
@@ -450,9 +480,9 @@
             },
             setColor: function (col) {
                 if (typeof col === 'string') {
-                    col = HexToHSB(col);
+                    col = _HexToHSB(col);
                 } else if (col.r !== undefined && col.g !== undefined && col.b !== undefined) {
-                    col = RGBToHSB(col);
+                    col = _RGBToHSB(col);
                 } else if (col.h !== undefined && col.s !== undefined && col.b !== undefined) {
                     col = fixHSB(col);
                 } else {
@@ -481,4 +511,4 @@
         ColorPickerShow: ColorPicker.showPicker,
         ColorPickerSetColor: ColorPicker.setColor
     });
-})(jQuery);
+})($);

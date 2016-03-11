@@ -1,5 +1,4 @@
-// import * as $ from 'jquery';
-let $ = require('jquery');
+import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
 
 const cgu = (services) => {
@@ -46,14 +45,14 @@ const cgu = (services) => {
                 if (data.success) {
                     alert(localeService.t('cgusRelog'));
                     self.location.replace(self.location.href);
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
         });
 
     }
+
     return {
         initialize
     };

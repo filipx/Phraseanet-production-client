@@ -1,3 +1,5 @@
+import $ from 'jquery';
+import * as AppCommons from 'phraseanet-common';
 import workzoneThesaurus from './thesaurus/index';
 import workzoneFacets from './facets/index';
 import workzoneBaskets from './baskets/index';
@@ -108,7 +110,7 @@ const workzone = (services) => {
             }
 
             event.stopImmediatePropagation();
-            //workzoneOptions.close();
+            // workzoneOptions.close();
             return false;
         });
 
@@ -149,9 +151,9 @@ const workzone = (services) => {
         });
         // workzoneOptions
         workzoneOptions = {
-            'selection': new Selectable($('#baskets'), { selector: '.CHIM' }),
-            'refresh': refreshBaskets,
-            'addElementToBasket': function (options) {
+            selection: new Selectable($('#baskets'), { selector: '.CHIM' }),
+            refresh: refreshBaskets,
+            addElementToBasket: function (options) {
                 let { sbas_id, record_id, event, singleSelection } = options;
                 console.log('try to add to basket');
                 singleSelection = !!singleSelection || false;
@@ -162,15 +164,16 @@ const workzone = (services) => {
                     humane.info(localeService.t('noActiveBasket'));
                 }
             },
-            'removeElementFromBasket': WorkZoneElementRemover,
-            'reloadCurrent': function () {
+            removeElementFromBasket: WorkZoneElementRemover,
+            reloadCurrent: function () {
                 var sstt = $('#baskets .content:visible');
                 if (sstt.length === 0)
                     return;
                 getContent(sstt.prev());
             },
-            'close': function () {
-                var frame = $('#idFrameC'), that = this;
+            close: function () {
+                const frame = $('#idFrameC');
+                const that = this;
 
                 if (!frame.hasClass('closed')) {
                     // hide tabs content
@@ -192,7 +195,7 @@ const workzone = (services) => {
                     });
                 }
             },
-            'open': function () {
+            open: function () {
                 var frame = $('#idFrameC');
 
                 if (frame.hasClass('closed')) {
@@ -214,7 +217,6 @@ const workzone = (services) => {
     const getResultSelectionStream = () => workzoneOptions.selection.stream;
 
     function refreshBaskets(options) {
-        console.log('refresh basket', options);
         let { basketId, sort, scrolltobottom, type } = options;
         type = typeof type === 'undefined' ? 'basket' : type;
 
@@ -479,7 +481,7 @@ const workzone = (services) => {
         $.each($('.SSTT', cache), function () {
             var el = $(this);
             $(this).find('.contextMenuTrigger').contextMenu('#' + $(this).attr('id') + ' .contextMenu', {
-                'appendTo': '#basketcontextwrap',
+                appendTo: '#basketcontextwrap',
                 openEvt: 'click',
                 theme: 'vista',
                 dropDown: true,
@@ -582,7 +584,7 @@ const workzone = (services) => {
                             .remove();
                     },
                     drag: function (event, ui) {
-                        if (utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping'))
+                        if (AppCommons.utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping'))
                             $('#dragDropCursor div').empty().append('+ ' + workzoneOptions.selection.length());
                         else
                             $('#dragDropCursor div').empty().append(workzoneOptions.selection.length());
@@ -596,7 +598,12 @@ const workzone = (services) => {
     }
 
     function dropOnBask(event, from, destKey, singleSelection) {
-        var action = '', from = $(from), dest_uri = '', lstbr = [], sselcont = [], act = 'ADD';
+        let action = '';
+        let dest_uri = '';
+        let lstbr = [];
+        let sselcont = [];
+        let act = 'ADD';
+        from = $(from);
 
         if (from.hasClass('CHIM')) {
             /* Element(s) come from an open object in the workzone */
@@ -630,7 +637,7 @@ const workzone = (services) => {
                     lstbr = [$(from).selector.split('_').slice(1, 3).join('_')];
                 }
             } else {
-                lstbr = searchSelection.asArray; //p4.Results.Selection.get();
+                lstbr = searchSelection.asArray;
             }
         } else {
             sselcont = $.map(workzoneOptions.selection.get(), function (n, i) {
@@ -641,12 +648,13 @@ const workzone = (services) => {
 
         switch (action) {
             case 'CHU2CHU' :
-                if (!utilsModule.is_ctrl_key(event)) act = 'MOV';
+                if (!AppCommons.utilsModule.is_ctrl_key(event)) act = 'MOV';
                 break;
             case 'IMGT2REG':
             case 'CHU2REG' :
             case 'REG2REG':
-                var sameSbas = true, sbas_reg = destKey.attr('sbas');
+                let sameSbas = true;
+                const sbas_reg = destKey.attr('sbas');
 
                 for (var i = 0; i < lstbr.length && sameSbas; i++) {
                     if (lstbr[i].split('_').shift() !== sbas_reg) {
@@ -656,16 +664,17 @@ const workzone = (services) => {
                 }
 
                 if (sameSbas === false) {
-                    return Alerts('', language.reg_wrong_sbas);
+                    return Alerts('', localeService.t('reg_wrong_sbas'));
                 }
 
                 break;
         }
-
+        let url = '';
+        let data = {};
         switch (act + action) {
             case 'MOVCHU2CHU':
-                var url = dest_uri + 'stealElements/';
-                var data = {
+                url = dest_uri + 'stealElements/';
+                data = {
                     elements: sselcont
                 };
                 break;
@@ -675,8 +684,8 @@ const workzone = (services) => {
             case 'ADDCHU2CHU':
             case 'ADDREG2CHU':
             case 'ADDIMGT2CHU':
-                var url = dest_uri + 'addElements/';
-                var data = {
+                url = dest_uri + 'addElements/';
+                data = {
                     lst: lstbr.join(';')
                 };
                 break;

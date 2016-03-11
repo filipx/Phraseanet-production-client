@@ -6,7 +6,7 @@ let instance = null;
 class ConfigService extends ApplicationConfigService {
     constructor(configuration) {
         super(configuration);
-        if ( !instance ) {
+        if (!instance) {
 
             instance = this;
         }

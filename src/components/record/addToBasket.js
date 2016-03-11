@@ -1,4 +1,4 @@
-
+import $ from 'jquery';
 
 const addToBasket = (services) => {
     const { configService, localeService, appEvents } = services;

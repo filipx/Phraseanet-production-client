@@ -1,4 +1,4 @@
-// import * as $ from 'jquery';
+import $ from 'jquery';
 import dialog from '../utils/dialog';
 
 const deleteBasket = (services) => {
@@ -27,8 +27,6 @@ const deleteBasket = (services) => {
                     lst = p4.WorkZone.Selection.serialize();
 
                 _deleteRecords(lst);
-
-                return;
                 break;
 
 
@@ -47,7 +45,6 @@ const deleteBasket = (services) => {
                     draggable: false
                 }).dialog('open').dialog('option', 'buttons', buttons);
                 $('#tooltip').hide();
-                return;
                 break;
             case 'STORY':
                 lst = $el.val();
@@ -61,15 +58,12 @@ const deleteBasket = (services) => {
         if ($('#DIALOG').data('ui-dialog')) {
             $('#DIALOG').dialog('destroy');
         }
-
-        var k = $(item).attr('id').split('_').slice(1, 2).pop();	// id de chutier
+        // id de chutier
+        var k = $(item).attr('id').split('_').slice(1, 2).pop();
         $.ajax({
             type: 'POST',
             url: '../prod/baskets/' + k + '/delete/',
             dataType: 'json',
-            beforeSend: function () {
-
-            },
             success: function (data) {
                 if (data.success) {
                     var basket = $('#SSTT_' + k);
@@ -90,8 +84,7 @@ const deleteBasket = (services) => {
                     if ($('#baskets .SSTT').length === 0) {
                         appEvents.emit('workzone.refresh');
                     }
-                }
-                else {
+                } else {
                     alert(data.message);
                 }
                 return;
@@ -104,18 +97,17 @@ const deleteBasket = (services) => {
             alert(localeService.t('nodocselected'));
             return false;
         }
-
-        var $dialog = dialog.create(services, {
+        let $dialog = dialog.create(services, {
             size: 'Small',
-            title: localeService.t('deleteRecords'),
-            localeService: localeService
+            title: localeService.t('deleteRecords')
         });
+
 
         $.ajax({
             type: 'POST',
             url: '../prod/records/delete/what/',
             dataType: 'html',
-            data: { lst: lst },
+            data: {lst: lst},
             success: function (data) {
                 $dialog.setContent(data);
             }
@@ -124,7 +116,7 @@ const deleteBasket = (services) => {
         return false;
     };
 
-    return { initialize, deleteConfirmation };
+    return {initialize, deleteConfirmation};
 };
 
 export default deleteBasket;

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import deleteBasket from './../../../basket/delete';
 import archiveBasket from './../../../basket/archive';
 import basketCreate from './../../../basket/create';
@@ -22,18 +23,18 @@ const workzoneBaskets = (services) => {
         storyReorderContent(services).initialize();
 
         $('body').on('click', '.basket-filter-action', (event) => {
-            console.log('filter event');
-            event.preventDefault();
-            const $el = $(event.currentTarget);
-            console.log('aa', $el.data('sort'));
-            if ( $el.data('sort') !== '') {
-                appEvents.emit('workzone.refresh', {
-                    basketId: 'current',
-                    sort: $el.data('sort')
-                });
-            }
+                console.log('filter event');
+                event.preventDefault();
+                const $el = $(event.currentTarget);
+                console.log('aa', $el.data('sort'));
+                if ($el.data('sort') !== '') {
+                    appEvents.emit('workzone.refresh', {
+                        basketId: 'current',
+                        sort: $el.data('sort')
+                    });
+                }
 
-        })
+            })
             .on('click', '.basket-preferences-action', (event) => {
                 console.log('filter event');
                 event.preventDefault();
@@ -60,7 +61,6 @@ const workzoneBaskets = (services) => {
     appEvents.listenAll({
         'baskets.doOpenBasketPreferences': openBasketPreferences
     });
-
 
 
     return {

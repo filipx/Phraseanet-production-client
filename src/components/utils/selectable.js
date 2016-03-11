@@ -1,17 +1,19 @@
+import $ from 'jquery';
 import * as Rx from 'rx';
-var Selectable = function ($container, options) {
+import * as AppCommons from 'phraseanet-common';
+const Selectable = function ($container, options) {
 
-    var defaults = {
+    let defaults = {
             allow_multiple: false,
             selector: '',
             callbackSelection: null,
             selectStart: null,
             selectStop: null,
             limit: null
-        },
-        options = (typeof options === 'object') ? options : {};
+        };
+    options = typeof options === 'object' ? options : {};
 
-    var $this = this;
+    let $this = this;
 
     if ($container.data('selectionnable')) {
         /* this container is already selectionnable */
@@ -24,8 +26,8 @@ var Selectable = function ($container, options) {
 
     this.stream = new Rx.Subject();
     this.$container = $container;
-    this.options = jQuery.extend(defaults, options);
-    this.datas = new Array();
+    this.options = $.extend(defaults, options);
+    this.datas = [];
 
     this.$container.data('selectionnable', this);
     this.$container.addClass('selectionnable');
@@ -33,38 +35,37 @@ var Selectable = function ($container, options) {
         .on('click', this.options.selector, function (event) {
             event.preventDefault();
             if (typeof $this.options.selectStart === 'function') {
-                $this.options.selectStart(jQuery.extend(jQuery.Event('selectStart'), event), $this);
+                $this.options.selectStart($.extend($.Event('selectStart'), event), $this);
             }
 
-            var $that = jQuery(this);
+            let $that = $(this);
 
-            var k = get_value($that, $this);
+            let k = get_value($that, $this);
 
-            if (utilsModule.is_shift_key(event) && jQuery('.last_selected', this.$container).filter($this.options.selector).length !== 0) {
-                var lst = jQuery($this.options.selector, this.$container);
+            if (AppCommons.utilsModule.is_shift_key(event) && $('.last_selected', this.$container).filter($this.options.selector).length !== 0) {
+                let lst = $($this.options.selector, this.$container);
 
-                var index1 = jQuery.inArray(jQuery('.last_selected', this.$container).filter($this.options.selector)[0], lst);
-                var index2 = jQuery.inArray($that[0], lst);
+                let index1 = $.inArray($('.last_selected', this.$container).filter($this.options.selector)[0], lst);
+                let index2 = $.inArray($that[0], lst);
 
                 if (index2 < index1) {
-                    var tmp = index1;
-                    index1 = (index2 - 1) < 0 ? index2 : (index2 - 1);
+                    let tmp = index1;
+                    index1 = index2 - 1 < 0 ? index2 : index2 - 1;
                     index2 = tmp;
                 }
 
-                var stopped = false;
+                let stopped = false;
 
                 if (index2 !== -1 && index1 !== -1) {
-                    var exp = $this.options.selector + ':gt(' + index1 + '):lt(' + (index2 - index1) + ')';
+                    let exp = $this.options.selector + ':gt(' + index1 + '):lt(' + (index2 - index1) + ')';
 
-                    $.each(jQuery(exp, this.$container), function (i, n) {
-                        if (!jQuery(n).hasClass('selected') && stopped === false) {
+                    $.each($(exp, this.$container), function (i, n) {
+                        if (!$(n).hasClass('selected') && stopped === false) {
                             if (!$this.hasReachLimit()) {
-                                var k = get_value(jQuery(n), $this);
+                                let k = get_value($(n), $this);
                                 $this.push(k);
-                                jQuery(n).addClass('selected');
-                            }
-                            else {
+                                $(n).addClass('selected');
+                            } else {
                                 alert(language.max_record_selected);
                                 stopped = true;
                             }
@@ -76,36 +77,31 @@ var Selectable = function ($container, options) {
                     if (!$this.hasReachLimit()) {
                         $this.push(k);
                         $that.addClass('selected');
-                    }
-                    else {
+                    } else {
                         alert(language.max_record_selected);
                     }
                 }
-            }
-            else {
-                if (!utilsModule.is_ctrl_key(event)) {
+            } else {
+                if (!AppCommons.utilsModule.is_ctrl_key(event)) {
                     $this.empty().push(k);
-                    jQuery('.selected', this.$container).filter($this.options.selector).removeClass('selected');
+                    $('.selected', this.$container).filter($this.options.selector).removeClass('selected');
                     $that.addClass('selected');
-                }
-                else {
+                } else {
                     if ($this.has(k) === true) {
                         $this.remove(k);
                         $that.removeClass('selected');
-                    }
-                    else {
+                    } else {
                         if (!$this.hasReachLimit()) {
                             $this.push(k);
                             $that.addClass('selected');
-                        }
-                        else {
+                        } else {
                             alert(language.max_record_selected);
                         }
                     }
                 }
             }
 
-            jQuery('.last_selected', this.$container).removeClass('last_selected');
+            $('.last_selected', this.$container).removeClass('last_selected');
             $that.addClass('last_selected');
 
             $this.stream.onNext({
@@ -113,7 +109,7 @@ var Selectable = function ($container, options) {
                 serialized: $this.serialize()
             });
             if (typeof $this.options.selectStop === 'function') {
-                $this.options.selectStop(jQuery.extend(jQuery.Event('selectStop'), event), $this);
+                $this.options.selectStop($.extend($.Event('selectStop'), event), $this);
             }
 
         });
@@ -123,10 +119,9 @@ var Selectable = function ($container, options) {
 
 function get_value(element, Selectable) {
     if (typeof Selectable.options.callbackSelection === 'function') {
-        return Selectable.options.callbackSelection(jQuery(element));
-    }
-    else {
-        return jQuery('input[name="id"]', jQuery(element)).val();
+        return Selectable.options.callbackSelection($(element));
+    } else {
+        return $('input[name="id"]', $(element)).val();
     }
 }
 
@@ -145,7 +140,7 @@ Selectable.prototype = {
         return false;
     },
     remove: function (element) {
-        this.datas = jQuery.grep(this.datas, function (n) {
+        this.datas = $.grep(this.datas, function (n) {
             return (n !== element);
         });
 
@@ -153,20 +148,19 @@ Selectable.prototype = {
     },
     has: function (element) {
 
-        return jQuery.inArray(element, this.datas) >= 0;
+        return $.inArray(element, this.datas) >= 0;
     },
     get: function () {
-        //this.stream.onNext(this.datas);
         return this.datas;
     },
     empty: function () {
-        var $this = this;
-        this.datas = new Array();
+        const $this = this;
+        this.datas = [];
 
-        jQuery(this.options.selector, this.$container).filter('.selected:visible').removeClass('selected');
+        $(this.options.selector, this.$container).filter('.selected:visible').removeClass('selected');
 
         if (typeof $this.options.selectStop === 'function') {
-            $this.options.selectStop(jQuery.Event('selectStop'), $this);
+            $this.options.selectStop($.Event('selectStop'), $this);
         }
 
         return this;
@@ -191,15 +185,14 @@ Selectable.prototype = {
         return this;
     },
     select: function (selector) {
-        var $this = this,
-            stopped = false;
+        const $this = this;
+        let stopped = false;
 
-        jQuery(this.options.selector, this.$container).filter(selector).not('.selected').filter(':visible').each(function () {
+        $(this.options.selector, this.$container).filter(selector).not('.selected').filter(':visible').each(function () {
             if (!$this.hasReachLimit()) {
                 $this.push(get_value(this, $this));
                 $(this).addClass('selected');
-            }
-            else {
+            } else {
                 if (stopped === false) {
                     alert(language.max_record_selected);
                 }
@@ -209,7 +202,7 @@ Selectable.prototype = {
 
 
         if (typeof $this.options.selectStop === 'function') {
-            $this.options.selectStop(jQuery.Event('selectStop'), $this);
+            $this.options.selectStop($.Event('selectStop'), $this);
         }
 
         return this;

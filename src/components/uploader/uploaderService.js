@@ -1,3 +1,4 @@
+import $ from 'jquery';
 let loadImage = require('blueimp-load-image/js/load-image');
 /* The jQuery UI widget factory, can be omitted if jQuery UI is already included */
 require('imports?define=>false&exports=>false!blueimp-file-upload/js/vendor/jquery.ui.widget.js');
@@ -12,33 +13,29 @@ require('imports?define=>false&exports=>false!blueimp-file-upload/js/jquery.file
  */
 var UploaderManager = function (options) {
 
-    var options = options || {};
+    options = options || {};
 
-    if (false === ('container' in options)) {
+    if (('container' in options) === false) {
         throw 'missing container parameter';
-    }
-    else if (!options.container.jquery) {
+    } else if (!options.container.jquery) {
         throw 'container parameter must be a jquery dom element';
     }
 
-    if (false === ('settingsBox' in options)) {
+    if (('settingsBox' in options) === false) {
         throw 'missing settingBox parameter';
-    }
-    else if (!options.settingsBox.jquery) {
+    } else if (!options.settingsBox.jquery) {
         throw 'container parameter must be a jquery dom element';
     }
 
-    if (false === ('uploadBox' in options)) {
+    if (('uploadBox' in options) === false) {
         throw 'missing uploadBox parameter';
-    }
-    else if (!options.uploadBox.jquery) {
+    } else if (!options.uploadBox.jquery) {
         throw 'container parameter must be a jquery dom element';
     }
 
-    if (false === ('downloadBox' in options)) {
+    if (('downloadBox' in options) === false) {
         throw 'missing downloadBox parameter';
-    }
-    else if (!options.downloadBox.jquery) {
+    } else if (!options.downloadBox.jquery) {
         throw 'container parameter must be a jquery dom element';
     }
 

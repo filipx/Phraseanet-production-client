@@ -1,17 +1,13 @@
+import $ from 'jquery';
 
-
-var listEditor = (services, options) => {
-    console.log('init list editor');
+const listEditor = (services, options) => {
     const { configService, localeService, appEvents } = services;
-    let { $container, listManagerInstance } = options;
-
-    var $editor = $('#list-editor-search-results');
-
-
-    var $form = $('#ListManager .editor').find('form[name="list-editor-search"]');
+    const { $container, listManagerInstance } = options;
+    const $editor = $('#list-editor-search-results');
+    const $form = $('#ListManager .editor').find('form[name="list-editor-search"]');
 
     $('a.next, a.prev', $editor).bind('click', function () {
-        var page = $(this).attr('value');
+        const page = $(this).attr('value');
 
         $('input[name="page"]', $form).val(page);
         $form.trigger('submit');
@@ -23,17 +19,14 @@ var listEditor = (services, options) => {
 
     $('th.sortable', $editor).bind('click', function () {
 
-            var $this = $(this);
+            let $this = $(this);
 
-            var sort = $('input', $this).val();
+            let sort = $('input', $this).val();
 
-            if ((sort === $('input[name="srt"]', $form).val())
-                && ($('input[name="ord"]', $form).val() === 'asc'))
-            {
-                var ord = 'desc';
-            }
-            else {
-                var ord = 'asc';
+            if ((sort === $('input[name="srt"]', $form).val()) && ($('input[name="ord"]', $form).val() === 'asc')) {
+                let ord = 'desc';
+            } else {
+                let ord = 'asc';
             }
 
             $('input[name="srt"]', $form).val(sort);
@@ -41,32 +34,34 @@ var listEditor = (services, options) => {
 
             $form.trigger('submit');
         })
-        .bind('mouseover', function () {$(this).addClass('hover');})
-        .bind('mouseout', function () {$(this).removeClass('hover');});
+        .bind('mouseover', function () {
+            $(this).addClass('hover');
+        })
+        .bind('mouseout', function () {
+            $(this).removeClass('hover');
+        });
 
     $('tbody tr', $editor).bind('click', function () {
 
-        var $this = $(this);
-        var usr_id = $('input[name="usr_id"]', $this).val();
+        let $this = $(this);
+        let usr_id = $('input[name="usr_id"]', $this).val();
 
-        var counters = $('#ListManager .counter.current, #ListManager .lists .list.selected .counter');
+        let counters = $('#ListManager .counter.current, #ListManager .lists .list.selected .counter');
 
-        if ($this.hasClass('selected'))
-        {
+        if ($this.hasClass('selected')) {
             $this.removeClass('selected');
             listManagerInstance.getList().removeUser(usr_id);
 
             counters.each(function (i, el) {
-                var n = parseInt($(el).text());
+                let n = parseInt($(el).text(), 10);
                 $(el).text(n - 1);
             });
-        }
-        else {
+        } else {
             $this.addClass('selected');
             listManagerInstance.getList().addUser(usr_id);
 
             counters.each(function (i, el) {
-                var n = parseInt($(el).text());
+                let n = parseInt($(el).text(), 10);
                 $(el).text(n + 1);
             });
         }

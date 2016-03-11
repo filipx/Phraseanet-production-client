@@ -6,7 +6,7 @@ let ProductionApplication = {
     bootstrap, utils, VideoEditor
 };
 
-if ( typeof window !== 'undefined' ) {
+if (typeof window !== 'undefined') {
     window.ProductionApplication = ProductionApplication;
 }
 

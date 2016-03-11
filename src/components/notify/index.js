@@ -7,7 +7,7 @@ import * as Rx from 'rx';
 const notify = (services) => {
 
     const { configService, localeService, appEvents } = services;
-    const language = []; //services.localeService;
+    const language = [];
     const defaultPollingTime = 10000;
     const defaultConfig = {
         url: null,
@@ -54,7 +54,7 @@ const notify = (services) => {
         notificationSource.subscribe(
             x => onPollSuccess(x, notificationInstance),
             e => onPollError(e, notificationInstance),
-            () => {} // onCompleted
+            () => {}
         );
     };
     const onPollSuccess = (data, notificationInstance) => {

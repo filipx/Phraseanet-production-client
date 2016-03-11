@@ -1,13 +1,12 @@
 import $ from 'jquery';
 import dialog from '../../utils/dialog';
 import VideoEditor from '../../videoEditor';
-// @REFACTORING @TODO activeTab is lost tbtested
 const recordToolsModal = (services, datas, activeTab = false) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const toolsTemplateEndPoint = 'prod/tools/';
     let $dialog = null;
-    // let activeTab = false;
+
     const openModal = (datas) => {
 
         $dialog = dialog.create(services, {
@@ -25,8 +24,6 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 return;
             }
         );
-
-        return true;
     };
 
     const _onModalReady = (template, data, activeTab) => {
@@ -83,14 +80,10 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             return false;
         });
 
-        //thumbExtractor
+
         var ThumbEditor = new VideoEditor('thumb_video', 'thumb_canvas', {
             altCanvas: $('#alt_canvas_container .alt_canvas')
         });
-
-        /*var ThumbEditor = new videoEditorModule.ThumbnailEditor("thumb_video", "thumb_canvas", {
-         altCanvas: $('#alt_canvas_container .alt_canvas')
-         });*/
 
         if (ThumbEditor.isSupported()) {
 
@@ -116,11 +109,9 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
                 if (previous.length > 0) {
                     previous.trigger('click');
-                }
-                else if (next.length > 0) {
+                } else if (next.length > 0) {
                     next.trigger('click');
-                }
-                else {
+                } else {
                     $(this).hide();
                     $('#thumb_info', $scope).show();
                     ThumbEditor.resetCanva();
@@ -173,7 +164,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
                     var content = $('<div />').css({
                         'text-align': 'center',
-                        'width': '100%',
+                        width: '100%',
                         'font-size': '14px'
                     }).append(data.translations.noImgSelected);
                     confirmationDialog.setContent(content);
@@ -190,8 +181,8 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 var screenshots = ThumbEditor.store.get(selectedScreenId);
 
 
-                var screenData = screenshots.getAltScreenShots(),
-                    subDefs = [];
+                let screenData = screenshots.getAltScreenShots();
+                let subDefs = [];
 
                 for (var i = 0; i < screenData.length; i++) {
                     subDefs.push({
@@ -222,9 +213,9 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
                     if (loadingDiv.length === 0) {
                         loadingDiv = $('<div />').css({
-                            'width': '120px',
-                            'height': '40px',
-                            'float': 'left',
+                            width: '120px',
+                            height: '40px',
+                            float: 'left',
                             'line-height': '40px',
                             'padding-left': '40px',
                             'text-align': 'left',
@@ -250,9 +241,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                             if (data.success) {
                                 confirmDialog.close();
                                 dialog.get(1).close();
-                            }
-                            else {
-                                //var content = $("<div />").css({'color':'#a00'}).append("{{ "an error occured" | trans }} " + data.message);
+                            } else {
                                 loadingDiv.append(content);
                                 enableConfirmButton(confirmDialog);
                             }
@@ -260,7 +249,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                     });
                 };
 
-                //show confirm box, content is loaded here /prod/tools/thumb-extractor/confirm-box/
+                // show confirm box, content is loaded here /prod/tools/thumb-extractor/confirm-box/
                 var validationDialog = dialog.create({
                     size: 'Small',
                     title: data.translations.thumbnailTitle,
@@ -287,15 +276,14 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                             }).append(data.datas);
                             validationDialog.setContent(content);
                             disableConfirmButton(validationDialog);
-                        }
-                        else {
+                        } else {
                             validationDialog.setContent(data.datas);
                         }
                     }
                 });
             });
         } else {
-            //not supported
+            // not supported
             $('#thumbExtractor').empty().append(localeService.t('browserFeatureSupport'));
         }
 
@@ -305,33 +293,10 @@ const recordToolsModal = (services, datas, activeTab = false) => {
     };
 
     const _onUniqueSelection = (databaseId, recordId, tabs) => {
-        /*function openToolModal(datas, activeTab) {
-
-         var toolsDialog = dialog.create({
-         size: 'Medium',
-         title: localeService.t('toolbox'),
-         loading: true
-         });
-
-         $.get("../prod/tools/"
-         , datas
-         , function (data) {
-         toolsDialog.setContent(data);
-         toolsDialog.setOption('contextArgs', datas);
-         // var tabs = $('.tabs', dialog.getDomElement()).tabs();
-
-         // activate tab if exists:
-         if( activeTab !== false ) {
-         tabs.tabs('option', 'active', activeTab);
-         }
-         return;
-         }
-         );
-         }*/
 
         $('#tools-sharing .stateChange_button').bind('click', function (event) {
-            var $btn = $(event.currentTarget),
-                state = true;
+            const $btn = $(event.currentTarget);
+            let state = true;
 
             // inverse state
             if ($btn.data('state') === 1) {
@@ -354,7 +319,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
         });
     };
 
-    return { openModal };
+    return {openModal};
 };
 
 export default recordToolsModal;

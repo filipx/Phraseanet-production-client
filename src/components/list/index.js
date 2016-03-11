@@ -1,10 +1,13 @@
+import $ from 'jquery';
+const humane = require('humane-js');
+
 var Lists = function () {
 
 };
 
 var List = function (id) {
 
-    if (parseInt(id) <= 0) {
+    if (parseInt(id, 10) <= 0) {
         throw 'Invalid list id';
     }
 
@@ -20,7 +23,7 @@ Lists.prototype = {
             type: 'POST',
             url: '/prod/lists/list/',
             dataType: 'json',
-            data: { name: name },
+            data: {name: name},
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
@@ -29,8 +32,7 @@ Lists.prototype = {
                         var list = new List(data.list_id);
                         callback(list);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -55,12 +57,10 @@ Lists.prototype = {
                         if (typeof callback === 'function') {
                             callback(data.result);
                         }
-                    }
-                    else {
+                    } else {
                         humane.error(data.message);
                     }
-                }
-                else {
+                } else {
                     if (typeof callback === 'function') {
                         callback(data);
                     }
@@ -79,7 +79,7 @@ List.prototype = {
         }
 
         var $this = this;
-        var data = { usr_ids: $(arrayUsers).toArray() };
+        var data = {usr_ids: $(arrayUsers).toArray()};
 
         $.ajax({
             type: 'POST',
@@ -93,8 +93,7 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this, data);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -119,8 +118,7 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -134,7 +132,7 @@ List.prototype = {
             type: 'POST',
             url: '/prod/lists/list/' + this.id + '/update/',
             dataType: 'json',
-            data: { name: name },
+            data: {name: name},
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
@@ -142,8 +140,7 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -165,8 +162,7 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this, data);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -180,7 +176,7 @@ List.prototype = {
             type: 'POST',
             url: '/prod/lists/list/' + this.id + '/share/' + usr_id + '/',
             dataType: 'json',
-            data: { role: role },
+            data: {role: role},
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);
@@ -188,8 +184,7 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -211,8 +206,7 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
@@ -234,17 +228,12 @@ List.prototype = {
                     if (typeof callback === 'function') {
                         callback($this, data);
                     }
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }
         });
     }
 };
-
-/*p4.Lists = new Lists();
- document.List = List;*/
-
 
 export default Lists;

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Lists from '../../list';
 import listEditor from './listEditor';
 import listShare from './listShare';
@@ -5,7 +6,8 @@ import dialog from '../../utils/dialog';
 import * as _ from 'underscore';
 var ListManager = function (services, options) {
     const { configService, localeService, appEvents } = services;
-    let $container, { containerId } = options;
+    const { containerId } = options;
+    let $container;
 
     this.list = null;
     this.container = $container = $(containerId);
@@ -20,16 +22,6 @@ var ListManager = function (services, options) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             const listId = $el.data('list-id');
-
-            /*var $this = $(this),
-                options = {
-                    size: 'Small',
-                    closeButton: true,
-                    title: $this.attr('title')
-                },
-                $dialog = dialogModule.dialog.create(options, 2);
-
-            $dialog.load($this.attr('href'), 'GET');*/
 
             listShare(services).openModal({
                 listId, modalOptions: {
@@ -76,7 +68,7 @@ var ListManager = function (services, options) {
     var initLeft = () => {
         console.log('init left');
         $container.on('click', '.push-refresh-list-action', (event) => {
-        //$('a.list_refresh', $container).bind('click', (event) => {
+            //$('a.list_refresh', $container).bind('click', (event) => {
             // /prod/lists/all/
             var callback = function (datas) {
                 $('.all-lists', $container).removeClass('loading').append(datas);
@@ -96,7 +88,7 @@ var ListManager = function (services, options) {
 
                 var buttons = {};
 
-                buttons[language.valider] = () => {
+                buttons[localeService.t('valider')] = () => {
 
                     var callbackOK = function () {
                         $('a.list_refresh', $container).trigger('click');
@@ -106,7 +98,7 @@ var ListManager = function (services, options) {
                     var name = $('input[name="name"]', dialog.get(2).getDomElement()).val();
 
                     if ($.trim(name) === '') {
-                        alert(language.listNameCannotBeEmpty);
+                        alert(localeService.t('listNameCannotBeEmpty'));
                         return;
                     }
 
@@ -116,8 +108,7 @@ var ListManager = function (services, options) {
                 var options = {
                     cancelButton: true,
                     buttons: buttons,
-                    size: '700x170',
-                    localeService: localeService
+                    size: '700x170'
                 };
 
                 dialog.create(services, options, 2).setContent(box);
@@ -131,15 +122,12 @@ var ListManager = function (services, options) {
 
         /*$('li.list a.list_link', $container).bind('click', function (event) {
 
-            var $this = $(this);
+         var $this = $(this);
 
-            $this.closest('.lists').find('.list.selected').removeClass('selected');
-            $this.parent('li.list').addClass('selected');
-
-
-
-            return false;
-        });*/
+         $this.closest('.lists').find('.list.selected').removeClass('selected');
+         $this.parent('li.list').addClass('selected');
+         return false;
+         });*/
         $container.on('click', '.list-edit-action', (event) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
@@ -170,8 +158,6 @@ var ListManager = function (services, options) {
             let $el = $(event.currentTarget);
             const listId = $el.data('list-id');
             const userId = $el.data('user-id');
-
-
 
 
             var badge = $(this).closest('.badge');
@@ -235,8 +221,7 @@ var ListManager = function (services, options) {
                     if (data.success) {
                         humane.info(data.message);
                         $('#ListManager .lists .list_refresh').trigger('click');
-                    }
-                    else {
+                    } else {
                         humane.error(data.message);
                     }
                     return;
@@ -263,7 +248,7 @@ var ListManager = function (services, options) {
 
                 var buttons = {};
 
-                buttons[language.valider] = function () {
+                buttons[localeService.t('valider')] = function () {
 
                     var callbackOK = function () {
                         $('#ListManager .all-lists a.list_refresh').trigger('click');
@@ -303,7 +288,7 @@ var ListManager = function (services, options) {
 
         var callback = function (list, datas) {
             $('.counter.current, .list.selected .counter', $('#ListManager')).each(function () {
-                $this.text(parseInt($this.text()) - 1);
+                $this.text(parseInt($this.text(), 10) - 1);
             });
 
             badge.remove();

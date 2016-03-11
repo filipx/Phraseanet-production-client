@@ -1,7 +1,9 @@
 /**
  * triggered via workzone > Basket > context menu
  */
+import $ from 'jquery';
 import dialog from '../utils/dialog';
+const humane = require('humane-js');
 
 const basketUpdate = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -21,7 +23,7 @@ const basketUpdate = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if ( $el.attr('title') !== undefined ) {
+            if ($el.attr('title') !== undefined) {
                 dialogOptions.title = $el.attr('title');
             }
             basketId = $el.data('basket-id');
@@ -37,7 +39,7 @@ const basketUpdate = (services) => {
         }, options);
         const $dialog = dialog.create(services, dialogOptions);
 
-        return $.get(`${url}prod/baskets/${basketId}/update/`, function (data) {
+        return $.get(`${url}prod/baskets/${basketId}/update/`, (data) => {
             $dialog.setContent(data);
             _onDialogReady();
             return;
@@ -66,7 +68,7 @@ const basketUpdate = (services) => {
 
                 },
                 success: function (data) {
-                    $dialog = dialog.get(1).close();
+                    dialog.get(1).close();
                     if (data.success) {
                         humane.info(data.message);
                         appEvents.emit('workzone.refresh', {
@@ -83,7 +85,7 @@ const basketUpdate = (services) => {
         };
     };
 
-    return { initialize };
+    return {initialize};
 };
 
 export default basketUpdate;

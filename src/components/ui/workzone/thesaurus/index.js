@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import thesaurus from '../../../thesaurus';
 
 const workzoneThesaurus = (services) => {

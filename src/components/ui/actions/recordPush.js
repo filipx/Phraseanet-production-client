@@ -12,20 +12,13 @@ const recordPushModal = (services, datas) => {
 
         let $dialog = dialog.create(services, {
             size: 'Full',
-            title: language.push,
-            localeService: localeService
+            title: localeService.t('push')
         });
 
         $.post(`${url}${pushTemplateEndPoint}`, datas, function (data) {
-            // $dialog.setContent(data.template);
             $dialog.setContent(data);
-            /*$(document).ready(function() {
-                p4.Feedback = new Feedback($('#PushBox'), data.context);
-                p4.ListManager = new ListManager($('#ListManager'));
-
-            });*/
             _onDialogReady();
-                return;
+            return;
         });
 
         return true;
@@ -35,12 +28,12 @@ const recordPushModal = (services, datas) => {
         pushRecord(services).initialize({
             feedback: {
                 containerId: '#PushBox',
-                context: 'Push'//'{{ context }}'
+                context: 'Push' // @TODO '{{ context }}'
             },
             listManager: {
                 containerId: '#ListManager',
             }
-        }); // initialization is remote controled
+        });
     };
 
 

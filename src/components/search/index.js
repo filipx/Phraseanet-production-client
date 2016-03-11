@@ -11,8 +11,8 @@ const search = (services) => {
         selection: false,
         navigation: {
             tot: 0, // p4.tot in record preview
-            tot_options: false, //datas.form; // p4.tot_options common/tooltip
-            tot_query: false, //datas.query; // p4.tot_query
+            tot_options: false, // datas.form; // p4.tot_options common/tooltip
+            tot_query: false, // datas.query; // p4.tot_query
             perPage: 0,
             page: 0
         }
@@ -26,25 +26,21 @@ const search = (services) => {
         console.log('search form should be here', $searchForm.get(0));
 
         searchResult.selection = new Selectable($searchResult, {
-                selector: '.IMGT',
-                limit: 800,
-                selectStart: function (event, selection) {
-                    $('#answercontextwrap table:visible').hide();
-                },
-                selectStop: function (event, selection) {
-                    prodApp.appEvents.emit('search.doRefreshSelection');
-                },
-                callbackSelection: function (element) {
-                    console.log(element);
-                    var elements = $(element).attr('id').split('_');
+            selector: '.IMGT',
+            limit: 800,
+            selectStart: function (event, selection) {
+                $('#answercontextwrap table:visible').hide();
+            },
+            selectStop: function (event, selection) {
+                appEvents.emit('search.doRefreshSelection');
+            },
+            callbackSelection: function (element) {
+                console.log(element);
+                var elements = $(element).attr('id').split('_');
 
-                    return elements.slice(elements.length - 2, elements.length).join('_');
-                }
-            });
-
-        /*searchResult.selection.stream.subscribe(function(data){
-            console.log('subscribed to stream', data)
-        });*/
+                return elements.slice(elements.length - 2, elements.length).join('_');
+            }
+        });
 
         $searchForm.on('click', '.toggle-collection', (event) => {
             let $el = $(event.currentTarget);
@@ -87,10 +83,10 @@ const search = (services) => {
                 let initialPage = $el.data('initial-value');
                 let totalPages = $el.data('total-pages');
 
-                if ( isNaN(inputPage)) {
+                if (isNaN(inputPage)) {
                     event.preventDefault();
                 }
-                if ( event.keyCode === 13) {
+                if (event.keyCode === 13) {
                     if (inputPage > 0 && inputPage <= totalPages) {
                         navigate(inputPage);
                     } else {
@@ -107,7 +103,7 @@ const search = (services) => {
                 loading: false,
                 closeCallback: function (dialog) {
 
-                    var datas = dialog.find('form.phrasea_query').appendTo(parent);//.clone();
+                    var datas = dialog.find('form.phrasea_query').appendTo(parent);
 
                     $('.adv_trigger', $searchForm).show();
                     $('.adv_options', $searchForm).hide();
@@ -163,7 +159,7 @@ const search = (services) => {
 
     const initAnswerForm = () => {
         $('button[type="submit"]', $searchForm).bind('click', function () {
-            prodApp.appEvents.emit('facets.doResetSelectedFacets');
+            appEvents.emit('facets.doResetSelectedFacets');
             console.log('trigger search');
             newSearch($('#EDIT_query').val());
             return false;
@@ -173,13 +169,6 @@ const search = (services) => {
         $('body').on('submit', $searchForm, function (event) {
             event.preventDefault();
             onSearch();
-            /*// $this = $(event.currentTarget);
-            var $this = $(event.currentTarget),
-                method = $this.attr('method') ? $this.attr('method') : 'POST';
-
-            var data = $this.serializeArray();
-            console.log('query', method, $this.attr('action'));*/
-
             return false;
         });
     };
@@ -229,19 +218,12 @@ const search = (services) => {
             },
             success: function (datas) {
 
-                // DEBUG QUERY PARSER
-                try {
-                    console.info(JSON.parse(datas.parsed_query));
-                }
-                catch (e) {}
-
                 $('#answers').empty().append(datas.results).removeClass('loading');
 
                 $('#answers img.lazyload').lazyload({
                     container: $('#answers')
                 });
-                prodApp.appEvents.emit('facets.doLoadFacets', datas.facets);
-                // workzoneFacetsModule.loadFacets(datas.facets);
+                appEvents.emit('facets.doLoadFacets', datas.facets);
 
                 $('#answers').append('<div id="paginate"><div class="navigation"><div id="tool_navigate"></div></div></div>');
 
@@ -252,9 +234,6 @@ const search = (services) => {
                     $('#IMGT_' + el).addClass('selected');
                 });
 
-                // searchResult.tot = datas.total_answers;
-                // searchResult.tot_options = datas.form;
-                // searchResult.tot_query = datas.query;
                 searchResult.navigation = Object.assign(searchResult.navigation, datas.navigation, {
                     tot: datas.total_answers,
                     tot_options: datas.form,
@@ -265,8 +244,7 @@ const search = (services) => {
                     $('#NEXT_PAGE, #answersNext').bind('click', function () {
                         navigate(datas.next_page);
                     });
-                }
-                else {
+                } else {
                     $('#NEXT_PAGE').unbind('click');
                 }
 
@@ -274,8 +252,7 @@ const search = (services) => {
                     $('#PREV_PAGE').bind('click', function () {
                         navigate(datas.prev_page);
                     });
-                }
-                else {
+                } else {
                     $('#PREV_PAGE').unbind('click');
                 }
 
@@ -285,13 +262,14 @@ const search = (services) => {
     };
 
     const beforeSearch = () => {
-        if (answAjaxrunning)
+        if (answAjaxrunning) {
             return;
+        }
         answAjaxrunning = true;
 
         clearAnswers();
         $('#tooltip').css({
-            'display': 'none'
+            display: 'none'
         });
         $('#answers').addClass('loading').empty();
         $('#answercontextwrap').remove();
@@ -353,8 +331,9 @@ const search = (services) => {
                 left: -20
             },
             start: function (event, ui) {
-                if (!$(this).hasClass('selected'))
+                if (!$(this).hasClass('selected')) {
                     return false;
+                }
             }
         });
         appEvents.emit('ui.linearizeUi');
@@ -393,10 +372,11 @@ const search = (services) => {
         $('form.phrasea_query .sbas_list').each(function () {
 
             var sbas_id = $(this).find('input[name=reference]:first').val();
-            if (bool)
+            if (bool) {
                 $(this).find(':checkbox').prop('checked', true);
-            else
+            } else {
                 $(this).find(':checkbox').prop('checked', false);
+            }
         });
 
         checkFilters(true);
@@ -456,8 +436,7 @@ const search = (services) => {
             if (nbSelectedColls !== nbCols) {
                 $('#ADVSRCH_SBAS_LABEL_' + sbas_id).addClass('danger');
                 danger = true;
-            }
-            else {
+            } else {
                 $('#ADVSRCH_SBAS_LABEL_' + sbas_id).removeClass('danger');
             }
 
@@ -467,8 +446,7 @@ const search = (services) => {
                 $('#ADVSRCH_SB_ZONE_' + sbas_id, container).hide();
                 // uncheck
                 $('#ADVSRCH_SB_ZONE_' + sbas_id + ' input:checkbox', container).prop('checked', false);
-            }
-            else {
+            } else {
                 // at least one coll checked for this databox
                 // show again the relevant fields in "sort by" select
                 $('.db_' + sbas_id, fieldsSort).show().prop('disabled', false);
@@ -485,8 +463,7 @@ const search = (services) => {
             // no collections checked at all
             // hide irrelevant filters
             $('#ADVSRCH_OPTIONS_ZONE').hide();
-        }
-        else {
+        } else {
             // at least one collection checked
             // show relevant filters
             $('#ADVSRCH_OPTIONS_ZONE').show();
@@ -503,7 +480,7 @@ const search = (services) => {
         search.elasticSort.by = $('option:selected:enabled', fieldsSort).val();
         search.elasticSort.order = $('option:selected:enabled', fieldsSortOrd).val();
 
-        //--------- from fields filter ---------
+        // --------- from fields filter ---------
 
         // unselect the unavailable fields (or all fields if "all" is selected)
         var optAllSelected = false;
@@ -513,7 +490,7 @@ const search = (services) => {
                     // nb: unselect the "all" field, so it acts as a button
                     optAllSelected = $(opt).is(':selected');
                 }
-                if (idx === 0 || optAllSelected || $(opt).is(':disabled') || !$(opt).is(':visible') ) {
+                if (idx === 0 || optAllSelected || $(opt).is(':disabled') || !$(opt).is(':visible')) {
                     $(opt).prop('selected', false);
                 }
             }
@@ -524,18 +501,17 @@ const search = (services) => {
         if (search.fields === null || search.fields.length === 0) {
             $('#ADVSRCH_FIELDS_ZONE', container).removeClass('danger');
             search.fields = [];
-        }
-        else {
+        } else {
             $('#ADVSRCH_FIELDS_ZONE', container).addClass('danger');
             danger = true;
         }
 
-        //--------- status bits filter ---------
+        // --------- status bits filter ---------
 
         // here only the relevant sb are checked
         console.log('should loop through', search.bases);
         const availableDb = search.bases;
-        for (var sbas_id in availableDb) {
+        for (let sbas_id in availableDb) {
 
             var nchecked = 0;
             $('#ADVSRCH_SB_ZONE_' + sbas_id + ' :checkbox[checked]', container).each(function () {
@@ -545,24 +521,20 @@ const search = (services) => {
             });
             if (nchecked === 0) {
                 $('#ADVSRCH_SB_ZONE_' + sbas_id, container).removeClass('danger');
-            }
-            else {
+            } else {
                 $('#ADVSRCH_SB_ZONE_' + sbas_id, container).addClass('danger');
                 danger = true;
             }
         }
-        /*for(sbas_id in search.bases) {
-        }*/
 
-        //--------- dates filter ---------
+        // --------- dates filter ---------
 
         // if no date field is selected for filter, select the first option
         $('#ADVSRCH_DATE_ZONE', adv_box).removeClass('danger');
         if ($('option.dbx:selected:enabled', dateFilterSelect).length === 0) {
             $('option:eq(0)', dateFilterSelect).prop('selected', true);
             $('#ADVSRCH_DATE_SELECTORS', container).hide();
-        }
-        else {
+        } else {
             $('#ADVSRCH_DATE_SELECTORS', container).show();
             search.dates.minbound = $('#ADVSRCH_DATE_ZONE input[name=date_min]', adv_box).val();
             search.dates.maxbound = $('#ADVSRCH_DATE_ZONE input[name=date_max]', adv_box).val();
@@ -579,8 +551,7 @@ const search = (services) => {
         // if one filter shows danger, show it on the query
         if (danger) {
             $('#EDIT_query').addClass('danger');
-        }
-        else {
+        } else {
             $('#EDIT_query').removeClass('danger');
         }
 
@@ -607,20 +578,16 @@ const search = (services) => {
         if ($el.hasClass('deployer_opened')) {
             $el.removeClass('deployer_opened').addClass('deployer_closed');
             $elContent.hide();
-        }
-        else {
+        } else {
             $el.removeClass('deployer_closed').addClass('deployer_opened');
             $elContent.show();
         }
     };
 
 
-
     const navigate = (page) => {
-        console.log('pass', page);
         $('#searchForm input[name="sel"]').val(searchResult.selection.serialize());
         $('#formAnswerPage').val(page);
-        console.log('answer', $('#formAnswerPage').val());
         $('#searchForm').submit();
     };
 
@@ -636,14 +603,10 @@ const search = (services) => {
         'search.doRefreshSelection': viewNbSelect,
         'search.doSelectDatabase': selectDatabase,
         'search.doToggleCollection': toggleCollection,
-        'search.doNavigate': navigate,
-        /*'search.getResultSelection': () => {
-            console.log('ok requesting result selection')
-            return searchResult.selection.stream
-        }*/
+        'search.doNavigate': navigate
     });
 
-    return { initialize, getResultSelectionStream, getResultNavigationStream };
+    return {initialize, getResultSelectionStream, getResultNavigationStream};
 };
 
 export default search;

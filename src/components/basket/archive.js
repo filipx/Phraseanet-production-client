@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 const archiveBasket = (services) => {
     const { configService, localeService, appEvents } = services;
     let $container = null;
@@ -20,8 +22,8 @@ const archiveBasket = (services) => {
             },
             success: function (data) {
                 if (data.success) {
-                    var basket = $('#SSTT_' + basket_id);
-                    var next = basket.next();
+                    const basket = $('#SSTT_' + basket_id);
+                    const next = basket.next();
 
                     if (next.data('ui-droppable')) {
                         next.droppable('destroy');
@@ -38,8 +40,7 @@ const archiveBasket = (services) => {
                     if ($('#baskets .SSTT').length === 0) {
                         appEvents.emit('workzone.refresh');
                     }
-                }
-                else {
+                } else {
                     alert(data.message);
                 }
                 return;
@@ -47,7 +48,7 @@ const archiveBasket = (services) => {
         });
     }
 
-    return { initialize };
+    return {initialize};
 };
 
 export default archiveBasket;

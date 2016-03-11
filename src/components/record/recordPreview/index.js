@@ -1,11 +1,12 @@
-let $ = require('jquery');
+import $ from 'jquery';
 import * as Rx from 'rx';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
 const previewRecordService = (services) => {
     const { configService, localeService, appEvents } = services;
     let $bodyContainer = null;
     let $previewContainer = null;
-    var prevAjax, prevAjaxrunning;
+    let prevAjax;
+    let prevAjaxrunning;
     prevAjaxrunning = false;
     let stream = new Rx.Subject();
     let options = {
@@ -75,7 +76,7 @@ const previewRecordService = (services) => {
      * @param event
      */
     const onGlobalKeydown = (event, specialKeyState) => {
-        if ( specialKeyState === undefined ) {
+        if (specialKeyState === undefined) {
             let specialKeyState = {
                 isCancelKey: false,
                 isShortcutKey: false
@@ -132,15 +133,15 @@ const previewRecordService = (services) => {
 
             justOpen = true;
 
-            if (!( navigator.userAgent.match(/msie/i))) {
+            if (!(navigator.userAgent.match(/msie/i))) {
                 $('#PREVIEWBOX').css({
-                    'display': 'block',
-                    'opacity': 0
+                    display: 'block',
+                    opacity: 0
                 }).fadeTo(500, 1);
             } else {
                 $('#PREVIEWBOX').css({
-                    'display': 'block',
-                    'opacity': 1
+                    display: 'block',
+                    opacity: 1
                 });
             }
             options.open = true;
@@ -157,7 +158,7 @@ const previewRecordService = (services) => {
 
 
         $('#tooltip').css({
-            'display': 'none'
+            display: 'none'
         });
 
         $('#PREVIEWIMGCONT').empty();
@@ -194,7 +195,7 @@ const previewRecordService = (services) => {
                 if (prevAjaxrunning)
                     prevAjax.abort();
                 if (env === 'RESULT')
-                    $('#current_result_n').empty().append(parseInt(pos) + 1);
+                    $('#current_result_n').empty().append(parseInt(pos, 10) + 1);
                 prevAjaxrunning = true;
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').addClass('loading');
             },
@@ -223,7 +224,7 @@ const previewRecordService = (services) => {
 
                 $('#PREVIEWIMGCONT').empty().append(data.html_preview);
                 $('#PREVIEWIMGCONT .thumb_wrapper')
-                    .width('100%').height('100%').image_enhance({ zoomable: true });
+                    .width('100%').height('100%').image_enhance({zoomable: true});
 
                 $('#PREVIEWIMGDESCINNER').empty().append(data.desc);
                 $('#HISTORICOPS').empty().append(data.history);
@@ -241,8 +242,8 @@ const previewRecordService = (services) => {
                 }
 
                 options.current = {};
-                options.current.width = parseInt($('#PREVIEWIMGCONT input[name=width]').val());
-                options.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val());
+                options.current.width = parseInt($('#PREVIEWIMGCONT input[name=width]').val(), 10);
+                options.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val(), 10);
                 options.current.tot = data.tot;
                 options.current.pos = relativePos;
 
@@ -261,8 +262,7 @@ const previewRecordService = (services) => {
                         _setCurrent(data.current);
                     }
                     _viewCurrent($('#PREVIEWCURRENT li.selected'));
-                }
-                else {
+                } else {
                     if (!justOpen) {
                         $('#PREVIEWCURRENT li.selected').removeClass('selected');
                         $('#PREVIEWCURRENTCONT li.current' + absolutePos).addClass('selected');
@@ -279,7 +279,7 @@ const previewRecordService = (services) => {
                 _setOthers(data.others);
                 _setTools(data.tools);
                 $('#tooltip').css({
-                    'display': 'none'
+                    display: 'none'
                 });
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').removeClass('loading');
                 if (!justOpen || (options.mode !== env))
@@ -304,7 +304,7 @@ const previewRecordService = (services) => {
         $('#PREVIEWBOX').fadeTo(500, 0);
         $('#PREVIEWBOX').queue(function () {
             $(this).css({
-                'display': 'none'
+                display: 'none'
             });
             _cancelPreview();
             $(this).dequeue();
@@ -343,19 +343,19 @@ const previewRecordService = (services) => {
     }
 
     function getNext() {
-        if (options.mode === 'REG' && parseInt(options.current.pos) === 0)
+        if (options.mode === 'REG' && parseInt(options.current.pos, 10) === 0) {
             $('#PREVIEWCURRENTCONT li img:first').trigger('click');
-        else {
+        } else {
             if (options.mode === 'RESULT') {
-                let posAsk = parseInt(options.current.pos) + 1;
-                posAsk = (posAsk >= parseInt(options.navigation.tot) || isNaN(posAsk)) ? 0 : posAsk;
+                let posAsk = parseInt(options.current.pos, 10) + 1;
+                posAsk = (posAsk >= parseInt(options.navigation.tot, 10) || isNaN(posAsk)) ? 0 : posAsk;
                 _openPreview('RESULT', posAsk, '', false);
-            }
-            else {
-                if (!$('#PREVIEWCURRENT li.selected').is(':last-child'))
+            } else {
+                if (!$('#PREVIEWCURRENT li.selected').is(':last-child')) {
                     $('#PREVIEWCURRENT li.selected').next().children('img').trigger('click');
-                else
+                } else {
                     $('#PREVIEWCURRENT li:first-child').children('img').trigger('click');
+                }
             }
 
         }
@@ -363,28 +363,30 @@ const previewRecordService = (services) => {
 
     function getPrevious() {
         if (options.mode === 'RESULT') {
-            let posAsk = parseInt(options.current.pos) - 1;
-            posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot) - 1)) : posAsk;
+            let posAsk = parseInt(options.current.pos, 10) - 1;
+            posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot, 10) - 1)) : posAsk;
             _openPreview('RESULT', posAsk, '', false);
-        }
-        else {
-            if (!$('#PREVIEWCURRENT li.selected').is(':first-child'))
+        } else {
+            if (!$('#PREVIEWCURRENT li.selected').is(':first-child')) {
                 $('#PREVIEWCURRENT li.selected').prev().children('img').trigger('click');
-            else
+            } else {
                 $('#PREVIEWCURRENT li:last-child').children('img').trigger('click');
+            }
         }
     }
 
     function _setPreview() {
-        if (!options.current)
+        if (!options.current) {
             return;
+        }
 
         var zoomable = $('img.record.zoomable');
-        if (zoomable.length > 0 && zoomable.hasClass('zoomed'))
+        if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
             return;
+        }
 
-        var h = parseInt(options.current.height);
-        var w = parseInt(options.current.width);
+        var h = parseInt(options.current.height, 10);
+        var w = parseInt(options.current.width, 10);
         var t = 20;
         var de = 0;
 
@@ -397,24 +399,23 @@ const previewRecordService = (services) => {
         }
 
         var ratioP = w / h;
-        var ratioD = parseInt(options.width) / parseInt(options.height);
+        var ratioD = parseInt(options.width, 10) / parseInt(options.height, 10);
 
         if (ratioD > ratioP) {
             //je regle la hauteur d'abord
-            if ((parseInt(h) + margY) > parseInt(options.height)) {
-                h = Math.round(parseInt(options.height) - margY);
+            if ((parseInt(h, 10) + margY) > parseInt(options.height, 10)) {
+                h = Math.round(parseInt(options.height, 10) - margY);
                 w = Math.round(h * ratioP);
             }
-        }
-        else {
-            if ((parseInt(w) + margX) > parseInt(options.width)) {
-                w = Math.round(parseInt(options.width) - margX);
+        } else {
+            if ((parseInt(w) + margX) > parseInt(options.width, 10)) {
+                w = Math.round(parseInt(options.width, 10) - margX);
                 h = Math.round(w / ratioP);
             }
         }
 
-        t = Math.round((parseInt(options.height) - h - de) / 2);
-        var l = Math.round((parseInt(options.width) - w) / 2);
+        t = Math.round((parseInt(options.height, 10) - h - de) / 2);
+        var l = Math.round((parseInt(options.width, 10) - w) / 2);
         $('#PREVIEWIMGCONT .record').css({
             width: w,
             height: h,
@@ -452,7 +453,7 @@ const previewRecordService = (services) => {
         }
         $('#PREVIEWCURRENT li.selected').removeClass('selected');
         el.addClass('selected');
-        $('#PREVIEWCURRENTCONT').animate({ 'scrollLeft': ($('#PREVIEWCURRENT li.selected').position().left + $('#PREVIEWCURRENT li.selected').width() / 2 - ($('#PREVIEWCURRENTCONT').width() / 2 )) });
+        $('#PREVIEWCURRENTCONT').animate({scrollLeft: ($('#PREVIEWCURRENT li.selected').position().left + $('#PREVIEWCURRENT li.selected').width() / 2 - ($('#PREVIEWCURRENTCONT').width() / 2))});
         return;
     }
 
@@ -538,13 +539,13 @@ const previewRecordService = (services) => {
     }
 
     const shouldResize = () => {
-        if ( options.open) {
+        if (options.open) {
             resizePreview();
         }
     };
 
     const shouldReload = () => {
-        if ( options.open) {
+        if (options.open) {
             reloadPreview();
         }
     };

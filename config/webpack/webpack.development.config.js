@@ -61,7 +61,7 @@ const WebpackNotifierPlugin = require('webpack-notifier');
 const config = require('../config');
 
 module.exports = {
-    // entry points 
+    // entry points
     entry: config.sourceDir,
     cache: true,
     debug: true,

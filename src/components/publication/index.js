@@ -1,4 +1,4 @@
-let $ = require('jquery');
+import $ from 'jquery';
 let lazyload = require('jquery-lazyload');
 import dialog from '../utils/dialog';
 
@@ -39,8 +39,7 @@ const publication = (services) => {
                         $answers.find('img.lazyload').lazyload({
                             container: $answers
                         });
-                    }
-                    else {
+                    } else {
                         $('.see_more.loading', $answers).remove();
                         $answers.append(data);
 
@@ -50,7 +49,7 @@ const publication = (services) => {
 
                         if (!noScroll) {
                             $answers.animate({
-                                'scrollTop': ($answers.scrollTop() + $answers.innerHeight() - 80)
+                                scrollTop: ($answers.scrollTop() + $answers.innerHeight() - 80)
                             });
                         }
                     }
@@ -64,19 +63,20 @@ const publication = (services) => {
             event.preventDefault();
             var $this = $(this);
 
-            if (typeof (renew) === 'undefined')
+            if (typeof (renew) === 'undefined') {
                 renew = 'false';
-            else
+            } else {
                 renew = renew ? 'true' : 'false';
+            }
 
             var buttons = {};
-            buttons[language.renewRss] = function () {
+            buttons[localeService.t('renewRss')] = function () {
                 $this.trigger({
                     type: 'click',
                     renew: true
                 });
             };
-            buttons[language.fermer] = function () {
+            buttons[localeService.t('fermer')] = function () {
                 $('#DIALOG').empty().dialog('destroy');
             };
 
@@ -130,8 +130,9 @@ const publication = (services) => {
 
 // remove a feed
         $answers.on('click', '.feed .entry a.feed_delete', function () {
-            if (!confirm('etes vous sur de vouloir supprimer cette entree ?'))
+            if (!confirm('etes vous sur de vouloir supprimer cette entree ?')) {
                 return false;
+            }
             var $this = $(this);
             $.ajax({
                 type: 'POST',
@@ -146,9 +147,9 @@ const publication = (services) => {
                         }, function () {
                             $entry.remove();
                         });
-                    }
-                    else
+                    } else {
                         alert(data.message);
+                    }
                 }
             });
             return false;
@@ -184,8 +185,9 @@ const publication = (services) => {
             dataType: 'html',
             data: data,
             beforeSend: function () {
-                if (ajaxState.isRunning && ajaxState.query.abort)
+                if (ajaxState.isRunning && ajaxState.query.abort) {
                     answAjax.abort();
+                }
                 if (page === 0) {
                     appEvents.emit('search.doClearSearch');
                 }
@@ -209,7 +211,7 @@ const publication = (services) => {
     var openModal = function (data) {
 
         var buttons = {};
-        buttons[language.valider] = function () {
+        buttons[localeService.t('valider')] = function () {
             var dialog = modal.get(1);
             var error = false;
             var $form = $('form.main_form', dialog.getDomElement());
@@ -222,11 +224,11 @@ const publication = (services) => {
             });
 
             if (error) {
-                alert(language.feed_require_fields);
+                alert(localeService.t('feed_require_fields'));
             }
 
             if ($('input[name="feed_id"]', $form).val() === '') {
-                alert(language.feed_require_feed);
+                alert(localeService.t('feed_require_feed'));
                 error = true;
             }
 
@@ -278,8 +280,7 @@ const publication = (services) => {
             size: 'Full',
             closeOnEscape: true,
             closeButton: true,
-            buttons: buttons,
-            localeService: localeService
+            buttons: buttons
         });
 
         modal.setContent(data);

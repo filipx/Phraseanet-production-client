@@ -1,3 +1,4 @@
+import $ from 'jquery';
 require('jquery.fancytree/src/jquery.fancytree');
 import * as _ from 'underscore';
 const workzoneFacets = (services) => {
@@ -5,8 +6,8 @@ const workzoneFacets = (services) => {
     let selectedFacetValues = [];
 
     /*var getSelectedFacets = function() {
-        return selectedFacetValues;
-    };*/
+     return selectedFacetValues;
+     };*/
 
     var resetSelectedFacets = function () {
         selectedFacetValues = [];
@@ -35,7 +36,9 @@ const workzoneFacets = (services) => {
             };
         });
 
-        treeSource.sort(_sortFacets('title', true, function (a) {return a.toUpperCase();}));
+        treeSource.sort(_sortFacets('title', true, function (a) {
+            return a.toUpperCase();
+        }));
 
         treeSource = _sortByPredefinedFacets(treeSource, 'name', ['Base_Name', 'Collection_Name', 'Type_Name']);
 
@@ -45,17 +48,20 @@ const workzoneFacets = (services) => {
     // from stackoverflow
     // http://stackoverflow.com/questions/979256/sorting-an-array-of-javascript-objects/979325#979325
     function _sortFacets(field, reverse, primer) {
-        var key = function (x) {return primer ? primer(x[field]) : x[field];};
+        var key = function (x) {
+            return primer ? primer(x[field]) : x[field];
+        };
 
         return function (a, b) {
-            var A = key(a), B = key(b);
-            return ( (A < B) ? -1 : ((A > B) ? 1 : 0) ) * [-1, 1][+!!reverse];
+            let A = key(a);
+            let B = key(b);
+            return ((A < B) ? -1 : ((A > B) ? 1 : 0)) * [-1, 1][+!!reverse];
         };
     }
 
     function _sortByPredefinedFacets(source, field, predefinedFieldOrder) {
-        var filteredSource = source.slice(),
-            ordered = [];
+        let filteredSource = source.slice();
+        let ordered = [];
         _.each(predefinedFieldOrder, function (fieldValue, index) {
             _.each(source, function (facet, facetIndex) {
                 if (facet[field] !== undefined) {
@@ -68,9 +74,9 @@ const workzoneFacets = (services) => {
             });
         });
 
-        var olen = filteredSource.length;
+        const olen = filteredSource.length;
         // fill predefined facets with non predefined facets
-        for (var i = 0; i < olen; i++) {
+        for (let i = 0; i < olen; i++) {
             ordered.push(filteredSource[i]);
         }
         return ordered;
@@ -80,8 +86,9 @@ const workzoneFacets = (services) => {
         var $facetsTree = $('#proposals');
         if (!$facetsTree.data('ui-fancytree')) {
             $facetsTree.fancytree({
-                clickFolderMode: 3, // activate and expand
-                icons:false,
+                // activate and expand
+                clickFolderMode: 3,
+                icons: false,
                 source: [],
                 activate: function (event, data) {
                     var query = data.node.data.query;
@@ -102,7 +109,7 @@ const workzoneFacets = (services) => {
 
                         var length = 15;
                         var facetFilterString = facetFilter;
-                        if ( facetFilterString.length > length) {
+                        if (facetFilterString.length > length) {
                             facetFilterString = facetFilterString.substring(0, length) + '…';
                         }
                         s_label.appendChild(document.createTextNode(facetFilterString));

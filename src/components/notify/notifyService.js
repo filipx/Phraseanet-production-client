@@ -10,11 +10,11 @@ let notifyService = (services) => {
 
     let getNotification = (data) => {
         /*return ajax({
-            type: 'POST',
-            url: `${notificationEndPoint}`,
-            data: data,
-            dataType: 'json'
-        }).promise();*/
+         type: 'POST',
+         url: `${notificationEndPoint}`,
+         data: data,
+         dataType: 'json'
+         }).promise();*/
         return new Promise((resolve, reject) => {
             ajax({
                 type: 'POST',
@@ -23,15 +23,15 @@ let notifyService = (services) => {
                 dataType: 'json'
             }).done((data) => {
                     data.status = data.status || false;
-                if ( data.status === 'ok') {
-                    resolve(data);
-                } else {
+                    if (data.status === 'ok') {
+                        resolve(data);
+                    } else {
+                        reject(data);
+                    }
+                })
+                .fail((data) => {
                     reject(data);
-                }
-            })
-            .fail((data) => {
-                reject(data);
-            });
+                });
         });
     };
 

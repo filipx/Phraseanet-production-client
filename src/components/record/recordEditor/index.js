@@ -1,7 +1,9 @@
+import $ from 'jquery';
+import * as AppCommons from 'phraseanet-common';
 import { sprintf } from 'sprintf-js';
 import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
-//var p4 = p4 || {};
+// var p4 = p4 || {};
 
 const recordEditorService = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -25,16 +27,16 @@ const recordEditorService = (services) => {
     let $editTextArea;
     const initialize = () => {
         options = {};
-        options.curField = '?'; //"?";
+        options.curField = '?'; // "?";
         options.$container = $('#idFrameE');
         options.textareaIsDirty = false;
         options.fieldLastValue = '';
         options.lastClickId = null;
         options.sbas_id = false;
         options.what = false;
-        //editor.regbasprid = false;
+        // editor.regbasprid = false;
         options.newrepresent = false;
-        //editor.ssel = false;
+        // editor.ssel = false;
 
         $ztextStatus = $('#ZTextStatus', options.$container);
         $editTextArea = $('#idEditZTextArea', options.$container);
@@ -42,6 +44,9 @@ const recordEditorService = (services) => {
     };
 
     const _bindEvents = () => {
+        let cclicks = 0;
+        const cDelay = 350;
+        let cTimer = null;
         // edit_clk_editimg
         $editorContainer
             .on('click', '.select-record-action', (event) => {
@@ -106,13 +111,26 @@ const recordEditorService = (services) => {
                 edit_validField(event, $el.data('mode'));
             })
 
-            .on('dblclick click', '.edit-thesaurus-action', (event) => {
+
+            .on('click', '.edit-thesaurus-action', (event) => {
                 event.preventDefault();
-                if ( event.type === 'dblclick') {
-                    edit_dblclickThesaurus(event);
+                cclicks++;
+
+                if (cclicks === 1) {
+                    cTimer = setTimeout(function () {
+                        edit_clickThesaurus(event);
+                        cclicks = 0;
+                    }, cDelay);
+
                 } else {
-                    edit_clickThesaurus(event);
+                    clearTimeout(cTimer);
+                    edit_dblclickThesaurus(event);
+                    cclicks = 0;
                 }
+            })
+            .on('dblclick', '.thesaurus-branch-action', (event) => {
+                // dbl is handled by click event
+                event.preventDefault();
             })
 
             .on('change', '.toggle-replace-mode-action', (event) => {
@@ -152,7 +170,7 @@ const recordEditorService = (services) => {
     };
 
     const onGlobalKeydown = (event, specialKeyState) => {
-        if ( specialKeyState === undefined ) {
+        if (specialKeyState === undefined) {
             let specialKeyState = {
                 isCancelKey: false,
                 isShortcutKey: false
@@ -160,7 +178,7 @@ const recordEditorService = (services) => {
         }
         switch (event.keyCode) {
             case 9:	// tab ou shift-tab
-                fieldNavigate(event, utilsModule.is_shift_key(event) ? -1 : 1);
+                fieldNavigate(event, AppCommons.utilsModule.is_shift_key(event) ? -1 : 1);
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
             case 27:
@@ -182,34 +200,34 @@ const recordEditorService = (services) => {
         return specialKeyState;
     };
 
-    function startThisEditing(params) {//sbas_id, what, regbasprid, ssel) {
+    function startThisEditing(params) {// sbas_id, what, regbasprid, ssel) {
         let { hasMultipleDatabases, databoxId, mode, notActionable, notActionableMsg, state } = params;
 
-        if ( hasMultipleDatabases === true ) {
+        if (hasMultipleDatabases === true) {
             $('#EDITWINDOW').hide();
             // commonModule.hideOverlay(2);
             // editor can't be run
-            $( '#dialog-edit-many-sbas', options.$container ).dialog({
+            $('#dialog-edit-many-sbas', options.$container).dialog({
                 modal: true,
-                resizable:false,
+                resizable: false,
                 buttons: {
                     Ok: function () {
-                        $( this ).dialog( 'close' );
+                        $(this).dialog('close');
                     }
                 }
             });
             return;
         }
 
-        if ( notActionable > 0) {
+        if (notActionable > 0) {
             alert(notActionableMsg);
         }
 
         options.sbas_id = databoxId;
         options.what = mode;
         options = Object.assign(options, state);
-        //editor.regbasprid = regbasprid;
-        //editor.ssel = ssel;
+        // editor.regbasprid = regbasprid;
+        // editor.ssel = ssel;
         $editTextArea = $('#idEditZTextArea', options.$container);
 
         let recordCollection = options.T_records;
@@ -514,8 +532,7 @@ const recordEditorService = (services) => {
 
         try {
             $('#divS .edit_field:first').trigger('mousedown');
-        }
-        catch (err) {
+        } catch (err) {
 
         }
     }
@@ -647,14 +664,9 @@ const recordEditorService = (services) => {
 
         //  var datas = editor.T_records[id].preview;
 
-        var h = parseInt($('input[name=height]', container).val());
-        var w = parseInt($('input[name=width]', container).val());
+        var h = parseInt($('input[name=height]', container).val(), 10);
+        var w = parseInt($('input[name=width]', container).val(), 10);
 
-        //  if(datas.doctype == 'video')
-        //  {
-        //    var h = parseInt(datas.height);
-        //    var w = parseInt(datas.width);
-        //  }
         var t = 0;
         var de = 0;
 
@@ -677,14 +689,13 @@ const recordEditorService = (services) => {
         var ratioD = dwidth / dheight;
 
         if (ratioD > ratioP) {
-            //je regle la hauteur d'abord
-            if ((parseInt(h) + margY) > dheight) {
+            // je regle la hauteur d'abord
+            if ((parseInt(h, 10) + margY) > dheight) {
                 h = Math.round(dheight - margY);
                 w = Math.round(h * ratioP);
             }
-        }
-        else {
-            if ((parseInt(w) + margX) > dwidth) {
+        } else {
+            if ((parseInt(w, 10) + margX) > dwidth) {
                 w = Math.round(dwidth - margX);
                 h = Math.round(w / ratioP);
             }
@@ -708,7 +719,7 @@ const recordEditorService = (services) => {
     }
 
     function _previewEdit(r) {
-console.log('try to append', options.T_records[r].preview);
+        console.log('try to append', options.T_records[r].preview);
 
         $('#TH_Opreview .PNB10').empty().append(options.T_records[r].preview);
 
@@ -726,10 +737,10 @@ console.log('try to append', options.T_records[r].preview);
 
         sel.removeClass('selected');
 
-        var i = step === 1 ? (parseInt(last.attr('pos')) + 1) : (parseInt(first.attr('pos')) - 1);
+        var i = step === 1 ? (parseInt(last.attr('pos'), 10) + 1) : (parseInt(first.attr('pos'), 10) - 1);
 
         if (i < 0)
-            i = parseInt($('.diapo:last', cache).attr('pos'));
+            i = parseInt($('.diapo:last', cache).attr('pos'), 10);
         else if (i >= $('.diapo', cache).length)
             i = 0;
 
@@ -745,9 +756,9 @@ console.log('try to append', options.T_records[r].preview);
         $('#EDIT_GRPDIAPO .edit_IMGT').attr('src', src).attr('style', style);
     }
 
-    //// ---------------------------------------------------------------------------
-//// on change de champ courant
-//// ---------------------------------------------------------------------------
+    // // ---------------------------------------------------------------------------
+// // on change de champ courant
+// // ---------------------------------------------------------------------------
 
     function _editField(evt, meta_struct_id) {
         document.getElementById('idEditZTextArea').blur();
@@ -759,15 +770,15 @@ console.log('try to append', options.T_records[r].preview);
 
         options.curField = meta_struct_id;
 
-        if (meta_struct_id >= 0 ) {
+        if (meta_struct_id >= 0) {
 
 
             let field = null;
-            if ( options.T_fields === undefined ) {
+            if (options.T_fields === undefined) {
                 return;
             }
 
-            if ( options.T_fields[meta_struct_id] !== undefined ) {
+            if (options.T_fields[meta_struct_id] !== undefined) {
                 field = options.T_fields[meta_struct_id];
 
                 var name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
@@ -811,8 +822,7 @@ console.log('try to append', options.T_records[r].preview);
                         idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + '/' + meta_struct_id + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + '</span>');
                         $('.metadatas_restrictionsTips', idexplain).tooltip();
                     }).trigger('keyup.maxLength');
-                }
-                else {
+                } else {
                     $('#idExplain').html('');
                 }
 
@@ -823,8 +833,7 @@ console.log('try to append', options.T_records[r].preview);
                     if (options.T_fields[meta_struct_id].type === 'date') {
                         $editTextArea.css('height', '16px');
                         $('#idEditDateZone', options.$container).show();
-                    }
-                    else {
+                    } else {
                         $('#idEditDateZone', options.$container).hide();
                         $editTextArea.css('height', '100%');
                     }
@@ -838,8 +847,7 @@ console.log('try to append', options.T_records[r].preview);
                         $editTextArea.val(options.fieldLastValue = '');
                         $editTextArea.addClass('hetero');
                         $('#idDivButtons', options.$container).show();	// valeurs h�t�rog�nes : les 3 boutons remplacer/ajouter/annuler
-                    }
-                    else {
+                    } else {
                         // homogene
                         $editTextArea.val(options.fieldLastValue = options.T_fields[meta_struct_id]._value);
                         $editTextArea.removeClass('hetero');
@@ -867,8 +875,7 @@ console.log('try to append', options.T_records[r].preview);
                     $('#idEditZTextArea').trigger('keyup.maxLength');
 
                     self.setTimeout("document.getElementById('idEditZTextArea').focus();", 50);
-                }
-                else {
+                } else {
                     // champ multivalue : liste
                     $ztextStatus.hide();
                     $('#ZTextMonoValued', options.$container).hide();
@@ -885,11 +892,10 @@ console.log('try to append', options.T_records[r].preview);
 
                     self.setTimeout("document.getElementById('EditTextMultiValued').focus();", 50);
 
-    //      reveal_mval();
+                    //      reveal_mval();
                 }
             }
-        }
-        else {
+        } else {
             // pas de champ, masquer la zone du textarea
             $('#idEditZone', options.$container).hide();
             $('.editDiaButtons', options.$container).hide();
@@ -900,20 +906,22 @@ console.log('try to append', options.T_records[r].preview);
 
     function _updateEditSelectedRecords(evt) {
         $('.editDiaButtons', options.$container).hide();
-
-        for (var n in options.T_statbits)	// tous les statusbits de la base
-        {
+// tous les statusbits de la base
+        for (var n in options.T_statbits) {
             options.T_statbits[n]._value = '-1';			// val unknown
             for (var i in options.T_records) {
-                if (!options.T_records[i]._selected)
+                if (!options.T_records[i]._selected) {
                     continue;
-                if (options.T_records[i].statbits.length === 0)
+                }
+                if (options.T_records[i].statbits.length === 0) {
                     continue;
+                }
 
-                if (options.T_statbits[n]._value === '-1')
+                if (options.T_statbits[n]._value === '-1') {
                     options.T_statbits[n]._value = options.T_records[i].statbits[n].value;
-                else if (options.T_statbits[n]._value !== options.T_records[i].statbits[n].value)
+                } else if (options.T_statbits[n]._value !== options.T_records[i].statbits[n].value) {
                     options.T_statbits[n]._value = '2';
+                }
             }
             var ck0 = $('#idCheckboxStatbit0_' + n);
             var ck1 = $('#idCheckboxStatbit1_' + n);
@@ -943,13 +951,11 @@ console.log('try to append', options.T_records[r].preview);
 
         if (nostatus === 0) {
             $('.displaystatus', status_box).show();
-        }
-        else {
+        } else {
             var yesstatus = $('.diapo.selected', options.$container).length;
             if (nostatus === yesstatus) {
                 $('.nostatus', status_box).show();
-            }
-            else {
+            } else {
                 $('.somestatus, .displaystatus', status_box).show();
             }
         }
@@ -962,23 +968,27 @@ console.log('try to append', options.T_records[r].preview);
         var ncolsel = 0;
         var nrecsel = 0;
         for (var i in options.T_records) {
-            if (!options.T_records[i]._selected)
+            if (!options.T_records[i]._selected) {
                 continue;
+            }
             nrecsel++;
 
             var bid = 'b' + options.T_records[i].bid;
-            if (t_selcol[bid])
+            if (t_selcol[bid]) {
                 continue;
+            }
 
             t_selcol[bid] = 1;
             ncolsel++;
             for (var f in options.T_sgval[bid]) {
-                if (!t_lsgval[f])
+                if (!t_lsgval[f]) {
                     t_lsgval[f] = {};
+                }
                 for (var ivs in options.T_sgval[bid][f]) {
-                    vs = options.T_sgval[bid][f][ivs];
-                    if (!t_lsgval[f][vs])
+                    let vs = options.T_sgval[bid][f][ivs];
+                    if (!t_lsgval[f][vs]) {
                         t_lsgval[f][vs] = 0;
+                    }
                     t_lsgval[f][vs]++;
                 }
             }
@@ -994,19 +1004,18 @@ console.log('try to append', options.T_records[r].preview);
                                     $('#EditTextMultiValued', options.$container).val(label);
                                     $('#EditTextMultiValued').trigger('keyup.maxLength');
                                     _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
-                                }
-                                else {
-                                    if (utilsModule.is_ctrl_key(e)) {
+                                } else {
+                                    if (AppCommons.utilsModule.is_ctrl_key(e)) {
                                         var t = $editTextArea.val();
                                         $editTextArea.val(t + (t ? ' ; ' : '') + label);
-                                    }
-                                    else {
+                                    } else {
                                         $editTextArea.val(label);
                                     }
                                     $('#idEditZTextArea').trigger('keyup.maxLength');
                                     options.textareaIsDirty = true;
-                                    if (options.T_fields[options.curField]._status !== 2)
+                                    if (options.T_fields[options.curField]._status !== 2) {
                                         edit_validField(evt, 'ask_ok');
+                                    }
                                 }
                             }
                         }
@@ -1026,57 +1035,52 @@ console.log('try to append', options.T_records[r].preview);
                             if (!options.textareaIsDirty || edit_validField(null, 'ask_ok') === true) {
                                 _editField(null, fid);
                                 return (true);
-                            }
-                            else {
+                            } else {
                                 return (false);
                             }
                         }
                     }
                 );
-            }
-            else {
+            } else {
                 $('#editSGtri_' + f, options.$container).css('visibility', 'hidden');
             }
         }
 
-        //$('#idFrameE .ww_status', editor.$container).html(nrecsel + " record(s) selected for editing");
+        // $('#idFrameE .ww_status', editor.$container).html(nrecsel + " record(s) selected for editing");
 
         _updateFieldDisplay();
 
-        if (options.curField === -1)
+        if (options.curField === -1) {
             _editStatus(evt);
-        else
+        } else {
             _editField(evt, options.curField);
+        }
     }
 
     function _updateFieldDisplay() {
-        for (var f in options.T_fields)	// tous les champs de la base
-        {
+        // tous les champs de la base
+        for (var f in options.T_fields) {
             options.T_fields[f]._status = 0;			// val unknown
             for (var i in options.T_records) {
-                if (!options.T_records[i]._selected)
+                if (!options.T_records[i]._selected) {
                     continue;
-
-
-                if (options.T_records[i].fields[f].isEmpty()) {
-                    var v = '';
                 }
-                else {
+
+                let v = '';
+                if (!options.T_records[i].fields[f].isEmpty()) {
                     // le champ existe dans la fiche
                     if (options.T_fields[f].multi) {
                         // champ multi : on compare la concat des valeurs
-                        var v = options.T_records[i].fields[f].getSerializedValues();
-                    }
-                    else {
-                        var v = options.T_records[i].fields[f].getValue().getValue();
+                        v = options.T_records[i].fields[f].getSerializedValues();
+                    } else {
+                        v = options.T_records[i].fields[f].getValue().getValue();
                     }
                 }
 
                 if (options.T_fields[f]._status === 0) {
                     options.T_fields[f]._value = v;
                     options.T_fields[f]._status = 1;
-                }
-                else if (options.T_fields[f]._status === 1 && options.T_fields[f]._value !== v) {
+                } else if (options.T_fields[f]._status === 1 && options.T_fields[f]._value !== v) {
                     options.T_fields[f]._value = '*****';
                     options.T_fields[f]._status = 2;
                     break;	// plus la peine de verifier le champ sur les autres records
@@ -1085,16 +1089,18 @@ console.log('try to append', options.T_records[r].preview);
             var o = document.getElementById('idEditField_' + f);
 
             if (o) {
-                if (options.T_fields[f]._status === 2)	// mixed
+                // mixed
+                if (options.T_fields[f]._status === 2) {
                     o.innerHTML = "<span class='hetero'>xxxxx</span>";
-                else {
+                } else {
                     var v = options.T_fields[f]._value;
-                    v = (v instanceof(Array)) ? v.join(';') : v;
+                    v = (v instanceof (Array)) ? v.join(';') : v;
                     o.innerHTML = _cleanTags(v).replace(/\n/gm, "<span style='color:#0080ff'>&para;</span><br/>");
                 }
             }
         }
     }
+
     // ---------------------------------------------------------------------------
 // on active le pseudo champ 'status'
 // ---------------------------------------------------------------------------
@@ -1126,8 +1132,9 @@ console.log('try to append', options.T_records[r].preview);
         var n = 0;					// le nbr de records selectionnes
 
         for (var r in options.T_records) {
-            if (!options.T_records[r]._selected)
+            if (!options.T_records[r]._selected) {
                 continue;
+            }
 
             options.T_records[r].fields[meta_struct_id].sort(_sortCompareMetas);
 
@@ -1139,14 +1146,15 @@ console.log('try to append', options.T_records[r].preview);
 
                 if (typeof (a[key]) === 'undefined') {
                     a[key] = {
-                        'n': 0,
-                        'f': new Array()
+                        n: 0,
+                        f: []
                     };	// n:nbr d'occurences DISTINCTES du mot ; f:flag presence mot dans r
                     options.T_mval.push(values[v]);
                 }
 
-                if (!a[key].f[r])
-                    a[key].n++;		// premiere apparition du mot dans le record r
+                if (!a[key].f[r]) {
+                    a[key].n++; // premiere apparition du mot dans le record r
+                }
                 a[key].f[r] = true;	// on ne recomptera pas le mot s'il apparait a nouveau dans le meme record
 
             }
@@ -1157,8 +1165,8 @@ console.log('try to append', options.T_records[r].preview);
         options.T_mval.sort(_sortCompareMetas);
 
         var t = '';
-        for (var i in options.T_mval)	// pour lire le tableau 'a' dans l'ordre trie par 'editor.T_mval'
-        {
+        // pour lire le tableau 'a' dans l'ordre trie par 'editor.T_mval'
+        for (var i in options.T_mval) {
             var value = options.T_mval[i];
             var word = value.getValue();
             var key = value.getVocabularyId() + '%' + word;
@@ -1225,8 +1233,9 @@ console.log('try to append', options.T_records[r].preview);
 // ---------------------------------------------------------------------------------------------------------
     function edit_validField(evt, action) {
         // action : 'ok', 'fusion' ou 'cancel'
-        if (options.curField === '?')
+        if (options.curField === '?') {
             return (true);
+        }
 
         if (action === 'cancel') {
             // on restore le contenu du champ
@@ -1240,21 +1249,21 @@ console.log('try to append', options.T_records[r].preview);
             alert(localeService.t('edit_hetero'));
             return (false);
         }
-        var o, newvalue;
+        let o;
+        let newvalue;
         if (o = document.getElementById('idEditField_' + options.curField)) {
-            console.log('should find value', $editTextArea, $editTextArea.val());
             let t = $editTextArea.val();
 
             let status = 0;
             let firstvalue = '';
             for (var i = 0; i < options.T_records.length; i++) {
-                if (!options.T_records[i]._selected)
+                if (!options.T_records[i]._selected) {
                     continue;			// on ne modifie pas les fiches non selectionnees
+                }
 
                 if (action === 'ok' || action === 'ask_ok') {
                     options.T_records[i].fields[options.curField].addValue(t, false, null);
-                }
-                else if (action === 'fusion' || action === 'ask_fusion') {
+                } else if (action === 'fusion' || action === 'ask_fusion') {
                     options.T_records[i].fields[options.curField].addValue(t, true, null);
                 }
 
@@ -1289,10 +1298,11 @@ console.log('try to append', options.T_records[r].preview);
         }
 
         for (var id in options.T_records) {
-            if (options.T_records[id]._selected)	// toutes les fiches selectionnees
-            {
-                if ($('#idEditDiapo_' + id).hasClass('nostatus'))
+            // toutes les fiches selectionnees
+            if (options.T_records[id]._selected) {
+                if ($('#idEditDiapo_' + id).hasClass('nostatus')) {
                     continue;
+                }
 
                 options.T_records[id].statbits[bit].value = val;
                 options.T_records[id].statbits[bit].dirty = true;
@@ -1305,15 +1315,17 @@ console.log('try to append', options.T_records[r].preview);
 // ---------------------------------------------------------------------------
     function _onSelectRecord(evt, i) {
         if (options.curField >= 0) {
-            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false)
+            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
                 return;
+            }
         }
 
         // guideline : si on mousedown sur une selection, c'est qu'on risque de draguer, donc on ne desectionne pas
-        if (evt && evt.type === 'mousedown' && options.T_records[i]._selected)
+        if (evt && evt.type === 'mousedown' && options.T_records[i]._selected) {
             return;
+        }
 
-        if (evt && utilsModule.is_shift_key(evt) && options.lastClickId !== null) {
+        if (evt && AppCommons.utilsModule.is_shift_key(evt) && options.lastClickId !== null) {
             // shift donc on sel du editor.lastClickId a ici
             var pos_from = options.T_pos[options.lastClickId];
             var pos_to = options.T_pos[i];
@@ -1325,20 +1337,19 @@ console.log('try to append', options.T_records[r].preview);
 
             for (var pos = pos_from; pos <= pos_to; pos++) {
                 var id = options.T_id[pos];
-                if (!options.T_records[id]._selected)	// toutes les fiches selectionnees
-                {
+                // toutes les fiches selectionnees
+                if (!options.T_records[id]._selected) {
                     options.T_records[id]._selected = true;
                     $('#idEditDiapo_' + id, options.$container).addClass('selected');
                 }
             }
-        }
-        else {
-            if (!evt || !utilsModule.is_ctrl_key(evt)) {
+        } else {
+            if (!evt || !AppCommons.utilsModule.is_ctrl_key(evt)) {
                 // on deselectionne tout avant
 
                 for (var id in options.T_records) {
-                    if (options.T_records[id]._selected)	// toutes les fiches selectionnees
-                    {
+                    // toutes les fiches selectionnees
+                    if (options.T_records[id]._selected) {
                         options.T_records[id]._selected = false;
                         $('#idEditDiapo_' + id, options.$container).removeClass('selected');
                     }
@@ -1346,10 +1357,11 @@ console.log('try to append', options.T_records[r].preview);
             }
             if (i >= 0) {
                 options.T_records[i]._selected = !options.T_records[i]._selected;
-                if (options.T_records[i]._selected)
+                if (options.T_records[i]._selected) {
                     $('#idEditDiapo_' + i, options.$container).addClass('selected');
-                else
+                } else {
                     $('#idEditDiapo_' + i, options.$container).removeClass('selected');
+                }
             }
         }
 
@@ -1375,8 +1387,9 @@ console.log('try to append', options.T_records[r].preview);
 
         var t = [];
 
-        if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false)
+        if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
             return (false);
+        }
 
         var required_fields = _check_required();
 
@@ -1414,8 +1427,9 @@ console.log('try to append', options.T_records[r].preview);
 
             // les statbits
             var tsb = [];
-            for (var n = 0; n < 64; n++)
+            for (var n = 0; n < 64; n++) {
                 tsb[n] = 'x';
+            }
             var sb_dirty = false;
             for (var n in options.T_records[r].statbits) {
                 if (options.T_records[r].statbits[n].dirty) {
@@ -1438,7 +1452,7 @@ console.log('try to append', options.T_records[r].preview);
             act: 'WORK',
             lst: $('#edit_lst').val(),
             act_option: 'SAVE' + options.what,
-            //regbasprid: editor.regbasprid,
+            // regbasprid: editor.regbasprid,
             ssel: options.ssel
         };
         if (options.newrepresent !== false)
@@ -1446,9 +1460,7 @@ console.log('try to append', options.T_records[r].preview);
 
         $.ajax({
             url: '../prod/records/edit/apply/',
-            data: params
-            //    ,dataType:'json'
-            ,
+            data: params,
             type: 'POST',
             success: function (data) {
                 if (options.what === 'GRP' || options.what === 'SSEL') {
@@ -1476,18 +1488,21 @@ console.log('try to append', options.T_records[r].preview);
             evt.stopPropagation();
 
         if (options.curField >= 0) {
-            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false)
+            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
                 return;
+            }
         }
 
         for (var r in options.T_records) {
             for (var f in options.T_records[r].fields) {
-                if ((dirty |= options.T_records[r].fields[f].isDirty()))
+                if ((dirty |= options.T_records[r].fields[f].isDirty())) {
                     break;
+                }
             }
             for (var n in options.T_records[r].statbits) {
-                if ((dirty |= options.T_records[r].statbits[n].dirty))
+                if ((dirty |= options.T_records[r].statbits[n].dirty)) {
                     break;
+                }
             }
         }
         if (!dirty || confirm(localeService.t('confirm_abandon'))) {
@@ -1496,12 +1511,12 @@ console.log('try to append', options.T_records[r].preview);
 
             // on reaffiche tous les thesaurus
             /*for (var i in p4.thesau.thlist)	// tous les thesaurus
-            {
-                var bid = p4.thesau.thlist[i].sbas_id;
-                var e = document.getElementById('TH_T.' + bid + '.T');
-                if (e)
-                    e.style.display = "";
-            }*/
+             {
+             var bid = p4.thesau.thlist[i].sbas_id;
+             var e = document.getElementById('TH_T.' + bid + '.T');
+             if (e)
+             e.style.display = "";
+             }*/
             // display all thesaurus
             $('.thesaurus-db-root').show();
 
@@ -1554,12 +1569,6 @@ console.log('try to append', options.T_records[r].preview);
                     me.TH_P_node.html('...');
                     me.TH_K_node.attr('class', 'h').html(ret);
                     me.jq = null;
-                },
-                error: function () {
-
-                },
-                timeout: function () {
-
                 }
             });
         };
@@ -1587,38 +1596,31 @@ console.log('try to append', options.T_records[r].preview);
                     var zid = '#TH_K\\.' + id.replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
                     $(zid, options.$container).html(ret);
                     me.jq = null;
-                },
-                error: function () {
-
-                },
-                timeout: function () {
-
                 }
             });
         };
     }
 
-    function edit_clickThesaurus(event)	// onclick dans le thesaurus
-    {
-        // on cherche ou on a clique
-        for (var e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode)
-            ;
+// onclick dans le thesaurus
+    function edit_clickThesaurus(event) {
+        let e;
+        for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode);
+
         if (e) {
             switch (e.id.substr(0, 4)) {
                 case 'TH_P':	// +/- de deploiement de mot
-                    edit_thesaurus_ow(e.id.substr(5) );
-                    // js = "recordEditorModule.edit_thesaurus_ow('" + e.id.substr(5) + "')";
-                    // self.setTimeout(js, 10);
+                    edit_thesaurus_ow(e.id.substr(5));
                     break;
             }
         }
         return (false);
     }
 
-    function edit_dblclickThesaurus(event)	// ondblclick dans le thesaurus
-    {
-        for (var e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode)
-            ;
+// ondblclick dans le thesaurus
+    function edit_dblclickThesaurus(event) {
+        let e;
+        for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode);
+
         if (e) {
             switch (e.id.substr(0, 4)) {
                 case 'TH_W':
@@ -1628,8 +1630,7 @@ console.log('try to append', options.T_records[r].preview);
                             $('#EditTextMultiValued', options.$container).val(w);
                             $('#EditTextMultiValued').trigger('keyup.maxLength');
                             _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
-                        }
-                        else {
+                        } else {
                             $editTextArea.val(w);
                             $('#idEditZTextArea').trigger('keyup.maxLength');
                             options.textareaIsDirty = true;
@@ -1641,16 +1642,15 @@ console.log('try to append', options.T_records[r].preview);
         return (false);
     }
 
-    function edit_thesaurus_ow(id)	// on ouvre ou ferme une branche de thesaurus
-    {
+// on ouvre ou ferme une branche de thesaurus
+    function edit_thesaurus_ow(id) {
         var o = document.getElementById('TH_K.' + id);
         if (o.className === 'o') {
             // on ferme
             o.className = 'c';
             document.getElementById('TH_P.' + id).innerHTML = '+';
             document.getElementById('TH_K.' + id).innerHTML = localeService.t('loading');
-        }
-        else if (o.className === 'c' || o.className === 'h') {
+        } else if (o.className === 'c' || o.className === 'h') {
             // on ouvre
             o.className = 'o';
             document.getElementById('TH_P.' + id).innerHTML = '-';
@@ -1672,24 +1672,22 @@ console.log('try to append', options.T_records[r].preview);
     }
 
 
-
-
     function _toggleReplaceMode(ckRegExp) {
 
 
         if (ckRegExp.checked) {
             $('#EditSR_TX', options.$container).hide();
             $('#EditSR_RX', options.$container).show();
-        }
-        else {
+        } else {
             $('#EditSR_RX', options.$container).hide();
             $('#EditSR_TX', options.$container).show();
         }
     }
 
     function _setSizeLimits() {
-        if (!$('#EDITWINDOW').is(':visible'))
+        if (!$('#EDITWINDOW').is(':visible')) {
             return;
+        }
 
         if ($('#EDIT_TOP').data('ui-resizable')) {
             $('#EDIT_TOP').resizable('option', 'maxHeight', ($('#EDIT_ALL').height() - $('#buttonEditing').height() - 10 - 160));
@@ -1712,21 +1710,25 @@ console.log('try to append', options.T_records[r].preview);
 
         $('#EDIT_MID', options.$container).css('top', (t) + 'px');
     }
+
     function _vsplit1() {
         $('#divS_wrapper').height('auto');
 
         var el = $('#divS_wrapper');
-        if (el.length === 0)
+        if (el.length === 0) {
             return;
+        }
         var a = $(el).width();
         el.width(a);
 
-        $('#idEditZone', options.$container).css('left', (a + 20 ));
+        $('#idEditZone', options.$container).css('left', (a + 20));
     }
+
     function _vsplit2() {
         var el = $('#EDIT_MID_R');
-        if (el.length === 0)
+        if (el.length === 0) {
             return;
+        }
         var a = $(el).width();
         el.width(a);
         var v = $('#EDIT_ALL').width() - a - 20;
@@ -1735,7 +1737,7 @@ console.log('try to append', options.T_records[r].preview);
     }
 
     function _activeField() {
-        var meta_struct_id = parseInt(options.curField);
+        var meta_struct_id = parseInt(options.curField, 10);
 
         meta_struct_id = (isNaN(meta_struct_id) || meta_struct_id < 0) ? 'status' : meta_struct_id;
 
@@ -1749,61 +1751,67 @@ console.log('try to append', options.T_records[r].preview);
             cont.scrollTop(calc + cont.scrollTop());
         }
     }
+
     function _sortCompareMetas(a, b) {
-        if (typeof (a) !== 'object')
+        if (typeof (a) !== 'object') {
             return (-1);
-        if (typeof (b) !== 'object')
+        }
+        if (typeof (b) !== 'object') {
             return (1);
+        }
         var na = a.getValue().toUpperCase();
         var nb = b.getValue().toUpperCase();
-        if (na === nb)
+        if (na === nb) {
             return (0);
+        }
         return (na < nb ? -1 : 1);
     }
 
-    //---------------------------------------------------------------------
-//nettoie
-//---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+// nettoie
+// ---------------------------------------------------------------------
     function _cleanTags(string) {
-        var chars2replace = [
-            {
-                f: '&',
-                t: '&amp;'
-            },
-            {
-                'f': '<',
-                't': '&lt;'
-            },
-            {
-                'f': '>',
-                't': '&gt;'
-            }
-        ];
-        for (var c in chars2replace)
+        var chars2replace = [{
+            f: '&',
+            t: '&amp;'
+        }, {
+            f: '<',
+            t: '&lt;'
+        }, {
+            f: '>',
+            t: '&gt;'
+        }];
+        for (var c in chars2replace) {
             string = string.replace(RegExp(chars2replace[c].f, 'g'), chars2replace[c].t);
+        }
         return string;
     }
 
     function _check_required(id_r, id_f) {
         var required_fields = false;
 
-        if (typeof id_r === 'undefined')
+        if (typeof id_r === 'undefined') {
             id_r = false;
-        if (typeof id_f === 'undefined')
+        }
+        if (typeof id_f === 'undefined') {
             id_f = false;
+        }
 
         for (var f in options.T_fields) {
-            if (id_f !== false && f !== id_f)
+            if (id_f !== false && f !== id_f) {
                 continue;
+            }
 
             var name = options.T_fields[f].name;
 
-            if (!options.T_fields[f].required)
+            if (!options.T_fields[f].required) {
                 continue;
+            }
 
             for (var r in options.T_records) {
-                if (id_r !== false && r !== id_r)
+                if (id_r !== false && r !== id_r) {
                     continue;
+                }
 
                 var elem = $('#idEditDiapo_' + r + ' .require_alert');
 
@@ -1812,8 +1820,7 @@ console.log('try to append', options.T_records[r].preview);
                 if (!options.T_records[r].fields[f]) {
                     elem.show();
                     required_fields = true;
-                }
-                else {
+                } else {
 
                     var check_required = '';
 
@@ -1821,8 +1828,7 @@ console.log('try to append', options.T_records[r].preview);
                     if (options.T_fields[f].multi) {
                         // champ multi : on compare la concat des valeurs
                         check_required = $.trim(options.T_records[r].fields[f].getSerializedValues());
-                    }
-                    else if (options.T_records[r].fields[f].getValue()) {
+                    } else if (options.T_records[r].fields[f].getValue()) {
                         check_required = $.trim(options.T_records[r].fields[f].getValue().getValue());
                     }
 
@@ -1842,30 +1848,34 @@ console.log('try to append', options.T_records[r].preview);
     function _edit_select_all() {
         $('#EDIT_FILM2 .diapo', options.$container).addClass('selected');
 
-        for (var i in options.T_records)
+        for (var i in options.T_records) {
             options.T_records[i]._selected = true;
+        }
 
         options.lastClickId = 1;
 
         _updateEditSelectedRecords(null);		// null : no evt available
     }
+
     // ---------------------------------------------------------------------------
 // highlight la valeur en cours de saisie dans la liste des multi-valeurs
 // appele par le onkeyup
 // ---------------------------------------------------------------------------
     function _reveal_mval(value, vocabularyId) {
-        if (typeof vocabularyId === 'undefined')
+        if (typeof vocabularyId === 'undefined') {
             vocabularyId = null;
+        }
 
         var textZone = $('#EditTextMultiValued');
 
         if (options.T_fields[options.curField].tbranch) {
-            if (value !== '')
+            if (value !== '') {
                 ETHSeeker.search(value);
+            }
         }
 
         if (value !== '') {
-            //		var nsel = 0;
+            // 		var nsel = 0;
             for (var rec_i in options.T_records) {
                 if (options.T_records[rec_i].fields[options.curField].hasValue(value, vocabularyId)) {
                     $('#idEditDiaButtonsP_' + rec_i).hide();
@@ -1877,8 +1887,7 @@ console.log('try to append', options.T_records[r].preview);
                         var indice = $(this).attr('id').split('_').pop();
                         _edit_diabutton(indice, 'del', value, vocabularyId);
                     });
-                }
-                else {
+                } else {
                     $('#idEditDiaButtonsM_' + rec_i).hide();
                     $('#idEditDiaButtonsP_' + rec_i).show();
                     var talt = sprintf(localeService.t('editAddSimple'), value);
@@ -1904,8 +1913,9 @@ console.log('try to append', options.T_records[r].preview);
         var meta_struct_id = options.curField;		// le champ en cours d'editing
 
         for (var r = 0; r < options.T_records.length; r++) {
-            if (!options.T_records[r]._selected)
+            if (!options.T_records[r]._selected) {
                 continue;
+            }
 
             options.T_records[r].fields[meta_struct_id].removeValue(value, VocabularyId);
         }
@@ -1921,8 +1931,9 @@ console.log('try to append', options.T_records[r].preview);
 
         // on ajoute le mot dans tous les records selectionnes
         for (var r = 0; r < options.T_records.length; r++) {
-            if (!options.T_records[r]._selected)
+            if (!options.T_records[r]._selected) {
                 continue;
+            }
 
             options.T_records[r].fields[meta_struct_id].addValue(value, false, VocabularyId);
         }
@@ -1962,31 +1973,27 @@ console.log('try to append', options.T_records[r].preview);
         if (current_field.length === 0) {
             current_field = $('#divS .edit_field:first');
             current_field.trigger('click');
-        }
-        else {
+        } else {
             if (dir >= 0) {
                 current_field.next().trigger('click');
-            }
-            else {
+            } else {
                 current_field.prev().trigger('click');
             }
         }
     }
 
 
-
     // ---------------------------------------------------------------------------
 // on a clique sur le peudo champ 'status'
 // ---------------------------------------------------------------------------
     /*function edit_mdwn_status(evt) {
-        if (!editor.textareaIsDirty || edit_validField(evt, "ask_ok") == true)
-            _editStatus(evt);
-        evt.cancelBubble = true;
-        if (evt.stopPropagation)
-            evt.stopPropagation();
-        return(false);
-    }*/
-
+     if (!editor.textareaIsDirty || edit_validField(evt, "ask_ok") == true)
+     _editStatus(evt);
+     evt.cancelBubble = true;
+     if (evt.stopPropagation)
+     evt.stopPropagation();
+     return(false);
+     }*/
 
 
     function _onTextareaKeyDown(event) {
@@ -1996,8 +2003,9 @@ console.log('try to append', options.T_records[r].preview);
         switch (event.keyCode) {
             case 13:
             case 10:
-                if (options.T_fields[options.curField].type === 'date')
+                if (options.T_fields[options.curField].type === 'date') {
                     cancelKey = true;
+                }
         }
 
         if (cancelKey) {
@@ -2025,8 +2033,9 @@ console.log('try to append', options.T_records[r].preview);
         console.log('curfield?', options.curField);
         console.log('t_field?', options.T_fields);
         if (options.T_fields[options.curField].tbranch) {
-            if (value !== '')
+            if (value !== '') {
                 ETHSeeker.search(value);
+            }
         }
         return (true);
     }
@@ -2038,27 +2047,29 @@ console.log('try to append', options.T_records[r].preview);
         var o;
         switch (event.keyCode) {
             case 27:	// esc : on restore la valeur avant editing
-                //			$("#btn_cancel", editor.$container).parent().css("backgroundColor", "#000000");
+                // 			$("#btn_cancel", editor.$container).parent().css("backgroundColor", "#000000");
                 edit_validField(event, 'cancel');
-                //			self.setTimeout("document.getElementById('btn_cancel').parentNode.style.backgroundColor = '';", 100);
+                // 			self.setTimeout("document.getElementById('btn_cancel').parentNode.style.backgroundColor = '';", 100);
                 cancelKey = true;
                 break;
         }
 
         if (cancelKey) {
             event.cancelBubble = true;
-            if (event.stopPropagation)
+            if (event.stopPropagation) {
                 event.stopPropagation();
+            }
             return (false);
         }
         if (!options.textareaIsDirty && ($editTextArea.val() !== options.fieldLastValue)) {
             options.textareaIsDirty = true;
         }
 
-        var s = $el.val(); //obj.value;
+        var s = $el.val(); // obj.value;
         if (options.T_fields[options.curField].tbranch) {
-            if (s !== '')
+            if (s !== '') {
                 ETHSeeker.search(s);
+            }
         }
         return (true);
     }

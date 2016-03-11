@@ -15,8 +15,7 @@ const notifyLayout = () => {
                 $notificationBoxContainer.hide();
                 $target.removeClass('open');
                 clear_notifications();
-            }
-            else {
+            } else {
                 $notificationBoxContainer.show();
 
                 setBoxHeight();
@@ -90,20 +89,20 @@ const notifyLayout = () => {
         var h = not.outerHeight() * n + not_t.outerHeight() * n_t;
         h = h > 350 ? 350 : h;
 
-        $notificationBoxContainer.stop().animate({ height: h });
+        $notificationBoxContainer.stop().animate({height: h});
     };
 
     const setBoxPosition = () => {
         if ($notificationTrigger.length > 0) {
             $notificationBoxContainer.css({
-                'left': Math.round($notificationTrigger.offset().left - 1)
+                left: Math.round($notificationTrigger.offset().left - 1)
             });
         }
     };
 
     const print_notifications = (page) => {
 
-        page = parseInt(page);
+        page = parseInt(page, 10);
         var buttons = {};
 
         buttons[language.fermer] = function () {

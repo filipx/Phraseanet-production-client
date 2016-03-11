@@ -47,16 +47,15 @@ const toolbar = (services) => {
 
     const _getSelection = (from, originalSelection) => {
         let newSelection = {
-                list: [],
-                group: null, //
-                type: null // story | basket
-            };
+            list: [],
+            group: null, //
+            type: null // story | basket
+        };
         switch (from) {
             case 'search-result':
                 if (searchSelection.length > 0) {
                     newSelection.list = searchSelection;
-                }
-                else {
+                } else {
                     newSelection.group = _getGroupSelection();
                 }
 
@@ -64,8 +63,7 @@ const toolbar = (services) => {
             case 'basket':
                 if (workzoneSelection.length > 0) {
                     newSelection.list = workzoneSelection;
-                }
-                else {
+                } else {
                     newSelection.group = _getGroupSelection();
                     newSelection.type = 'basket';
                 }
@@ -73,8 +71,7 @@ const toolbar = (services) => {
             case 'story':
                 if (workzoneSelection.length > 0) {
                     newSelection.list = workzoneSelection;
-                }
-                else {
+                } else {
                     newSelection.group = _getGroupSelection();
                     newSelection.type = 'story';
                 }
@@ -203,7 +200,7 @@ const toolbar = (services) => {
         });
     };
 
-    return { initialize };
+    return {initialize};
 };
 
 export default toolbar;

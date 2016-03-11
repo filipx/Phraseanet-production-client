@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import dialog from '../utils/dialog';
 const shareRecord = (services) => {
     const { configService, localeService, appEvents } = services;

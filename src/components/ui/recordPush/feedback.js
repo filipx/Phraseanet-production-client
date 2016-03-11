@@ -1,11 +1,14 @@
+import $ from 'jquery';
 import dialog from '../../utils/dialog';
 import Selectable from '../../utils/selectable';
 import * as _ from 'underscore';
-var Feedback = function (services, options) {
+const humane = require('humane-js');
+
+const Feedback = function (services, options) {
     const { configService, localeService, appEvents } = services;
-    console.log('init feedback with', options);
-    let $container, { containerId, context } = options;
-    console.log('init feedback with', containerId, context);
+    let $container;
+    let { containerId, context } = options;
+
     this.container = $container = $(containerId);
 
     this.Context = context;
@@ -123,8 +126,7 @@ var Feedback = function (services, options) {
                     humane.info(data.message);
                     dialog.close(1);
                     appEvents.emit('workzone.refresh');
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
                 return;
@@ -144,21 +146,21 @@ var Feedback = function (services, options) {
 
     $('.FeedbackSend', this.container).bind('click', function () {
         if ($('.badges .badge', $container).length === 0) {
-            alert(language.FeedBackNoUsersSelected);
+            alert(localeService.t('FeedBackNoUsersSelected'));
             return;
         }
 
         var buttons = {};
 
-        buttons[language.send] = function () {
+        buttons[localeService.t('send')] = function () {
             if ($.trim($('input[name="name"]', $dialog.getDomElement()).val()) === '') {
                 var options = {
                     size: 'Alert',
                     closeButton: true,
-                    title: language.warning
+                    title: localeService.t('warning')
                 };
                 var $dialogAlert = dialog.create(services, options, 3);
-                $dialogAlert.setContent(language.FeedBackNameMandatory);
+                $dialogAlert.setContent(localeService.t('FeedBackNameMandatory'));
 
                 return false;
             }
@@ -178,7 +180,7 @@ var Feedback = function (services, options) {
             size: 'Medium',
             buttons: buttons,
             loading: true,
-            title: language.send,
+            title: localeService.t('send'),
             closeOnEscape: true,
             cancelButton: true
         };
@@ -223,7 +225,7 @@ var Feedback = function (services, options) {
         var toggles = $('.status_off.toggle_' + feature, $badges);
 
         if (toggles.length === 0) {
-            var toggles = $('.status_on.toggle_' + feature, $badges);
+            toggles = $('.status_on.toggle_' + feature, $badges);
         }
         if (toggles.length === 0) {
             humane.info('No user selected');
@@ -262,7 +264,6 @@ var Feedback = function (services, options) {
     });
 
 
-
     $('form.list_saver', this.container).bind('submit', () => {
         var $form = $(event.currentTarget);
         var $input = $('input[name="name"]', $form);
@@ -274,13 +275,13 @@ var Feedback = function (services, options) {
             return false;
         }
 
-        appEvents.emit('push.createList', { name: $input.val(), collection: users });
+        appEvents.emit('push.createList', {name: $input.val(), collection: users});
         $input.val('');
         /*
-        p4.Lists.create($input.val(), function (list) {
-            $input.val('');
-            list.addUsers(users);
-        });*/
+         p4.Lists.create($input.val(), function (list) {
+         $input.val('');
+         list.addUsers(users);
+         });*/
 
         return false;
     });
@@ -317,12 +318,12 @@ var Feedback = function (services, options) {
         var html = '';
 
         if (item.type === 'USER') {
-            html = _.template($('#list_user_tpl').html())( {
+            html = _.template($('#list_user_tpl').html())({
 
                 item: item
             });
         } else if (item.type === 'LIST') {
-            html = _.template($('#list_list_tpl').html())( {
+            html = _.template($('#list_list_tpl').html())({
                 item: item
             });
         }
@@ -345,7 +346,7 @@ Feedback.prototype = {
             return;
         }
 
-        var html = _.template($('#' + this.Context.toLowerCase() + '_badge_tpl').html())( {
+        var html = _.template($('#' + this.Context.toLowerCase() + '_badge_tpl').html())({
             user: user
         });
 
@@ -400,8 +401,7 @@ Feedback.prototype = {
                     humane.info(data.message);
                     $this.selectUser(data.user);
                     callback();
-                }
-                else {
+                } else {
                     humane.error(data.message);
                 }
             }

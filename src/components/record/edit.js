@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import recordEditorService from './recordEditor';
 
 const editRecord = (services) => {

@@ -1,3 +1,4 @@
+import $ from 'jquery';
 const printRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     let $container = null;
@@ -27,7 +28,7 @@ const printRecord = (services) => {
         if ($('#DIALOG').data('ui-dialog')) {
             $('#DIALOG').dialog('destroy');
         }
-        $('#DIALOG').attr('title', language.print)
+        $('#DIALOG').attr('title', localeService.t('print'))
             .empty().addClass('loading')
             .dialog({
                 resizable: false,

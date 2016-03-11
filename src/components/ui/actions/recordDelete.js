@@ -57,14 +57,14 @@ const recordDeleteModal = (services) => {
                 success: function (data) {
                     $dialog.close();
                     $.each(data, function (i, n) {
-                        var imgt = $('#IMGT_' + n),
-                            chim = $('.CHIM_' + n),
-                            stories = $('.STORY_' + n);
+                        let imgt = $('#IMGT_' + n);
+                        let chim = $('.CHIM_' + n);
+                        let stories = $('.STORY_' + n);
                         $('.doc_infos', imgt).remove();
                         imgt.unbind('click').removeAttr('ondblclick').removeClass('selected').draggable('destroy').removeClass('IMGT').find('img').unbind();
                         imgt.find('.thumb img').attr('src', '/assets/common/images/icons/deleted.png').css({
-                            width:'100%',
-                            height:'auto',
+                            width: '100%',
+                            height: 'auto',
                             margin: '0 10px',
                             top: '0'
                         });
@@ -72,15 +72,13 @@ const recordDeleteModal = (services) => {
                         imgt.find('.status,.title,.bottom').empty();
 
                         p4.Results.Selection.remove(n);
-                        if (stories.length > 0)
-                        {
+                        if (stories.length > 0) {
                             appEvents.emit('workzone.refresh');
-                        }
-                        else {
+                        } else {
                             p4.WorkZone.Selection.remove(n);
                         }
                     });
-                    prodApp.appEvents.emit('search.doRefreshSelection');
+                    appEvents.emit('search.doRefreshSelection');
                 },
                 complete: function () {
                     $this.prop('disabled', false);
@@ -93,7 +91,7 @@ const recordDeleteModal = (services) => {
         });
     };
 
-    return { openModal };
+    return {openModal};
 };
 
 export default recordDeleteModal;

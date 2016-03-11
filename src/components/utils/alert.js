@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import dialog from './dialog';
 
 function create_dialog() {
@@ -10,7 +11,7 @@ function create_dialog() {
 function alert(title, message, callback) {
     var dialog = create_dialog();
 
-    var button = new Object();
+    var button = {};
 
     button['Ok'] = function () {
         if (typeof callback === 'function')

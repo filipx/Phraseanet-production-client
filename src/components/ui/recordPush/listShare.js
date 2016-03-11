@@ -1,5 +1,8 @@
+import $ from 'jquery';
 import dialog from '../../utils/dialog';
 import * as _ from 'underscore';
+const humane = require('humane-js');
+
 const listShare = (services, options) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
@@ -7,7 +10,8 @@ const listShare = (services, options) => {
     let $dialog = null;
 
 
-    const initialize = () => {};
+    const initialize = () => {
+    };
 
 
     const openModal = (options) => {
@@ -22,11 +26,11 @@ const listShare = (services, options) => {
     };
 
     const onModalReady = (listId) => {
-        var $container = $('#ListShare'),
-            $completer_form = $('form[name="list_share_user"]', $container),
-            $owners_form = $('form[name="owners"]', $container),
-            $autocompleter = $('input[name="user"]', $completer_form),
-            $dialog = dialog.get(2); //p4.Dialog.get(2);
+        let $container = $('#ListShare');
+        let $completer_form = $('form[name="list_share_user"]', $container);
+        let $owners_form = $('form[name="owners"]', $container);
+        let $autocompleter = $('input[name="user"]', $completer_form);
+        let $dialog = dialog.get(2);
 
         $completer_form.bind('submit', function () {
             return false;
@@ -56,23 +60,20 @@ const listShare = (services, options) => {
         });
 
 
-        function shareWith(userId, role)
-        {
-            var role = typeof role === 'undefined' ? 1 : role;
+        function shareWith(userId, role) {
+            role = typeof role === 'undefined' ? 1 : role;
 
             $.ajax({
                 type: 'POST',
                 url: '/prod/lists/list/' + listId + '/share/' + userId + '/',
                 dataType: 'json',
-                data : { role : role },
+                data: {role: role},
                 beforeSend: function () {
                 },
                 success: function (data) {
-                    if (data.success)
-                    {
+                    if (data.success) {
                         humane.info(data.message);
-                    }
-                    else {
+                    } else {
                         humane.error(data.message);
                     }
                     $dialog.refresh();
@@ -82,32 +83,23 @@ const listShare = (services, options) => {
             });
         }
 
-        function unShareWith(usr_id, callback)
-        {
+        function unShareWith(usr_id, callback) {
             $.ajax({
                 type: 'POST',
                 url: '/prod/lists/list/' + listId + '/unshare/' + usr_id + '/',
                 dataType: 'json',
-                data : {},
+                data: {},
                 beforeSend: function () {
                 },
                 success: function (data) {
-                    if (data.success)
-                    {
+                    if (data.success) {
                         humane.info(data.message);
                         callback(data);
-                    }
-                    else {
+                    } else {
                         humane.error(data.message);
                     }
                     $dialog.refresh();
 
-                    return;
-                },
-                error: function () {
-                    return;
-                },
-                timeout: function () {
                     return;
                 }
             });
@@ -115,39 +107,36 @@ const listShare = (services, options) => {
 
         $autocompleter.autocomplete({
                 minLength: 2,
-                source: function ( request, response ) {
+                source: function (request, response) {
                     $.ajax({
                         url: '/prod/push/search-user/',
                         dataType: 'json',
                         data: {
                             query: request.term
                         },
-                        success: function ( data ) {
-                            response( data );
+                        success: function (data) {
+                            response(data);
                         }
                     });
                 },
-                select: function ( event, ui ) {
-                    if (ui.item.type === 'USER')
-                    {
+                select: function (event, ui) {
+                    if (ui.item.type === 'USER') {
                         shareWith(ui.item.usr_id);
                     }
 
                     return false;
                 }
             })
-            .data( 'ui-autocomplete' )._renderItem = function ( ul, item ) {
+            .data('ui-autocomplete')._renderItem = function (ul, item) {
             if (item.type === 'USER') {
-                var html = _.template($('#list_user_tpl').html())( {
+                var html = _.template($('#list_user_tpl').html())({
                     item: item
                 });
 
-                return $(html).data( 'ui-autocomplete-item', item ).appendTo(ul);
+                return $(html).data('ui-autocomplete-item', item).appendTo(ul);
             }
         };
     };
-
-
 
 
     return {

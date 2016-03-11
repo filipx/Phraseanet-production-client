@@ -1,7 +1,8 @@
-//import UploaderManager from './uploaderService';
+
+import $ from 'jquery';
+import * as _ from 'underscore';
 import dialog from '../utils/dialog';
 import Alerts from '../utils/alert';
-import * as _ from 'underscore';
 
 const uploader = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -34,7 +35,7 @@ const uploader = (services) => {
             dataType: 'html',
             success: function (data) {
                 $dialog.setContent(data);
-                $(document).ready( () => onOpenModal());
+                $(document).ready(() => onOpenModal());
                 return;
             }
         });
@@ -54,7 +55,7 @@ const uploader = (services) => {
         if (iev >= 10) {
             $('#UPLOAD_FLASH_LINK').hide();
         }
-        //Upload management
+        // Upload management
         var uploaderInstance = new UploaderManager({
             container: $('#uploadBox'),
             uploadBox: $('#uploadBox .upload-box-addedfiles'),
@@ -70,23 +71,22 @@ const uploader = (services) => {
             maxHeight: 120
         });
 
-        //Init jquery tabs
+        // Init jquery tabs
         $('.upload-tabs', uploaderInstance.getContainer()).tabs({
-            beforeLoad: function ( event, ui ) {
-                ui.jqXHR.success(function ( xhr, status, index, anchor ) {
+            beforeLoad: function (event, ui) {
+                ui.jqXHR.success(function (xhr, status, index, anchor) {
                     var lazaretBox = $('#lazaretBox');
 
                     $('.userTips', lazaretBox).tooltip();
                 });
-                ui.jqXHR.error(function ( xhr, status, index, anchor ) {
-                    //display error message if ajax failed
-                    $( anchor.hash ).html(language.error);
+                ui.jqXHR.error(function (xhr, status, index, anchor) {
+                    // display error message if ajax failed
+                    $(anchor.hash).html(language.error);
                 });
 
                 ui.tab.find('span').html(' <img src="/assets/common/images/icons/loader404040.gif"/>');
             },
-            load: function (event, ui)
-            {
+            load: function (event, ui) {
                 ui.tab.find('span').empty();
                 $('.btn.page-lazaret', uploaderInstance.getContainer()).bind('click', function () {
                     $('.lazaret-target').attr('href', $('a', $(this)).attr('href'));
@@ -96,13 +96,13 @@ const uploader = (services) => {
                     return false;
                 });
             },
-            create : function () {
+            create: function () {
                 $('#tab-upload').css('overflow', 'hidden');
             },
             heightStyle: 'fill'
         });
 
-        //Show the good collection status box
+        // Show the good collection status box
         $('select[name="base_id"]', uploaderInstance.getSettingsBox()).bind('change', function () {
             var selectedCollId = $(this).find('option:selected').val();
 
@@ -121,22 +121,22 @@ const uploader = (services) => {
 
         uploaderInstance.getContainer().on('file-transmited', function () {
             var domEl = $('.number-files-transmited');
-            domEl.html(parseInt(domEl.html()) + 1);
+            domEl.html(parseInt(domEl.html(), 10) + 1);
         });
 
         uploaderInstance.getContainer().on('uploaded-file-removed', function () {
             var domEl = $('.number-files-to-transmit');
-            domEl.html(parseInt(domEl.html()) - 1);
+            domEl.html(parseInt(domEl.html(), 10) - 1);
         });
 
-        //Remove all element from upload box
+        // Remove all element from upload box
         $('button.clear-queue', uploaderInstance.getContainer()).bind('click', function () {
             uploaderInstance.clearUploadBox();
             $('ul', $(this).closest('.upload-box')).empty();
             uploaderInstance.getContainer().trigger('file-removed');
         });
 
-        //Cancel all upload
+        // Cancel all upload
         $('#cancel-all').bind('click', function () {
             //Remove all cancel
             $('button.remove-element', uploaderInstance.getDownloadBox()).each(function (i, el) {
@@ -146,7 +146,7 @@ const uploader = (services) => {
             progressbarAll.width('0%');
         });
 
-        //Remove an element from the upload box
+        // Remove an element from the upload box
         $(uploaderInstance.getUploadBox()).on('click', 'button.remove-element', function () {
             var container = $(this).closest('li');
             var uploadIndex = container.find('input[name=uploadIndex]').val();
@@ -155,9 +155,9 @@ const uploader = (services) => {
             uploaderInstance.getContainer().trigger('file-removed');
         });
 
-        //Get all elements in the upload box & trigger the submit event
+        // Get all elements in the upload box & trigger the submit event
         $('button.upload-submitter', uploaderInstance.getContainer()).bind('click', function () {
-            //Fetch all valid elements
+            // Fetch all valid elements
             var documents = uploaderInstance.getUploadBox().find('li.upload-valid');
 
             totalElement = documents.length;
@@ -169,24 +169,24 @@ const uploader = (services) => {
 
                 var $dialog = dialog.get(1);
 
-                //reset progressbar for iframe uploads
-                if ( !$.support.xhrFileUpload && !$.support.xhrFormDataFileUpload) {
+                // reset progressbar for iframe uploads
+                if (!$.support.xhrFileUpload && !$.support.xhrFormDataFileUpload) {
                     progressbarAll.width('0%');
                 }
-                //enabled cancel all button
+                // enabled cancel all button
                 $('#cancel-all').attr('disabled', false);
 
-                //prevent dialog box from being closed while files are being downloaded
+                // prevent dialog box from being closed while files are being downloaded
                 $dialog.getDomElement().bind('dialogbeforeclose', function (event, ui) {
-                    if ( !uploaderInstance.Queue.isEmpty()) {
+                    if (!uploaderInstance.Queue.isEmpty()) {
                         Alerts(language.warning, language.fileBeingDownloaded);
                         return false;
                     }
                 });
 
                 documents.each(function (index, el) {
-                    var index = $(el).find('input[name=uploadIndex]').val();
-                    uploaderInstance.getData(index).submit();
+                    let indexValue = $(el).find('input[name=uploadIndex]').val();
+                    uploaderInstance.getData(indexValue).submit();
                 });
             }
         });
@@ -208,26 +208,29 @@ const uploader = (services) => {
             },
             // override "on error" local ajax event to prevent global ajax event from being triggered
             // as all fileupload options are passed as argument to the $.ajax jquery function
-            error: function () {return false;},
+            error: function () {
+                return false;
+            },
             // Set singleFileUploads, sequentialUploads to true so the files
             // are upload one by one
-            singleFileUploads : true,
+            singleFileUploads: true,
             sequentialUploads: true,
             recalculateProgress: true,
-            //When a file is added
+            // When a file is added
             add: function (e, data) {
-                //Since singleFileUploads &  sequentialUploads are setted to true
-                //There is only on file data.files
+                // Since singleFileUploads &  sequentialUploads are setted to true
+                // There is only on file data.files
                 $.each(data.files, function (index, file) {
                     $('.upload-box').show();
-
+                    let params = {};
+                    let html = '';
                     if (file.error) {
-                        var params = $.extend({}, file, { error: language.errorFileApi, language: language });
-                        var html = _.template($('#upload_items_error_tpl').html())(params);
+                        params = $.extend({}, file, {error: language.errorFileApi, language: language});
+                        html = _.template($('#upload_items_error_tpl').html())(params);
                         uploaderInstance.getUploadBox().append(html);
                     } else if (file.size > maxFileSize) {
-                        var params = $.extend({}, file, { error: language.errorFileApiTooBig, language: language });
-                        var html = _.template($('#upload_items_error_tpl').html())(params);
+                        params = $.extend({}, file, {error: language.errorFileApiTooBig, language: language});
+                        html = _.template($('#upload_items_error_tpl').html())(params);
                         uploaderInstance.getUploadBox().append(html);
                     } else {
                         // Add data to Queue
@@ -243,8 +246,8 @@ const uploader = (services) => {
                             language: language
                         };
 
-                        //Set context in upload-box
-                        var html = _.template($('#upload_items_tpl').html())(formatedFile);
+                        // Set context in upload-box
+                        html = _.template($('#upload_items_tpl').html())(formatedFile);
                         uploaderInstance.getUploadBox().append(html);
 
                         var context = $('li', uploaderInstance.getUploadBox()).last();
@@ -263,7 +266,7 @@ const uploader = (services) => {
 
                 uploaderInstance.getContainer().trigger('file-added');
             },
-            //on success upload
+            // on success upload
             done: function (e, data) {
                 // set progress bar to 100% for preventing mozilla bug which never reach 100%
                 data.context.find('.progress-bar').width('100%');
@@ -275,8 +278,8 @@ const uploader = (services) => {
 
                 data.context.find('button.remove-element').remove();
 
-                if ( !$.support.xhrFileUpload && !$.support.xhrFormDataFileUpload) {
-                    progressbarAll.width(100 - Math.round((uploaderInstance.Queue.getLength() * (100 / totalElement ))) + '%');
+                if (!$.support.xhrFileUpload && !$.support.xhrFormDataFileUpload) {
+                    progressbarAll.width(100 - Math.round((uploaderInstance.Queue.getLength() * (100 / totalElement))) + '%');
                 }
 
                 if (uploaderInstance.Queue.isEmpty()) {
@@ -284,29 +287,29 @@ const uploader = (services) => {
                     bitrateBox.empty();
                     $('#uploadBoxRight .progress').removeClass('progress-striped active');
                     var $dialog = dialog.get(1);
-                    //unbind check before close event & disabled button for cancel all download
+                    // unbind check before close event & disabled button for cancel all download
                     $dialog.getDomElement().unbind('dialogbeforeclose');
-                    //disabled cancel-all button, if queue is empty and last upload success
+                    // disabled cancel-all button, if queue is empty and last upload success
                     $('#cancel-all').attr('disabled', true);
                 }
 
                 return false;
             },
             fail: function () {
-                //disabled cancel-all button, if queue is empty and last upload fail
+                // disabled cancel-all button, if queue is empty and last upload fail
                 if (uploaderInstance.Queue.isEmpty()) {
                     $('#cancel-all').attr('disabled', true);
                 }
             }
         });
 
-        //on submit file
+        // on submit file
         $('#fileupload', uploaderInstance.getContainer()).bind('fileuploadsubmit', function (e, data) {
             var $this = $(this);
             var params = [];
             data.formData = [];
 
-            //get form datas attached to the file
+            // get form datas attached to the file
             params.push(data.context.find('input, select').serializeArray());
             params.push($('input', $('.collection-status:visible', uploaderInstance.getSettingsBox())).serializeArray());
             params.push($('select', uploaderInstance.getSettingsBox()).serializeArray());
@@ -317,53 +320,63 @@ const uploader = (services) => {
                 });
             });
 
-            //remove current context
+            // remove current context
             data.context.remove();
 
-            //Set new context in download-box
+            // Set new context in download-box
             $.each(data.files, function (index, file) {
-                var params = $.extend({}, file, { language: language, id:'file-' + index });
-                var html = _.template($('#download_items_tpl').html())( params);
+                let params = $.extend({}, file, {language: language, id: 'file-' + index});
+                let html = _.template($('#download_items_tpl').html())(params);
 
                 uploaderInstance.getDownloadBox().append(html);
 
                 data.context = $('li', uploaderInstance.getDownloadBox()).last();
 
-                //copy image
+                // copy image
                 data.context.find('.upload-record .canva-wrapper').prepend(data.image);
 
-                //launch ajax request
+                // launch ajax request
                 var jqXHR = $this.fileupload('send', data)
                     .success(function (response) {
                         if (response.success) {
-                            //case record
+                            // case record
                             if (response.element === 'record') {
-                                var html = _.template($('#download_finish_tpl').html())( { heading:response.message, reasons: response.reasons });
+                                html = _.template($('#download_finish_tpl').html())({
+                                    heading: response.message,
+                                    reasons: response.reasons
+                                });
                                 data.context.find('.upload-record p.success').append(html).show();
-                            } else { //case quarantine
-                                var html = _.template($('#download_finish_tpl').html())( { heading:response.message, reasons: response.reasons });
+                            } else {
+                                // case quarantine
+                                html = _.template($('#download_finish_tpl').html())({
+                                    heading: response.message,
+                                    reasons: response.reasons
+                                });
                                 data.context.find('.upload-record p.error').append(html).show();
                             }
                         } else {
-                            //fail
-                            var html = _.template($('#download_finish_tpl').html())( { heading:response.message, reasons: response.reasons });
+                            // fail
+                            html = _.template($('#download_finish_tpl').html())({
+                                heading: response.message,
+                                reasons: response.reasons
+                            });
                             data.context.find('.upload-record p.error').append(html).show();
                         }
                     })
                     .error(function (jqXHR, textStatus, errorThrown) {
-                        //Request is aborted
+                        // Request is aborted
                         if (errorThrown === 'abort') {
                             return false;
                         } else {
                             data.context.find('.upload-record p.error').append(jqXHR.status + ' ' + jqXHR.statusText).show();
                         }
-                        //Remove data
+                        // Remove data
                         uploaderInstance.removeData(data.uploadIndex);
                         // Remove cancel button
                         $('button.remove-element', data.context).remove();
                     });
 
-                //cancel request
+                // cancel request
                 $('button.remove-element', data.context).bind('click', function (e) {
                     jqXHR.abort();
                     data.context.remove();
@@ -386,25 +399,25 @@ const uploader = (services) => {
 
         var progressbarAll = $('#uploadBoxRight .progress-bar-total');
 
-        //Get global upload progress
+        // Get global upload progress
         $('#fileupload', uploaderInstance.getContainer()).bind('fileuploadprogressall', function (e, data) {
             progressbarAll.width(Math.round(uploaderInstance.Formater.pourcent(data.loaded, data.total)) + '%');
         });
 
         $('#fileupload', uploaderInstance.getContainer()).bind('fileuploadfail', function (e, data) {
-            //Remove from queue
+            // Remove from queue
             uploaderInstance.removeData(data.uploadIndex);
         });
 
         $('#fileupload', uploaderInstance.getContainer()).bind('fileuploadsend', function (e, data) {
 
-            //IFRAME progress fix
-            if ( !$.support.xhrFileUpload && !$.support.xhrFormDataFileUpload) {
+            // IFRAME progress fix
+            if (!$.support.xhrFileUpload && !$.support.xhrFormDataFileUpload) {
                 data.context.find('.progress-bar').width('25%');
             }
         });
     };
 
-    return { initialize };
+    return {initialize};
 };
 export default uploader;

@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import * as AppCommons from 'phraseanet-common';
 import toolbar from './toolbar';
 import mainMenu from './mainMenu';
 import keyboard from './keyboard';
@@ -67,47 +68,47 @@ const ui = (services) => {
                         // hide download
                         commonModule.hideOverlay(2);
                         $('#MODALDL').css({
-                            'display': 'none'
+                            display: 'none'
                         });
                         break;
                 }
-            }
-            else {
+            } else {
                 if ($('#EDITWINDOW').is(':visible')) {
                     // access to editor instead of edit modal
-                    //specialKeyState = editRecord.onGlobalKeydown(event, specialKeyState);
-                }
-                else {
+                    // specialKeyState = editRecord.onGlobalKeydown(event, specialKeyState);
+                } else {
                     if (previewIsOpen) {
                         specialKeyState = previewRecord.onGlobalKeydown(event, specialKeyState);
-                    }
-                    else {
-                        if ($('#EDIT_query').hasClass('focused'))
+                    } else {
+                        if ($('#EDIT_query').hasClass('focused')) {
                             return true;
+                        }
 
-                        if ($('.overlay').is(':visible'))
+                        if ($('.overlay').is(':visible')) {
                             return true;
+                        }
 
-                        if ($('.ui-widget-overlay').is(':visible'))
+                        if ($('.ui-widget-overlay').is(':visible')) {
                             return true;
+                        }
 
                         switch (this.appUi.getActiveZone()) {
                             case 'rightFrame':
                                 switch (event.keyCode) {
                                     case 65:	// a
-                                        if (utilsModule.is_ctrl_key(event)) {
+                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
                                             $('.tools .answer_selector.all_selector').trigger('click');
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
-                                    case 80://P
-                                        if (utilsModule.is_ctrl_key(event)) {
+                                    case 80:// P
+                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
                                             _onOpenPrintModal('lst=' + p4.Results.Selection.serialize());
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
-                                    case 69://e
-                                        if (utilsModule.is_ctrl_key(event)) {
+                                    case 69:// e
+                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
                                             openRecordEditor('IMGT', p4.Results.Selection.serialize());
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
@@ -120,16 +121,16 @@ const ui = (services) => {
                                         $('#answers').scrollTop($('#answers').scrollTop() - 30);
                                         specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         break;
-                                    case 37://previous page
+                                    case 37:// previous page
                                         $('#PREV_PAGE').trigger('click');
                                         specialKeyState.isShortcutKey = true;
                                         break;
-                                    case 39://previous page
+                                    case 39:// previous page
                                         $('#NEXT_PAGE').trigger('click');
                                         specialKeyState.isShortcutKey = true;
                                         break;
-                                    case 9://tab
-                                        if (!utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+                                    case 9:// tab
+                                        if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
                                             document.getElementById('EDIT_query').focus();
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
@@ -141,27 +142,27 @@ const ui = (services) => {
                             case 'idFrameC':
                                 switch (event.keyCode) {
                                     case 65:	// a
-                                        if (utilsModule.is_ctrl_key(event)) {
+                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
                                             p4.WorkZone.Selection.selectAll();
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
-                                    case 80://P
-                                        if (utilsModule.is_ctrl_key(event)) {
+                                    case 80:// P
+                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
                                             _onOpenPrintModal('lst=' + p4.WorkZone.Selection.serialize());
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
-                                    case 69://e
-                                        if (utilsModule.is_ctrl_key(event)) {
+                                    case 69:// e
+                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
                                             openRecordEditor('IMGT', p4.WorkZone.Selection.serialize());
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
-                                    //						case 46://del
-                                    //								_deleteRecords(p4.Results.Selection.serialize());
-                                    //								specialKeyState.isCancelKey = true;
-                                    //							break;
+                                    // 						case 46:// del
+                                    // 								_deleteRecords(p4.Results.Selection.serialize());
+                                    // 								specialKeyState.isCancelKey = true;
+                                    // 							break;
                                     case 40:	// down arrow
                                         $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() + 30);
                                         specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
@@ -170,14 +171,14 @@ const ui = (services) => {
                                         $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() - 30);
                                         specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         break;
-                                    //								case 37://previous page
-                                    //									$('#PREV_PAGE').trigger('click');
-                                    //									break;
-                                    //								case 39://previous page
-                                    //									$('#NEXT_PAGE').trigger('click');
-                                    //									break;
-                                    case 9://tab
-                                        if (!utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+                                    // 								case 37:// previous page
+                                    // 									$('#PREV_PAGE').trigger('click');
+                                    // 									break;
+                                    // 								case 39:// previous page
+                                    // 									$('#NEXT_PAGE').trigger('click');
+                                    // 									break;
+                                    case 9:// tab
+                                        if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
                                             document.getElementById('EDIT_query').focus();
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
@@ -229,11 +230,12 @@ const ui = (services) => {
         var content = '';
         var callback = null;
         var button = {
-            'OK': function (e) {
+            OK: function (e) {
                 hideOverlay(3);
                 $(this).dialog('close');
                 return;
-            } };
+            }
+        };
         var escape = true;
         var onClose = function () {
         };
@@ -259,8 +261,7 @@ const ui = (services) => {
         if (typeof (Alerts) === 'undefined') {
             alert(localeService.t('serverDisconnected'));
             self.location.replace(self.location.href);
-        }
-        else {
+        } else {
             Alerts(options.title, content, callback);
         }
         return;
@@ -277,10 +278,10 @@ const ui = (services) => {
     const activeZoning = () => {
         $('#idFrameC, #rightFrame').bind('mousedown', function (event) {
             var old_zone = getActiveZone();
-            setActiveZone($(this).attr('id') );
+            setActiveZone($(this).attr('id'));
             if (getActiveZone() !== old_zone && getActiveZone() !== 'headBlock') {
                 $('.effectiveZone.activeZone').removeClass('activeZone');
-                $('.effectiveZone', this).addClass('activeZone');//.flash('#555555');
+                $('.effectiveZone', this).addClass('activeZone');// .flash('#555555');
             }
             $('#EDIT_query').blur();
         });
@@ -295,7 +296,7 @@ const ui = (services) => {
         var headBlockH = $('#headBlock').outerHeight();
         var bodyY = bodySize.y - headBlockH - 2;
         var bodyW = bodySize.x - 2;
-        //$('#desktop').height(bodyY).width(bodyW);
+        // $('#desktop').height(bodyY).width(bodyW);
 
         appEvents.emit('preview.doResize');
 
@@ -320,29 +321,27 @@ const ui = (services) => {
 
     };
     const linearizeUi = () => {
-        var list = $('#answers .list');
+        const list = $('#answers .list');
+        let fllWidth = $('#answers').innerWidth();
+        let n;
         if (list.length > 0) {
-            var fllWidth = $('#answers').innerWidth();
             fllWidth -= 16;
 
             var stdWidth = 460;
             var diff = 28;
-            var n = Math.round(fllWidth / (stdWidth));
+            n = Math.round(fllWidth / (stdWidth));
             var w = Math.floor(fllWidth / n) - diff;
             if (w < 360 && n > 1)
                 w = Math.floor(fllWidth / (n - 1)) - diff;
             $('#answers .list').width(w);
-        }
-        else {
+        } else {
 
             var minMargin = 5;
-            var margin = 0;
             var el = $('#answers .diapo:first');
             var diapoWidth = el.outerWidth() + (minMargin * 2);
-            var fllWidth = $('#answers').innerWidth();
             fllWidth -= 26;
 
-            var n = Math.floor(fllWidth / (diapoWidth));
+            n = Math.floor(fllWidth / (diapoWidth));
 
             margin = Math.floor((fllWidth % diapoWidth) / (2 * n));
             margin = margin + minMargin;
@@ -359,7 +358,7 @@ const ui = (services) => {
     });
 
 
-    return { initialize, showModal, activeZoning, getActiveZone, resizeAll };
+    return {initialize, showModal, activeZoning, getActiveZone, resizeAll};
 };
 
 export default ui;

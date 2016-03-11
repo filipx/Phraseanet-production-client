@@ -1,6 +1,8 @@
 /**
  * triggered via workzone > Basket > context menu
  */
+import $ from 'jquery';
+import * as _ from 'underscore';
 import dialog from '../utils/dialog';
 import Selectable from '../utils/selectable';
 
@@ -14,7 +16,7 @@ const storyReorderContent = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if ( $el.attr('title') !== undefined ) {
+            if ($el.attr('title') !== undefined) {
                 dialogOptions.title = $el.attr('title');
             }
 
@@ -53,8 +55,7 @@ const storyReorderContent = (services) => {
             return false;
         });
 
-        function autoorder()
-        {
+        function autoorder() {
             var val = $.trim($('#auto_order').val());
 
             if (val === '') {
@@ -64,18 +65,22 @@ const storyReorderContent = (services) => {
             var diapos = [];
             $('#reorder_box .diapo form').each(function (i, n) {
                 diapos.push({
-                    'title': $('input[name=title]', n).val(),
-                    'order' : parseInt($('input[name=default]', n).val()),
-                    'id'  : $('input[name=id]', n).val()
+                    title: $('input[name=title]', n).val(),
+                    order: parseInt($('input[name=default]', n).val(), 10),
+                    id: $('input[name=id]', n).val()
                 });
             });
 
             var sorterCallback;
 
             if (val === 'default') {
-                sorterCallback = function (diapo) {return diapo.order;};
+                sorterCallback = function (diapo) {
+                    return diapo.order;
+                };
             } else {
-                sorterCallback = function (diapo) {return diapo.title;};
+                sorterCallback = function (diapo) {
+                    return diapo.title;
+                };
             }
 
             var elements = [];
@@ -97,17 +102,17 @@ const storyReorderContent = (services) => {
         }
 
         $('.elements', container).sortable({
-            appendTo : container,
+            appendTo: container,
             placeholder: 'diapo ui-sortable-placeholder',
-            distance:20,
+            distance: 20,
             cursorAt: {
-                top:10,
-                left:-20
+                top: 10,
+                left: -20
             },
-            items:'div.diapo',
-            scroll:true,
-            scrollSensitivity:40,
-            scrollSpeed:30,
+            items: 'div.diapo',
+            scroll: true,
+            scrollSensitivity: 40,
+            scrollSpeed: 30,
             start: function (event, ui) {
                 var selected = $('.selected', container);
 
@@ -119,8 +124,7 @@ const storyReorderContent = (services) => {
 
                 $('.selected:visible', container).hide();
 
-                while (n > 0)
-                {
+                while (n > 0) {
                     $('<div style="height:130px;" class="diapo ui-sortable-placeholderfollow"></div>').after($('.diapo.ui-sortable-placeholder', container));
                     n--;
                 }
@@ -132,21 +136,19 @@ const storyReorderContent = (services) => {
                 var main_id = $(ui.item[0]).attr('id');
 
                 var selected = $('.selected', container);
-                var sorter = new Array();
+                var sorter = [];
 
 
                 selected.each(function (i, n) {
 
-                    var position = parseInt($(n).attr('position'));
+                    var position = parseInt($(n).attr('position'), 10);
 
-                    if (position !== '')
-                    {
+                    if (position !== '') {
                         sorter[position] = $(n);
                     }
 
                     var id = $(n).attr('id');
-                    if (id === main_id)
-                    {
+                    if (id === main_id) {
                         return;
                     }
 
@@ -156,15 +158,14 @@ const storyReorderContent = (services) => {
                 var last_moved = $(ui.item[0]);
                 $(sorter).each(function (i, n) {
                     $(n).show().removeAttr('position');
-                    if ($(n).attr('id') === main_id)
-                    {
+                    if ($(n).attr('id') === main_id) {
                         before = false;
-                    }
-                    else {
-                        if (before)
+                    } else {
+                        if (before) {
                             $(n).before($(ui.item[0]));
-                        else
+                        } else {
                             $(n).after($(last_moved));
+                        }
 
                     }
                     last_moved = sorter[i];
@@ -174,9 +175,8 @@ const storyReorderContent = (services) => {
             change: function () {
                 $('.diapo.ui-sortable-placeholderfollow', container).remove();
 
-                var n = OrderSelection.length() - 1 ;
-                while (n > 0)
-                {
+                var n = OrderSelection.length() - 1;
+                while (n > 0) {
                     $('<div style="height:130px;" class="diapo ui-sortable-placeholderfollow"></div>').after($('.diapo.ui-sortable-placeholder', container));
                     n--;
                 }
@@ -185,7 +185,7 @@ const storyReorderContent = (services) => {
         }).disableSelection();
 
         var OrderSelection = new Selectable($('.elements', container), {
-            selector : '.CHIM'
+            selector: '.CHIM'
         });
 
 
@@ -231,7 +231,7 @@ const storyReorderContent = (services) => {
         });
     };
 
-    return { initialize };
+    return {initialize};
 };
 
 export default storyReorderContent;

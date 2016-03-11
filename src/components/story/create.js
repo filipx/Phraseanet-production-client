@@ -1,6 +1,7 @@
 /**
  * triggered via workzone > Basket > context menu
  */
+import $ from 'jquery';
 import dialog from '../utils/dialog';
 
 const storyCreate = (services) => {
@@ -21,7 +22,7 @@ const storyCreate = (services) => {
             const $el = $(event.currentTarget);
             let dialogOptions = {};
 
-            if ( $el.attr('title') !== undefined ) {
+            if ($el.attr('title') !== undefined) {
                 dialogOptions.title = $el.attr('title');
             }
 
@@ -98,7 +99,7 @@ const storyCreate = (services) => {
         });
     };
 
-    return { initialize };
+    return {initialize};
 };
 
 export default storyCreate;
