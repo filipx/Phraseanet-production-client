@@ -7,7 +7,7 @@ import recordPropertyModal from '../actions/recordProperty';
 import recordFeedbackModal from '../actions/recordFeedback';
 import recordPushModal from '../actions/recordPush';
 import recordPublishModal from '../actions/recordPublish';
-import recordToolsModal from '../actions/recordTools';
+import recordToolsModal from '../../record/tools/index';
 import recordPrintModal from '../actions/recordPrint';
 import recordBridge from '../actions/recordBridge';
 

@@ -8,7 +8,6 @@ import * as AppCommons from 'phraseanet-common';
 import cgu from './components/cgu';
 import preferences from './components/preferences';
 import publication from './components/publication';
-import preview from './components/ui/recordPreview';
 import workzone from './components/ui/workzone';
 import notify from './components/notify/index';
 import Locale from './components/locale';
@@ -24,6 +23,7 @@ import search from './components/search';
 import utils from './components/utils/utils';
 import dialog from './components/utils/dialog';
 import Selectable from './components/utils/selectable';
+
 class Bootstrap {
 
     app;
