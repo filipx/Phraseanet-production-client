@@ -184,7 +184,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 let screenData = screenshots.getAltScreenShots();
                 let subDefs = [];
 
-                for (var i = 0; i < screenData.length; i++) {
+                for (let i = 0; i < screenData.length; i++) {
                     subDefs.push({
                         name: screenData[i].name,
                         src: screenData[i].dataURI

@@ -126,7 +126,7 @@ var recordField = function (databoxField, arrayValues) {
 
         var first = true;
 
-        for (var v in arrayValues) {
+        for (let v in arrayValues) {
             if (typeof arrayValues[v] !== 'object') {
                 if (window.console) {
                     console.error('Trying to add a non-recordFieldValue to the field...');
@@ -187,7 +187,7 @@ recordField.prototype = {
                 console.error('Unable to set a value to a readonly field');
             }
 
-            return;
+            return this;
         }
 
         if (window.console) {
@@ -252,7 +252,7 @@ recordField.prototype = {
 
         VocabularyId = checkVocabId(VocabularyId);
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             if (VocabularyId !== null) {
                 if (this.datas[d].getVocabularyId() === VocabularyId) {
                     if (window.console) {
@@ -276,7 +276,7 @@ recordField.prototype = {
                 console.error('Unable to set a value to a readonly field');
             }
 
-            return;
+            return this;
         }
 
         vocabularyId = checkVocabId(vocabularyId);
@@ -285,7 +285,7 @@ recordField.prototype = {
             console.log('Try to remove value ', value, vocabularyId, this.datas);
         }
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             if (window.console) {
                 console.log('loopin... ', this.datas[d].getValue());
             }
@@ -310,7 +310,7 @@ recordField.prototype = {
     isEmpty: function () {
         var empty = true;
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             if (this.datas[d].getValue() !== '') {
                 empty = false;
             }
@@ -324,10 +324,10 @@ recordField.prototype = {
                 console.error('Unable to set a value to a readonly field');
             }
 
-            return;
+            return this;
         }
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             this.datas[d].remove();
             this.options.dirty = true;
         }
@@ -357,7 +357,7 @@ recordField.prototype = {
 
         var arrayValues = [];
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             if (this.datas[d].getValue() === '') {
                 continue;
             }
@@ -377,7 +377,7 @@ recordField.prototype = {
         var arrayValues = [];
         var values = this.getValues();
 
-        for (var v in values) {
+        for (let v in values) {
             arrayValues.push(values[v].getValue());
         }
 
@@ -395,7 +395,7 @@ recordField.prototype = {
 
         var n = 0;
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             if (this.datas[d].getVocabularyId() !== null) {
                 continue;
             }
@@ -424,7 +424,7 @@ recordField.prototype = {
 
         var returnValue = [];
 
-        for (var d in this.datas) {
+        for (let d in this.datas) {
             var temp = {
                 meta_id: this.datas[d].getMetaId() ? this.datas[d].getMetaId() : '',
                 meta_struct_id: this.getMetaStructId(),

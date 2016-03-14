@@ -21,8 +21,9 @@ const user = (translations) => {
     const manageSession = (...params) => {
         let [data, showMessages] = params;
 
-        if (typeof (showMessages) === 'undefined')
+        if (typeof (showMessages) === 'undefined') {
             showMessages = false;
+        }
 
         if (data.status === 'disconnected' || data.status === 'session') {
             disconnected();
@@ -53,7 +54,7 @@ const user = (translations) => {
              var current_sstt = current_open.length > 0 ? current_open.attr('id').split('_').pop() : false;
 
              var main_open = false;
-             for (var i = 0; i != data.changed.length; i++) {
+             for (let i = 0; i != data.changed.length; i++) {
              var sstt = $('#SSTT_' + data.changed[i]);
              if (sstt.size() === 0) {
              if (main_open === false) {
@@ -74,8 +75,9 @@ const user = (translations) => {
              }*/
             // @todo: to be moved
             if ($.trim(data.message) !== '') {
-                if ($('#MESSAGE').length === 0)
+                if ($('#MESSAGE').length === 0) {
                     $('body').append('<div id="#MESSAGE"></div>');
+                }
                 $('#MESSAGE')
                     .empty()
                     .append(data.message + '<div style="margin:20px;"><input type="checkbox" class="dialog_remove" />' + language.hideMessage + '</div>')
@@ -87,8 +89,10 @@ const user = (translations) => {
                         draggable: false,
                         modal: true,
                         close: function () {
-                            if ($('.dialog_remove:checked', $(this)).length > 0)
+                            if ($('.dialog_remove:checked', $(this)).length > 0) {
+                                // @TODO get from module
                                 setTemporaryPref('message', 0);
+                            }
                         }
                     })
                     .dialog('open');

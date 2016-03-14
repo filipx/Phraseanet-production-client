@@ -229,7 +229,7 @@ Queue.prototype = {
     },
     getLength: function () {
         var count = 0;
-        for (var k in this.list) {
+        for (let k in this.list) {
             if (this.list.hasOwnProperty(k)) {
                 ++count;
             }

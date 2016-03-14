@@ -22,7 +22,6 @@ import basket from './components/basket';
 import search from './components/search';
 import utils from './components/utils/utils';
 import dialog from './components/utils/dialog';
-import Selectable from './components/utils/selectable';
 
 class Bootstrap {
 

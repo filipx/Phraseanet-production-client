@@ -100,12 +100,14 @@ const previewRecordService = (services) => {
                         closePreview();
                         break;
                     case 32:
-                        if (options.slideShow)
+                        if (options.slideShow) {
                             stopSlide();
-                        else
+                        } else {
                             startSlide();
+                        }
                         specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                         break;
+                    default:
                 }
             }
         }
@@ -121,8 +123,9 @@ const previewRecordService = (services) => {
      */
     function _openPreview(env, pos, contId, reload) {
 
-        if (contId === undefined)
+        if (contId === undefined) {
             contId = '';
+        }
         var roll = 0;
         var justOpen = false;
 
@@ -148,13 +151,15 @@ const previewRecordService = (services) => {
             options.nCurrent = 5;
             $('#PREVIEWCURRENT, #PREVIEWOTHERSINNER, #SPANTITLE').empty();
             resizePreview();
-            if (env === 'BASK')
+            if (env === 'BASK') {
                 roll = 1;
+            }
 
         }
 
-        if (reload === true)
+        if (reload === true) {
             roll = 1;
+        }
 
 
         $('#tooltip').css({
@@ -192,10 +197,12 @@ const previewRecordService = (services) => {
                 query: query
             },
             beforeSend: function () {
-                if (prevAjaxrunning)
+                if (prevAjaxrunning) {
                     prevAjax.abort();
-                if (env === 'RESULT')
+                }
+                if (env === 'RESULT') {
                     $('#current_result_n').empty().append(parseInt(pos, 10) + 1);
+                }
                 prevAjaxrunning = true;
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').addClass('loading');
             },
@@ -216,8 +223,9 @@ const previewRecordService = (services) => {
                 if (data.error) {
                     $('#PREVIEWIMGDESC, #PREVIEWOTHERS').removeClass('loading');
                     alert(data.error);
-                    if (justOpen)
+                    if (justOpen) {
                         closePreview();
+                    }
                     return;
                 }
                 posAsk = data.pos - 1;
@@ -282,8 +290,9 @@ const previewRecordService = (services) => {
                     display: 'none'
                 });
                 $('#PREVIEWIMGDESC, #PREVIEWOTHERS').removeClass('loading');
-                if (!justOpen || (options.mode !== env))
+                if (!justOpen || (options.mode !== env)) {
                     resizePreview();
+                }
 
                 options.mode = env;
                 $('#EDIT_query').focus();
@@ -332,6 +341,7 @@ const previewRecordService = (services) => {
             $('#start_slide').hide();
             $('#stop_slide').show();
             getNext();
+            // @TODO - test n fix
             setTimeout('startSlide()', 3000);
         }
     }
@@ -408,7 +418,7 @@ const previewRecordService = (services) => {
                 w = Math.round(h * ratioP);
             }
         } else {
-            if ((parseInt(w) + margX) > parseInt(options.width, 10)) {
+            if ((parseInt(w, 10) + margX) > parseInt(options.width, 10)) {
                 w = Math.round(parseInt(options.width, 10) - margX);
                 h = Math.round(w / ratioP);
             }
@@ -498,8 +508,9 @@ const previewRecordService = (services) => {
             success: function (data) {
                 _setCurrent(data.current);
                 _viewCurrent($('#PREVIEWCURRENT li.selected'));
-                if (typeof (tools) !== 'undefined')
+                if (typeof (tools) !== 'undefined') {
                     _setTools(tools);
+                }
                 return;
             }
         });

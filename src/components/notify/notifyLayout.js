@@ -26,8 +26,9 @@ const notifyLayout = () => {
         });
 
         $(document).on('mousedown', () => {
-            if ($notificationTrigger.hasClass('open'))
+            if ($notificationTrigger.hasClass('open')) {
                 $notificationTrigger.trigger('click');
+            }
 
             if ($notificationTrigger.hasClass('open')) {
                 $notificationBoxContainer.hide();
@@ -64,8 +65,9 @@ const notifyLayout = () => {
         // var box = $('#notification_box');
         $notificationBoxContainer.empty().append(notificationContent);
 
-        if ($notificationBoxContainer.is(':visible'))
+        if ($notificationBoxContainer.is(':visible')) {
             setBoxHeight();
+        }
 
         if ($('.notification.unread', $notificationBoxContainer).length > 0) {
             $('.counter', $notificationTrigger)
@@ -73,9 +75,9 @@ const notifyLayout = () => {
                 .append($('.notification.unread', $notificationBoxContainer).length);
             $('.counter', $notificationTrigger).css('visibility', 'visible');
 
-        }
-        else
+        } else {
             $('#notification_trigger .counter').css('visibility', 'hidden').empty();
+        }
     };
 
 
@@ -152,10 +154,11 @@ const notifyLayout = () => {
                 $notificationDialog.removeClass('loading');
 
 
-                if (page === 0)
+                if (page === 0) {
                     $notificationDialog.empty();
-                else
+                } else {
                     $('.notification_next', $notificationDialog).remove();
+                }
 
                 let i = 0;
                 for (i in data.notifications) {
@@ -213,8 +216,9 @@ const notifyLayout = () => {
     const clear_notifications = () => {
         var unread = $('#notification_box .unread');
 
-        if (unread.length === 0)
+        if (unread.length === 0) {
             return;
+        }
 
         unread.removeClass('unread');
         $('#notification_trigger .counter').css('visibility', 'hidden').empty();

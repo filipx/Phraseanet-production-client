@@ -7,10 +7,8 @@ const basket = () => {
     const onUpdatedContent = (data) => {
 
         if (data.changed.length > 0) {
-            var current_open = $('.SSTT.ui-state-active');
-            var current_sstt = current_open.length > 0 ? current_open.attr('id').split('_').pop() : false;
-
-            var main_open = false;
+            let current_open = $('.SSTT.ui-state-active');
+            let main_open = false;
             for (let i = 0; i !== data.changed.length; i++) {
                 var sstt = $('#SSTT_' + data.changed[i]);
                 if (sstt.size() === 0) {

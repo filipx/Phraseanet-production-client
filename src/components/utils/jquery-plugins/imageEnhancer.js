@@ -133,8 +133,9 @@ import $ from 'jquery';
     };
 
     function zoomPreview(bool, ratio, $img, $container) {
-        if ($img.length === 0)
+        if ($img.length === 0) {
             return;
+        }
 
         let t1 = parseInt($img.css('top'), 10);
         let l1 = parseInt($img.css('left'), 10);
@@ -142,7 +143,6 @@ import $ from 'jquery';
         let h1 = $img.height();
 
         let w2;
-        let t2;
 
         if (bool) {
             if ((w1 * 1.08) < 32767) {
@@ -158,13 +158,8 @@ import $ from 'jquery';
             }
         }
 
-        let datas = $(this).data('image_enhance');
-
         h2 = Math.round(w2 / ratio);
         w2 = Math.round(w2);
-
-        t2 = Math.round(t1 - (h2 - h1) / 2) + 'px';
-        let l2 = Math.round(l1 - (w2 - w1) / 2) + 'px';
 
         let wPreview = $container.width() / 2;
         let hPreview = $container.height() / 2;
@@ -179,8 +174,9 @@ import $ from 'jquery';
     }
 
     function calculate_sizes(window_width, window_height, image_width, image_height, border) {
-        if (typeof border !== 'number')
+        if (typeof border !== 'number') {
             border = 0;
+        }
 
         let width;
         let height;

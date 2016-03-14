@@ -253,7 +253,7 @@ const Feedback = function (services, options) {
         var url = $(this).attr('href');
 
         var callbackList = function (list) {
-            for (var i in list.entries) {
+            for (let i in list.entries) {
                 this.selectUser(list.entries[i].User);
             }
         };
@@ -307,7 +307,7 @@ const Feedback = function (services, options) {
                 if (ui.item.type === 'USER') {
                     $this.selectUser(ui.item);
                 } else if (ui.item.type === 'LIST') {
-                    for (var e in ui.item.entries) {
+                    for (let e in ui.item.entries) {
                         $this.selectUser(ui.item.entries[e].User);
                     }
                 }

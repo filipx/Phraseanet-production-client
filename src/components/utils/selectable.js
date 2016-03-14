@@ -62,8 +62,8 @@ const Selectable = function ($container, options) {
                     $.each($(exp, this.$container), function (i, n) {
                         if (!$(n).hasClass('selected') && stopped === false) {
                             if (!$this.hasReachLimit()) {
-                                let k = get_value($(n), $this);
-                                $this.push(k);
+                                let contain = get_value($(n), $this);
+                                $this.push(contain);
                                 $(n).addClass('selected');
                             } else {
                                 alert(language.max_record_selected);
@@ -114,7 +114,7 @@ const Selectable = function ($container, options) {
 
         });
 
-    return;
+    return this;
 };
 
 function get_value(element, Selectable) {

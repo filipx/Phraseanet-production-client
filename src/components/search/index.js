@@ -204,8 +204,9 @@ const search = (services) => {
             data: data,
             dataType: 'json',
             beforeSend: function (formData) {
-                if (answAjaxrunning && answAjax.abort)
+                if (answAjaxrunning && answAjax.abort) {
                     answAjax.abort();
+                }
                 beforeSearch();
             },
             error: function () {
@@ -276,8 +277,9 @@ const search = (services) => {
     };
 
     const afterSearch = () => {
-        if ($('#answercontextwrap').length === 0)
+        if ($('#answercontextwrap').length === 0) {
             $('body').append('<div id="answercontextwrap"></div>');
+        }
 
         $.each($('#answers .contextMenuTrigger'), function () {
 

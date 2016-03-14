@@ -11,7 +11,7 @@ let humane = require('humane-js');
 const workzone = (services) => {
     const { configService, localeService, appEvents } = services;
     let workzoneOptions = {};
-    let searchSelection = { asArray: [], serialized: '' };
+    let searchSelection = {asArray: [], serialized: ''};
     workzoneFacets(services);
     workzoneBaskets(services).initialize();
     workzoneThesaurus(services).initialize();
@@ -45,10 +45,12 @@ const workzone = (services) => {
                     _saveWindows();
                     return;
                 }
-                if (nwidth < 265)
+                if (nwidth < 265) {
                     nwidth = 265;
-                if (el.find('div.chim-wrapper:first').hasClass('valid') && nwidth < 410)
+                }
+                if (el.find('div.chim-wrapper:first').hasClass('valid') && nwidth < 410) {
                     nwidth = 410;
+                }
 
 
                 $('#idFrameC').stop().animate({
@@ -140,7 +142,6 @@ const workzone = (services) => {
         });
         $('.basket_refresher').on('click', function () {
             return workzoneOptions.refresh('current');
-            return false;
         });
         activeBaskets();
 
@@ -151,7 +152,7 @@ const workzone = (services) => {
         });
         // workzoneOptions
         workzoneOptions = {
-            selection: new Selectable($('#baskets'), { selector: '.CHIM' }),
+            selection: new Selectable($('#baskets'), {selector: '.CHIM'}),
             refresh: refreshBaskets,
             addElementToBasket: function (options) {
                 let { sbas_id, record_id, event, singleSelection } = options;
@@ -167,8 +168,9 @@ const workzone = (services) => {
             removeElementFromBasket: WorkZoneElementRemover,
             reloadCurrent: function () {
                 var sstt = $('#baskets .content:visible');
-                if (sstt.length === 0)
+                if (sstt.length === 0) {
                     return;
+                }
                 getContent(sstt.prev());
             },
             close: function () {
@@ -180,7 +182,7 @@ const workzone = (services) => {
                     $('#idFrameC .tabs > .ui-tabs-panel').hide();
 
                     frame.data('openwidth', frame.width());
-                    frame.animate({ width: 100 },
+                    frame.animate({width: 100},
                         300,
                         'linear',
                         function () {
@@ -200,7 +202,7 @@ const workzone = (services) => {
 
                 if (frame.hasClass('closed')) {
                     var width = frame.data('openwidth') ? frame.data('openwidth') : 300;
-                    frame.css({ width: width });
+                    frame.css({width: width});
                     appEvents.emit('ui.answerSizer');
                     appEvents.emit('ui.linearizeUi');
                     frame.removeClass('closed');
@@ -325,12 +327,13 @@ const workzone = (services) => {
                         opacity: 0.7
                     }
                 }).dialog('open');
+            // @TODO - check if return have always existed
             return;
         }
 
         var id = $(el).attr('id').split('_').slice(2, 4).join('_');
 
-        $.ajax({
+        return $.ajax({
             type: 'POST',
             url: $(el).attr('href'),
             dataType: 'json',
@@ -378,10 +381,8 @@ const workzone = (services) => {
                     humane.error(data.message);
                     $('.wrapCHIM_' + id).find('.CHIM').fadeIn();
                 }
-                return;
             }
         });
-        return false;
     }
 
 
@@ -398,8 +399,9 @@ const workzone = (services) => {
                 if (nextBasketScroll) {
                     nextBasketScroll = false;
 
-                    if (!b_active.next().is(':visible'))
+                    if (!b_active.next().is(':visible')) {
                         return;
+                    }
 
                     var t = $('#baskets .SSTT.active').position().top + b_active.next().height() - 200;
 
@@ -433,8 +435,9 @@ const workzone = (services) => {
 
         $('.bloc', cache).droppable({
             accept: function (elem) {
-                if ($(elem).hasClass('grouping') && !$(elem).hasClass('SSTT'))
+                if ($(elem).hasClass('grouping') && !$(elem).hasClass('SSTT')) {
                     return true;
+                }
                 return false;
             },
             scope: 'objects',
@@ -461,8 +464,9 @@ const workzone = (services) => {
                             return false;
                         }
                     }
-                    if ($(elem).hasClass('grouping') || $(elem).parent()[0] === $(this)[0])
+                    if ($(elem).hasClass('grouping') || $(elem).parent()[0] === $(this)[0]) {
                         return false;
+                    }
                     return true;
                 },
                 drop: function (event, ui) {
@@ -470,8 +474,9 @@ const workzone = (services) => {
                 }
             });
 
-        if ($('#basketcontextwrap').length === 0)
+        if ($('#basketcontextwrap').length === 0) {
             $('body').append('<div id="basketcontextwrap"></div>');
+        }
 
         $('.context-menu-item', cache).hover(function () {
             $(this).addClass('context-menu-item-hover');
@@ -536,8 +541,9 @@ const workzone = (services) => {
                                 return false;
                             }
                         }
-                        if ($(elem).hasClass('grouping') || $(elem).parent()[0] === $(this)[0])
+                        if ($(elem).hasClass('grouping') || $(elem).parent()[0] === $(this)[0]) {
                             return false;
+                        }
                         return true;
                     },
                     hoverClass: 'baskDrop',
@@ -584,10 +590,11 @@ const workzone = (services) => {
                             .remove();
                     },
                     drag: function (event, ui) {
-                        if (AppCommons.utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping'))
+                        if (AppCommons.utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping')) {
                             $('#dragDropCursor div').empty().append('+ ' + workzoneOptions.selection.length());
-                        else
+                        } else {
                             $('#dragDropCursor div').empty().append(workzoneOptions.selection.length());
+                        }
 
                     }
                 });
@@ -656,7 +663,7 @@ const workzone = (services) => {
                 let sameSbas = true;
                 const sbas_reg = destKey.attr('sbas');
 
-                for (var i = 0; i < lstbr.length && sameSbas; i++) {
+                for (let i = 0; i < lstbr.length && sameSbas; i++) {
                     if (lstbr[i].split('_').shift() !== sbas_reg) {
                         sameSbas = false;
                         break;
@@ -668,6 +675,7 @@ const workzone = (services) => {
                 }
 
                 break;
+            default:
         }
         let url = '';
         let data = {};
@@ -693,8 +701,7 @@ const workzone = (services) => {
                 if (window.console) {
                     console.log('Should not happen');
                 }
-                return;
-                break;
+                return false;
         }
 
         if (window.console) {
@@ -721,7 +728,7 @@ const workzone = (services) => {
                     return workzoneOptions.reloadCurrent();
                 }
 
-                return;
+                return true;
             }
         });
     }
@@ -730,7 +737,7 @@ const workzone = (services) => {
         $.ajax({
             type: 'POST',
             url: '../prod/WorkZone/attachStories/',
-            data: { stories: searchSelection.asArray },
+            data: {stories: searchSelection.asArray},
             dataType: 'json',
             success: function (data) {
                 humane.info(data.message);
@@ -754,6 +761,7 @@ const workzone = (services) => {
     function setRemoveWarning(state) {
         warnOnRemove = state;
     }
+
     // remove record from basket/story preferences
     function toggleRemoveWarning(el) {
         var state = !el.checked;
@@ -766,8 +774,12 @@ const workzone = (services) => {
             searchSelection = selection;
         },
         'workzone.refresh': refreshBaskets,
-        'workzone.doAddToBasket': (options) => { workzoneOptions.addElementToBasket(options);},
-        'workzone.doRemoveFromBasket': (options) => { WorkZoneElementRemover(options.event, options.confirm); },
+        'workzone.doAddToBasket': (options) => {
+            workzoneOptions.addElementToBasket(options);
+        },
+        'workzone.doRemoveFromBasket': (options) => {
+            WorkZoneElementRemover(options.event, options.confirm);
+        },
         'workzone.doRemoveWarning': setRemoveWarning,
         'workzone.doToggleRemoveWarning': toggleRemoveWarning
     });

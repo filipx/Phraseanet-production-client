@@ -21,10 +21,12 @@ const deleteBasket = (services) => {
 
                 var lst = '';
 
-                if (type === 'IMGT')
+                if (type === 'IMGT') {
                     lst = p4.Results.Selection.serialize();
-                if (type === 'CHIM')
+                }
+                if (type === 'CHIM') {
                     lst = p4.WorkZone.Selection.serialize();
+                }
 
                 _deleteRecords(lst);
                 break;
@@ -50,7 +52,7 @@ const deleteBasket = (services) => {
                 lst = $el.val();
                 _deleteRecords(lst);
                 break;
-
+            default:
         }
     };
 

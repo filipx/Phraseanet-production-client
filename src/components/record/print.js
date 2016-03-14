@@ -18,6 +18,7 @@ const printRecord = (services) => {
                 case 'record':
                     key = 'lst';
                     break;
+                default:
             }
 
             doPrint(`${key}=${idContent}`);

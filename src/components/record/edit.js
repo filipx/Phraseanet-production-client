@@ -22,6 +22,7 @@ const editRecord = (services) => {
                 case 'record':
                     type = 'IMGT';
                     break;
+                default:
             }
 
             _doEdit(type, idContent);
@@ -82,6 +83,7 @@ const editRecord = (services) => {
             case 'STORY':
                 datas.story = value;
                 break;
+            default:
         }
 
         return openModal(datas);

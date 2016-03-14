@@ -19,6 +19,7 @@ const exportRecord = (services) => {
                 case 'record':
                     key = 'lst';
                     break;
+                default:
             }
 
             doExport(`${key}=${idContent}`);

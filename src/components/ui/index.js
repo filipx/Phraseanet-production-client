@@ -71,6 +71,7 @@ const ui = (services) => {
                             display: 'none'
                         });
                         break;
+                    default:
                 }
             } else {
                 if ($('#EDITWINDOW').is(':visible')) {
@@ -91,7 +92,7 @@ const ui = (services) => {
                         if ($('.ui-widget-overlay').is(':visible')) {
                             return true;
                         }
-
+                        // @TODO imbricated switch case
                         switch (this.appUi.getActiveZone()) {
                             case 'rightFrame':
                                 switch (event.keyCode) {
@@ -135,6 +136,7 @@ const ui = (services) => {
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
+                                    default:
                                 }
                                 break;
 
@@ -183,6 +185,7 @@ const ui = (services) => {
                                             specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                                         }
                                         break;
+                                    default:
                                 }
                                 break;
 
@@ -210,8 +213,9 @@ const ui = (services) => {
             }
             if (specialKeyState.isCancelKey) {
                 event.cancelBubble = true;
-                if (event.stopPropagation)
+                if (event.stopPropagation) {
                     event.stopPropagation();
+                }
                 return (false);
             }
             return (true);
@@ -220,8 +224,9 @@ const ui = (services) => {
 
     const hideOverlay = (n) => {
         var div = 'OVERLAY';
-        if (typeof (n) !== 'undefined')
+        if (typeof (n) !== 'undefined') {
             div += n;
+        }
         $('#' + div).hide().remove();
     };
 
@@ -331,8 +336,9 @@ const ui = (services) => {
             var diff = 28;
             n = Math.round(fllWidth / (stdWidth));
             var w = Math.floor(fllWidth / n) - diff;
-            if (w < 360 && n > 1)
+            if (w < 360 && n > 1) {
                 w = Math.floor(fllWidth / (n - 1)) - diff;
+            }
             $('#answers .list').width(w);
         } else {
 
@@ -343,7 +349,7 @@ const ui = (services) => {
 
             n = Math.floor(fllWidth / (diapoWidth));
 
-            margin = Math.floor((fllWidth % diapoWidth) / (2 * n));
+            let margin = Math.floor((fllWidth % diapoWidth) / (2 * n));
             margin = margin + minMargin;
 
             $('#answers .diapo').css('margin', '5px ' + (margin) + 'px');

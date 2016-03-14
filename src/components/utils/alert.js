@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import dialog from './dialog';
+// import dialog from './dialog';
 
 function create_dialog() {
     if ($('#p4_alerts').length === 0) {
@@ -9,21 +9,22 @@ function create_dialog() {
 }
 
 function alert(title, message, callback) {
-    var dialog = create_dialog();
+    var $dialog = create_dialog();
 
     var button = {};
 
-    button['Ok'] = function () {
-        if (typeof callback === 'function')
+    button.Ok = function () {
+        if (typeof callback === 'function') {
             callback();
-        else
-            dialog.dialog('close');
+        } else {
+            $dialog.dialog('close');
+        }
     };
-    if (dialog.data('ui-dialog')) {
-        dialog.dialog('destroy');
+    if ($dialog.data('ui-dialog')) {
+        $dialog.dialog('destroy');
     }
 
-    dialog.attr('title', title)
+    $dialog.attr('title', title)
         .empty()
         .append(message)
         .dialog({
@@ -40,7 +41,7 @@ function alert(title, message, callback) {
         }).dialog('open');
 
     if (typeof callback === 'function') {
-        dialog.bind('dialogclose', function (event, ui) {
+        $dialog.bind('dialogclose', function (event, ui) {
             callback();
         });
     }

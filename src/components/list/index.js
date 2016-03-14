@@ -17,8 +17,6 @@ var List = function (id) {
 Lists.prototype = {
     create: function (name, callback) {
 
-        var $this = this;
-
         $.ajax({
             type: 'POST',
             url: '/prod/lists/list/',
@@ -41,7 +39,6 @@ Lists.prototype = {
     },
     get: function (callback, type) {
 
-        var $this = this;
         type = typeof type === 'undefined' ? 'json' : type;
 
         $.ajax({

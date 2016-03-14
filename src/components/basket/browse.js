@@ -76,8 +76,9 @@ const basketBrowse = (services) => {
                 url,
                 dataType: 'html',
                 beforeSend: function () {
-                    if (results && results.abort && typeof results.abort === 'function')
+                    if (results && results.abort && typeof results.abort === 'function') {
                         results.abort();
+                    }
                     $('.Browser', $container).hide();
                     $('.Basket', $container).addClass('loading').empty().show();
                 },
@@ -233,16 +234,14 @@ const basketBrowse = (services) => {
 
         $('form[name="BasketBrowser"]', $container).bind('submit', function () {
 
-            var $this = $(this);
+            let $this = $(this);
 
             loadResults($this.serializeArray(), $this.attr('action'));
 
             return false;
         }).trigger('submit').find('label').bind('click', function () {
             const input = $(this).prev('input');
-            let name = input.attr('name');
-
-            var inputs = $('input[name="' + $(this).prev('input').attr('name') + '"]', $container);
+            let inputs = $('input[name="' + $(this).prev('input').attr('name') + '"]', $container);
             inputs.prop('checked', false).next('label').removeClass('selected');
 
             input.prop('checked', true).next('label').addClass('selected');

@@ -2,9 +2,8 @@ import $ from 'jquery';
 (function () {
     $.fn.extend({
         highlight: function (color) {
-            console.log('high ligh binded');
             if ($(this).hasClass('animating')) {
-                return;
+                return $(this);
             }
             color = typeof color !== 'undefined' ? color : 'red';
             const oldColor = $(this).css('backgroundColor');

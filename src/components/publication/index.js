@@ -173,13 +173,13 @@ const publication = (services) => {
     };
 
 
-    var _fetchRemote = function (url, data) {
-        var page = 0;
+    const _fetchRemote = function (url, data) {
+        let page = 0;
         if (data.page === undefined) {
             page = data.page;
         }
 
-        return ajaxState.query = $.ajax({
+        ajaxState.query = $.ajax({
             type: 'GET',
             url: url,
             dataType: 'html',
@@ -206,6 +206,7 @@ const publication = (services) => {
                 ajaxState.isRunning = false;
             }
         });
+        return ajaxState.query;
     };
 
     var openModal = function (data) {
@@ -349,6 +350,7 @@ const publication = (services) => {
             case 'SSTT':
                 options.ssel = value;
                 break;
+            default:
         }
 
         $.post('../prod/feeds/requestavailable/'

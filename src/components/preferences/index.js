@@ -52,19 +52,19 @@ const preferences = (services) => {
             onSubmit: function (hsb, hex, rgb, el) {
                 var back_hex = '';
                 var unactive = '';
-
+                var sim_b;
 
                 if (hsb.b >= 50) {
                     back_hex = '000000';
 
-                    var sim_b = 0.1 * hsb.b;
+                    sim_b = 0.1 * hsb.b;
                 } else {
                     back_hex = 'FFFFFF';
 
-                    var sim_b = 100 - 0.1 * (100 - hsb.b);
+                    sim_b = 100 - 0.1 * (100 - hsb.b);
                 }
 
-                var sim_b = 0.1 * hsb.b;
+                sim_b = 0.1 * hsb.b;
 
                 var sim_rgb = utilsModule.hsl2rgb(hsb.h, hsb.s, sim_b);
                 var sim_hex = utilsModule.RGBtoHex(sim_rgb.r, sim_rgb.g, sim_rgb.b);
@@ -102,6 +102,7 @@ const preferences = (services) => {
             case 'QUERY':
                 $('#look_box_settings input[name=start_page_value]').show();
                 break;
+            default:
         }
     }
 

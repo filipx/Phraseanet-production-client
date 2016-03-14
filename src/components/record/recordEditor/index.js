@@ -187,15 +187,18 @@ const recordEditorService = (services) => {
                 break;
 
             case 33:	// pg up
-                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok'))
+                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok')) {
                     skipImage(event, 1);
+                }
                 specialKeyState.isCancelKey = true;
                 break;
             case 34:	// pg dn
-                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok'))
+                if (!options.textareaIsDirty || edit_validField(event, 'ask_ok')) {
                     skipImage(event, -1);
+                }
                 specialKeyState.isCancelKey = true;
                 break;
+            default:
         }
         return specialKeyState;
     };
@@ -231,10 +234,10 @@ const recordEditorService = (services) => {
         $editTextArea = $('#idEditZTextArea', options.$container);
 
         let recordCollection = options.T_records;
-        for (var r in recordCollection) {
+        for (let r in recordCollection) {
             var fields = {};
 
-            for (var f in options.T_records[r].fields) {
+            for (let f in options.T_records[r].fields) {
 
                 var meta_struct_id = options.T_records[r].fields[f].meta_struct_id;
 
@@ -266,7 +269,7 @@ const recordEditorService = (services) => {
 
                 var values = [];
 
-                for (var v in options.T_records[r].fields[f].values) {
+                for (let v in options.T_records[r].fields[f].values) {
                     var meta_id = options.T_records[r].fields[f].values[v].meta_id;
                     var value = options.T_records[r].fields[f].values[v].value;
                     var vocabularyId = options.T_records[r].fields[f].values[v].vocabularyId;
@@ -297,8 +300,9 @@ const recordEditorService = (services) => {
 
         $('#editcontextwrap').remove();
 
-        if ($('#editcontextwrap').length === 0)
+        if ($('#editcontextwrap').length === 0) {
             $('body').append('<div id="editcontextwrap"></div>');
+        }
 
 
         // if is a group, only select the group
@@ -395,7 +399,7 @@ const recordEditorService = (services) => {
             }
         });
 
-        var buttons = {};
+        let buttons = {};
         buttons[localeService.t('valider')] = function (e) {
             $(this).dialog('close');
             edit_applyMultiDesc(e);
@@ -413,8 +417,6 @@ const recordEditorService = (services) => {
             modal: true,
             buttons: buttons
         });
-
-        var buttons = {};
 
         buttons[localeService.t('valider')] = function () {
             var form = $('#Edit_copyPreset_dlg FORM');
@@ -555,8 +557,9 @@ const recordEditorService = (services) => {
         $('.EDIT_presets_list A.title').dblclick(
             function () {
                 var preset_id = $(this).parent().parent().attr('id');
-                if (preset_id.substr(0, 12) === 'EDIT_PRESET_')
+                if (preset_id.substr(0, 12) === 'EDIT_PRESET_') {
                     _preset_load(preset_id.substr(12));
+                }
                 return false;
             }
         );
@@ -619,19 +622,20 @@ const recordEditorService = (services) => {
                     $('#Edit_copyPreset_dlg').dialog('close');
                 }
 
-                for (i in options.T_fields) {
+                for (let i in options.T_fields) {
                     options.T_fields[i].preset = null;
                     if (typeof (data.fields[options.T_fields[i].name]) !== 'undefined') {
                         options.T_fields[i].preset = data.fields[options.T_fields[i].name];
                     }
                 }
-                for (var r = 0; r < options.T_records.length; r++) {
-                    if (!options.T_records[r]._selected)
+                for (let r = 0; r < options.T_records.length; r++) {
+                    if (!options.T_records[r]._selected) {
                         continue;
+                    }
 
-                    for (i in options.T_fields) {
+                    for (let i in options.T_fields) {
                         if (options.T_fields[i].preset !== null) {
-                            for (val in options.T_fields[i].preset) {
+                            for (let val in options.T_fields[i].preset) {
                                 // fix : some (old, malformed) presets values may need trim()
                                 options.T_records[r].fields['' + i].addValue(options.T_fields[i].preset[val].trim(), false, null);
                             }
@@ -645,13 +649,14 @@ const recordEditorService = (services) => {
 
     function _setPreviewEdit() {
         console.log('open preview tab');
-        if (!$('#TH_Opreview').is(':visible'))
+        if (!$('#TH_Opreview').is(':visible')) {
             return false;
+        }
 
         var selected = $('#EDIT_FILM2 .diapo.selected');
 
         if (selected.length !== 1) {
-            return;
+            return false;
         }
 
         var id = selected.attr('id').split('_').pop();
@@ -659,8 +664,9 @@ const recordEditorService = (services) => {
         var container = $('#TH_Opreview');
         var zoomable = $('img.record.zoomable', container);
 
-        if (zoomable.length > 0 && zoomable.hasClass('zoomed'))
-            return;
+        if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
+            return false;
+        }
 
         //  var datas = editor.T_records[id].preview;
 
@@ -674,7 +680,7 @@ const recordEditorService = (services) => {
         var margY = 0;
 
         if ($('img.record.record_audio', container).length > 0) {
-            var margY = 100;
+            margY = 100;
             de = 60;
         }
 
@@ -730,19 +736,20 @@ const recordEditorService = (services) => {
     }
 
     function skipImage(evt, step) {
-        var cache = $('#EDIT_FILM2');
-        var first = $('.diapo.selected:first', cache);
-        var last = $('.diapo.selected:last', cache);
-        var sel = $('.diapo.selected', cache);
+        let cache = $('#EDIT_FILM2');
+        let first = $('.diapo.selected:first', cache);
+        let last = $('.diapo.selected:last', cache);
+        let sel = $('.diapo.selected', cache);
 
         sel.removeClass('selected');
 
-        var i = step === 1 ? (parseInt(last.attr('pos'), 10) + 1) : (parseInt(first.attr('pos'), 10) - 1);
+        let i = step === 1 ? (parseInt(last.attr('pos'), 10) + 1) : (parseInt(first.attr('pos'), 10) - 1);
 
-        if (i < 0)
+        if (i < 0) {
             i = parseInt($('.diapo:last', cache).attr('pos'), 10);
-        else if (i >= $('.diapo', cache).length)
+        } else if (i >= $('.diapo', cache).length) {
             i = 0;
+        }
 
         _onSelectRecord(evt, i);
     }
@@ -907,9 +914,9 @@ const recordEditorService = (services) => {
     function _updateEditSelectedRecords(evt) {
         $('.editDiaButtons', options.$container).hide();
 // tous les statusbits de la base
-        for (var n in options.T_statbits) {
+        for (let n in options.T_statbits) {
             options.T_statbits[n]._value = '-1';			// val unknown
-            for (var i in options.T_records) {
+            for (let i in options.T_records) {
                 if (!options.T_records[i]._selected) {
                     continue;
                 }
@@ -941,6 +948,7 @@ const recordEditorService = (services) => {
                     ck0.removeClass('gui_ckbox_0 gui_ckbox_1').addClass('gui_ckbox_2');
                     ck1.removeClass('gui_ckbox_0 gui_ckbox_1').addClass('gui_ckbox_2');
                     break;
+                default:
             }
         }
 
@@ -961,13 +969,15 @@ const recordEditorService = (services) => {
         }
 
         // calcul des valeurs suggerees COMMUNES aux records (collections) selectionnes //
-        for (var f in options.T_fields)	// tous les champs de la base
+        // tous les champs de la base
+        for (let f in options.T_fields) {
             options.T_fields[f]._sgval = [];
+        }
         var t_lsgval = {};
         var t_selcol = {};		// les bases (coll) dont au - une thumb est selectionnee
         var ncolsel = 0;
         var nrecsel = 0;
-        for (var i in options.T_records) {
+        for (let i in options.T_records) {
             if (!options.T_records[i]._selected) {
                 continue;
             }
@@ -980,11 +990,11 @@ const recordEditorService = (services) => {
 
             t_selcol[bid] = 1;
             ncolsel++;
-            for (var f in options.T_sgval[bid]) {
+            for (let f in options.T_sgval[bid]) {
                 if (!t_lsgval[f]) {
                     t_lsgval[f] = {};
                 }
-                for (var ivs in options.T_sgval[bid][f]) {
+                for (let ivs in options.T_sgval[bid][f]) {
                     let vs = options.T_sgval[bid][f][ivs];
                     if (!t_lsgval[f][vs]) {
                         t_lsgval[f][vs] = 0;
@@ -994,8 +1004,8 @@ const recordEditorService = (services) => {
             }
         }
         var t_sgval = {};
-        for (var f in t_lsgval) {
-            for (var sv in t_lsgval[f]) {
+        for (let f in t_lsgval) {
+            for (let sv in t_lsgval[f]) {
                 if (t_lsgval[f][sv] === ncolsel) {
                     options.T_fields[f]._sgval.push({
                             label: sv,
@@ -1059,9 +1069,9 @@ const recordEditorService = (services) => {
 
     function _updateFieldDisplay() {
         // tous les champs de la base
-        for (var f in options.T_fields) {
+        for (let f in options.T_fields) {
             options.T_fields[f]._status = 0;			// val unknown
-            for (var i in options.T_records) {
+            for (let i in options.T_records) {
                 if (!options.T_records[i]._selected) {
                     continue;
                 }
@@ -1131,7 +1141,7 @@ const recordEditorService = (services) => {
         var a = [];		// key : mot ; val : nbr d'occurences distinctes
         var n = 0;					// le nbr de records selectionnes
 
-        for (var r in options.T_records) {
+        for (let r in options.T_records) {
             if (!options.T_records[r]._selected) {
                 continue;
             }
@@ -1140,9 +1150,9 @@ const recordEditorService = (services) => {
 
             var values = options.T_records[r].fields[meta_struct_id].getValues();
 
-            for (var v in values) {
-                var word = values[v].getValue();
-                var key = values[v].getVocabularyId() + '%' + word;
+            for (let v in values) {
+                let word = values[v].getValue();
+                let key = values[v].getVocabularyId() + '%' + word;
 
                 if (typeof (a[key]) === 'undefined') {
                     a[key] = {
@@ -1166,12 +1176,12 @@ const recordEditorService = (services) => {
 
         var t = '';
         // pour lire le tableau 'a' dans l'ordre trie par 'editor.T_mval'
-        for (var i in options.T_mval) {
-            var value = options.T_mval[i];
-            var word = value.getValue();
-            var key = value.getVocabularyId() + '%' + word;
+        for (let i in options.T_mval) {
+            let value = options.T_mval[i];
+            let word = value.getValue();
+            let key = value.getVocabularyId() + '%' + word;
 
-            var extra = value.getVocabularyId() ? '<img src="/assets/common/images/icons/ressource16.png" /> ' : '';
+            let extra = value.getVocabularyId() ? '<img src="/assets/common/images/icons/ressource16.png" /> ' : '';
 
             if (i > 0) {
                 if (value.getVocabularyId() !== null && options.T_mval[i - 1].getVocabularyId() === value.getVocabularyId()) {
@@ -1200,24 +1210,24 @@ const recordEditorService = (services) => {
         $('#ZTextMultiValued_values', options.$container).html(t);
 
         $('#ZTextMultiValued_values .add_all', options.$container).unbind('click').bind('click', function () {
-            var container = $(this).closest('div');
+            let container = $(this).closest('div');
 
-            var span = $('span.value', container);
+            let span = $('span.value', container);
 
-            var value = span.text();
-            var vocab_id = span.attr('vocabid');
+            let value = span.text();
+            let vocab_id = span.attr('vocabid');
 
             _addMultivaluedField(value, vocab_id);
             _updateFieldDisplay();
             return false;
         });
         $('#ZTextMultiValued_values .remove_all', options.$container).unbind('click').bind('click', function () {
-            var container = $(this).closest('div');
+            let container = $(this).closest('div');
 
-            var span = $('span.value', container);
+            let span = $('span.value', container);
 
-            var value = span.text();
-            var vocab_id = span.attr('vocabid');
+            let value = span.text();
+            let vocab_id = span.attr('vocabid');
 
             _edit_delmval(value, vocab_id);
             _updateFieldDisplay();
@@ -1256,7 +1266,7 @@ const recordEditorService = (services) => {
 
             let status = 0;
             let firstvalue = '';
-            for (var i = 0; i < options.T_records.length; i++) {
+            for (let i = 0; i < options.T_records.length; i++) {
                 if (!options.T_records[i]._selected) {
                     continue;			// on ne modifie pas les fiches non selectionnees
                 }
@@ -1284,8 +1294,8 @@ const recordEditorService = (services) => {
 // on a clique sur une checkbox de status
 // ---------------------------------------------------------------------------
     function edit_clkstatus(evt, bit, val) {
-        var ck0 = $('#idCheckboxStatbit0_' + bit);
-        var ck1 = $('#idCheckboxStatbit1_' + bit);
+        let ck0 = $('#idCheckboxStatbit0_' + bit);
+        let ck1 = $('#idCheckboxStatbit1_' + bit);
         switch (val) {
             case 0:
                 ck0.attr('class', 'gui_ckbox_1');
@@ -1295,9 +1305,10 @@ const recordEditorService = (services) => {
                 ck0.attr('class', 'gui_ckbox_0');
                 ck1.attr('class', 'gui_ckbox_1');
                 break;
+            default:
         }
 
-        for (var id in options.T_records) {
+        for (let id in options.T_records) {
             // toutes les fiches selectionnees
             if (options.T_records[id]._selected) {
                 if ($('#idEditDiapo_' + id).hasClass('nostatus')) {
@@ -1327,16 +1338,16 @@ const recordEditorService = (services) => {
 
         if (evt && AppCommons.utilsModule.is_shift_key(evt) && options.lastClickId !== null) {
             // shift donc on sel du editor.lastClickId a ici
-            var pos_from = options.T_pos[options.lastClickId];
-            var pos_to = options.T_pos[i];
+            let pos_from = options.T_pos[options.lastClickId];
+            let pos_to = options.T_pos[i];
             if (pos_from > pos_to) {
-                var tmp = pos_from;
+                let tmp = pos_from;
                 pos_from = pos_to;
                 pos_to = tmp;
             }
 
-            for (var pos = pos_from; pos <= pos_to; pos++) {
-                var id = options.T_id[pos];
+            for (let pos = pos_from; pos <= pos_to; pos++) {
+                let id = options.T_id[pos];
                 // toutes les fiches selectionnees
                 if (!options.T_records[id]._selected) {
                     options.T_records[id]._selected = true;
@@ -1347,7 +1358,7 @@ const recordEditorService = (services) => {
             if (!evt || !AppCommons.utilsModule.is_ctrl_key(evt)) {
                 // on deselectionne tout avant
 
-                for (var id in options.T_records) {
+                for (let id in options.T_records) {
                     // toutes les fiches selectionnees
                     if (options.T_records[id]._selected) {
                         options.T_records[id]._selected = false;
@@ -1367,10 +1378,10 @@ const recordEditorService = (services) => {
 
         $('#TH_Opreview .PNB10').empty();
 
-        var selected = $('#EDIT_FILM2 .diapo.selected');
+        let selected = $('#EDIT_FILM2 .diapo.selected');
         if (selected.length === 1) {
 
-            var r = selected.attr('id').split('_').pop();
+            let r = selected.attr('id').split('_').pop();
             _previewEdit(r);
         }
 
@@ -1382,37 +1393,37 @@ const recordEditorService = (services) => {
 // on a clique sur le 'ok' general : save
 // ----------------------------------------------------------------------------------
     function edit_applyMultiDesc(evt) {
-        var sendorder = '';
-        var sendChuOrder = '';
+        let sendorder = '';
+        let sendChuOrder = '';
 
-        var t = [];
+        let t = [];
 
         if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
-            return (false);
+            return false;
         }
 
-        var required_fields = _check_required();
+        let required_fields = _check_required();
 
         if (required_fields) {
             alert(localeService.t('some_required_fields'));
-            return;
+            return false;
         }
 
         $('#EDIT_ALL', options.$container).hide();
 
         $('#EDIT_WORKING', options.$container).show();
 
-        for (var r in options.T_records) {
-            var record_datas = {
+        for (let r in options.T_records) {
+            let record_datas = {
                 record_id: options.T_records[r].rid,
                 metadatas: [],
                 edit: 0,
                 status: null
             };
 
-            var editDirty = false;
+            let editDirty = false;
 
-            for (var f in options.T_records[r].fields) {
+            for (let f in options.T_records[r].fields) {
                 if (!options.T_records[r].fields[f].isDirty()) {
                     continue;
                 }
@@ -1426,12 +1437,12 @@ const recordEditorService = (services) => {
             }
 
             // les statbits
-            var tsb = [];
-            for (var n = 0; n < 64; n++) {
+            let tsb = [];
+            for (let n = 0; n < 64; n++) {
                 tsb[n] = 'x';
             }
-            var sb_dirty = false;
-            for (var n in options.T_records[r].statbits) {
+            let sb_dirty = false;
+            for (let n in options.T_records[r].statbits) {
                 if (options.T_records[r].statbits[n].dirty) {
                     tsb[63 - n] = options.T_records[r].statbits[n].value;
                     sb_dirty = true;
@@ -1439,14 +1450,15 @@ const recordEditorService = (services) => {
             }
 
             if (sb_dirty || editDirty) {
-                if (sb_dirty === true)
+                if (sb_dirty === true) {
                     record_datas.status = tsb.join('');
+                }
 
                 t.push(record_datas);
             }
         }
 
-        var params = {
+        let params = {
             mds: t,
             sbid: options.sbas_id,
             act: 'WORK',
@@ -1455,8 +1467,9 @@ const recordEditorService = (services) => {
             // regbasprid: editor.regbasprid,
             ssel: options.ssel
         };
-        if (options.newrepresent !== false)
+        if (options.newrepresent !== false) {
             params.newrepresent = options.newrepresent;
+        }
 
         $.ajax({
             url: '../prod/records/edit/apply/',
@@ -1481,11 +1494,12 @@ const recordEditorService = (services) => {
     function edit_cancelMultiDesc(evt) {
 
 
-        var dirty = false;
+        let dirty = false;
 
         evt.cancelBubble = true;
-        if (evt.stopPropagation)
+        if (evt.stopPropagation) {
             evt.stopPropagation();
+        }
 
         if (options.curField >= 0) {
             if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
@@ -1493,13 +1507,13 @@ const recordEditorService = (services) => {
             }
         }
 
-        for (var r in options.T_records) {
-            for (var f in options.T_records[r].fields) {
+        for (let r in options.T_records) {
+            for (let f in options.T_records[r].fields) {
                 if ((dirty |= options.T_records[r].fields[f].isDirty())) {
                     break;
                 }
             }
-            for (var n in options.T_records[r].statbits) {
+            for (let n in options.T_records[r].statbits) {
                 if ((dirty |= options.T_records[r].statbits[n].dirty)) {
                     break;
                 }
@@ -1510,10 +1524,10 @@ const recordEditorService = (services) => {
             $('#idFrameE .ww_content', options.$container).empty();
 
             // on reaffiche tous les thesaurus
-            /*for (var i in p4.thesau.thlist)	// tous les thesaurus
+            /*for (let i in p4.thesau.thlist)	// tous les thesaurus
              {
-             var bid = p4.thesau.thlist[i].sbas_id;
-             var e = document.getElementById('TH_T.' + bid + '.T');
+             let bid = p4.thesau.thlist[i].sbas_id;
+             let e = document.getElementById('TH_T.' + bid + '.T');
              if (e)
              e.style.display = "";
              }*/
@@ -1530,7 +1544,7 @@ const recordEditorService = (services) => {
 
         this.sbas_id = sbas_id;
 
-        var zid = ('' + sbas_id).replace(new RegExp('\\.', 'g'), '\\.') + '\\.T';
+        let zid = ('' + sbas_id).replace(new RegExp('\\.', 'g'), '\\.') + '\\.T';
 
         this.TH_P_node = $('#TH_P\\.' + zid, options.$container);
         this.TH_K_node = $('#TH_K\\.' + zid, options.$container);
@@ -1538,9 +1552,11 @@ const recordEditorService = (services) => {
         this._ctimer = null;
 
         this.search = function (txt) {
-            if (this._ctimer)
+            // @TODO - external call
+            if (this._ctimer) {
                 clearTimeout(this._ctimer);
-            var js = "ETHSeeker.search_delayed('" + txt.replace("'", "\\'") + "');";
+            }
+            let js = "ETHSeeker.search_delayed('" + txt.replace("'", "\\'") + "');";
             this._ctimer = setTimeout(js, 125);
         };
 
@@ -1550,8 +1566,8 @@ const recordEditorService = (services) => {
                 this.jq = null;
             }
             txt = txt.replace("'", "\\'");
-            var url = '/xmlhttp/openbranches_prod.h.php';
-            var parms = {
+            let url = '/xmlhttp/openbranches_prod.h.php';
+            let parms = {
                 bid: this.sbas_id,
                 lng: p4.lng,
                 t: txt,
@@ -1559,7 +1575,7 @@ const recordEditorService = (services) => {
                 u: Math.random()
             };
 
-            var me = this;
+            let me = this;
 
             this.jq = $.ajax({
                 url: url,
@@ -1578,22 +1594,22 @@ const recordEditorService = (services) => {
                 this.jq.abort();
                 this.jq = null;
             }
-            var url = '/xmlhttp/getterm_prod.h.php';
-            var parms = {
+            let url = '/xmlhttp/getterm_prod.h.php';
+            let parms = {
                 bid: this.sbas_id,
                 lng: p4.lng,
                 sortsy: 1,
                 id: thid,
                 typ: 'TH'
             };
-            var me = this;
+            let me = this;
 
 
             this.jq = $.ajax({
                 url: url,
                 data: parms,
                 success: function (ret) {
-                    var zid = '#TH_K\\.' + id.replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
+                    let zid = '#TH_K\\.' + id.replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
                     $(zid, options.$container).html(ret);
                     me.jq = null;
                 }
@@ -1611,6 +1627,7 @@ const recordEditorService = (services) => {
                 case 'TH_P':	// +/- de deploiement de mot
                     edit_thesaurus_ow(e.id.substr(5));
                     break;
+                default:
             }
         }
         return (false);
@@ -1625,7 +1642,7 @@ const recordEditorService = (services) => {
             switch (e.id.substr(0, 4)) {
                 case 'TH_W':
                     if (options.curField >= 0) {
-                        var w = $(e).text();
+                        let w = $(e).text();
                         if (options.T_fields[options.curField].multi) {
                             $('#EditTextMultiValued', options.$container).val(w);
                             $('#EditTextMultiValued').trigger('keyup.maxLength');
@@ -1637,6 +1654,7 @@ const recordEditorService = (services) => {
                         }
                     }
                     break;
+                default:
             }
         }
         return (false);
@@ -1644,7 +1662,7 @@ const recordEditorService = (services) => {
 
 // on ouvre ou ferme une branche de thesaurus
     function edit_thesaurus_ow(id) {
-        var o = document.getElementById('TH_K.' + id);
+        let o = document.getElementById('TH_K.' + id);
         if (o.className === 'o') {
             // on ferme
             o.className = 'c';
@@ -1655,12 +1673,12 @@ const recordEditorService = (services) => {
             o.className = 'o';
             document.getElementById('TH_P.' + id).innerHTML = '-';
 
-            var t_id = id.split('.');
-            var sbas_id = t_id[0];
+            let t_id = id.split('.');
+            let sbas_id = t_id[0];
             t_id.shift();
-            var thid = t_id.join('.');
-            var url = '/xmlhttp/getterm_prod.x.php';
-            var parms = 'bid=' + sbas_id;
+            let thid = t_id.join('.');
+            let url = '/xmlhttp/getterm_prod.x.php';
+            let parms = 'bid=' + sbas_id;
             parms += '&lng=' + p4.lng;
             parms += '&sortsy=1';
             parms += '&id=' + thid;
@@ -1701,12 +1719,13 @@ const recordEditorService = (services) => {
     }
 
     function _hsplit1() {
-        var el = $('#EDIT_TOP');
-        if (el.length === 0)
+        let el = $('#EDIT_TOP');
+        if (el.length === 0) {
             return;
-        var h = $(el).outerHeight();
+        }
+        let h = $(el).outerHeight();
         $(el).height(h);
-        var t = $(el).offset().top + h;
+        let t = $(el).offset().top + h;
 
         $('#EDIT_MID', options.$container).css('top', (t) + 'px');
     }
@@ -1714,38 +1733,38 @@ const recordEditorService = (services) => {
     function _vsplit1() {
         $('#divS_wrapper').height('auto');
 
-        var el = $('#divS_wrapper');
+        let el = $('#divS_wrapper');
         if (el.length === 0) {
             return;
         }
-        var a = $(el).width();
+        let a = $(el).width();
         el.width(a);
 
         $('#idEditZone', options.$container).css('left', (a + 20));
     }
 
     function _vsplit2() {
-        var el = $('#EDIT_MID_R');
+        let el = $('#EDIT_MID_R');
         if (el.length === 0) {
             return;
         }
-        var a = $(el).width();
+        let a = $(el).width();
         el.width(a);
-        var v = $('#EDIT_ALL').width() - a - 20;
+        let v = $('#EDIT_ALL').width() - a - 20;
 
         $('#EDIT_MID_L', options.$container).width(v);
     }
 
     function _activeField() {
-        var meta_struct_id = parseInt(options.curField, 10);
+        let meta_struct_id = parseInt(options.curField, 10);
 
         meta_struct_id = (isNaN(meta_struct_id) || meta_struct_id < 0) ? 'status' : meta_struct_id;
 
         $('#divS div.active, #divS div.hover').removeClass('active hover');
         $('#EditFieldBox_' + meta_struct_id).addClass('active');
 
-        var cont = $('#divS');
-        var calc = $('#EditFieldBox_' + meta_struct_id).offset().top - cont.offset().top;// hauteur relative par rapport au visible
+        let cont = $('#divS');
+        let calc = $('#EditFieldBox_' + meta_struct_id).offset().top - cont.offset().top;// hauteur relative par rapport au visible
 
         if (calc > cont.height() || calc < 0) {
             cont.scrollTop(calc + cont.scrollTop());
@@ -1759,8 +1778,8 @@ const recordEditorService = (services) => {
         if (typeof (b) !== 'object') {
             return (1);
         }
-        var na = a.getValue().toUpperCase();
-        var nb = b.getValue().toUpperCase();
+        let na = a.getValue().toUpperCase();
+        let nb = b.getValue().toUpperCase();
         if (na === nb) {
             return (0);
         }
@@ -1771,7 +1790,7 @@ const recordEditorService = (services) => {
 // nettoie
 // ---------------------------------------------------------------------
     function _cleanTags(string) {
-        var chars2replace = [{
+        let chars2replace = [{
             f: '&',
             t: '&amp;'
         }, {
@@ -1781,14 +1800,14 @@ const recordEditorService = (services) => {
             f: '>',
             t: '&gt;'
         }];
-        for (var c in chars2replace) {
+        for (let c in chars2replace) {
             string = string.replace(RegExp(chars2replace[c].f, 'g'), chars2replace[c].t);
         }
         return string;
     }
 
     function _check_required(id_r, id_f) {
-        var required_fields = false;
+        let required_fields = false;
 
         if (typeof id_r === 'undefined') {
             id_r = false;
@@ -1797,23 +1816,23 @@ const recordEditorService = (services) => {
             id_f = false;
         }
 
-        for (var f in options.T_fields) {
+        for (let f in options.T_fields) {
             if (id_f !== false && f !== id_f) {
                 continue;
             }
 
-            var name = options.T_fields[f].name;
+            let name = options.T_fields[f].name;
 
             if (!options.T_fields[f].required) {
                 continue;
             }
 
-            for (var r in options.T_records) {
+            for (let r in options.T_records) {
                 if (id_r !== false && r !== id_r) {
                     continue;
                 }
 
-                var elem = $('#idEditDiapo_' + r + ' .require_alert');
+                let elem = $('#idEditDiapo_' + r + ' .require_alert');
 
                 elem.hide();
 
@@ -1822,7 +1841,7 @@ const recordEditorService = (services) => {
                     required_fields = true;
                 } else {
 
-                    var check_required = '';
+                    let check_required = '';
 
                     // le champ existe dans la fiche
                     if (options.T_fields[f].multi) {
@@ -1848,7 +1867,7 @@ const recordEditorService = (services) => {
     function _edit_select_all() {
         $('#EDIT_FILM2 .diapo', options.$container).addClass('selected');
 
-        for (var i in options.T_records) {
+        for (let i in options.T_records) {
             options.T_records[i]._selected = true;
         }
 
@@ -1862,11 +1881,13 @@ const recordEditorService = (services) => {
 // appele par le onkeyup
 // ---------------------------------------------------------------------------
     function _reveal_mval(value, vocabularyId) {
+        let talt;
+
         if (typeof vocabularyId === 'undefined') {
             vocabularyId = null;
         }
 
-        var textZone = $('#EditTextMultiValued');
+        let textZone = $('#EditTextMultiValued');
 
         if (options.T_fields[options.curField].tbranch) {
             if (value !== '') {
@@ -1875,26 +1896,26 @@ const recordEditorService = (services) => {
         }
 
         if (value !== '') {
-            // 		var nsel = 0;
-            for (var rec_i in options.T_records) {
+            // 		let nsel = 0;
+            for (let rec_i in options.T_records) {
                 if (options.T_records[rec_i].fields[options.curField].hasValue(value, vocabularyId)) {
                     $('#idEditDiaButtonsP_' + rec_i).hide();
-                    var talt = sprintf(localeService.t('editDelSimple'), value);
+                    talt = sprintf(localeService.t('editDelSimple'), value);
                     $('#idEditDiaButtonsM_' + rec_i).show()
                         .attr('alt', talt)
                         .attr('Title', talt)
                         .unbind('click').bind('click', function () {
-                        var indice = $(this).attr('id').split('_').pop();
+                        let indice = $(this).attr('id').split('_').pop();
                         _edit_diabutton(indice, 'del', value, vocabularyId);
                     });
                 } else {
                     $('#idEditDiaButtonsM_' + rec_i).hide();
                     $('#idEditDiaButtonsP_' + rec_i).show();
-                    var talt = sprintf(localeService.t('editAddSimple'), value);
+                    talt = sprintf(localeService.t('editAddSimple'), value);
                     $('#idEditDiaButtonsP_' + rec_i).show().attr('alt', talt)
                         .attr('Title', talt)
                         .unbind('click').bind('click', function () {
-                        var indice = $(this).attr('id').split('_').pop();
+                        let indice = $(this).attr('id').split('_').pop();
                         _edit_diabutton(indice, 'add', value, vocabularyId);
                     });
                 }
@@ -1910,9 +1931,9 @@ const recordEditorService = (services) => {
 // on a clique sur le bouton 'supprimer' un mot dans le multi-val
 // ---------------------------------------------------------------------------
     function _edit_delmval(value, VocabularyId) {
-        var meta_struct_id = options.curField;		// le champ en cours d'editing
+        let meta_struct_id = options.curField;		// le champ en cours d'editing
 
-        for (var r = 0; r < options.T_records.length; r++) {
+        for (let r = 0; r < options.T_records.length; r++) {
             if (!options.T_records[r]._selected) {
                 continue;
             }
@@ -1927,10 +1948,10 @@ const recordEditorService = (services) => {
 // on a clique sur le bouton 'ajouter' un mot dans le multi-val
 // ---------------------------------------------------------------------------
     function _addMultivaluedField(value, VocabularyId) {
-        var meta_struct_id = options.curField;		// le champ en cours d'editing
+        let meta_struct_id = options.curField;		// le champ en cours d'editing
 
         // on ajoute le mot dans tous les records selectionnes
-        for (var r = 0; r < options.T_records.length; r++) {
+        for (let r = 0; r < options.T_records.length; r++) {
             if (!options.T_records[r]._selected) {
                 continue;
             }
@@ -1951,7 +1972,7 @@ const recordEditorService = (services) => {
     }
 
     function _edit_diabutton(record_indice, act, value, vocabularyId) {
-        var meta_struct_id = options.curField;		// le champ en cours d'editing
+        let meta_struct_id = options.curField;		// le champ en cours d'editing
         if (act === 'del') {
             options.T_records[record_indice].fields[meta_struct_id].removeValue(value, vocabularyId);
         }
@@ -1969,7 +1990,7 @@ const recordEditorService = (services) => {
 // ---------------------------------------------------------------------------
     // edit_chgFld
     function fieldNavigate(evt, dir) {
-        var current_field = $('#divS .edit_field.active');
+        let current_field = $('#divS .edit_field.active');
         if (current_field.length === 0) {
             current_field = $('#divS .edit_field:first');
             current_field.trigger('click');
@@ -2006,12 +2027,15 @@ const recordEditorService = (services) => {
                 if (options.T_fields[options.curField].type === 'date') {
                     cancelKey = true;
                 }
+                break;
+            default:
         }
 
         if (cancelKey) {
             event.cancelBubble = true;
-            if (event.stopPropagation)
+            if (event.stopPropagation) {
                 event.stopPropagation();
+            }
             return (false);
         }
         return (true);
@@ -2043,8 +2067,8 @@ const recordEditorService = (services) => {
     // key up textarea
     function _onTextareaKeyUp(event, obj) {
         let $el = $(event.currentTarget);
-        var cancelKey = false;
-        var o;
+        let cancelKey = false;
+        let o;
         switch (event.keyCode) {
             case 27:	// esc : on restore la valeur avant editing
                 // 			$("#btn_cancel", editor.$container).parent().css("backgroundColor", "#000000");
@@ -2052,6 +2076,7 @@ const recordEditorService = (services) => {
                 // 			self.setTimeout("document.getElementById('btn_cancel').parentNode.style.backgroundColor = '';", 100);
                 cancelKey = true;
                 break;
+            default:
         }
 
         if (cancelKey) {
@@ -2065,7 +2090,7 @@ const recordEditorService = (services) => {
             options.textareaIsDirty = true;
         }
 
-        var s = $el.val(); // obj.value;
+        let s = $el.val(); // obj.value;
         if (options.T_fields[options.curField].tbranch) {
             if (s !== '') {
                 ETHSeeker.search(s);

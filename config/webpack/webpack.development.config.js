@@ -78,7 +78,8 @@ module.exports = {
         preLoaders: [{
             test: /\.js$/,
             loader: 'eslint-loader',
-            exclude: /node_modules/
+            include: path.join(__dirname, '../../src')
+            // exclude: /node_modules/
         }],
         loaders: [{
             test: /\.js$/,
