@@ -3,27 +3,33 @@ import * as AppCommons from 'phraseanet-common';
 import toolbar from './toolbar';
 import mainMenu from './mainMenu';
 import keyboard from './keyboard';
+import cgu from '../cgu';
 import editRecordService from '../record/edit';
 import exportRecord from '../record/export';
 import addToBasket from '../record/addToBasket';
 import removeFromBasket from '../record/removeFromBasket';
 import printRecord from '../record/print';
+import preferences from '../preferences';
 import previewRecordService from '../record/recordPreview';
 import Alerts from '../utils/alert';
 import uploader from '../uploader';
+
 const ui = (services) => {
     const { configService, localeService, appEvents } = services;
     let activeZone = false;
+    let searchSelection = {asArray: [], serialized: ''};
+    let workzoneSelection = {asArray: [], serialized: ''};
 
-
-    const initialize = () => {
+    const initialize = (options) => {
+        let {$container} = options;
         // init state navigation
         // records and baskets actions in global interface:
         exportRecord(services).initialize();
         addToBasket(services).initialize();
         removeFromBasket(services).initialize();
         printRecord(services).initialize();
-
+        cgu(services).initialize(options);
+        preferences(services).initialize(options);
 
         let editRecord = editRecordService(services);
         editRecord.initialize();
@@ -56,7 +62,7 @@ const ui = (services) => {
             keyboard(services).openModal();
         });
 
-        $('body').on('keydown', function (event) {
+        $container.on('keydown', (event) => {
             let specialKeyState = {
                 isCancelKey: false,
                 isShortcutKey: false
@@ -77,130 +83,28 @@ const ui = (services) => {
                 if ($('#EDITWINDOW').is(':visible')) {
                     // access to editor instead of edit modal
                     // specialKeyState = editRecord.onGlobalKeydown(event, specialKeyState);
+                } else if (previewIsOpen) {
+                    specialKeyState = previewRecord.onGlobalKeydown(event, specialKeyState);
+                } else if ($('#EDIT_query').hasClass('focused')) {
+                    // if return true - nothing to do
+                } else if ($('.overlay').is(':visible')) {
+                    // if return true - nothing to do
+                } else if ($('.ui-widget-overlay').is(':visible')) {
+                    // if return true - nothing to do
                 } else {
-                    if (previewIsOpen) {
-                        specialKeyState = previewRecord.onGlobalKeydown(event, specialKeyState);
-                    } else {
-                        if ($('#EDIT_query').hasClass('focused')) {
-                            return true;
-                        }
-
-                        if ($('.overlay').is(':visible')) {
-                            return true;
-                        }
-
-                        if ($('.ui-widget-overlay').is(':visible')) {
-                            return true;
-                        }
-                        // @TODO imbricated switch case
-                        switch (this.appUi.getActiveZone()) {
-                            case 'rightFrame':
-                                switch (event.keyCode) {
-                                    case 65:	// a
-                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                                            $('.tools .answer_selector.all_selector').trigger('click');
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    case 80:// P
-                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                                            _onOpenPrintModal('lst=' + p4.Results.Selection.serialize());
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    case 69:// e
-                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                                            openRecordEditor('IMGT', p4.Results.Selection.serialize());
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    case 40:	// down arrow
-                                        $('#answers').scrollTop($('#answers').scrollTop() + 30);
-                                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        break;
-                                    case 38:	// down arrow
-                                        $('#answers').scrollTop($('#answers').scrollTop() - 30);
-                                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        break;
-                                    case 37:// previous page
-                                        $('#PREV_PAGE').trigger('click');
-                                        specialKeyState.isShortcutKey = true;
-                                        break;
-                                    case 39:// previous page
-                                        $('#NEXT_PAGE').trigger('click');
-                                        specialKeyState.isShortcutKey = true;
-                                        break;
-                                    case 9:// tab
-                                        if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
-                                            document.getElementById('EDIT_query').focus();
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    default:
-                                }
-                                break;
-
-
-                            case 'idFrameC':
-                                switch (event.keyCode) {
-                                    case 65:	// a
-                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                                            p4.WorkZone.Selection.selectAll();
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    case 80:// P
-                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                                            _onOpenPrintModal('lst=' + p4.WorkZone.Selection.serialize());
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    case 69:// e
-                                        if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                                            openRecordEditor('IMGT', p4.WorkZone.Selection.serialize());
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    // 						case 46:// del
-                                    // 								_deleteRecords(p4.Results.Selection.serialize());
-                                    // 								specialKeyState.isCancelKey = true;
-                                    // 							break;
-                                    case 40:	// down arrow
-                                        $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() + 30);
-                                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        break;
-                                    case 38:	// down arrow
-                                        $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() - 30);
-                                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        break;
-                                    // 								case 37:// previous page
-                                    // 									$('#PREV_PAGE').trigger('click');
-                                    // 									break;
-                                    // 								case 39:// previous page
-                                    // 									$('#NEXT_PAGE').trigger('click');
-                                    // 									break;
-                                    case 9:// tab
-                                        if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
-                                            document.getElementById('EDIT_query').focus();
-                                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                                        }
-                                        break;
-                                    default:
-                                }
-                                break;
-
-
-                            case 'mainMenu':
-                                break;
-
-
-                            case 'headBlock':
-                                break;
-
-                            default:
-                                break;
-
-                        }
+                    switch (getActiveZone()) {
+                        case 'rightFrame':
+                            _searchResultKeyDownEvent(event, specialKeyState);
+                            break;
+                        case 'idFrameC':
+                            _workzoneKeyDownEvent(event, specialKeyState);
+                            break;
+                        case 'mainMenu':
+                            break;
+                        case 'headBlock':
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -211,6 +115,7 @@ const ui = (services) => {
                     keyboard(services).openModal();
                 }
             }
+
             if (specialKeyState.isCancelKey) {
                 event.cancelBubble = true;
                 if (event.stopPropagation) {
@@ -220,6 +125,103 @@ const ui = (services) => {
             }
             return (true);
         });
+    };
+
+    // @TODO to be moved
+    const _searchResultKeyDownEvent = (event, specialKeyState) => {
+        switch (event.keyCode) {
+            case 65:	// a
+                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                    $('.tools .answer_selector.all_selector').trigger('click');
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            case 80:// P
+                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                    _onOpenPrintModal('lst=' + searchSelection.serialized);
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            case 69:// e
+                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                    openRecordEditor('IMGT', searchSelection.serialized);
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            case 40:	// down arrow
+                $('#answers').scrollTop($('#answers').scrollTop() + 30);
+                specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                break;
+            case 38:	// down arrow
+                $('#answers').scrollTop($('#answers').scrollTop() - 30);
+                specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                break;
+            case 37:// previous page
+                $('#PREV_PAGE').trigger('click');
+                specialKeyState.isShortcutKey = true;
+                break;
+            case 39:// previous page
+                $('#NEXT_PAGE').trigger('click');
+                specialKeyState.isShortcutKey = true;
+                break;
+            case 9:// tab
+                if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+                    document.getElementById('EDIT_query').focus();
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            default:
+        }
+    };
+
+    // @TODO to be moved
+    const _workzoneKeyDownEvent = (event, specialKeyState) => {
+        switch (event.keyCode) {
+            case 65:	// a
+                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                    appEvents.emit('workzone.selection.selectAll');
+                    // p4.WorkZone.Selection.selectAll();
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            case 80:// P
+                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                    _onOpenPrintModal('lst=' + workzoneSelection.serialized);
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            case 69:// e
+                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                    openRecordEditor('IMGT', workzoneSelection.serialized);
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            // 						case 46:// del
+            // 								_deleteRecords(searchSelection.serialized);
+            // 								specialKeyState.isCancelKey = true;
+            // 							break;
+            case 40:	// down arrow
+                $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() + 30);
+                specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                break;
+            case 38:	// down arrow
+                $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() - 30);
+                specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                break;
+            // 								case 37:// previous page
+            // 									$('#PREV_PAGE').trigger('click');
+            // 									break;
+            // 								case 39:// previous page
+            // 									$('#NEXT_PAGE').trigger('click');
+            // 									break;
+            case 9:// tab
+                if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+                    document.getElementById('EDIT_query').focus();
+                    specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                }
+                break;
+            default:
+        }
     };
 
     const hideOverlay = (n) => {
@@ -358,6 +360,12 @@ const ui = (services) => {
     };
 
     appEvents.listenAll({
+        'broadcast.searchResultSelection': (selection) => {
+            searchSelection = selection;
+        },
+        'broadcast.workzoneResultSelection': (selection) => {
+            workzoneSelection = selection;
+        },
         'ui.resizeAll': resizeAll,
         'ui.answerSizer': answerSizer,
         'ui.linearizeUi': linearizeUi

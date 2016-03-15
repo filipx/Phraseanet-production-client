@@ -194,7 +194,7 @@ Selectable.prototype = {
                 $(this).addClass('selected');
             } else {
                 if (stopped === false) {
-                    alert(language.max_record_selected);
+                    alert(max_record_selected);
                 }
                 stopped = true;
             }

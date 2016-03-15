@@ -22,6 +22,16 @@ const mainMenu = (services) => {
 
             _stateNavigator($el.data('state'));
         });
+        /**
+         * mainMenu > help context menu
+         */
+
+        $('#help-trigger').contextMenu('#mainMenu .helpcontextmenu', {
+            openEvt: 'click', dropDown: true, theme: 'vista',
+            showTransition: 'slideDown',
+            hideTransition: 'hide',
+            shadow: false
+        });
     };
 
     const _stateNavigator = (...state) => {

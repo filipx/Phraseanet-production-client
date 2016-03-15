@@ -6,6 +6,7 @@
     "clean": "rimraf dist",
     "dev": "npm run clean && set NODE_ENV=devlopment && webpack --config ./config/webpack/webpack.development.config.js --progress --profile --colors",
     "production": "npm run clean && set NODE_ENV=production && webpack --config ./config/webpack/webpack.production.config.js --progress --profile --colors",
+    "dist": "npm run clean && set NODE_ENV=production && webpack --config ./config/webpack/webpack.production.config.js --progress --profile --colors && webpack --config ./config/webpack/webpack.production.minified.config.js --progress --profile --colors",
     "test": "npm run test:server && npm run test:browser",
     "test:server": "mocha --opts config/mocha.opts",
     "test:browser": "./node_modules/.bin/karma start --single-run",
@@ -121,7 +122,7 @@
     "jquery": "^1.11.3",
     "jquery-lazyload": "^1.9.7",
     "jquery.fancytree": "^2.15.0",
-    "phraseanet-common": "^0.1.0",
+    "phraseanet-common": "^0.2.0",
     "rx": "^4.0.7",
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3"

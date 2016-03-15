@@ -3,7 +3,6 @@ import * as AppCommons from 'phraseanet-common';
 import { sprintf } from 'sprintf-js';
 import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
-// var p4 = p4 || {};
 
 const recordEditorService = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -1569,7 +1568,7 @@ const recordEditorService = (services) => {
             let url = '/xmlhttp/openbranches_prod.h.php';
             let parms = {
                 bid: this.sbas_id,
-                lng: p4.lng,
+                lng: localeService.getLocale(),
                 t: txt,
                 mod: 'TREE',
                 u: Math.random()
@@ -1597,7 +1596,7 @@ const recordEditorService = (services) => {
             let url = '/xmlhttp/getterm_prod.h.php';
             let parms = {
                 bid: this.sbas_id,
-                lng: p4.lng,
+                lng: localeService.getLocale(),
                 sortsy: 1,
                 id: thid,
                 typ: 'TH'
@@ -1679,7 +1678,7 @@ const recordEditorService = (services) => {
             let thid = t_id.join('.');
             let url = '/xmlhttp/getterm_prod.x.php';
             let parms = 'bid=' + sbas_id;
-            parms += '&lng=' + p4.lng;
+            parms += '&lng=' + localeService.getLocale();
             parms += '&sortsy=1';
             parms += '&id=' + thid;
             parms += '&typ=TH';

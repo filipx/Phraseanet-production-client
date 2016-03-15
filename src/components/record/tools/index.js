@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import dialog from '../../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 import VideoEditor from '../../videoEditor';
 const recordToolsModal = (services, datas, activeTab = false) => {
     const { configService, localeService, appEvents } = services;
@@ -25,6 +25,19 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             }
         );
     };
+
+    const disableConfirmButton = (dialog) => {
+        dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
+            return $(this).text() === localeService.t('valider');
+        }).addClass('ui-state-disabled').attr('disabled', true);
+    }
+
+
+    const enableConfirmButton = (dialog) => {
+        dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
+            return $(this).text() === localeService.t('valider');
+        }).removeClass('ui-state-disabled').attr('disabled', false);
+    }
 
     const _onModalReady = (template, data, activeTab) => {
 
@@ -154,7 +167,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             });
             $scope.on('click', '#thumb_validate_button', function () {
                 var thumbnail = $('.selected', $sliderWrapper);
-
+                let content = '';
                 if (thumbnail.length === 0) {
                     let confirmationDialog = dialog.create({
                         size: 'Alert',
@@ -162,125 +175,111 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                         closeOnEscape: true
                     }, 3);
 
-                    var content = $('<div />').css({
+                    content = $('<div />').css({
                         'text-align': 'center',
                         width: '100%',
                         'font-size': '14px'
                     }).append(data.translations.noImgSelected);
                     confirmationDialog.setContent(content);
 
-                    return;
-                }
+                    return false;
+                } else {
 
-                var buttons = {};
+                    var buttons = {};
 
-                var record_id = $('input[name=record_id]').val();
-                var sbas_id = $('input[name=sbas_id]').val();
+                    var record_id = $('input[name=record_id]').val();
+                    var sbas_id = $('input[name=sbas_id]').val();
 
-                var selectedScreenId = thumbnail.attr('id').split('_').pop();
-                var screenshots = ThumbEditor.store.get(selectedScreenId);
-
-
-                let screenData = screenshots.getAltScreenShots();
-                let subDefs = [];
-
-                for (let i = 0; i < screenData.length; i++) {
-                    subDefs.push({
-                        name: screenData[i].name,
-                        src: screenData[i].dataURI
-
-                    });
-                }
+                    var selectedScreenId = thumbnail.attr('id').split('_').pop();
+                    var screenshots = ThumbEditor.store.get(selectedScreenId);
 
 
-                function disableConfirmButton(dialog) {
-                    dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
-                        return $(this).text() === localeService.t('valider');
-                    }).addClass('ui-state-disabled').attr('disabled', true);
-                }
+                    let screenData = screenshots.getAltScreenShots();
+                    let subDefs = [];
 
+                    for (let i = 0; i < screenData.length; i++) {
+                        subDefs.push({
+                            name: screenData[i].name,
+                            src: screenData[i].dataURI
 
-                function enableConfirmButton(dialog) {
-                    dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
-                        return $(this).text() === localeService.t('valider');
-                    }).removeClass('ui-state-disabled').attr('disabled', false);
-                }
-
-                buttons[localeService.t('valider')] = function () {
-                    let confirmDialog = dialog.get(2);
-                    var buttonPanel = confirmDialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane');
-                    var loadingDiv = buttonPanel.find('.info-div');
-
-                    if (loadingDiv.length === 0) {
-                        loadingDiv = $('<div />').css({
-                            width: '120px',
-                            height: '40px',
-                            float: 'left',
-                            'line-height': '40px',
-                            'padding-left': '40px',
-                            'text-align': 'left',
-                            'background-position': 'left center'
-                        }).attr('class', 'info-div').prependTo(buttonPanel);
+                        });
                     }
+                    buttons[localeService.t('valider')] = function () {
+                        let confirmDialog = dialog.get(2);
+                        var buttonPanel = confirmDialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane');
+                        var loadingDiv = buttonPanel.find('.info-div');
 
-                    $.ajax({
+                        if (loadingDiv.length === 0) {
+                            loadingDiv = $('<div />').css({
+                                width: '120px',
+                                height: '40px',
+                                float: 'left',
+                                'line-height': '40px',
+                                'padding-left': '40px',
+                                'text-align': 'left',
+                                'background-position': 'left center'
+                            }).attr('class', 'info-div').prependTo(buttonPanel);
+                        }
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/prod/tools/thumb-extractor/apply/',
+                            data: {
+                                sub_def: subDefs,
+                                record_id: record_id,
+                                sbas_id: sbas_id
+                            },
+                            beforeSend: function () {
+                                disableConfirmButton(confirmDialog);
+                                loadingDiv.empty().addClass('loading').append(data.translations.processing);
+                            },
+                            success: function (data) {
+                                loadingDiv.empty().removeClass('loading');
+
+                                if (data.success) {
+                                    confirmDialog.close();
+                                    dialog.get(1).close();
+                                } else {
+                                    loadingDiv.append(content);
+                                    enableConfirmButton(confirmDialog);
+                                }
+                            }
+                        });
+                    };
+
+                    // show confirm box, content is loaded here /prod/tools/thumb-extractor/confirm-box/
+                    var validationDialog = dialog.create({
+                        size: 'Small',
+                        title: data.translations.thumbnailTitle,
+                        cancelButton: true,
+                        buttons: buttons
+                    }, 2);
+
+                    var datas = {
+                        image: $('.selected', $sliderWrapper).attr('src'),
+                        sbas_id: sbas_id,
+                        record_id: record_id
+                    };
+
+                    return $.ajax({
                         type: 'POST',
-                        url: '/prod/tools/thumb-extractor/apply/',
-                        data: {
-                            sub_def: subDefs,
-                            record_id: record_id,
-                            sbas_id: sbas_id
-                        },
-                        beforeSend: function () {
-                            disableConfirmButton(confirmDialog);
-                            loadingDiv.empty().addClass('loading').append(data.translations.processing);
-                        },
+                        url: '/prod/tools/thumb-extractor/confirm-box/',
+                        data: datas,
                         success: function (data) {
-                            loadingDiv.empty().removeClass('loading');
 
-                            if (data.success) {
-                                confirmDialog.close();
-                                dialog.get(1).close();
+                            if (data.error) {
+                                content = $('<div />').css({
+                                    'font-size': '16px',
+                                    'text-align': 'center'
+                                }).append(data.datas);
+                                validationDialog.setContent(content);
+                                disableConfirmButton(validationDialog);
                             } else {
-                                loadingDiv.append(content);
-                                enableConfirmButton(confirmDialog);
+                                validationDialog.setContent(data.datas);
                             }
                         }
                     });
-                };
-
-                // show confirm box, content is loaded here /prod/tools/thumb-extractor/confirm-box/
-                var validationDialog = dialog.create({
-                    size: 'Small',
-                    title: data.translations.thumbnailTitle,
-                    cancelButton: true,
-                    buttons: buttons
-                }, 2);
-
-                var datas = {
-                    image: $('.selected', $sliderWrapper).attr('src'),
-                    sbas_id: sbas_id,
-                    record_id: record_id
-                };
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/prod/tools/thumb-extractor/confirm-box/',
-                    data: datas,
-                    success: function (data) {
-
-                        if (data.error) {
-                            var content = $('<div />').css({
-                                'font-size': '16px',
-                                'text-align': 'center'
-                            }).append(data.datas);
-                            validationDialog.setContent(content);
-                            disableConfirmButton(validationDialog);
-                        } else {
-                            validationDialog.setContent(data.datas);
-                        }
-                    }
-                });
+                }
             });
         } else {
             // not supported

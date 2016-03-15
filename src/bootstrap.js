@@ -4,9 +4,6 @@ const humane = require('humane-js');
 require('imports?define=>false&exports=>false!./components/utils/jquery-plugins/colorAnimation');
 // let dialogModule = require('../node_modules/phraseanet-common/src/components/dialog.js');
 import * as AppCommons from 'phraseanet-common';
-
-import cgu from './components/cgu';
-import preferences from './components/preferences';
 import publication from './components/publication';
 import workzone from './components/ui/workzone';
 import notify from './components/notify/index';
@@ -21,7 +18,7 @@ import user from './components/user';
 import basket from './components/basket';
 import search from './components/search';
 import utils from './components/utils/utils';
-import dialog from './components/utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 
 class Bootstrap {
 
@@ -30,8 +27,6 @@ class Bootstrap {
     localeService;
     appServices;
     appUi;
-    appCgu;
-    appPreferences;
     appPublication;
     appWorkzone;
     appSearch;
@@ -92,6 +87,7 @@ class Bootstrap {
             throw new Error('implementation error: failed to configure new notifier');
         }
 
+        // @TODO remove global variables
         // register some global variables,
         window.bodySize = {
             x: 0,
@@ -108,15 +104,12 @@ class Bootstrap {
          * add components
          */
         this.appUi = ui(this.appServices);
-        this.appCgu = cgu(this.appServices);
         this.appSearch = search(this.appServices);
         this.appPublication = publication(this.appServices);
-        this.appPreferences = preferences(this.appServices);
         this.appWorkzone = workzone(this.appServices);
 
-        //
-
         $(document).ready(() => {
+            // @TODO to be removed
             let $body = $('body');
             // trigger default route
             this.initJqueryPlugins();
@@ -140,15 +133,9 @@ class Bootstrap {
                 this.appEvents.emit('broadcast.workzoneResultSelection', data);
             });
 
-
             // should be loaded after dom ready:
             this.initState();
-            this.appUi.initialize();
-            //this.appSearch.initialize();
-            // init cgu modal:
-            this.appCgu.initialize();
-            // init preferences modal:
-            this.appPreferences.initialize({$container: $body});
+            this.appUi.initialize({$container: $body});
         });
 
     }
@@ -174,14 +161,6 @@ class Bootstrap {
         AppCommons.commonModule.initialize();
         $.datepicker.setDefaults({showMonthAfterYear: false});
         $.datepicker.setDefaults($.datepicker.regional[this.localeService.getLocale()]);
-
-        console.log(AppCommons.commonModule);
-        $('#help-trigger').contextMenu('#mainMenu .helpcontextmenu', {
-            openEvt: 'click', dropDown: true, theme: 'vista',
-            showTransition: 'slideDown',
-            hideTransition: 'hide',
-            shadow: false
-        });
     }
 
     initDom() {
@@ -192,6 +171,7 @@ class Bootstrap {
         humane.forceNew = true;
         // cguModule.activateCgus();
 
+        // @TODO to be removed
         // catch main menu links
         $('body').on('click', 'a.dialog', (event) => {
             event.preventDefault();
@@ -276,62 +256,7 @@ class Bootstrap {
             dateFormat: 'yy/mm/dd'
         });
 
-        $('.tools .answer_selector').bind('click', function () {
-            let el = $(this);
-            let p4 = window.p4;
-            if (el.hasClass('all_selector')) {
-                p4.Results.Selection.selectAll();
-            } else {
-                if (el.hasClass('none_selector')) {
-                    p4.Results.Selection.empty();
-                } else {
-                    if (!el.hasClass('starred_selector')) {
-                        if (el.hasClass('video_selector')) {
-                            p4.Results.Selection.empty();
-                            p4.Results.Selection.select('.type-video');
-                        } else {
-                            if (el.hasClass('image_selector')) {
-                                p4.Results.Selection.empty();
-                                p4.Results.Selection.select('.type-image');
-                            } else {
-                                if (el.hasClass('document_selector')) {
-                                    p4.Results.Selection.empty();
-                                    p4.Results.Selection.select('.type-document');
-                                } else {
-                                    if (el.hasClass('audio_selector')) {
-                                        p4.Results.Selection.empty();
-                                        p4.Results.Selection.select('.type-audio');
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }).bind('mouseover', function (event) {
-            if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                $(this).addClass('add_selector');
-            } else {
-                $(this).removeClass('add_selector');
-            }
-        }).bind('mouseout', function () {
-            $(this).removeClass('add_selector');
-        });
-
-        // getLanguage();
         this.appSearch.initialize();
-        // prodModule._initAnswerForm();
-
-        // setTimeout("pollNotifications();", 10000);
-
-
-        $('#EDIT_query').bind('focus', function () {
-            $(this).addClass('focused');
-        }).bind('blur', function () {
-            $(this).removeClass('focused');
-        });
-
 
         $('input.input_select_copy').on('focus', function () {
             $(this).select();
@@ -350,8 +275,6 @@ class Bootstrap {
                 $(this).remove();
             });
         });
-
-
     }
 }
 

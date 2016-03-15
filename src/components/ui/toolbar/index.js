@@ -1,7 +1,8 @@
 import $ from 'jquery';
+import * as AppCommons from 'phraseanet-common';
 import moveRecords from '../actions/moveRecord';
 import editRecord from '../../record/edit';
-import recordDeleteModal from '../actions/recordDelete';
+import deleteRecord from '../../record/delete';
 import recordDownloadModal from '../actions/recordDownload';
 import recordPropertyModal from '../actions/recordProperty';
 import recordFeedbackModal from '../actions/recordFeedback';
@@ -124,7 +125,39 @@ const toolbar = (services) => {
 
 
     const _bindEvents = () => {
-        console.log('1 > bnd toolbar event');
+
+        /**
+         * tools > selection ALL|NONE|per type
+         */
+        $container.on('click mouseover', '.tools .answer_selector', (event) => {
+            event.preventDefault();
+            let $el = $(event.currentTarget);
+            let actionName = $el.data('action-name');
+            let state = $el.data('action-state') === true ? true : false;
+            let type = $el.data('type');
+
+            switch (actionName) {
+                case 'select-toggle':
+                    if (state) {
+                        appEvents.emit('search.selection.unselectAll');
+                    } else {
+                        appEvents.emit('search.selection.selectAll');
+                    }
+                    break;
+                case 'select-all':
+                    appEvents.emit('search.selection.selectAll');
+                    break;
+                case 'unselect-all':
+                    appEvents.emit('search.selection.unselectAll');
+                    break;
+                case 'select-type':
+                    appEvents.emit('search.selection.selectByType', {type: type});
+                    break;
+                default:
+            }
+            $el.data('action-state', !state);
+        });
+
         /**
          * tools > Edit > Move
          */
@@ -190,7 +223,7 @@ const toolbar = (services) => {
          * tools > Delete
          */
         $container.on('click', '.TOOL_trash_btn', function (event) {
-            _triggerModal(event, recordDeleteModal(services).openModal);
+            _triggerModal(event, deleteRecord(services).openModal);
         });
         /**
          * tools > Edit

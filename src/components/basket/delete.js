@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import dialog from '../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 
 const deleteBasket = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -16,7 +16,7 @@ const deleteBasket = (services) => {
     const deleteConfirmation = ($el, type) => {
         console.log('delete confirmation', $el, type);
         switch (type) {
-            case 'IMGT':
+            /*case 'IMGT':
             case 'CHIM':
 
                 var lst = '';
@@ -30,14 +30,12 @@ const deleteBasket = (services) => {
 
                 _deleteRecords(lst);
                 break;
-
-
+            */
             case 'SSTT':
 
                 var buttons = {};
                 buttons[localeService.t('valider')] = function (e) {
                     _deleteBasket($el);
-                    //prodApp.appEvents.emit('baskets.doDeleteBasket', $el);
                 };
 
                 $('#DIALOG').empty().append(localeService.t('confirmDel')).attr('title', localeService.t('attention')).dialog({
@@ -48,10 +46,10 @@ const deleteBasket = (services) => {
                 }).dialog('open').dialog('option', 'buttons', buttons);
                 $('#tooltip').hide();
                 break;
-            case 'STORY':
+            /*case 'STORY':
                 lst = $el.val();
                 _deleteRecords(lst);
-                break;
+                break;*/
             default:
         }
     };
@@ -94,7 +92,7 @@ const deleteBasket = (services) => {
         });
     };
 
-    const _deleteRecords = (lst) => {
+    /*const _deleteRecords = (lst) => {
         if (lst.split(';').length === 0) {
             alert(localeService.t('nodocselected'));
             return false;
@@ -116,7 +114,7 @@ const deleteBasket = (services) => {
         });
 
         return false;
-    };
+    };*/
 
     return {initialize, deleteConfirmation};
 };

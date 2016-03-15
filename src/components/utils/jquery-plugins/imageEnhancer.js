@@ -19,6 +19,9 @@ import $ from 'jquery';
 
                     let wrapper = $('.thumb_wrapper', $(this));
                     let $image = $('img', $this);
+                    let image_width = parseInt($('input[name="width"]', $this).val(), 10);
+                    let image_height = parseInt($('input[name="height"]', $this).val(), 10);
+                    let ratio = image_width / image_height;
 
                     wrapper.css('position', 'relative');
 
@@ -96,10 +99,6 @@ import $ from 'jquery';
                             'max-width': 'none',
                             'max-height': 'none'
                         });
-
-                        let image_width = parseInt($('input[name="width"]', $this).val(), 10);
-                        let image_height = parseInt($('input[name="height"]', $this).val(), 10);
-                        let ratio = image_width / image_height;
 
                         $this.bind('mousewheel', function (event, delta) {
                             $image.addClass('zoomed');

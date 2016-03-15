@@ -1,6 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
-import dialog from '../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
 let lazyload = require('jquery-lazyload');
 
@@ -40,6 +40,13 @@ const search = (services) => {
 
                 return elements.slice(elements.length - 2, elements.length).join('_');
             }
+        });
+        // map events to result selection:
+        appEvents.listenAll({
+            'search.selection.selectAll': () => searchResult.selection.selectAll(),
+            'search.selection.unselectAll': () => searchResult.selection.empty(),
+            'search.selection.selectByType': (dataType) => searchResult.selection.select(dataType.type),
+            'search.selection.remove': (data) => searchResult.selection.remove(data.records)
         });
 
         $searchForm.on('click', '.toggle-collection', (event) => {
@@ -140,6 +147,16 @@ const search = (services) => {
             }
         });
 
+        /**
+         * inform global app for state
+         * @TODO refactor
+         */
+        $('#EDIT_query').bind('focus', function () {
+            $(this).addClass('focused');
+        }).bind('blur', function () {
+            $(this).removeClass('focused');
+        });
+
         initAnswerForm();
     };
 
@@ -148,7 +165,6 @@ const search = (services) => {
 
     const onSpecialSearch = (data) => {
         let { qry, allbase } = data;
-        console.log('catch onSpecialSearch', data);
         if (allbase) {
             toggleDatabase(true);
         }
@@ -160,7 +176,6 @@ const search = (services) => {
     const initAnswerForm = () => {
         $('button[type="submit"]', $searchForm).bind('click', function () {
             appEvents.emit('facets.doResetSelectedFacets');
-            console.log('trigger search');
             newSearch($('#EDIT_query').val());
             return false;
         });

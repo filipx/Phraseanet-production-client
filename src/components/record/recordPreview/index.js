@@ -341,8 +341,7 @@ const previewRecordService = (services) => {
             $('#start_slide').hide();
             $('#stop_slide').show();
             getNext();
-            // @TODO - test n fix
-            setTimeout('startSlide()', 3000);
+            setTimeout(() => startSlide(), configService.get('previewSlideshow.duration'));
         }
     }
 

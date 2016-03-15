@@ -168,10 +168,9 @@ const workzone = (services) => {
             removeElementFromBasket: WorkZoneElementRemover,
             reloadCurrent: function () {
                 var sstt = $('#baskets .content:visible');
-                if (sstt.length === 0) {
-                    return;
+                if (sstt.length > 0) {
+                    getContent(sstt.prev());
                 }
-                getContent(sstt.prev());
             },
             close: function () {
                 const frame = $('#idFrameC');
@@ -216,6 +215,7 @@ const workzone = (services) => {
         };
 
     };
+
     const getResultSelectionStream = () => workzoneOptions.selection.stream;
 
     function refreshBaskets(options) {
@@ -327,62 +327,63 @@ const workzone = (services) => {
                         opacity: 0.7
                     }
                 }).dialog('open');
-            // @TODO - check if return have always existed
-            return;
-        }
+            return false;
+        } else {
 
-        var id = $(el).attr('id').split('_').slice(2, 4).join('_');
+            let id = $(el).attr('id').split('_').slice(2, 4).join('_');
 
-        return $.ajax({
-            type: 'POST',
-            url: $(el).attr('href'),
-            dataType: 'json',
-            beforeSend: function () {
-                $('.wrapCHIM_' + id).find('.CHIM').fadeOut();
-            },
-            success: function (data) {
-                if (data.success) {
-                    humane.info(data.message);
-                    workzoneOptions.selection.remove(id);
+            return $.ajax({
+                type: 'POST',
+                url: $(el).attr('href'),
+                dataType: 'json',
+                beforeSend: function () {
+                    $('.wrapCHIM_' + id).find('.CHIM').fadeOut();
+                },
+                success: function (data) {
+                    if (data.success) {
+                        humane.info(data.message);
+                        workzoneOptions.selection.remove(id);
 
-                    if ($('.wrapCHIM_' + id).find('.CHIM').data('ui-draggable')) {
-                        $('.wrapCHIM_' + id).find('.CHIM').draggable('destroy');
-                    }
-
-                    $('.wrapCHIM_' + id).remove();
-
-                    if (context === 'reg_train_basket') {
-                        var carousel = $('#PREVIEWCURRENTCONT');
-                        var carouselItemLength = $('li', carousel).length;
-                        var selectedItem = $('li.prevTrainCurrent.selected', carousel);
-                        var selectedItemIndex = $('li', carousel).index(selectedItem);
-
-                        // item is first and list has at least 2 items
-                        if (selectedItemIndex === 0 && carouselItemLength > 1) {
-                            // click next item
-                            selectedItem.next().find('img').trigger('click');
-                            // item is last item and list has at least 2 items
-                        } else if (carouselItemLength > 1 && selectedItemIndex === (carouselItemLength - 1)) {
-                            // click previous item
-                            selectedItem.prev().find('img').trigger('click');
-                            // Basket is empty
-                        } else if (carouselItemLength > 1) {
-                            // click next item
-                            selectedItem.next().find('img').trigger('click');
-                        } else {
-                            appEvents.emit('preview.close');
+                        if ($('.wrapCHIM_' + id).find('.CHIM').data('ui-draggable')) {
+                            $('.wrapCHIM_' + id).find('.CHIM').draggable('destroy');
                         }
 
-                        selectedItem.remove();
+                        $('.wrapCHIM_' + id).remove();
+
+                        if (context === 'reg_train_basket') {
+                            var carousel = $('#PREVIEWCURRENTCONT');
+                            var carouselItemLength = $('li', carousel).length;
+                            var selectedItem = $('li.prevTrainCurrent.selected', carousel);
+                            var selectedItemIndex = $('li', carousel).index(selectedItem);
+
+                            // item is first and list has at least 2 items
+                            if (selectedItemIndex === 0 && carouselItemLength > 1) {
+                                // click next item
+                                selectedItem.next().find('img').trigger('click');
+                                // item is last item and list has at least 2 items
+                            } else if (carouselItemLength > 1 && selectedItemIndex === (carouselItemLength - 1)) {
+                                // click previous item
+                                selectedItem.prev().find('img').trigger('click');
+                                // Basket is empty
+                            } else if (carouselItemLength > 1) {
+                                // click next item
+                                selectedItem.next().find('img').trigger('click');
+                            } else {
+                                appEvents.emit('preview.close');
+                            }
+
+                            selectedItem.remove();
+                        } else {
+                            return workzoneOptions.reloadCurrent();
+                        }
                     } else {
-                        return workzoneOptions.reloadCurrent();
+                        humane.error(data.message);
+                        $('.wrapCHIM_' + id).find('.CHIM').fadeIn();
                     }
-                } else {
-                    humane.error(data.message);
-                    $('.wrapCHIM_' + id).find('.CHIM').fadeIn();
                 }
-            }
-        });
+            });
+        }
+
     }
 
 
@@ -768,6 +769,14 @@ const workzone = (services) => {
         userModule.setPref('reg_delete', (state ? '1' : '0'));
         warnOnRemove = state;
     }
+
+    // map events to result selection:
+    appEvents.listenAll({
+        'workzone.selection.selectAll': () => workzoneOptions.selection.selectAll(),
+        // 'workzone.selection.unselectAll': () => workzoneOptions.selection.empty(),
+        // 'workzone.selection.selectByType': (dataType) => workzoneOptions.selection.select(dataType.type),
+        'workzone.selection.remove': (data) => workzoneOptions.selection.remove(data.records)
+    });
 
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {

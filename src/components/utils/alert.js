@@ -1,5 +1,4 @@
 import $ from 'jquery';
-// import dialog from './dialog';
 
 function create_dialog() {
     if ($('#p4_alerts').length === 0) {

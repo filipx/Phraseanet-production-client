@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Lists from '../../list';
 import listEditor from './listEditor';
 import listShare from './listShare';
-import dialog from '../../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 import * as _ from 'underscore';
 var ListManager = function (services, options) {
     const { configService, localeService, appEvents } = services;

@@ -2,7 +2,7 @@
  * triggered via workzone > Basket > context menu
  */
 import $ from 'jquery';
-import dialog from '../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 
 const basketCreate = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -80,7 +80,6 @@ const basketCreate = (services) => {
                     appEvents.emit('workzone.refresh', {
                         basketId: data.basket.id
                     });
-                    //p4.WorkZone.refresh(data.basket.id);
                     dialog.close(1);
 
                     return;

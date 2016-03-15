@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import dialog from '../../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 import pushRecord from '../recordPush';
 
 const recordPushModal = (services, datas) => {

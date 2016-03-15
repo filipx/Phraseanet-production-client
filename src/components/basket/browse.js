@@ -1,6 +1,5 @@
 import $ from 'jquery';
-import dialog from '../utils/dialog';
-
+import dialog from 'phraseanet-common/src/components/dialog';
 const basketBrowse = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');

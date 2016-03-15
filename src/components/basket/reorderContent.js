@@ -3,7 +3,7 @@
  */
 import $ from 'jquery';
 import * as _ from 'underscore';
-import dialog from '../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
 
 const basketReorderContent = (services) => {

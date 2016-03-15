@@ -1,6 +1,5 @@
 import $ from 'jquery';
 
-
 const keyboard = (services) => {
     const { configService, localeService, appEvents } = services;
 

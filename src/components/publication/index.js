@@ -1,6 +1,6 @@
 import $ from 'jquery';
 let lazyload = require('jquery-lazyload');
-import dialog from '../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 
 const publication = (services) => {
     let ajaxState = {
@@ -210,12 +210,19 @@ const publication = (services) => {
     };
 
     var openModal = function (data) {
+        let buttons = {};
+        let modal = dialog.create(services, {
+            size: 'Full',
+            closeOnEscape: true,
+            closeButton: true,
+            // buttons: {}
+        });
+        modal.setContent(data);
 
-        var buttons = {};
         buttons[localeService.t('valider')] = function () {
-            var dialog = modal.get(1);
+            var $dialog = dialog.get(1);
             var error = false;
-            var $form = $('form.main_form', dialog.getDomElement());
+            var $form = $('form.main_form', $dialog.getDomElement());
 
             $('.required_text', $form).each(function (i, el) {
                 if ($.trim($(el).val()) === '') {
@@ -243,51 +250,44 @@ const publication = (services) => {
                 data: $form.serializeArray(),
                 dataType: 'json',
                 beforeSend: function () {
-                    $('button', dialog.getDomElement()).prop('disabled', true);
+                    $('button', $dialog.getDomElement()).prop('disabled', true);
                 },
                 error: function () {
-                    $('button', dialog.getDomElement()).prop('disabled', false);
+                    $('button', $dialog.getDomElement()).prop('disabled', false);
                 },
                 timeout: function () {
-                    $('button', dialog.getDomElement()).prop('disabled', false);
+                    $('button', $dialog.getDomElement()).prop('disabled', false);
                 },
                 success: function (data) {
-                    $('button', dialog.getDomElement()).prop('disabled', false);
+                    $('button', $dialog.getDomElement()).prop('disabled', false);
                     if (data.error === true) {
                         alert(data.message);
                         return;
                     }
 
-                    if ($('form.main_form', dialog.getDomElement()).hasClass('entry_update')) {
-                        var id = $('form input[name="entry_id"]', dialog.getDomElement()).val();
+                    if ($('form.main_form', $dialog.getDomElement()).hasClass('entry_update')) {
+                        var id = $('form input[name="entry_id"]', $dialog.getDomElement()).val();
                         var container = $('#entry_' + id);
 
                         container.replaceWith(data.datas);
 
                         container.hide().fadeIn();
 
+                        // @TODO: something was happening here
                         $answers.find('img.lazyload').lazyload({
                             container: $answers
                         });
                     }
 
-                    dialog.close(1);
+                    $dialog.close(1);
                 }
             });
-            dialog.close(1);
+            //$dialog.close(1);
         };
 
-        var modal = dialog.create(services, {
-            size: 'Full',
-            closeOnEscape: true,
-            closeButton: true,
-            buttons: buttons
-        });
-
-        modal.setContent(data);
-
-        var $feeds_item = $('.feeds .feed', modal.getDomElement());
-        var $form = $('form.main_form', modal.getDomElement());
+        modal.setOption('buttons', buttons);
+        let $feeds_item = $('.feeds .feed', modal.getDomElement());
+        let $form = $('form.main_form', modal.getDomElement());
 
         $feeds_item.bind('click', function () {
             $feeds_item.removeClass('selected');

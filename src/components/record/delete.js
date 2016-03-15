@@ -1,14 +1,14 @@
 import $ from 'jquery';
-import dialog from '../../utils/dialog';
+import dialog from 'phraseanet-common/src/components/dialog';
 
-const recordDeleteModal = (services) => {
+const deleteRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     const deleteTemplateEndPoint = 'prod/records/delete/what/';
-
+    let workzoneSelection = [];
+    let searchSelection = [];
 
     const openModal = (datas) => {
-        // @REFACTORING - should use local dialog
         var $dialog = dialog.create(services, {
             size: 'Small',
             title: localeService.t('deleteRecords')
@@ -61,6 +61,7 @@ const recordDeleteModal = (services) => {
                         let chim = $('.CHIM_' + n);
                         let stories = $('.STORY_' + n);
                         $('.doc_infos', imgt).remove();
+                        // @TODO clean up
                         imgt.unbind('click').removeAttr('ondblclick').removeClass('selected').draggable('destroy').removeClass('IMGT').find('img').unbind();
                         imgt.find('.thumb img').attr('src', '/assets/common/images/icons/deleted.png').css({
                             width: '100%',
@@ -71,11 +72,12 @@ const recordDeleteModal = (services) => {
                         chim.parent().slideUp().remove();
                         imgt.find('.status,.title,.bottom').empty();
 
-                        p4.Results.Selection.remove(n);
+                        appEvents.emit('search.selection.remove', {records: n});
+
                         if (stories.length > 0) {
                             appEvents.emit('workzone.refresh');
                         } else {
-                            p4.WorkZone.Selection.remove(n);
+                            appEvents.emit('workzone.selection.remove', {records: n});
                         }
                     });
                     appEvents.emit('search.doRefreshSelection');
@@ -94,4 +96,4 @@ const recordDeleteModal = (services) => {
     return {openModal};
 };
 
-export default recordDeleteModal;
+export default deleteRecord;
