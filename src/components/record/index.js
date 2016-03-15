@@ -1,5 +1,5 @@
 import { Observable } from 'rx';
-import { ajax } from 'jQuery';
+import { ajax } from 'jquery';
 
 let recordService = (services) => {
     const { configService } = services;

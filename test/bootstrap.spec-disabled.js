@@ -3,6 +3,7 @@
 /* eslint no-unused-expressions: 0*/
 /* eslint max-nested-callbacks: 0*/
 import chai from 'chai';
+import $ from 'jquery';
 const expect = chai.expect;
 
 import bootstrap from '../src/bootstrap';

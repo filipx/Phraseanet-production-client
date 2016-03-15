@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 function checkVocabId(VocabularyId) {
     if (typeof VocabularyId === 'undefined') {
         VocabularyId = null;
@@ -70,7 +72,7 @@ var databoxField = function (name, label, meta_struct_id, options) {
     this.name = name;
     this.label = label;
     this.meta_struct_id = meta_struct_id;
-    this.options = jQuery.extend(defaults, options);
+    this.options = $.extend(defaults, options);
 
     if (this.options.multi === true && this.options.separator === null) {
         this.options.separator = ';';

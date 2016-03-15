@@ -1,14 +1,15 @@
+import $ from 'jquery';
 /*
- * jQuery Color Animations
+ * $ Color Animations
  * Copyright 2007 John Resig
  * Released under the MIT and GPL licenses.
  */
 
-(function (jQuery) {
+(function () {
 
     // We override the animation for all of these color styles
-    jQuery.each(['backgroundColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'borderTopColor', 'color', 'outlineColor'], function (i, attr) {
-        jQuery.fx.step[attr] = function (fx) {
+    $.each(['backgroundColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'borderTopColor', 'color', 'outlineColor'], function (i, attr) {
+        $.fx.step[attr] = function (fx) {
             if (fx.state === 0) {
                 fx.start = getColor(fx.elem, attr);
                 fx.end = getRGB(fx.end);
@@ -24,7 +25,7 @@
 
     // Color Conversion functions from highlightFade
     // By Blair Mitchelmore
-    // http://jquery.offput.ca/highlightFade/
+    // http://$.offput.ca/highlightFade/
 
     // Parse strings looking for color tuples [255,255,255]
     function getRGB(color) {
@@ -56,17 +57,17 @@
         }
 
         // Otherwise, we're most likely dealing with a named color
-        return colors[jQuery.trim(color).toLowerCase()];
+        return colors[$.trim(color).toLowerCase()];
     }
 
     function getColor(elem, attr) {
         var color;
 
         do {
-            color = jQuery.curCSS(elem, attr);
+            color = $.curCSS(elem, attr);
 
             // Keep going until we find an element that has color, or we hit the body
-            if (color !== '' && color !== 'transparent' || jQuery.nodeName(elem, 'body')) {
+            if (color !== '' && color !== 'transparent' || $.nodeName(elem, 'body')) {
                 break;
             }
 
@@ -126,4 +127,4 @@
         yellow: [255, 255, 0]
     };
 
-})(jQuery);
+})();

@@ -227,7 +227,7 @@ const recordBridge = (services) => {
 
             checkboxes.each(function (i, checkbox) {
                 if ($(checkbox).is(':checked') !== $this.is(':checked')) {
-                    var event = jQuery.Event('click');
+                    var event = $.Event('click');
                     event.selector_all = true;
                     $(checkbox).trigger(event);
                 }
