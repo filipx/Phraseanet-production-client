@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
+require('phraseanet-common/src/components/tooltip');
 const basketBrowse = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');

@@ -1,9 +1,8 @@
 import * as utils from './components/utils/utils.js';
-import VideoEditor from './components/videoEditor';
 import bootstrap from './bootstrap.js';
 
 let ProductionApplication = {
-    bootstrap, utils, VideoEditor
+    bootstrap, utils
 };
 
 if (typeof window !== 'undefined') {

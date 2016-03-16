@@ -1,8 +1,6 @@
-// import * as $ from 'jquery';
 import $ from 'jquery';
 const humane = require('humane-js');
 require('imports?define=>false&exports=>false!./components/utils/jquery-plugins/colorAnimation');
-// let dialogModule = require('../node_modules/phraseanet-common/src/components/dialog.js');
 import * as AppCommons from 'phraseanet-common';
 import publication from './components/publication';
 import workzone from './components/ui/workzone';

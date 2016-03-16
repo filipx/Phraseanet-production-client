@@ -89,13 +89,23 @@ module.exports = {
             loader: 'babel-loader'
         }, {
             test: require.resolve('jquery-lazyload'),
-            loader: "imports?this=>window&$=jquery"
+            loader: "imports?this=>window"
+        }, {
+            test: require.resolve('phraseanet-common/src/components/tooltip'),
+            loader: "imports?this=>window"
+        }, {
+            test: require.resolve('phraseanet-common/src/components/vendors/contextMenu'),
+            loader: "imports?this=>window"
         }]
     },
     resolve: {
         extensions: ['', '.js']
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        }),
         new WebpackNotifierPlugin({
             alwaysNotify: true
         }),

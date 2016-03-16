@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import { sprintf } from 'sprintf-js';
 import * as AppCommons from 'phraseanet-common';
+require('phraseanet-common/src/components/vendors/contextMenu');
+
 const thesaurusService = (services) => {
     const { configService, localeService, appEvents } = services;
     let options = {};

@@ -4,7 +4,7 @@ process.env.NODE_ENV = 'development';
 
 global.babel = require('babel-core/register');
 global.chai = require("chai");
-global.jquery = require("jquery");
+// global.$ = require("jquery");
 global.chaiAsPromised = require("chai-as-promised");
 global.chai.use(chaiAsPromised);
 global.expect = global.chai.expect;

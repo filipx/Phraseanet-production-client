@@ -3,6 +3,8 @@ import * as AppCommons from 'phraseanet-common';
 import { sprintf } from 'sprintf-js';
 import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
+require('phraseanet-common/src/components/tooltip');
+require('phraseanet-common/src/components/vendors/contextMenu');
 
 const recordEditorService = (services) => {
     const { configService, localeService, appEvents } = services;

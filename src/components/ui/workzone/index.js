@@ -5,8 +5,9 @@ import workzoneFacets from './facets/index';
 import workzoneBaskets from './baskets/index';
 import Selectable from '../../utils/selectable';
 import Alerts from '../../utils/alert';
-let humane = require('humane-js');
-
+const humane = require('humane-js');
+require('phraseanet-common/src/components/tooltip');
+require('phraseanet-common/src/components/vendors/contextMenu');
 
 const workzone = (services) => {
     const { configService, localeService, appEvents } = services;

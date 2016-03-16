@@ -23,6 +23,10 @@ module.exports = Object.assign({}, webpackConfig, {
         library: config._app
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        }),
         // Notifier
         new WebpackNotifierPlugin({
             title: PKG_LOCATION.name,

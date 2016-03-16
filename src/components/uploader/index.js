@@ -1,8 +1,8 @@
-
 import $ from 'jquery';
 import * as _ from 'underscore';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Alerts from '../utils/alert';
+require('phraseanet-common/src/components/tooltip');
 
 const uploader = (services) => {
     const { configService, localeService, appEvents } = services;

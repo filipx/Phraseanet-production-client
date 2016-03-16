@@ -7,9 +7,10 @@ module.exports = function(config) {
         exclude: [],
         // list of files / patterns to load in the browser
         files: [
+            './node_modules/jquery/dist/jquery.js',
             './node_modules/babel-polyfill/dist/polyfill.js',
             './node_modules/phantomjs-polyfill/bind-polyfill.js',
-            './test/**/*.spec.js'
+            './test/**/*.browser.js'
         ],
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -24,7 +25,7 @@ module.exports = function(config) {
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
             // 'src/**/*.js': ['coverage'],
-            'test/**/*.spec.js': ['webpack', 'sourcemap']
+            'test/**/*.browser.js': ['webpack', 'sourcemap']
         },
         // test results reporter to use
 		reporters: ['progress', 'mocha','coverage'],
@@ -40,9 +41,7 @@ module.exports = function(config) {
             }
             ]
         },
-        webpack: {
-            module: webpackConfig.module
-        },
+        webpack: webpackConfig,
         webpackMiddleware: {
             noInfo: true
         },

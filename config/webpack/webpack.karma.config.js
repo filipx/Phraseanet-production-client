@@ -6,7 +6,8 @@ import config from '../config';
 module.exports = {
     cache: true,
     debug: true,
-    hot:false,
+    hot: false,
+    devtool: 'inline-source-map',
     output: {},
 	entry: {},
     module: {
@@ -21,14 +22,22 @@ module.exports = {
             loaders: ['babel-loader']
         }, {
             test: require.resolve('jquery-lazyload'),
-            loader: "imports?this=>window&$=jquery"
+            loader: "imports?this=>window"
+        }, {
+            test: require.resolve('phraseanet-common/src/components/tooltip'),
+            loader: "imports?this=>window"
+        }, {
+            test: require.resolve('phraseanet-common/src/components/vendors/contextMenu'),
+            loader: "imports?this=>window"
         }]
     },
     resolve: {
         extensions: ['', '.js']
     },
-    externals: {
-        jquery: 'jQuery',
-        ui: 'jQuery.ui'
-    }
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        }),
+    ]
 };

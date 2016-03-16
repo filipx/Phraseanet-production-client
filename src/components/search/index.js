@@ -3,6 +3,8 @@ import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
 let lazyload = require('jquery-lazyload');
+require('phraseanet-common/src/components/tooltip');
+require('phraseanet-common/src/components/vendors/contextMenu');
 
 const search = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -315,6 +317,9 @@ const search = (services) => {
         $('#answers').removeClass('loading');
         $('.captionTips, .captionRolloverTips').tooltip({
             delay: 0,
+            delayOptions: {
+
+            },
             isBrowsable: false,
             extraClass: 'caption-tooltip-container'
         });

@@ -11,14 +11,95 @@ const preferences = (services) => {
             event.preventDefault();
             openModal(event);
         });
+
         $container.on('click', '.preferences-options-submit', (event) => {
             event.preventDefault();
             submitState();
         });
+
         $container.on('change', '.preferences-options-start-page', (event) => {
             event.preventDefault();
             setInitialStateOptions();
         });
+
+        $container.on('change', '.preferences-options-search-reload', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('advanced_search_reload', $el.prop('checked') ? '1' : '0');
+        });
+
+        $container.on('change', '.preferences-options-presentation-thumbnail', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('view', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+
+        $container.on('change', '.preferences-options-presentation-list', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('view', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+
+        $container.on('change', '.preferences-options-rollover-caption', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('rollover_thumbnail', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+
+        $container.on('change', '.preferences-options-rollover-preview', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('rollover_thumbnail', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+
+        $container.on('change', '.preferences-options-technical-display', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('technical_display', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+        $container.on('change', '.preferences-options-rollover-preview', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('technical_display', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+        $container.on('change', '.preferences-options-rollover-preview', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('technical_display', $el.val());
+            appEvents.emit('search.doSearch');
+        });
+
+        $container.on('change', '.preferences-options-doctype-display', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('doctype_display', $el.prop('checked') ? '1' : '0');
+            appEvents.emit('search.doSearch');
+        });
+
+        $container.on('change', '.preferences-options-basket-status', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('basket_status_display', $el.prop('checked') ? '1' : '0');
+        });
+
+        $container.on('change', '.preferences-options-basket-caption', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('basket_caption_display', $el.prop('checked') ? '1' : '0');
+        });
+
+        $container.on('change', '.preferences-options-basket-title', (event) => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('basket_title_display', $el.prop('checked') ? '1' : '0');
+        });
+
 
         $('#nperpage_slider').slider({
             value: parseInt($('#nperpage_value').val(), 10),
@@ -66,8 +147,8 @@ const preferences = (services) => {
 
                 sim_b = 0.1 * hsb.b;
 
-                var sim_rgb = utilsModule.hsl2rgb(hsb.h, hsb.s, sim_b);
-                var sim_hex = utilsModule.RGBtoHex(sim_rgb.r, sim_rgb.g, sim_rgb.b);
+                var sim_rgb = appCommons.utilsModule.hsl2rgb(hsb.h, hsb.s, sim_b);
+                var sim_hex = appCommons.utilsModule.RGBtoHex(sim_rgb.r, sim_rgb.g, sim_rgb.b);
 
                 appCommons.userModule.setPref('background-selection', hex);
                 appCommons.userModule.setPref('background-selection-disabled', sim_hex);

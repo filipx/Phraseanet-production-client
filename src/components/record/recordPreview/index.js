@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import * as Rx from 'rx';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
+require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {
     const { configService, localeService, appEvents } = services;
     let $bodyContainer = null;

@@ -3,7 +3,7 @@ import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../../utils/selectable';
 import * as _ from 'underscore';
 const humane = require('humane-js');
-
+require('phraseanet-common/src/components/tooltip');
 const Feedback = function (services, options) {
     const { configService, localeService, appEvents } = services;
     let $container;

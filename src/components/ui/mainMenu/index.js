@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import publication from '../../publication';
+require('phraseanet-common/src/components/vendors/contextMenu');
 
 const mainMenu = (services) => {
     const { configService, localeService, appEvents } = services;

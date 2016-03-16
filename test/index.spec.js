@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 import ProductionApplication from '../src';
 
-describe('ProductionApplication', () => {
+describe('ProductionApplication Unit test', () => {
 
     it('should be an object', () => {
         expect(typeof ProductionApplication).to.eql('object');
