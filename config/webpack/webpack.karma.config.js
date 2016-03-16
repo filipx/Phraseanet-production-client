@@ -19,7 +19,10 @@ module.exports = {
         loaders: [{
             test: /\.js?$/,
             exclude: /node_modules\/(?!phraseanet-common)/,
-            loaders: ['babel-loader']
+            loader: 'babel',
+            query: {
+                presets: ['es2015', 'stage-0']
+            }
         }, {
             test: require.resolve('jquery-lazyload'),
             loader: "imports?this=>window"

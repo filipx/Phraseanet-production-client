@@ -78,15 +78,16 @@ module.exports = {
         preLoaders: [{
             test: /\.js$/,
             loader: 'eslint-loader',
+            exclude: /node_modules/,
             include: path.join(__dirname, '../../src')
-            // exclude: /node_modules/
         }],
         loaders: [{
             test: /\.js$/,
-            // exclude: /node_modules/,
             exclude: /node_modules\/(?!phraseanet-common)/,
-            //include: path.join(__dirname, '../../src'),
-            loader: 'babel-loader'
+            loader: 'babel',
+            query: {
+                presets: ['es2015', 'stage-0']
+            }
         }, {
             test: require.resolve('jquery-lazyload'),
             loader: "imports?this=>window"
