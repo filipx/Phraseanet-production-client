@@ -81,7 +81,10 @@ module.exports = {
             include: path.join(__dirname, '../../src')
             // exclude: /node_modules/
         }],
-        loaders: [{
+        loaders: [/* {
+            test: require.resolve('phraseanet-common/src/components/dialog'),
+            loader: "babel-loader"
+        }, */{
             test: /\.js$/,
             // exclude: /node_modules/,
             exclude: /node_modules\/(?!phraseanet-common)/,
