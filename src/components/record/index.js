@@ -17,7 +17,6 @@ let recordService = (services) => {
                 dataType: 'json'
             }).done((data) => {
                     data.status = data.status || false;
-                    console.log('data', data);
                     if (data.status === 'ok') {
                         resolve(data);
                     } else {

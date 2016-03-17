@@ -14,7 +14,6 @@ const deleteBasket = (services) => {
     };
 
     const deleteConfirmation = ($el, type) => {
-        console.log('delete confirmation', $el, type);
         switch (type) {
             /*case 'IMGT':
             case 'CHIM':

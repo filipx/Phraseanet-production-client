@@ -6,7 +6,6 @@ const addToBasket = (services) => {
     const initialize = () => {
         $container = $('body');
         $container.on('click', '.record-add-to-basket-action', (event) => {
-            console.log('search-record-add-basket-action');
             event.preventDefault();
             let $el = $(event.currentTarget);
             let dbId = $el.data('db-id');

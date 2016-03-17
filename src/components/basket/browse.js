@@ -108,7 +108,7 @@ const basketBrowse = (services) => {
         }
 
         function activateLinks($scope) {
-            let confirmBox = dialog.create({
+            let confirmBox = dialog.create(services, {
                 size: 'Alert',
                 closeOnEscape: true,
                 cancelButton: true,
@@ -149,7 +149,7 @@ const basketBrowse = (services) => {
                                 appEvents.emit('workzone.refresh');
                             } else {
                                 confirmBox.close();
-                                var alertBox = dialog.create({
+                                var alertBox = dialog.create(services, {
                                     size: 'Alert',
                                     closeOnEscape: true,
                                     closeButton: true
@@ -160,7 +160,7 @@ const basketBrowse = (services) => {
                         },
                         error: function () {
                             confirmBox.close();
-                            var alertBox = dialog.create({
+                            var alertBox = dialog.create(services, {
                                 size: 'Alert',
                                 closeOnEscape: true,
                                 closeButton: true

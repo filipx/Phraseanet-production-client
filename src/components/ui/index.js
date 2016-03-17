@@ -6,6 +6,7 @@ import keyboard from './keyboard';
 import cgu from '../cgu';
 import editRecordService from '../record/edit';
 import exportRecord from '../record/export';
+import shareRecord from '../record/share';
 import addToBasket from '../record/addToBasket';
 import removeFromBasket from '../record/removeFromBasket';
 import printRecord from '../record/print';
@@ -28,6 +29,7 @@ const ui = (services) => {
         addToBasket(services).initialize();
         removeFromBasket(services).initialize();
         printRecord(services).initialize();
+        shareRecord(services).initialize(options);
         cgu(services).initialize(options);
         preferences(services).initialize(options);
 

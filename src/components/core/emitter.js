@@ -24,7 +24,6 @@ Emitter.prototype.listen = function (name, handler) {
 };
 Emitter.prototype.listenAll = function (group, name, handler) {
     for (let prop in group) {
-        console.log('add event', prop);
         var fnName = createName(prop);
         this.subjects[fnName] || (this.subjects[fnName] = new Rx.Subject());
         this.subjects[fnName].subscribe(group[prop]);

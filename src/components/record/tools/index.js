@@ -169,7 +169,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 var thumbnail = $('.selected', $sliderWrapper);
                 let content = '';
                 if (thumbnail.length === 0) {
-                    let confirmationDialog = dialog.create({
+                    let confirmationDialog = dialog.create(services, {
                         size: 'Alert',
                         title: data.translations.alertTitle,
                         closeOnEscape: true
@@ -248,7 +248,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                     };
 
                     // show confirm box, content is loaded here /prod/tools/thumb-extractor/confirm-box/
-                    var validationDialog = dialog.create({
+                    var validationDialog = dialog.create(services, {
                         size: 'Small',
                         title: data.translations.thumbnailTitle,
                         cancelButton: true,

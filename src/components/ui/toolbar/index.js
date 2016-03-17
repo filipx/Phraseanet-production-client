@@ -4,7 +4,7 @@ import moveRecords from '../actions/moveRecord';
 import editRecord from '../../record/edit';
 import deleteRecord from '../../record/delete';
 import recordDownloadModal from '../actions/recordDownload';
-import recordPropertyModal from '../actions/recordProperty';
+import propertyRecord from '../../record/property';
 import recordFeedbackModal from '../actions/recordFeedback';
 import recordPushModal from '../actions/recordPush';
 import recordPublishModal from '../actions/recordPublish';
@@ -21,11 +21,9 @@ const toolbar = (services) => {
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
             searchSelection = selection.serialized;
-            console.log('ok jsut received a updated selection from search', selection);
         },
         'broadcast.workzoneResultSelection': (selection) => {
             workzoneSelection = selection.serialized;
-            console.log('ok jsut received a updated selection from workzone', selection);
         }
     });
 
@@ -129,7 +127,7 @@ const toolbar = (services) => {
         /**
          * tools > selection ALL|NONE|per type
          */
-        $container.on('click mouseover', '.tools .answer_selector', (event) => {
+        $container.on('click', '.tools .answer_selector', (event) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
             let actionName = $el.data('action-name');
@@ -170,7 +168,7 @@ const toolbar = (services) => {
          * tools > Edit > Properties
          */
         $container.on('click', '.TOOL_chgstatus_btn', function (event) {
-            _triggerModal(event, recordPropertyModal(services).openModal);
+            _triggerModal(event, propertyRecord(services).openModal);
         });
 
         /**

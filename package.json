@@ -116,6 +116,7 @@
     "blueimp-file-upload": "^9.12.1",
     "blueimp-load-image": "^2.6.0",
     "es6-promise": "^3.0.2",
+    "geonames-server-jquery-plugin": "^0.2.2",
     "humane-js": "^3.2.2",
     "i18next": "^2.1.0",
     "i18next-xhr-backend": "^0.3.0",
@@ -123,7 +124,7 @@
     "jquery-lazyload": "^1.9.7",
     "jquery-ui": "^1.10.5",
     "jquery.fancytree": "^2.15.0",
-    "phraseanet-common": "^0.2.3",
+    "phraseanet-common": "^0.2.4",
     "rx": "^4.0.7",
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3"

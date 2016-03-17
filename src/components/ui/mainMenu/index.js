@@ -40,7 +40,7 @@ const mainMenu = (services) => {
 
         switch (stateName) {
             case 'publication':
-                publication.fetchPublications();
+                appEvents.emit('publication.fetch');
                 break;
             default:
                 console.log('navigation state error: state "' + stateName + '" not found');

@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import Lists from '../../list';
+import {Lists, List} from '../../list';
 import listEditor from './listEditor';
 import listShare from './listShare';
 import dialog from 'phraseanet-common/src/components/dialog';
@@ -12,7 +12,6 @@ var ListManager = function (services, options) {
     this.list = null;
     this.container = $container = $(containerId);
     this.userList = new Lists();
-
     $container.on('click', '.back_link', function () {
             $('#PushBox').show();
             $('#ListManager').hide();
@@ -66,7 +65,6 @@ var ListManager = function (services, options) {
 
 
     var initLeft = () => {
-        console.log('init left');
         $container.on('click', '.push-refresh-list-action', (event) => {
             //$('a.list_refresh', $container).bind('click', (event) => {
             // /prod/lists/all/
@@ -255,7 +253,7 @@ var ListManager = function (services, options) {
                         dialog.get(2).close();
                     };
 
-                    var List = new document.List(list_id);
+                    var List = new List(list_id);
                     List.remove(callbackOK);
                 };
 
@@ -279,7 +277,6 @@ var ListManager = function (services, options) {
     initLeft();
 
     $('.badges a.deleter', this.container).on('click', (event) => {
-        console.log('badges deleter');
         let $this = $(event.currentTarget);
         var badge = $this.closest('.badge');
 
@@ -303,7 +300,7 @@ var ListManager = function (services, options) {
 
 ListManager.prototype = {
     workOn: function (list_id) {
-        this.list = new document.List(list_id);
+        this.list = new List(list_id);
     },
     getList: function () {
         return this.list;

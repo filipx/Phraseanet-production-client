@@ -8,7 +8,6 @@ const pushRecord = (services) => {
     let listManagerInstance = null;
 
     const initialize = (options) => {
-        console.log('ok init with', options);
         let { feedback, listManager } = options;
 
         feedbackInstance = new Feedback(services, feedback);
@@ -31,12 +30,12 @@ const pushRecord = (services) => {
 
     appEvents.listenAll({
         // 'push.doInitialize': initialize,
+        'push.addUser': Feedback.addUser,
         'push.setActiveList': setActiveList,
         'push.createList': createList,
         'push.reload': reloadBridge
     });
 
-    // instance wil be stored in p4.Feedback
     return {
         initialize,
         // Feedback: Feedback,

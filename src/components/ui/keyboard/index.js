@@ -8,7 +8,6 @@ const keyboard = (services) => {
     };
 
     const openModal = () => {
-        console.log('open modal');
         $('#keyboard-stop').bind('click', function () {
             var display = $(this).get(0).checked ? '0' : '1';
 

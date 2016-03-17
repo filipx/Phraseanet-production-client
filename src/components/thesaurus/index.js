@@ -19,7 +19,6 @@ const thesaurusService = (services) => {
         options.thlist = {};
         options.tabs = null;
         for (let db of config.availableDatabases) {
-            console.log('loop throug available db', db.id);
             options.thlist['s' + db.id] = new ThesauThesaurusSeeker(db.id);
         }
 
@@ -184,7 +183,7 @@ const thesaurusService = (services) => {
 
         let msg = sprintf(config.replaceMessage, {from: term, to: f});
 
-        let confirmBox = dialog.create({
+        let confirmBox = dialog.create(services, {
             size: 'Alert',
             closeOnEscape: true,
             cancelButton: true,
@@ -284,7 +283,7 @@ const thesaurusService = (services) => {
     function T_replaceCandidates_OK() {
 
 
-        var replacingBox = dialogModule.dialog.create({
+        var replacingBox = dialog.create(services, {
             size: 'Alert'
         });
         replacingBox.setContent(config.replaceInProgressMsg);
@@ -307,7 +306,7 @@ const thesaurusService = (services) => {
                 replacingBox.close();
 
                 if (result.msg !== '') {
-                    var alert = dialogModule.dialog.create({
+                    var alert = dialog.create(services, {
                         size: 'Alert',
                         closeOnEscape: true,
                         closeButton: true
@@ -329,7 +328,7 @@ const thesaurusService = (services) => {
 
 
     function T_acceptCandidates_OK() {
-        var acceptingBox = dialogModule.dialog.create({
+        var acceptingBox = dialog.create(services, {
             size: 'Alert'
         });
         acceptingBox.setContent(config.acceptMsg);
@@ -409,7 +408,7 @@ const thesaurusService = (services) => {
 
 
     function C_deleteCandidates_OK() {
-        var deletingBox = dialogModule.dialog.create({
+        var deletingBox = dialog.create(services, {
             size: 'Alert'
         });
         deletingBox.setContent(config.deleteMsg);
@@ -434,7 +433,7 @@ const thesaurusService = (services) => {
                 deletingBox.close();
 
                 if (result.msg !== '') {
-                    var alert = dialogModule.dialog.create({
+                    var alert = dialog.create(services, {
                         size: 'Alert',
                         closeOnEscape: true,
                         closeButton: true
@@ -478,7 +477,7 @@ const thesaurusService = (services) => {
         trees.C._toAccept.type = type;
         trees.C._toAccept.dst = lidst.eq(0).attr('id');
 
-        var confirmBox = dialogModule.dialog.create({
+        var confirmBox = dialog.create(services, {
             size: 'Alert',
             closeOnEscape: true,
             cancelButton: true,
@@ -566,7 +565,7 @@ const thesaurusService = (services) => {
                     msg = sprintf(deleteCandidateManyMsg, trees.C._selInfos.n);
                 }
 
-                let confirmBox = dialogModule.dialog.create({
+                let confirmBox = dialog.create(services, {
                     size: 'Alert',
                     closeOnEscape: true,
                     cancelButton: true,

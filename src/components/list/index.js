@@ -233,4 +233,4 @@ List.prototype = {
     }
 };
 
-export default Lists;
+export {Lists, List};

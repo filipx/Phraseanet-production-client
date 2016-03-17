@@ -15,7 +15,6 @@ const workzoneFacets = (services) => {
         return selectedFacetValues;
     };
     var loadFacets = function (facets) {
-        console.log('should load facets', facets);
         // Convert facets data to fancytree source format
         var treeSource = _.map(facets, function (facet) {
             // Values

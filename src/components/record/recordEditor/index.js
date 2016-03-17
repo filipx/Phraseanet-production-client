@@ -52,13 +52,11 @@ const recordEditorService = (services) => {
         $editorContainer
             .on('click', '.select-record-action', (event) => {
                 let $el = $(event.currentTarget);
-                console.log('select record action');
                 _onSelectRecord(event, $el.data('index'));
             })
             // set grouping (regroupement) image
             .on('click', '.set-grouping-image-action', (event) => {
                 let $el = $(event.currentTarget);
-                console.log('select record action');
                 setRegDefault($el.data('index'), $el.data('record-id'));
             })
             // status field edition
@@ -73,7 +71,6 @@ const recordEditorService = (services) => {
             })
             // edit field by name / set active for edition
             .on('click', '.edit-field-action', (event) => {
-                console.log('ok catch event for edit-field-by-name-action');
                 let $el = $(event.currentTarget);
                 if (!options.textareaIsDirty || edit_validField(event, 'ask_ok') === true) {
                     _editField(event, $el.data('id'));
@@ -649,7 +646,6 @@ const recordEditorService = (services) => {
     }
 
     function _setPreviewEdit() {
-        console.log('open preview tab');
         if (!$('#TH_Opreview').is(':visible')) {
             return false;
         }
@@ -726,8 +722,6 @@ const recordEditorService = (services) => {
     }
 
     function _previewEdit(r) {
-        console.log('try to append', options.T_records[r].preview);
-
         $('#TH_Opreview .PNB10').empty().append(options.T_records[r].preview);
 
         if ($('img.PREVIEW_PIC.zoomable').length > 0) {
@@ -2054,9 +2048,7 @@ const recordEditorService = (services) => {
     function _onTextareaMouseUp(event, obj) {
         let $el = $(event.currentTarget);
         let value = $el.val();
-        console.log('has valeu?', value);
-        console.log('curfield?', options.curField);
-        console.log('t_field?', options.T_fields);
+
         if (options.T_fields[options.curField].tbranch) {
             if (value !== '') {
                 ETHSeeker.search(value);

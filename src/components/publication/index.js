@@ -7,20 +7,20 @@ const publication = (services) => {
         query: null,
         isRunning: false
     };
-
+    let $answers;
     let curPage;
     const { configService, localeService, appEvents } = services;
     const initialize = () => {
 
-        var $answers = $('#answers');
+        $answers = $('#answers');
 
-// refresh current view
+        // refresh current view
         $answers.on('click', '.feed_reload', function (event) {
             event.preventDefault();
             fetchPublications(curPage);
         });
 
-// navigate to a specific feed
+        // navigate to a specific feed
         $answers.on('click', '.ajax_answers', function (event) {
             event.preventDefault();
             var $this = $(this);
@@ -58,16 +58,17 @@ const publication = (services) => {
 
         });
 
-// subscribe_rss
+        // subscribe_rss
         $answers.on('click', '.subscribe_rss', function (event) {
             event.preventDefault();
-            var $this = $(this);
+            let $this = $(this);
+            let renew = false;
 
-            if (typeof (renew) === 'undefined') {
-                renew = 'false';
-            } else {
-                renew = renew ? 'true' : 'false';
-            }
+            /*if (typeof (renew) === 'undefined') {
+             renew = 'false';
+             } else {
+             renew = renew ? 'true' : 'false';
+             }*/
 
             var buttons = {};
             buttons[localeService.t('renewRss')] = function () {
@@ -114,7 +115,7 @@ const publication = (services) => {
             });
         });
 
-// edit a feed
+        // edit a feed
         $answers.on('click', '.feed .entry a.feed_edit', function () {
             var $this = $(this);
             $.ajax({
@@ -128,7 +129,7 @@ const publication = (services) => {
             return false;
         });
 
-// remove a feed
+        // remove a feed
         $answers.on('click', '.feed .entry a.feed_delete', function () {
             if (!confirm('etes vous sur de vouloir supprimer cette entree ?')) {
                 return false;
@@ -165,11 +166,9 @@ const publication = (services) => {
         });
 
         $answers.on('click', '.see_more a', function (event) {
-            $see_more = $(this).closest('.see_more');
+            const $see_more = $(this).closest('.see_more');
             $see_more.addClass('loading');
         });
-
-        fetchPublications();
     };
 
 
@@ -307,8 +306,11 @@ const publication = (services) => {
     };
 
     var fetchPublications = function (page) {
+        if (page === undefined) {
+            $answers.empty();
+        }
         curPage = page;
-        return _fetchRemote('../prod/feeds/', {
+        return _fetchRemote(configService.get('baseUrl') + 'prod/feeds/', {
             page: page
         })
             .then(function (data) {
@@ -353,7 +355,7 @@ const publication = (services) => {
             default:
         }
 
-        $.post('../prod/feeds/requestavailable/'
+        $.post(configService.get('baseUrl') + 'prod/feeds/requestavailable/'
             , options
             , function (data) {
 
@@ -363,6 +365,9 @@ const publication = (services) => {
         return;
     };
 
+    appEvents.listenAll({
+        'publication.fetch': fetchPublications
+    });
     return {
         initialize,
         fetchPublications,

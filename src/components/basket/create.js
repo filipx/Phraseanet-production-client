@@ -12,7 +12,6 @@ const basketCreate = (services) => {
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
             searchSelectionSerialized = selection.serialized;
-            console.log('ok jsut received a updated selection from search', selection);
         }
     });
 

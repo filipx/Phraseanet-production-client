@@ -9,7 +9,6 @@ import Selectable from '../utils/selectable';
 const basketReorderContent = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const endPoint = 'prod/baskets/4/reorder/';
     let searchSelectionSerialized = '';
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {

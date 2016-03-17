@@ -169,7 +169,7 @@ const recordBridge = (services) => {
                             // pushModule.reloadBridge(managerUrl);
                         } else {
                             confirmBox.close();
-                            var alertBox = dialogModule.dialog.create({
+                            var alertBox = dialog.create(services, {
                                 size: 'Alert',
                                 closeOnEscape: true,
                                 closeButton: true
@@ -181,7 +181,7 @@ const recordBridge = (services) => {
                 });
             };
 
-            var confirmBox = dialogModule.dialog.create({
+            var confirmBox = dialog.create(services, {
                 size: 'Alert',
                 closeOnEscape: true,
                 closeButton: true,

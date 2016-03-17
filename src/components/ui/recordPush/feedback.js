@@ -1,9 +1,11 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../../utils/selectable';
+import pushAddUser from '../../push/addUser';
 import * as _ from 'underscore';
 const humane = require('humane-js');
 require('phraseanet-common/src/components/tooltip');
+
 const Feedback = function (services, options) {
     const { configService, localeService, appEvents } = services;
     let $container;
@@ -20,6 +22,8 @@ const Feedback = function (services, options) {
         }
     );
 
+    pushAddUser(services).initialize({$container: this.container});
+
     var $this = this;
 
     this.container.on('click', '.content .options .select-all', function (event) {
@@ -32,12 +36,14 @@ const Feedback = function (services, options) {
 
     $('.UserTips', this.container).tooltip();
 
-    this.container.on('click', 'a.user_adder', function (event) {
+    /*this.container.on('click', '.user_adder', function (event) {
+        event.preventDefault();
+        const url = configService.get('baseUrl');
         var $this = $(this);
 
         $.ajax({
             type: 'GET',
-            url: $this.attr('href'),
+            url: `${url}prod/push/add-user/`,
             dataType: 'html',
             beforeSend: function () {
                 var options = {
@@ -61,7 +67,7 @@ const Feedback = function (services, options) {
         });
 
         return false;
-    });
+    });*/
 
     this.container.on('click', '.recommended_users', function (event) {
         var usr_id = $('input[name="usr_id"]', $(this)).val();
@@ -387,15 +393,15 @@ Feedback.prototype = {
     appendBadge: function (badge) {
         $('.user_content .badges', this.container).append(badge);
     },
-    addUser: function ($form, callback) {
-
+    addUser: function (options) {
+        let {$userForm, callback} = options;
         var $this = this;
 
         $.ajax({
             type: 'POST',
             url: '/prod/push/add-user/',
             dataType: 'json',
-            data: $form.serializeArray(),
+            data: $userForm.serializeArray(),
             success: function (data) {
                 if (data.success) {
                     humane.info(data.message);

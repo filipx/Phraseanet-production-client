@@ -57,7 +57,6 @@ class LocaleService {
                     this.translate = t;
                     this.cachedTranslations = i18next.getResourceBundle(this.locale);
                     resolve(instance);
-                    //console.log('i18n', i18next.getResourceBundle(this.locale),t);
                     if (data.callback !== undefined) {
                         data.callback();
                     }

@@ -157,7 +157,6 @@ const workzone = (services) => {
             refresh: refreshBaskets,
             addElementToBasket: function (options) {
                 let { sbas_id, record_id, event, singleSelection } = options;
-                console.log('try to add to basket');
                 singleSelection = !!singleSelection || false;
 
                 if ($('#baskets .SSTT.active').length === 1) {

@@ -17,7 +17,6 @@ const notify = (services) => {
     };
 
     const initialize = () => {
-        console.log('initalize notifier');
         notifyLayout().bindEvents();
     };
 
@@ -83,7 +82,6 @@ const notify = (services) => {
         if (data.apps && parseInt(data.apps, 10) > 1) {
             t = Math.round((Math.sqrt(parseInt(data.apps, 10) - 1) * 1.3 * 60000));
         }
-        t = defaultPollingTime;
 
         window.setTimeout(poll, t, notificationInstance);
 
@@ -91,7 +89,6 @@ const notify = (services) => {
     };
 
     const onPollError = (e, notificationInstance) => {
-        console.log('onError', e);
         window.setTimeout(poll, defaultPollingTime, notificationInstance);
     };
 

@@ -114,20 +114,19 @@ class Bootstrap {
             this.initDom();
 
             this.appWorkzone.initialize();
+            this.appPublication.initialize();
+
             // proxy selection
             this.appSearch.getResultSelectionStream().subscribe((data) => {
-                console.log('subscribed to search result stream', data);
                 this.appEvents.emit('broadcast.searchResultSelection', data);
             });
             // on navigation object changes
             this.appSearch.getResultNavigationStream().subscribe((data) => {
-                console.log('navigation Changed', data);
                 this.appEvents.emit('broadcast.searchResultNavigation', data.object);
             });
 
 
             this.appWorkzone.getResultSelectionStream().subscribe((data) => {
-                console.log('subscribed to search result stream', data);
                 this.appEvents.emit('broadcast.workzoneResultSelection', data);
             });
 
@@ -143,7 +142,7 @@ class Bootstrap {
 
         switch (initialState) {
             case 'publication':
-                this.appPublication.initialize();
+                this.appEvents.emit('publication.fetch');
                 // window.publicationModule.fetchPublications();
                 break;
             default:

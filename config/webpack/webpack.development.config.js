@@ -97,6 +97,9 @@ module.exports = {
         }, {
             test: require.resolve('phraseanet-common/src/components/vendors/contextMenu'),
             loader: "imports?this=>window"
+        }, {
+            test: require.resolve('geonames-server-jquery-plugin/jquery.geonames'),
+            loader: "imports?this=>window"
         }]
     },
     resolve: {

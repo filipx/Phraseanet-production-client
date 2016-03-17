@@ -28,7 +28,7 @@ const recordPushModal = (services, datas) => {
         pushRecord(services).initialize({
             feedback: {
                 containerId: '#PushBox',
-                context: 'Push' // @TODO '{{ context }}'
+                context: 'Push'
             },
             listManager: {
                 containerId: '#ListManager',

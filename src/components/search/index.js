@@ -1,5 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
+import resultInfos from './resultInfos';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
 let lazyload = require('jquery-lazyload');
@@ -25,7 +26,10 @@ const search = (services) => {
     const initialize = () => {
         $searchForm = $('#searchForm');
         $searchResult = $('#answers');
-        console.log('search form should be here', $searchForm.get(0));
+
+        resultInfos(services).initialize({
+            $container: $('#answers_status')
+        });
 
         searchResult.selection = new Selectable($searchResult, {
             selector: '.IMGT',
@@ -37,7 +41,6 @@ const search = (services) => {
                 appEvents.emit('search.doRefreshSelection');
             },
             callbackSelection: function (element) {
-                console.log(element);
                 var elements = $(element).attr('id').split('_');
 
                 return elements.slice(elements.length - 2, elements.length).join('_');
@@ -59,7 +62,6 @@ const search = (services) => {
         $searchForm.on('click', '.toggle-database', (event) => {
             let $el = $(event.currentTarget);
             let state = $el.data('state') || false;
-            console.log('toggle database', state);
             toggleDatabase(state);
         });
 
@@ -82,7 +84,6 @@ const search = (services) => {
             .on('click', '.search-navigate-action', (event) => {
                 event.preventDefault();
                 let $el = $(event.currentTarget);
-                console.log('passs page', $el.attr('data-page'));
                 navigate($el.data('page'));
             })
             .on('keypress', '.search-navigate-input-action', (event) => {
@@ -183,7 +184,7 @@ const search = (services) => {
         });
 
 
-        $('body').on('submit', $searchForm, function (event) {
+        $('body').on('submit', $searchForm.selector, function (event) {
             event.preventDefault();
             onSearch();
             return false;
@@ -206,13 +207,11 @@ const search = (services) => {
         }
 
         $('#idFrameC li.proposals_WZ').removeClass('active');
-
         appEvents.emit('search.doSearch');
         return false;
     };
 
     const onSearch = () => {
-        console.log('ok search!');
         var data = $searchForm.serializeArray();
 
         answAjax = $.ajax({
@@ -437,7 +436,6 @@ const search = (services) => {
             var $this = $(this);
 
             var sbas_id = $this.parent().find('input[name="reference"]').val();
-            console.log('sbas id', sbas_id);
             search.bases[sbas_id] = [];
 
             var nbCols = 0;
@@ -531,7 +529,6 @@ const search = (services) => {
         // --------- status bits filter ---------
 
         // here only the relevant sb are checked
-        console.log('should loop through', search.bases);
         const availableDb = search.bases;
         for (let sbas_id in availableDb) {
 
@@ -561,7 +558,6 @@ const search = (services) => {
             search.dates.minbound = $('#ADVSRCH_DATE_ZONE input[name=date_min]', adv_box).val();
             search.dates.maxbound = $('#ADVSRCH_DATE_ZONE input[name=date_max]', adv_box).val();
             search.dates.field = $('#ADVSRCH_DATE_ZONE select[name=date_field]', adv_box).val();
-            console.log(search.dates.minbound, search.dates.maxbound, search.dates.field);
             if ($.trim(search.dates.minbound) || $.trim(search.dates.maxbound)) {
                 danger = true;
                 $('#ADVSRCH_DATE_ZONE', adv_box).addClass('danger');
@@ -587,7 +583,6 @@ const search = (services) => {
     };
 
     const selectDatabase = ($el, sbas_id) => {
-        console.log('ok select', $el, sbas_id);
         var bool = $el.prop('checked');
         $.each($('.sbascont_' + sbas_id + ' :checkbox'), function () {
             this.checked = bool;
