@@ -1,10 +1,12 @@
 import $ from 'jquery';
+import dialog from 'phraseanet-common/src/components/dialog';
 
 const recordBridge = (services) => {
     const { configService, localeService, appEvents } = services;
-    var pub_tabs = $('#pub_tabs');
-    var container = $('#dialog_publicator');
-    var managerUrl = container.data('url');
+    let pub_tabs = $('#pub_tabs');
+    let container = $('#dialog_publicator');
+    let managerUrl = container.data('url');
+    let $panel;
     const initialize = () => {
         pub_tabs.tabs({
             beforeLoad: function (event, ui) {
@@ -153,8 +155,8 @@ const recordBridge = (services) => {
         });
 
         $('.delete-account', $panel).bind('click', function () {
-            account_id = $(this).val();
-            var buttons = {};
+            let account_id = $(this).val();
+            let buttons = {};
 
             buttons[localeService.t('valider')] = function () {
                 $.ajax({

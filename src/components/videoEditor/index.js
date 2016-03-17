@@ -45,7 +45,8 @@ Canva.prototype = {
     },
     getContext2d: function () {
 
-        if (undefined === this.domCanva.getContext) {
+        if (this.domCanva.getContext === undefined) {
+            /* eslint-disable no-undef */
             return G_vmlCanvasManager
                 .initElement(this.domCanva)
                 .getContext('2d');

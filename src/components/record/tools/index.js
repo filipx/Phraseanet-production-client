@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 import VideoEditor from '../../videoEditor';
+const humane = require('humane-js');
+
 const recordToolsModal = (services, datas, activeTab = false) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');

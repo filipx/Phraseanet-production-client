@@ -1,5 +1,5 @@
 import $ from 'jquery';
-
+import * as appCommons from 'phraseanet-common';
 const keyboard = (services) => {
     const { configService, localeService, appEvents } = services;
 
@@ -11,7 +11,7 @@ const keyboard = (services) => {
         $('#keyboard-stop').bind('click', function () {
             var display = $(this).get(0).checked ? '0' : '1';
 
-            userModule.setPref('keyboard_infos', display);
+            appCommons.userModule.setPref('keyboard_infos', display);
 
         });
 

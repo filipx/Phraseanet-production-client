@@ -7,7 +7,6 @@ import * as Rx from 'rx';
 const notify = (services) => {
 
     const { configService, localeService, appEvents } = services;
-    const language = [];
     const defaultPollingTime = 10000;
     const defaultConfig = {
         url: null,
@@ -17,7 +16,7 @@ const notify = (services) => {
     };
 
     const initialize = () => {
-        notifyLayout().bindEvents();
+        notifyLayout(services).initialize();
     };
 
     const createNotifier = (state) => {
@@ -57,11 +56,6 @@ const notify = (services) => {
         );
     };
     const onPollSuccess = (data, notificationInstance) => {
-        if (data.status === 'disconnected' || data.status === 'session') {
-            appEvents.emit('user.disconnected', data);
-            return false;
-        }
-
         // broadcast session refresh event
         appEvents.emit('session.refresh', data);
         // broadcast notification refresh event
@@ -69,15 +63,8 @@ const notify = (services) => {
             appEvents.emit('notification.refresh', data);
         }
         // append notification content
-        notifyLayout().addNotifications(data.notifications);
+        notifyLayout(services).addNotifications(data.notifications);
 
-/*
-        let isConnected = false;
-        if (data) {
-            isConnected = user(language).manageSession(data, true);
-        }
-        if (!isConnected) return;
-        */
         let t = 120000;
         if (data.apps && parseInt(data.apps, 10) > 1) {
             t = Math.round((Math.sqrt(parseInt(data.apps, 10) - 1) * 1.3 * 60000));
@@ -88,16 +75,17 @@ const notify = (services) => {
         return true;
     };
 
-    const onPollError = (e, notificationInstance) => {
+    const onPollError = (data, notificationInstance) => {
+        if (data.status === 'disconnected' || data.status === 'session') {
+            appEvents.emit('user.disconnected', data);
+            return false;
+        }
         window.setTimeout(poll, defaultPollingTime, notificationInstance);
     };
 
 
     return {
         initialize,
-        bindEvents: () => {
-            notifyLayout().bindEvents();
-        },
         /*appendNotifications: (content) => {
             notifyLayout().addNotifications(content)
         },*/

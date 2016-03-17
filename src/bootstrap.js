@@ -34,7 +34,7 @@ class Bootstrap {
         const configuration = Object.assign({}, defaultConfig, userConfig);
 
         this.appEvents = new Emitter();
-        this.appEvents.listenAll(user().subscribeToEvents);
+        // this.appEvents.listenAll(user().subscribeToEvents);
         this.appEvents.listenAll(basket().subscribeToEvents);
         // @TODO add locale/translations in streams
 
@@ -62,6 +62,9 @@ class Bootstrap {
 
         // export translation for backward compatibility:
         window.language = this.localeService.getTranslations();
+
+
+        const userSession = user(this.appServices);
 
         let appProdNotification = {
             url: this.configService.get('notify.url'),

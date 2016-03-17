@@ -4,7 +4,6 @@
 import $ from 'jquery';
 import * as _ from 'underscore';
 import dialog from 'phraseanet-common/src/components/dialog';
-import Selectable from '../utils/selectable';
 require('geonames-server-jquery-plugin/jquery.geonames.js');
 
 const pushAddUser = (services) => {

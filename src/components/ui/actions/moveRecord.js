@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
+const humane = require('humane-js');
 
 let $dialog = null;
 

@@ -1,13 +1,14 @@
 import $ from 'jquery';
-import user from '../user/index.js';
+import dialog from 'phraseanet-common/src/components/dialog';
+// import user from '../user/index.js';
 
 
-const notifyLayout = () => {
+const notifyLayout = (services) => {
+    const { configService, localeService, appEvents } = services;
     const $notificationBoxContainer = $('#notification_box');
     const $notificationTrigger = $('#notification_trigger');
     let $notificationDialog = $('#notifications-dialog');
-
-    const bindEvents = () => {
+    const initialize = () => {
         $notificationTrigger.on('mousedown', (event) => {
             event.stopPropagation();
             const $target = $(event.currentTarget);
@@ -107,7 +108,7 @@ const notifyLayout = () => {
         page = parseInt(page, 10);
         var buttons = {};
 
-        buttons[language.fermer] = function () {
+        buttons[localeService.t('fermer')] = function () {
             $notificationDialog.dialog('close');
         };
 
@@ -118,7 +119,7 @@ const notifyLayout = () => {
 
         $notificationDialog
             .dialog({
-                title: language.notifications,
+                title: localeService.t('notifications'),
                 autoOpen: false,
                 closeOnEscape: true,
                 resizable: false,
@@ -225,7 +226,7 @@ const notifyLayout = () => {
     };
 
     return {
-        bindEvents,
+        initialize,
         addNotifications
     };
 };

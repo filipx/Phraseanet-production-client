@@ -1,5 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
+import * as appCommons from 'phraseanet-common';
 import resultInfos from './resultInfos';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
@@ -22,6 +23,7 @@ const search = (services) => {
     };
     let $searchForm = null;
     let $searchResult = null;
+    let answAjaxrunning = false;
 
     const initialize = () => {
         $searchForm = $('#searchForm');
@@ -31,7 +33,7 @@ const search = (services) => {
             $container: $('#answers_status')
         });
 
-        searchResult.selection = new Selectable($searchResult, {
+        searchResult.selection = new Selectable(services, $searchResult, {
             selector: '.IMGT',
             limit: 800,
             selectStart: function (event, selection) {
@@ -109,7 +111,7 @@ const search = (services) => {
             var parent = $searchForm.parent();
 
             var options = {
-                size: (bodySize.x - 120) + 'x' + (bodySize.y - 120),
+                size: (window.bodySize.x - 120) + 'x' + (window.bodySize.y - 120),
                 loading: false,
                 closeCallback: function (dialog) {
 
@@ -166,15 +168,15 @@ const search = (services) => {
     const getResultSelectionStream = () => searchResult.selection.stream;
     const getResultNavigationStream = () => Rx.Observable.ofObjectChanges(searchResult.navigation);
 
-    const onSpecialSearch = (data) => {
+    /*const onSpecialSearch = (data) => {
         let { qry, allbase } = data;
         if (allbase) {
             toggleDatabase(true);
         }
-        workzoneFacetsModule.resetSelectedFacets();
+        resetSelectedFacets();
         $('#EDIT_query').val(decodeURIComponent(qry).replace(/\+/g, ' '));
         newSearch(qry);
-    };
+    };*/
 
     const initAnswerForm = () => {
         $('button[type="submit"]', $searchForm).bind('click', function () {
@@ -197,14 +199,14 @@ const search = (services) => {
 
         clearAnswers();
         $('#SENT_query').val(query);
-        var histo = $('#history-queries ul');
+        /*var histo = $('#history-queries ul');
 
         histo.prepend('<li onclick="prodModule.doSpecialSearch(\'' + query.replace(/\'/g, "\\'") + '\')">' + query + '</li>');
 
         var lis = $('li', histo);
         if (lis.length > 25) {
             $('li:last', histo).remove();
-        }
+        }*/
 
         $('#idFrameC li.proposals_WZ').removeClass('active');
         appEvents.emit('search.doSearch');
@@ -214,7 +216,7 @@ const search = (services) => {
     const onSearch = () => {
         var data = $searchForm.serializeArray();
 
-        answAjax = $.ajax({
+        let answAjax = $.ajax({
             type: 'POST',
             url: '../prod/query/',
             data: data,
@@ -574,7 +576,7 @@ const search = (services) => {
         }
 
         if (save === true) {
-            userModule.setPref('search', JSON.stringify(search));
+            appCommons.userModule.setPref('search', JSON.stringify(search));
         }
     };
 
@@ -616,7 +618,6 @@ const search = (services) => {
         'search.doResetSearch': resetSearch,
         'search.doClearSearch': clearAnswers,
         'search.doCheckFilters': checkFilters,
-        'search.doSpecialSearch': onSpecialSearch,
         'search.doRefreshSelection': viewNbSelect,
         'search.doSelectDatabase': selectDatabase,
         'search.doToggleCollection': toggleCollection,

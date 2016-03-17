@@ -15,7 +15,7 @@ const Feedback = function (services, options) {
 
     this.Context = context;
 
-    this.selection = new Selectable(
+    this.selection = new Selectable(services,
         $('.user_content .badges', this.container),
         {
             selector: '.badge'
@@ -86,7 +86,7 @@ const Feedback = function (services, options) {
             title: $(this).attr('title')
         };
 
-        $dialog = dialog.create(services, options, 2);
+        let $dialog = dialog.create(services, options, 2);
         $dialog.setContent(content);
 
         $dialog.getDomElement().find('a.adder').bind('click', function () {
@@ -181,7 +181,6 @@ const Feedback = function (services, options) {
 
             $FeedBackForm.trigger('submit');
         };
-
         var options = {
             size: 'Medium',
             buttons: buttons,
@@ -192,6 +191,7 @@ const Feedback = function (services, options) {
         };
 
         var $dialog = dialog.create(services, options, 2);
+
 
         var $FeedBackForm = $('form[name="FeedBackForm"]', $container);
 

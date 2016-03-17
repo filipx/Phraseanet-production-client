@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 require('phraseanet-common/src/components/tooltip');
+const humane = require('humane-js');
+
 const basketBrowse = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
@@ -108,12 +110,8 @@ const basketBrowse = (services) => {
         }
 
         function activateLinks($scope) {
-            let confirmBox = dialog.create(services, {
-                size: 'Alert',
-                closeOnEscape: true,
-                cancelButton: true,
-                buttons: buttons
-            }, 2);
+            let confirmBox = {};
+            let buttons = {};
 
             $('a.result', $scope).bind('click', function () {
                 var $this = $(this);
@@ -175,6 +173,12 @@ const basketBrowse = (services) => {
 
                 return false;
             });
+            confirmBox = dialog.create(services, {
+                size: 'Alert',
+                closeOnEscape: true,
+                cancelButton: true,
+                buttons: buttons
+            }, 2);
         }
 
         function active_archiver($scope) {

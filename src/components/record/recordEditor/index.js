@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import * as AppCommons from 'phraseanet-common';
+import * as appCommons from 'phraseanet-common';
 import { sprintf } from 'sprintf-js';
 import * as recordModel from '../../record/model';
 import * as Rx from 'rx';
@@ -176,7 +176,7 @@ const recordEditorService = (services) => {
         }
         switch (event.keyCode) {
             case 9:	// tab ou shift-tab
-                fieldNavigate(event, AppCommons.utilsModule.is_shift_key(event) ? -1 : 1);
+                fieldNavigate(event, appCommons.utilsModule.is_shift_key(event) ? -1 : 1);
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
             case 27:
@@ -206,7 +206,6 @@ const recordEditorService = (services) => {
 
         if (hasMultipleDatabases === true) {
             $('#EDITWINDOW').hide();
-            // commonModule.hideOverlay(2);
             // editor can't be run
             $('#dialog-edit-many-sbas', options.$container).dialog({
                 modal: true,
@@ -348,7 +347,7 @@ const recordEditorService = (services) => {
             },
             stop: function () {
                 _hsplit1();
-                userModule.setPref('editing_top_box', Math.floor($('#EDIT_TOP').height() * 100 / $('#EDIT_ALL').height()));
+                appCommons.userModule.setPref('editing_top_box', Math.floor($('#EDIT_TOP').height() * 100 / $('#EDIT_ALL').height()));
                 _setSizeLimits();
             }
         });
@@ -361,7 +360,7 @@ const recordEditorService = (services) => {
                 _setPreviewEdit();
             },
             stop: function () {
-                userModule.setPref('editing_right_box', Math.floor($('#divS').width() * 100 / $('#EDIT_MID_L').width()));
+                appCommons.userModule.setPref('editing_right_box', Math.floor($('#divS').width() * 100 / $('#EDIT_MID_L').width()));
                 _vsplit1();
                 _setSizeLimits();
             }
@@ -377,7 +376,7 @@ const recordEditorService = (services) => {
                     _setPreviewEdit();
                 },
                 stop: function () {
-                    userModule.setPref('editing_left_box', Math.floor($('#EDIT_MID_R').width() * 100 / $('#EDIT_MID').width()));
+                    appCommons.userModule.setPref('editing_left_box', Math.floor($('#EDIT_MID_R').width() * 100 / $('#EDIT_MID').width()));
                     _vsplit2();
                     _setSizeLimits();
                 }
@@ -393,7 +392,7 @@ const recordEditorService = (services) => {
             },
             change: function (event, ui) {
                 options.diapoSize = $(ui.value)[0];
-                userModule.setPref('editing_images_size', options.diapoSize);
+                appCommons.userModule.setPref('editing_images_size', options.diapoSize);
             }
         });
 
@@ -499,10 +498,10 @@ const recordEditorService = (services) => {
             onSelect: function (dateText, inst) {
                 var lval = $editTextArea.val();
                 if (lval !== dateText) {
-                    fieldLastValue = lval;
+                    options.fieldLastValue = lval;
                     $editTextArea.val(dateText);
                     $('#idEditZTextArea').trigger('keyup.maxLength');
-                    textareaIsDirty = true;
+                    options.textareaIsDirty = true;
                     edit_validField(null, 'ok');
                 }
             }
@@ -577,7 +576,7 @@ const recordEditorService = (services) => {
 
     function _preset_copy() {
         var html = '';
-        for (i in options.T_fields) {
+        for (let i in options.T_fields) {
             if (options.T_fields[i]._status === 1) {
                 if (options.T_fields[i].readonly) {
                     continue;
@@ -856,9 +855,9 @@ const recordEditorService = (services) => {
 
                         $('#idDivButtons', options.$container).hide();	// valeurs homog�nes
                         if (options.T_fields[meta_struct_id].type === 'date') {
-                            var v = options.T_fields[meta_struct_id]._value.split(' ');
-                            d = v[0].split('/');
-                            var dateObj = new Date();
+                            let v = options.T_fields[meta_struct_id]._value.split(' ');
+                            let d = v[0].split('/');
+                            let dateObj = new Date();
                             if (d.length === 3) {
                                 dateObj.setYear(d[0]);
                                 dateObj.setMonth((d[1] - 1));
@@ -1010,7 +1009,7 @@ const recordEditorService = (services) => {
                                     $('#EditTextMultiValued').trigger('keyup.maxLength');
                                     _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
                                 } else {
-                                    if (AppCommons.utilsModule.is_ctrl_key(e)) {
+                                    if (appCommons.utilsModule.is_ctrl_key(e)) {
                                         var t = $editTextArea.val();
                                         $editTextArea.val(t + (t ? ' ; ' : '') + label);
                                     } else {
@@ -1331,7 +1330,7 @@ const recordEditorService = (services) => {
             return;
         }
 
-        if (evt && AppCommons.utilsModule.is_shift_key(evt) && options.lastClickId !== null) {
+        if (evt && appCommons.utilsModule.is_shift_key(evt) && options.lastClickId !== null) {
             // shift donc on sel du editor.lastClickId a ici
             let pos_from = options.T_pos[options.lastClickId];
             let pos_to = options.T_pos[i];
@@ -1350,7 +1349,7 @@ const recordEditorService = (services) => {
                 }
             }
         } else {
-            if (!evt || !AppCommons.utilsModule.is_ctrl_key(evt)) {
+            if (!evt || !appCommons.utilsModule.is_ctrl_key(evt)) {
                 // on deselectionne tout avant
 
                 for (let id in options.T_records) {
@@ -1478,7 +1477,6 @@ const recordEditorService = (services) => {
                 }
                 $('#Edit_copyPreset_dlg').remove();
                 $('#EDITWINDOW').hide();
-                commonModule.hideOverlay(2);
                 appEvents.emit('preview.doReload');
                 return;
             }

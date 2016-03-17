@@ -6,6 +6,11 @@ const editRecord = (services) => {
     const url = configService.get('baseUrl');
     const editTemplateEndPoint = 'prod/records/edit/';
     let $container = null;
+
+    appEvents.listenAll({
+        'record.doEdit': _doEdit
+    });
+
     const initialize = () => {
         $container = $('body');
         $container.on('click', '.edit-record-action', function (event) {
@@ -25,8 +30,9 @@ const editRecord = (services) => {
                 default:
             }
 
-            _doEdit(type, idContent);
+            _doEdit({type: type, value: idContent});
         });
+
     };
 
     const openModal = (datas) => {
@@ -64,7 +70,8 @@ const editRecord = (services) => {
     };
 
     // open Modal
-    function _doEdit(type, value) {
+    function _doEdit(options) {
+        let {type, value} = options;
         var datas = {
             lst: '',
             ssel: '',

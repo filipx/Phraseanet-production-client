@@ -2,6 +2,11 @@ import $ from 'jquery';
 const printRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     let $container = null;
+
+    appEvents.listenAll({
+        'record.doPrint': doPrint
+    });
+
     const initialize = () => {
         $container = $('body');
         $container.on('click', '.record-print-action', function (event) {

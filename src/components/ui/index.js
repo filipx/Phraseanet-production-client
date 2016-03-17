@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import * as AppCommons from 'phraseanet-common';
+import * as appCommons from 'phraseanet-common';
 import toolbar from './toolbar';
 import mainMenu from './mainMenu';
 import keyboard from './keyboard';
@@ -74,7 +74,7 @@ const ui = (services) => {
                 switch (event.keyCode) {
                     case 27:
                         // hide download
-                        commonModule.hideOverlay(2);
+                        hideOverlay(2);
                         $('#MODALDL').css({
                             display: 'none'
                         });
@@ -133,20 +133,24 @@ const ui = (services) => {
     const _searchResultKeyDownEvent = (event, specialKeyState) => {
         switch (event.keyCode) {
             case 65:	// a
-                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                if (appCommons.utilsModule.is_ctrl_key(event)) {
                     $('.tools .answer_selector.all_selector').trigger('click');
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
             case 80:// P
-                if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                    _onOpenPrintModal('lst=' + searchSelection.serialized);
+                if (appCommons.utilsModule.is_ctrl_key(event)) {
+                    appEvents.emit('record.doPrint', 'lst=' + searchSelection.serialized);
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
             case 69:// e
-                if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                    openRecordEditor('IMGT', searchSelection.serialized);
+                if (appCommons.utilsModule.is_ctrl_key(event)) {
+                    // eq to: editRecord.doEdit()
+                    appEvents.emit('record.doEdit', {
+                        type: 'IMGT',
+                        value: searchSelection.serialized
+                    });
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
@@ -167,7 +171,7 @@ const ui = (services) => {
                 specialKeyState.isShortcutKey = true;
                 break;
             case 9:// tab
-                if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+                if (!appCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
                     document.getElementById('EDIT_query').focus();
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
@@ -180,21 +184,25 @@ const ui = (services) => {
     const _workzoneKeyDownEvent = (event, specialKeyState) => {
         switch (event.keyCode) {
             case 65:	// a
-                if (AppCommons.utilsModule.is_ctrl_key(event)) {
+                if (appCommons.utilsModule.is_ctrl_key(event)) {
                     appEvents.emit('workzone.selection.selectAll');
                     // p4.WorkZone.Selection.selectAll();
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
             case 80:// P
-                if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                    _onOpenPrintModal('lst=' + workzoneSelection.serialized);
+                if (appCommons.utilsModule.is_ctrl_key(event)) {
+                    appEvents.emit('record.doPrint', 'lst=' + workzoneSelection.serialized);
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
             case 69:// e
-                if (AppCommons.utilsModule.is_ctrl_key(event)) {
-                    openRecordEditor('IMGT', workzoneSelection.serialized);
+                if (appCommons.utilsModule.is_ctrl_key(event)) {
+                    // eq to: editRecord.doEdit()
+                    appEvents.emit('record.doEdit', {
+                        type: 'IMGT',
+                        value: workzoneSelection.serialized
+                    });
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
@@ -217,7 +225,7 @@ const ui = (services) => {
             // 									$('#NEXT_PAGE').trigger('click');
             // 									break;
             case 9:// tab
-                if (!AppCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+                if (!appCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
                     document.getElementById('EDIT_query').focus();
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
@@ -299,12 +307,12 @@ const ui = (services) => {
 
     const resizeAll = () => {
         var body = $('body');
-        bodySize.y = body.height();
-        bodySize.x = body.width();
+        window.bodySize.y = body.height();
+        window.bodySize.x = body.width();
 
         var headBlockH = $('#headBlock').outerHeight();
-        var bodyY = bodySize.y - headBlockH - 2;
-        var bodyW = bodySize.x - 2;
+        var bodyY = window.bodySize.y - headBlockH - 2;
+        var bodyW = window.bodySize.x - 2;
         // $('#desktop').height(bodyY).width(bodyW);
 
         appEvents.emit('preview.doResize');
@@ -324,7 +332,7 @@ const ui = (services) => {
         if (!$.support.cssFloat) {
             // $('#idFrameC .insidebloc').width(el - 56);
         }
-        var widthA = Math.round(bodySize.x - el - 10);
+        var widthA = Math.round(window.bodySize.x - el - 10);
         $('#rightFrame').width(widthA);
         $('#rightFrame').css('left', $('#idFrameC').width());
 
@@ -361,6 +369,21 @@ const ui = (services) => {
 
     };
 
+    const saveWindow = () => {
+        var key = '';
+        var value = '';
+
+
+        if ($('#idFrameE').is(':visible') && $('#EDITWINDOW').is(':visible')) {
+            key = 'edit_window';
+            value = $('#idFrameE').outerWidth() / $('#EDITWINDOW').innerWidth();
+        } else {
+            key = 'search_window';
+            value = $('#idFrameC').outerWidth() / window.bodySize.x;
+        }
+        appCommons.userModule.setPref(key, value);
+    }
+
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
             searchSelection = selection;
@@ -370,7 +393,8 @@ const ui = (services) => {
         },
         'ui.resizeAll': resizeAll,
         'ui.answerSizer': answerSizer,
-        'ui.linearizeUi': linearizeUi
+        'ui.linearizeUi': linearizeUi,
+        'ui.saveWindow': saveWindow
     });
 
 

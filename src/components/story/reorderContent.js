@@ -184,7 +184,7 @@ const storyReorderContent = (services) => {
 
         }).disableSelection();
 
-        var OrderSelection = new Selectable($('.elements', container), {
+        var OrderSelection = new Selectable(services, $('.elements', container), {
             selector: '.CHIM'
         });
 

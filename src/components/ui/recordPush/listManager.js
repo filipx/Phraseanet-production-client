@@ -4,7 +4,9 @@ import listEditor from './listEditor';
 import listShare from './listShare';
 import dialog from 'phraseanet-common/src/components/dialog';
 import * as _ from 'underscore';
-var ListManager = function (services, options) {
+const humane = require('humane-js');
+
+const ListManager = function (services, options) {
     const { configService, localeService, appEvents } = services;
     const { containerId } = options;
     let $container;

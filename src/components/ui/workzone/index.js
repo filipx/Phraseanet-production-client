@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import * as AppCommons from 'phraseanet-common';
+import * as appCommons from 'phraseanet-common';
 import workzoneThesaurus from './thesaurus/index';
 import workzoneFacets from './facets/index';
 import workzoneBaskets from './baskets/index';
@@ -28,8 +28,8 @@ const workzone = (services) => {
         $('#idFrameC').resizable({
             handles: 'e',
             resize: function () {
-                answerSizer();
-                linearizeUi();
+                appEvents.emit('ui.answerSizer');
+                appEvents.emit('ui.linearizeUi');
             },
             stop: function () {
 
@@ -43,7 +43,7 @@ const workzone = (services) => {
 
                 var nwidth = (n) * w + diff + n;
                 if (isNaN(nwidth)) {
-                    _saveWindows();
+                    appEvents.emit('ui.saveWindow');
                     return;
                 }
                 if (nwidth < 265) {
@@ -60,9 +60,9 @@ const workzone = (services) => {
                     300,
                     'linear',
                     function () {
-                        answerSizer();
-                        linearizeUi();
-                        _saveWindows();
+                        appEvents.emit('ui.answerSizer');
+                        appEvents.emit('ui.linearizeUi');
+                        appEvents.emit('ui.saveWindow');
                     });
             }
         });
@@ -153,7 +153,7 @@ const workzone = (services) => {
         });
         // workzoneOptions
         workzoneOptions = {
-            selection: new Selectable($('#baskets'), {selector: '.CHIM'}),
+            selection: new Selectable(services, $('#baskets'), {selector: '.CHIM'}),
             refresh: refreshBaskets,
             addElementToBasket: function (options) {
                 let { sbas_id, record_id, event, singleSelection } = options;
@@ -591,7 +591,7 @@ const workzone = (services) => {
                             .remove();
                     },
                     drag: function (event, ui) {
-                        if (AppCommons.utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping')) {
+                        if (appCommons.utilsModule.is_ctrl_key(event) || $(this).closest('.content').hasClass('grouping')) {
                             $('#dragDropCursor div').empty().append('+ ' + workzoneOptions.selection.length());
                         } else {
                             $('#dragDropCursor div').empty().append(workzoneOptions.selection.length());
@@ -656,7 +656,7 @@ const workzone = (services) => {
 
         switch (action) {
             case 'CHU2CHU' :
-                if (!AppCommons.utilsModule.is_ctrl_key(event)) act = 'MOV';
+                if (!appCommons.utilsModule.is_ctrl_key(event)) act = 'MOV';
                 break;
             case 'IMGT2REG':
             case 'CHU2REG' :
@@ -766,7 +766,7 @@ const workzone = (services) => {
     // remove record from basket/story preferences
     function toggleRemoveWarning(el) {
         var state = !el.checked;
-        userModule.setPref('reg_delete', (state ? '1' : '0'));
+        appCommons.userModule.setPref('reg_delete', (state ? '1' : '0'));
         warnOnRemove = state;
     }
 

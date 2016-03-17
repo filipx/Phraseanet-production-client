@@ -36,7 +36,8 @@
         //     "vars": "all",
         //     "args": "none"
         // }],
-        //"no-use-before-define": [2, "nofunc"],
+        "no-undef": 2,
+        // "no-use-before-define": [2,  "nofunc"],
         // possible errors
         "comma-dangle": 0,
         //"no-cond-assign": [2, "always"],

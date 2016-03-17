@@ -1,15 +1,16 @@
 import $ from 'jquery';
 import * as Rx from 'rx';
-import * as AppCommons from 'phraseanet-common';
-const Selectable = function ($container, options) {
-
+import * as appCommons from 'phraseanet-common';
+const Selectable = function (services, $container, options) {
+    const { configService, localeService, appEvents } = services;
     let defaults = {
             allow_multiple: false,
             selector: '',
             callbackSelection: null,
             selectStart: null,
             selectStop: null,
-            limit: null
+            limit: null,
+            localeService: localeService
         };
     options = typeof options === 'object' ? options : {};
 
@@ -42,7 +43,7 @@ const Selectable = function ($container, options) {
 
             let k = get_value($that, $this);
 
-            if (AppCommons.utilsModule.is_shift_key(event) && $('.last_selected', this.$container).filter($this.options.selector).length !== 0) {
+            if (appCommons.utilsModule.is_shift_key(event) && $('.last_selected', this.$container).filter($this.options.selector).length !== 0) {
                 let lst = $($this.options.selector, this.$container);
 
                 let index1 = $.inArray($('.last_selected', this.$container).filter($this.options.selector)[0], lst);
@@ -66,7 +67,7 @@ const Selectable = function ($container, options) {
                                 $this.push(contain);
                                 $(n).addClass('selected');
                             } else {
-                                alert(language.max_record_selected);
+                                alert(localeService.t('max_record_selected'));
                                 stopped = true;
                             }
                         }
@@ -78,11 +79,11 @@ const Selectable = function ($container, options) {
                         $this.push(k);
                         $that.addClass('selected');
                     } else {
-                        alert(language.max_record_selected);
+                        alert(localeService.t('max_record_selected'));
                     }
                 }
             } else {
-                if (!AppCommons.utilsModule.is_ctrl_key(event)) {
+                if (!appCommons.utilsModule.is_ctrl_key(event)) {
                     $this.empty().push(k);
                     $('.selected', this.$container).filter($this.options.selector).removeClass('selected');
                     $that.addClass('selected');
@@ -95,7 +96,7 @@ const Selectable = function ($container, options) {
                             $this.push(k);
                             $that.addClass('selected');
                         } else {
-                            alert(language.max_record_selected);
+                            alert(localeService.t('max_record_selected'));
                         }
                     }
                 }
@@ -194,7 +195,7 @@ Selectable.prototype = {
                 $(this).addClass('selected');
             } else {
                 if (stopped === false) {
-                    alert(max_record_selected);
+                    alert($this.options.localeService.t('max_record_selected'));
                 }
                 stopped = true;
             }

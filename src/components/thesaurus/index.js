@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { sprintf } from 'sprintf-js';
 import * as AppCommons from 'phraseanet-common';
+import dialog from 'phraseanet-common/src/components/dialog';
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const thesaurusService = (services) => {
@@ -314,7 +315,7 @@ const thesaurusService = (services) => {
                     alert.setContent(result.msg);
                 }
 
-                for (i in result.ctermsDeleted) {
+                for (let i in result.ctermsDeleted) {
                     var cid = '#CX_P\\.' + result.ctermsDeleted[i].replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
                     $(cid).remove();
                 }
@@ -328,17 +329,17 @@ const thesaurusService = (services) => {
 
 
     function T_acceptCandidates_OK() {
-        var acceptingBox = dialog.create(services, {
+        let same_sbas = true;
+        let acceptingBox = dialog.create(services, {
             size: 'Alert'
         });
         acceptingBox.setContent(config.acceptMsg);
 
-        var t_ids = [];
-        var dst = trees.C._toAccept.dst.split('.');
+        let t_ids = [];
+        let dst = trees.C._toAccept.dst.split('.');
         dst.shift();
-        var sbid = dst.shift();
+        let sbid = dst.shift();
         dst = dst.join('.');
-        same_sbas = true;
         // obviously the candidates and the target already complies (same sbas, good tbranch)
         trees.C._selInfos.sel.each(
             function () {
@@ -541,9 +542,9 @@ const thesaurusService = (services) => {
             case 'REPLACE':
                 if (trees.C._selInfos.n === 1) {
                     term = trees.C._selInfos.sel.eq(0).find('span span').html();
-                    msg = sprintf(replaceCandidateUniqueMsg, term);
+                    msg = sprintf(config.replaceCandidateUniqueMsg, term);
                 } else {
-                    msg = sprintf(replaceCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(config.replaceCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 options.tabs.tabs('option', 'active', 0);
@@ -560,9 +561,9 @@ const thesaurusService = (services) => {
 
                 if (trees.C._selInfos.n === 1) {
                     term = trees.C._selInfos.sel.eq(0).find('span span').html();
-                    msg = sprintf(deleteCandidateUniqueMsg, term);
+                    msg = sprintf(config.deleteCandidateUniqueMsg, term);
                 } else {
-                    msg = sprintf(deleteCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(config.deleteCandidateManyMsg, trees.C._selInfos.n);
                 }
 
                 let confirmBox = dialog.create(services, {
@@ -982,7 +983,7 @@ const thesaurusService = (services) => {
         };
         this.search_delayed = function (txt) {
             var me = this;
-            if ($this._xmlttp.abort && typeof $this._xmlttp.abort === 'function') {
+            if (this._xmlttp.abort && typeof this._xmlttp.abort === 'function') {
                 this._xmlhttp.abort();
             }
             var url = '/xmlhttp/openbranches_prod.x.php';
@@ -1011,7 +1012,7 @@ const thesaurusService = (services) => {
         };
         this.openBranch = function (id, thid) {
             var me = this;
-            if ($this._xmlttp.abort && typeof $this._xmlttp.abort === 'function') {
+            if (this._xmlttp.abort && typeof this._xmlttp.abort === 'function') {
                 this._xmlhttp.abort();
             }
             var url = '/xmlhttp/getterm_prod.x.php';
@@ -1046,8 +1047,9 @@ const thesaurusService = (services) => {
                 this.tObj.TH_searching.src = '/assets/common/images/icons/ftp-loader-blank.gif';
                 // && (typeof(ret.parsed)=="undefined" || ret.parsed))
                 if (ret) {
-                    var htmlnodes = ret.getElementsByTagName('html');
-                    if (htmlnodes && htmlnodes.length === 1 && (htmlnode = htmlnodes.item(0).firstChild)) {
+                    let htmlnodes = ret.getElementsByTagName('html');
+                    let htmlnode = htmlnodes.item(0).firstChild;
+                    if (htmlnodes && htmlnodes.length === 1 && htmlnode) {
                         if (typeof (id) === 'undefined') {
                             // called from search or 'auto' : full thesaurus search
                             if (!this.tObj.TH_P) {

@@ -32,7 +32,7 @@ const previewRecordService = (services) => {
             containment: 'parent',
             drag: function (event, ui) {
                 var x = $(ui.position.left)[0];
-                if (x < 330 || x > (bodySize.x - 400)) {
+                if (x < 330 || x > (window.bodySize.x - 400)) {
                     return false;
                 }
                 var v = $(ui.position.left)[0];
@@ -131,8 +131,6 @@ const previewRecordService = (services) => {
         var justOpen = false;
 
         if (!options.open) {
-            commonModule.showOverlay();
-
             $('#PREVIEWIMGCONT').disableSelection();
 
             justOpen = true;
@@ -241,13 +239,15 @@ const previewRecordService = (services) => {
 
                 if ($('#popularity .bitly_link').length > 0) {
 
-                    BitlyCB.statsResponse = function (data) {
-                        var result = data.results;
-                        if ($('#popularity .bitly_link_' + result.userHash).length > 0) {
-                            $('#popularity .bitly_link_' + result.userHash).append(' (' + result.clicks + ' clicks)');
-                        }
-                    };
-                    BitlyClient.stats($('#popularity .bitly_link').html(), 'BitlyCB.statsResponse');
+                    if (window.BitlyCB !== undefined && window.BitlyClient !== undefined) {
+                        window.BitlyCB.statsResponse = function (data) {
+                            var result = data.results;
+                            if ($('#popularity .bitly_link_' + result.userHash).length > 0) {
+                                $('#popularity .bitly_link_' + result.userHash).append(' (' + result.clicks + ' clicks)');
+                            }
+                        };
+                        window.BitlyClient.stats($('#popularity .bitly_link').html(), 'BitlyCB.statsResponse');
+                    }
                 }
 
                 options.current = {};
@@ -309,7 +309,6 @@ const previewRecordService = (services) => {
 
     function closePreview() {
         options.open = false;
-        commonModule.hideOverlay();
 
         $('#PREVIEWBOX').fadeTo(500, 0);
         $('#PREVIEWBOX').queue(function () {

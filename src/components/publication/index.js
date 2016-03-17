@@ -185,7 +185,7 @@ const publication = (services) => {
             data: data,
             beforeSend: function () {
                 if (ajaxState.isRunning && ajaxState.query.abort) {
-                    answAjax.abort();
+                    ajaxState.query.abort();
                 }
                 if (page === 0) {
                     appEvents.emit('search.doClearSearch');

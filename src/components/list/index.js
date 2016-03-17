@@ -165,50 +165,6 @@ List.prototype = {
             }
         });
     },
-    shareWith: function (usr_id, role, callback) {
-
-        var $this = this;
-
-        $.ajax({
-            type: 'POST',
-            url: '/prod/lists/list/' + this.id + '/share/' + usr_id + '/',
-            dataType: 'json',
-            data: {role: role},
-            success: function (data) {
-                if (data.success) {
-                    humane.info(data.message);
-
-                    if (typeof callback === 'function') {
-                        callback($this);
-                    }
-                } else {
-                    humane.error(data.message);
-                }
-            }
-        });
-    },
-    unshareWith: function (callback) {
-
-        var $this = this;
-
-        $.ajax({
-            type: 'POST',
-            url: '/prod/lists/list/' + this.id + '/unshare/' + usr_id + '/',
-            dataType: 'json',
-            data: {},
-            success: function (data) {
-                if (data.success) {
-                    humane.info(data.message);
-
-                    if (typeof callback === 'function') {
-                        callback($this);
-                    }
-                } else {
-                    humane.error(data.message);
-                }
-            }
-        });
-    },
     get: function (callback) {
 
         var $this = this;

@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
-
+const humane = require('humane-js');
 const cgu = (services) => {
     const { configService, localeService, appEvents } = services;
 

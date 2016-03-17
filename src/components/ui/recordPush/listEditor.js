@@ -22,11 +22,10 @@ const listEditor = (services, options) => {
             let $this = $(this);
 
             let sort = $('input', $this).val();
+            let ord = 'asc';
 
             if ((sort === $('input[name="srt"]', $form).val()) && ($('input[name="ord"]', $form).val() === 'asc')) {
-                let ord = 'desc';
-            } else {
-                let ord = 'asc';
+                ord = 'desc';
             }
 
             $('input[name="srt"]', $form).val(sort);

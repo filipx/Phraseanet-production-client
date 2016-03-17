@@ -81,7 +81,7 @@ const uploader = (services) => {
                 });
                 ui.jqXHR.error(function (xhr, status, index, anchor) {
                     // display error message if ajax failed
-                    $(anchor.hash).html(language.error);
+                    $(anchor.hash).html(localeService.t('error'));
                 });
 
                 ui.tab.find('span').html(' <img src="/assets/common/images/icons/loader404040.gif"/>');
@@ -179,7 +179,7 @@ const uploader = (services) => {
                 // prevent dialog box from being closed while files are being downloaded
                 $dialog.getDomElement().bind('dialogbeforeclose', function (event, ui) {
                     if (!uploaderInstance.Queue.isEmpty()) {
-                        Alerts(language.warning, language.fileBeingDownloaded);
+                        Alerts(localeService.t('warning'), localeService.t('fileBeingDownloaded'));
                         return false;
                     }
                 });
@@ -225,11 +225,11 @@ const uploader = (services) => {
                     let params = {};
                     let html = '';
                     if (file.error) {
-                        params = $.extend({}, file, {error: language.errorFileApi, language: language});
+                        params = $.extend({}, file, {error: localeService.t('errorFileApi')});
                         html = _.template($('#upload_items_error_tpl').html())(params);
                         uploaderInstance.getUploadBox().append(html);
                     } else if (file.size > maxFileSize) {
-                        params = $.extend({}, file, {error: language.errorFileApiTooBig, language: language});
+                        params = $.extend({}, file, {error: localeService.t('errorFileApiTooBig')});
                         html = _.template($('#upload_items_error_tpl').html())(params);
                         uploaderInstance.getUploadBox().append(html);
                     } else {
@@ -242,8 +242,7 @@ const uploader = (services) => {
                             size: typeof file.size !== 'undefined' ? uploaderInstance.Formater.size(file.size) : '',
                             name: file.name,
                             type: typeof file.type !== 'undefined' ? file.type : '',
-                            uploadIndex: uploaderInstance.getUploadIndex(),
-                            language: language
+                            uploadIndex: uploaderInstance.getUploadIndex()
                         };
 
                         // Set context in upload-box
@@ -325,7 +324,7 @@ const uploader = (services) => {
 
             // Set new context in download-box
             $.each(data.files, function (index, file) {
-                let params = $.extend({}, file, {language: language, id: 'file-' + index});
+                let params = $.extend({}, file, {id: 'file-' + index});
                 let html = _.template($('#download_items_tpl').html())(params);
 
                 uploaderInstance.getDownloadBox().append(html);

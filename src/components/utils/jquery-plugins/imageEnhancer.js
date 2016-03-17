@@ -157,7 +157,7 @@ import $ from 'jquery';
             }
         }
 
-        h2 = Math.round(w2 / ratio);
+        let h2 = Math.round(w2 / ratio);
         w2 = Math.round(w2);
 
         let wPreview = $container.width() / 2;
