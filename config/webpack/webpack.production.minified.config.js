@@ -16,6 +16,7 @@ module.exports = Object.assign({}, webpackConfig, {
     devtool: false,
     hot: false,
     build: true,
+    watch: false,
     output: {
         path: config.distDir,
         filename: config._app + '.min.js',

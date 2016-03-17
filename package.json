@@ -29,7 +29,7 @@
     "package:prod": "./node_modules/.bin/ncu -u",
     "package:dev": "./node_modules/.bin/ncu -p -u",
     "asset-server": "node config/webpack/webpack.hot.assets.config",
-    "preversion": "npm run dist && git add -A dist && git commit -m 'Build lib'",
+    "publish-patch": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version patch && npm publish",
     "postpublish": "git push origin master --follow-tags"
   },
   "pre-commit": [
@@ -81,6 +81,7 @@
     "karma-spec-reporter": "0.0.24",
     "karma-webpack": "^1.7.0",
     "lodash": "4.5.1",
+    "lolex": "^1.4.0",
     "mocha": "^2.4.5",
     "npm-check-updates": "^2.5.7",
     "npmlog": "^2.0.2",
@@ -124,7 +125,7 @@
     "jquery-lazyload": "^1.9.7",
     "jquery-ui": "^1.10.5",
     "jquery.fancytree": "^2.15.0",
-    "phraseanet-common": "^0.2.4",
+    "phraseanet-common": "^0.2.5",
     "rx": "^4.0.7",
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3"
