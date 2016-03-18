@@ -11,6 +11,7 @@ import addToBasket from '../record/addToBasket';
 import removeFromBasket from '../record/removeFromBasket';
 import printRecord from '../record/print';
 import preferences from '../preferences';
+import order from '../order';
 import previewRecordService from '../record/recordPreview';
 import Alerts from '../utils/alert';
 import uploader from '../uploader';
@@ -32,6 +33,7 @@ const ui = (services) => {
         shareRecord(services).initialize(options);
         cgu(services).initialize(options);
         preferences(services).initialize(options);
+        order(services).initialize(options);
 
         let editRecord = editRecordService(services);
         editRecord.initialize();

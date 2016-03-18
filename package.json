@@ -30,6 +30,7 @@
     "package:dev": "./node_modules/.bin/ncu -p -u",
     "asset-server": "node config/webpack/webpack.hot.assets.config",
     "publish-patch": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version patch && npm publish",
+    "publish-minor": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version minor && npm publish",
     "postpublish": "git push origin master --follow-tags"
   },
   "pre-commit": [
