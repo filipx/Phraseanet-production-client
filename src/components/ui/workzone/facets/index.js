@@ -62,16 +62,18 @@ const workzoneFacets = (services) => {
     function _sortByPredefinedFacets(source, field, predefinedFieldOrder) {
         let filteredSource = source.slice();
         let ordered = [];
+
         _.each(predefinedFieldOrder, function (fieldValue, index) {
-            _.each(source, function (facet, facetIndex) {
+            for (let i = filteredSource.length - 1; i > -1; --i) {
+                let facet = filteredSource[i];
                 if (facet[field] !== undefined) {
                     if (facet[field] === fieldValue) {
                         ordered.push(facet);
                         // remove from filtered
-                        filteredSource.splice(facetIndex, 1);
+                        filteredSource.splice(i, 1);
                     }
                 }
-            });
+            }
         });
 
         const olen = filteredSource.length;
