@@ -218,7 +218,7 @@ const search = (services) => {
 
         let answAjax = $.ajax({
             type: 'POST',
-            url: `${url}prod/query`,
+            url: `${url}prod/query/`,
             data: data,
             dataType: 'json',
             beforeSend: function (formData) {
