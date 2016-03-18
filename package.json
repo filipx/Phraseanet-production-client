@@ -124,7 +124,7 @@
     "jquery-lazyload": "^1.9.7",
     "jquery-ui": "^1.10.5",
     "jquery.fancytree": "^2.15.0",
-    "phraseanet-common": "^0.2.5",
+    "phraseanet-common": "^0.2.8",
     "rx": "^4.0.7",
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3"
