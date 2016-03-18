@@ -37,10 +37,9 @@ module.exports = {
     resolve: {
         extensions: ['', '.js']
     },
-    plugins: [
-        new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery"
-        }),
-    ]
+    externals: {
+        jquery: 'jQuery',
+        ui: 'jQuery.ui'
+    },
+    plugins: []
 };
