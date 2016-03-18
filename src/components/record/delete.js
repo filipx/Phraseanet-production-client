@@ -4,7 +4,6 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const deleteRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const deleteTemplateEndPoint = 'prod/records/delete/what/';
     let workzoneSelection = [];
     let searchSelection = [];
 
@@ -16,7 +15,7 @@ const deleteRecord = (services) => {
 
         $.ajax({
             type: 'POST',
-            url: `${url}${deleteTemplateEndPoint}`,
+            url: `${url}prod/records/delete/what/`,
             dataType: 'html',
             data: datas,
             success: function (data) {

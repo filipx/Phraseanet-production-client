@@ -4,13 +4,12 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const recordDownloadModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const downloadTemplateEndPoint = 'prod/export/multi-export/';
 
     const openModal = (datas) => {
         // @TODO: use local dialog module
         let $dialog = dialog.create(services, { title: localeService.t('export') });
 
-        $.post(`${url}${downloadTemplateEndPoint}`, datas, function (data) {
+        $.post(`${url}prod/export/multi-export/`, datas, function (data) {
             $dialog.setContent(data);
 
             $('.tabs', $dialog.getDomElement()).tabs();

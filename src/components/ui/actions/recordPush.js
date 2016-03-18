@@ -5,7 +5,6 @@ import pushRecord from '../recordPush';
 const recordPushModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const pushTemplateEndPoint = 'prod/push/sendform/';
 
 
     const openModal = (datas) => {
@@ -15,7 +14,7 @@ const recordPushModal = (services, datas) => {
             title: localeService.t('push')
         });
 
-        $.post(`${url}${pushTemplateEndPoint}`, datas, function (data) {
+        $.post(`${url}prod/push/sendform/`, datas, function (data) {
             $dialog.setContent(data);
             _onDialogReady();
             return;
@@ -31,7 +30,7 @@ const recordPushModal = (services, datas) => {
                 context: 'Push'
             },
             listManager: {
-                containerId: '#ListManager',
+                containerId: '#ListManager'
             }
         });
     };

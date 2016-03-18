@@ -3,6 +3,7 @@ import dialog from 'phraseanet-common/src/components/dialog';
 
 const recordBridge = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let pub_tabs = $('#pub_tabs');
     let container = $('#dialog_publicator');
     let managerUrl = container.data('url');
@@ -68,7 +69,7 @@ const recordBridge = (services) => {
 
             $.ajax({
                 type: 'GET',
-                url: '/prod/bridge/upload/',
+                url: `${url}prod/bridge/upload/`,
                 data: $form.serializeArray(),
                 beforeSend: function () {
                     $panel.empty().addClass('loading');
@@ -162,7 +163,7 @@ const recordBridge = (services) => {
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
-                    url: '/prod/bridge/adapter/' + account_id + '/delete/',
+                    url: `${url}prod/bridge/adapter/${account_id}/delete/`,
                     data: {},
                     success: function (datas) {
                         if (datas.success) {

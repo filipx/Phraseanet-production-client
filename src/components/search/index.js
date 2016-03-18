@@ -10,7 +10,7 @@ require('phraseanet-common/src/components/vendors/contextMenu');
 
 const search = (services) => {
     const { configService, localeService, appEvents } = services;
-
+    const url = configService.get('baseUrl');
     let searchResult = {
         selection: false,
         navigation: {
@@ -218,7 +218,7 @@ const search = (services) => {
 
         let answAjax = $.ajax({
             type: 'POST',
-            url: '../prod/query/',
+            url: `${url}prod/query`,
             data: data,
             dataType: 'json',
             beforeSend: function (formData) {

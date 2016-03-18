@@ -6,7 +6,6 @@ const humane = require('humane-js');
 const listShare = (services, options) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const shareTemplateEndPoint = 'prod/lists/list/1/share/';
     let $dialog = null;
 
 
@@ -65,7 +64,7 @@ const listShare = (services, options) => {
 
             $.ajax({
                 type: 'POST',
-                url: '/prod/lists/list/' + listId + '/share/' + userId + '/',
+                url: `${url}prod/lists/list/${listId}/share/${userId}/`,
                 dataType: 'json',
                 data: {role: role},
                 beforeSend: function () {
@@ -83,10 +82,10 @@ const listShare = (services, options) => {
             });
         }
 
-        function unShareWith(usr_id, callback) {
+        function unShareWith(userId, callback) {
             $.ajax({
                 type: 'POST',
-                url: '/prod/lists/list/' + listId + '/unshare/' + usr_id + '/',
+                url: `${url}prod/lists/list/${listId}/unshare/${userId}/`,
                 dataType: 'json',
                 data: {},
                 beforeSend: function () {
@@ -109,7 +108,7 @@ const listShare = (services, options) => {
                 minLength: 2,
                 source: function (request, response) {
                     $.ajax({
-                        url: '/prod/push/search-user/',
+                        url: `${url}prod/push/search-user/`,
                         dataType: 'json',
                         data: {
                             query: request.term

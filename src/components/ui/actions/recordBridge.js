@@ -5,7 +5,6 @@ import recordBridge from '../recordBridge';
 const bridgeRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const bridgeTemplateEndPoint = 'prod/bridge/manager/';
 
     const openModal = (datas) => {
 
@@ -15,7 +14,7 @@ const bridgeRecord = (services) => {
             loading: false
         });
 
-        return $.post(`${url}${bridgeTemplateEndPoint}`, datas, function (data) {
+        return $.post(`${url}prod/bridge/manager/`, datas, function (data) {
             $dialog.setContent(data);
             _onDialogReady();
             return;

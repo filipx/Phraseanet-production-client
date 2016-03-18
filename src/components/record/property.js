@@ -4,7 +4,6 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const propertyRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const propertyTemplateEndPoint = 'prod/records/property/';
 
     const openModal = (datas) => {
         return doProperty(datas);
@@ -19,7 +18,7 @@ const propertyRecord = (services) => {
         $.ajax({
             type: 'GET',
             data: datas,
-            url: `${url}${propertyTemplateEndPoint}`,
+            url: `${url}prod/records/property/`,
             success: function (data) {
                 $dialog.setContent(data);
                 _onPropertyReady($dialog);

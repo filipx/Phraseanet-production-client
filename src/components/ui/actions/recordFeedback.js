@@ -5,7 +5,6 @@ import pushRecord from '../recordPush';
 const recordFeedbackModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const feedbackTemplateEndPoint = 'prod/push/validateform/';
 
 
     const openModal = (datas) => {
@@ -15,7 +14,7 @@ const recordFeedbackModal = (services, datas) => {
             title: localeService.t('feedback')
         });
 
-        $.post(`${url}${feedbackTemplateEndPoint}`, datas, function (data) {
+        $.post(`${url}prod/push/validateform/`, datas, function (data) {
             // data content's javascript can't be fully refactored
             $dialog.setContent(data);
             _onDialogReady();

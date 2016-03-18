@@ -4,6 +4,7 @@ let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageE
 require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let $bodyContainer = null;
     let $previewContainer = null;
     let prevAjax;
@@ -185,7 +186,7 @@ const previewRecordService = (services) => {
         let posAsk = null;
         prevAjax = $.ajax({
             type: 'POST',
-            url: '../prod/records/',
+            url: `${url}prod/records/`,
             dataType: 'json',
             data: {
                 env: env,
@@ -479,7 +480,7 @@ const previewRecordService = (services) => {
         $('#PREVIEWCURRENTCONT').fadeOut('fast');
         $.ajax({
             type: 'POST',
-            url: '/prod/query/answer-train/',
+            url: `${url}prod/query/answer-train/`,
             dataType: 'json',
             data: {
                 pos: absolutePos,
@@ -498,7 +499,7 @@ const previewRecordService = (services) => {
     function _getRegTrain(contId, pos, tools) {
         $.ajax({
             type: 'POST',
-            url: '/prod/query/reg-train/',
+            url: `${url}prod/query/reg-train/`,
             dataType: 'json',
             data: {
                 cont: contId,

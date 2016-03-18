@@ -3,6 +3,7 @@ import * as appCommons from 'phraseanet-common';
 const humane = require('humane-js');
 const cgu = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
 
     const initialize = (options = {}) => {
         const { $container } = options;
@@ -39,7 +40,7 @@ const cgu = (services) => {
 
         $.ajax({
             type: 'POST',
-            url: '../prod/TOU/deny/' + id + '/',
+            url: `${url}prod/TOU/deny/${id}/`,
             dataType: 'json',
             success: function (data) {
                 if (data.success) {

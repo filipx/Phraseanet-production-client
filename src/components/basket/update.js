@@ -8,7 +8,6 @@ const humane = require('humane-js');
 const basketUpdate = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const endPoint = 'prod/baskets/4/reorder/';
     let basketId = false;
     let searchSelectionSerialized = '';
     appEvents.listenAll({

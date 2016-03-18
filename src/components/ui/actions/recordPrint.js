@@ -3,7 +3,6 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const recordPrintModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const printTemplateEndPoint = 'prod/printer/?';
 
 
     const openModal = (datas) => {
@@ -33,7 +32,7 @@ const recordPrintModal = (services, datas) => {
 
         $.ajax({
             type: 'POST',
-            url: `${url}${printTemplateEndPoint}` + $.param(datas),
+            url: `${url}prod/printer/?` + $.param(datas),
             dataType: 'html',
             beforeSend: function () {
 

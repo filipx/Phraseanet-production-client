@@ -7,7 +7,6 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const basketCreate = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const endPoint = 'prod/baskets/create/';
     let searchSelectionSerialized = '';
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
@@ -37,7 +36,7 @@ const basketCreate = (services) => {
         }, options);
         const $dialog = dialog.create(services, dialogOptions);
 
-        return $.get(`${url}${endPoint}`, function (data) {
+        return $.get(`${url}prod/baskets/create/`, function (data) {
             $dialog.setContent(data);
             _onDialogReady();
             return;

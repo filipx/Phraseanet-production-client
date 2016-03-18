@@ -8,6 +8,7 @@ require('phraseanet-common/src/components/tooltip');
 
 const Feedback = function (services, options) {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let $container;
     let { containerId, context } = options;
 
@@ -296,7 +297,7 @@ const Feedback = function (services, options) {
             minLength: 2,
             source: function (request, response) {
                 $.ajax({
-                    url: '/prod/push/search-user/',
+                    url: `${url}prod/push/search-user/`,
                     dataType: 'json',
                     data: {
                         query: request.term
@@ -399,6 +400,7 @@ Feedback.prototype = {
 
         $.ajax({
             type: 'POST',
+            // @TODO - load baseUrl from configService
             url: '/prod/push/add-user/',
             dataType: 'json',
             data: $userForm.serializeArray(),

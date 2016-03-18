@@ -7,7 +7,6 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const storyCreate = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const endPoint = 'prod/story/create/';
     let searchSelectionSerialized = '';
 
     appEvents.listenAll({
@@ -38,7 +37,7 @@ const storyCreate = (services) => {
         }, options);
         const $dialog = dialog.create(services, dialogOptions);
 
-        return $.get(`${url}${endPoint}`, function (data) {
+        return $.get(`${url}prod/story/create/`, function (data) {
             $dialog.setContent(data);
             _onDialogReady();
             return;

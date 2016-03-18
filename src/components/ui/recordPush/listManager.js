@@ -9,6 +9,7 @@ const humane = require('humane-js');
 const ListManager = function (services, options) {
     const { configService, localeService, appEvents } = services;
     const { containerId } = options;
+    const url = configService.get('baseUrl');
     let $container;
 
     this.list = null;
@@ -135,10 +136,9 @@ const ListManager = function (services, options) {
             $el.closest('.lists').find('.list.selected').removeClass('selected');
             $el.parent('li.list').addClass('selected');
 
-            let url = `../prod/push/edit-list/${listId}/`;
             $.ajax({
                 type: 'GET',
-                url: url,
+                url: `${url}prod/push/edit-list/${listId}/`,
                 dataType: 'html',
                 success: (data) => {
                     this.workOn(listId);

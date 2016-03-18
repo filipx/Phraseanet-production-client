@@ -6,7 +6,6 @@ const humane = require('humane-js');
 const recordToolsModal = (services, datas, activeTab = false) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const toolsTemplateEndPoint = 'prod/tools/';
     let $dialog = null;
 
     const openModal = (datas) => {
@@ -17,7 +16,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             loading: true
         });
 
-        return $.get(`${url}${toolsTemplateEndPoint}`
+        return $.get(`${url}prod/tools/`
             , datas
             , function (data) {
                 $dialog.setContent(data);
@@ -225,7 +224,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
                         $.ajax({
                             type: 'POST',
-                            url: '/prod/tools/thumb-extractor/apply/',
+                            url: `${url}prod/tools/thumb-extractor/apply/`,
                             data: {
                                 sub_def: subDefs,
                                 record_id: record_id,
@@ -265,7 +264,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
 
                     return $.ajax({
                         type: 'POST',
-                        url: '/prod/tools/thumb-extractor/confirm-box/',
+                        url: `${url}prod/tools/thumb-extractor/confirm-box/`,
                         data: datas,
                         success: function (data) {
 

@@ -1,6 +1,7 @@
 import $ from 'jquery';
 const printRecord = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let $container = null;
 
     appEvents.listenAll({
@@ -53,7 +54,7 @@ const printRecord = (services) => {
 
         $.ajax({
             type: 'POST',
-            url: '../prod/printer/?' + value,
+            url: `${url}prod/printer/?${value}`,
             dataType: 'html',
             beforeSend: function () {
 

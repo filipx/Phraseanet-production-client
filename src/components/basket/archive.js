@@ -2,6 +2,7 @@ import $ from 'jquery';
 
 const archiveBasket = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -12,17 +13,17 @@ const archiveBasket = (services) => {
         });
     };
 
-    function doArchive(basket_id) {
+    function doArchive(basketId) {
         $.ajax({
             type: 'POST',
-            url: '../prod/baskets/' + basket_id + '/archive/?archive=1',
+            url: `${url}prod/baskets/${basketId}/archive/?archive=1`,
             dataType: 'json',
             beforeSend: function () {
 
             },
             success: function (data) {
                 if (data.success) {
-                    const basket = $('#SSTT_' + basket_id);
+                    const basket = $('#SSTT_' + basketId);
                     const next = basket.next();
 
                     if (next.data('ui-droppable')) {

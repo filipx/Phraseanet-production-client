@@ -4,7 +4,6 @@ import recordEditorService from './recordEditor';
 const editRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const editTemplateEndPoint = 'prod/records/edit/';
     let $container = null;
 
     appEvents.listenAll({
@@ -43,7 +42,7 @@ const editRecord = (services) => {
         $('#EDITWINDOW').show();
 
         $.ajax({
-            url: `${url}${editTemplateEndPoint}`,
+            url: `${url}prod/records/edit/`,
             type: 'POST',
             dataType: 'html',
             data: datas,

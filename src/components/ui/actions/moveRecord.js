@@ -7,8 +7,6 @@ let $dialog = null;
 const moveRecords = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const moveRecordsEndPoint = 'prod/records/movecollection/';
-    const postMovableRecordsEndPoint = 'prod/records/movecollection/apply/';
 
     const openModal = (datas) => {
         $dialog = dialog.create(services, {
@@ -84,7 +82,7 @@ const moveRecords = (services) => {
     const _getMovableRecords = (datas) => {
         return $.ajax({
             type: 'POST',
-            url: `${url}${moveRecordsEndPoint}`,
+            url: `${url}prod/records/movecollection/`,
             data: datas
         });
     };
@@ -92,7 +90,7 @@ const moveRecords = (services) => {
     const _postMovableRecords = (datas) => {
         return $.ajax({
             type: 'POST',
-            url: `${url}${postMovableRecordsEndPoint}`,
+            url: `${url}prod/records/movecollection/apply/`,
             dataType: 'json',
             data: datas
         });

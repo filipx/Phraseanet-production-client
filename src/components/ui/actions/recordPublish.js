@@ -5,11 +5,10 @@ import publication from '../../publication';
 const recordPublishModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const publishTemplateEndPoint = 'prod/feeds/requestavailable/';
 
     const openModal = (datas) => {
 
-        $.post(`${url}${publishTemplateEndPoint}`
+        $.post(`${url}prod/feeds/requestavailable/`
             , datas
             , function (data) {
 

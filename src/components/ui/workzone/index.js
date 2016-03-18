@@ -11,6 +11,7 @@ require('phraseanet-common/src/components/vendors/contextMenu');
 
 const workzone = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let workzoneOptions = {};
     let searchSelection = {asArray: [], serialized: ''};
     workzoneFacets(services);
@@ -232,7 +233,7 @@ const workzone = (services) => {
 
         $.ajax({
             type: 'GET',
-            url: '../prod/WorkZone/',
+            url: `${url}prod/WorkZone/`,
             data: {
                 id: basketId,
                 sort: sort,
@@ -737,7 +738,7 @@ const workzone = (services) => {
     function fix() {
         $.ajax({
             type: 'POST',
-            url: '../prod/WorkZone/attachStories/',
+            url: `${url}prod/WorkZone/attachStories/`,
             data: {stories: searchSelection.asArray},
             dataType: 'json',
             success: function (data) {

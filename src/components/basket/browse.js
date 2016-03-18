@@ -6,7 +6,6 @@ const humane = require('humane-js');
 const basketBrowse = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const endPoint = 'prod/WorkZone/Browse/';
 
     const initialize = () => {
         $('body').on('click', '.basket-browse-action', (event) => {
@@ -30,7 +29,7 @@ const basketBrowse = (services) => {
         }, options);
         const $dialog = dialog.create(services, dialogOptions);
 
-        return $.get(`${url}${endPoint}`, function (data) {
+        return $.get(`${url}prod/WorkZone/Browse/`, function (data) {
             $dialog.setContent(data);
             _onDialogReady();
             return;

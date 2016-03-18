@@ -5,7 +5,6 @@ const humane = require('humane-js');
 const exportRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const exportTemplateEndPoint = 'prod/export/multi-export/';
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -39,7 +38,7 @@ const exportRecord = (services) => {
 
         $.ajax({
             method: 'POST',
-            url: `${url}${exportTemplateEndPoint}`,
+            url: `${url}prod/export/multi-export/`,
             data: datas,
             success: function (data) {
                 $dialog.setContent(data);

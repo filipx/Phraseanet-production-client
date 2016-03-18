@@ -10,6 +10,8 @@ const publication = (services) => {
     let $answers;
     let curPage;
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
+
     const initialize = () => {
 
         $answers = $('#answers');
@@ -310,7 +312,7 @@ const publication = (services) => {
             $answers.empty();
         }
         curPage = page;
-        return _fetchRemote(configService.get('baseUrl') + 'prod/feeds/', {
+        return _fetchRemote(`${url}prod/feeds/`, {
             page: page
         })
             .then(function (data) {
@@ -355,7 +357,7 @@ const publication = (services) => {
             default:
         }
 
-        $.post(configService.get('baseUrl') + 'prod/feeds/requestavailable/'
+        $.post(`${url}prod/feeds/requestavailable/`
             , options
             , function (data) {
 

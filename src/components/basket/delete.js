@@ -3,6 +3,7 @@ import dialog from 'phraseanet-common/src/components/dialog';
 
 const deleteBasket = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let $container = null;
     const initialize = () => {
         $container = $('body');
@@ -61,7 +62,7 @@ const deleteBasket = (services) => {
         var k = $(item).attr('id').split('_').slice(1, 2).pop();
         $.ajax({
             type: 'POST',
-            url: '../prod/baskets/' + k + '/delete/',
+            url: `${url}prod/baskets/${k}/delete/`,
             dataType: 'json',
             success: function (data) {
                 if (data.success) {

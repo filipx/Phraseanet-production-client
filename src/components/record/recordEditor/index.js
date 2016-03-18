@@ -8,6 +8,7 @@ require('phraseanet-common/src/components/vendors/contextMenu');
 
 const recordEditorService = (services) => {
     const { configService, localeService, appEvents } = services;
+    const url = configService.get('baseUrl');
     let $container = null;
     let options = {};
     let stream = new Rx.Subject();
@@ -450,7 +451,7 @@ const recordEditorService = (services) => {
 
             $.ajax({
                 type: 'POST',
-                url: '../prod/records/edit/presets',
+                url: `${url}prod/records/edit/presets`,
                 data: {
                     sbas_id: options.sbas_id,
                     title: jtitle.val(),
@@ -513,7 +514,7 @@ const recordEditorService = (services) => {
 
         $.ajax({
             type: 'GET',
-            url: '../prod/records/edit/presets',
+            url: `${url}prod/records/edit/presets`,
             data: {
                 sbas_id: options.sbas_id
             },
@@ -596,10 +597,10 @@ const recordEditorService = (services) => {
         }
     }
 
-    function _preset_delete(preset_id, li) {
+    function _preset_delete(presetId, li) {
         $.ajax({
             type: 'DELETE',
-            url: '../prod/records/edit/presets/' + preset_id,
+            url: `${url}prod/records/edit/presets/${presetId}`,
             data: {},
             dataType: 'json',
             success: function (data, textStatus) {
@@ -608,10 +609,10 @@ const recordEditorService = (services) => {
         });
     }
 
-    function _preset_load(preset_id) {
+    function _preset_load(presetId) {
         $.ajax({
             type: 'GET',
-            url: '../prod/records/edit/presets/' + preset_id,
+            url: `${url}prod/records/edit/presets/${presetId}`,
             data: {},
             dataType: 'json',
             success: function (data, textStatus) {
@@ -794,7 +795,7 @@ const recordEditorService = (services) => {
                     appendTo: '#idEditZone',
                     source: function (request, response) {
                         $.ajax({
-                            url: '../prod/records/edit/vocabulary/' + vocabType + '/',
+                            url: `${url}prod/records/edit/vocabulary/${vocabType}/`,
                             dataType: 'json',
                             data: {
                                 sbas_id: options.sbas_id,
@@ -1466,7 +1467,7 @@ const recordEditorService = (services) => {
         }
 
         $.ajax({
-            url: '../prod/records/edit/apply/',
+            url: `${url}prod/records/edit/apply/`,
             data: params,
             type: 'POST',
             success: function (data) {

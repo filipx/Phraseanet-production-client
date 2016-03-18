@@ -19,6 +19,7 @@ Lists.prototype = {
 
         $.ajax({
             type: 'POST',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/list/',
             dataType: 'json',
             data: {name: name},
@@ -43,6 +44,7 @@ Lists.prototype = {
 
         $.ajax({
             type: 'GET',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/all/',
             dataType: type,
             data: {},
@@ -80,6 +82,7 @@ List.prototype = {
 
         $.ajax({
             type: 'POST',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/list/' + $this.id + '/add/',
             dataType: 'json',
             data: data,
@@ -105,6 +108,7 @@ List.prototype = {
 
         $.ajax({
             type: 'POST',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/list/' + this.id + '/delete/',
             dataType: 'json',
             data: {},
@@ -127,6 +131,7 @@ List.prototype = {
 
         $.ajax({
             type: 'POST',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/list/' + this.id + '/update/',
             dataType: 'json',
             data: {name: name},
@@ -149,6 +154,7 @@ List.prototype = {
 
         $.ajax({
             type: 'POST',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/list/' + this.id + '/remove/' + usr_id + '/',
             dataType: 'json',
             data: {},
@@ -171,6 +177,7 @@ List.prototype = {
 
         $.ajax({
             type: 'GET',
+            // @TODO - load baseUrl from configService
             url: '/prod/lists/list/' + this.id + '/',
             dataType: 'json',
             data: {},
