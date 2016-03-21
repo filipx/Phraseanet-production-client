@@ -3,7 +3,7 @@ import * as Rx from 'rx';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
 require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let $bodyContainer = null;
     let $previewContainer = null;
@@ -255,6 +255,7 @@ const previewRecordService = (services) => {
                 options.current.width = parseInt($('#PREVIEWIMGCONT input[name=width]').val(), 10);
                 options.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val(), 10);
                 options.current.tot = data.tot;
+                console.log('setting up current pos to', relativePos)
                 options.current.pos = relativePos;
 
                 if ($('#PREVIEWBOX img.record.zoomable').length > 0) {
@@ -374,7 +375,10 @@ const previewRecordService = (services) => {
     function getPrevious() {
         if (options.mode === 'RESULT') {
             let posAsk = parseInt(options.current.pos, 10) - 1;
-            posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot, 10) - 1)) : posAsk;
+            if (options.navigation.page === 1) {
+                // may go to last result
+                posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot, 10) - 1)) : posAsk;
+            }
             _openPreview('RESULT', posAsk, '', false);
         } else {
             if (!$('#PREVIEWCURRENT li.selected').is(':first-child')) {
