@@ -211,6 +211,7 @@ const publication = (services) => {
     };
 
     var openModal = function (data) {
+        console.log('publish edit')
         let buttons = {};
         let modal = dialog.create(services, {
             size: 'Full',
@@ -220,71 +221,7 @@ const publication = (services) => {
         });
         modal.setContent(data);
 
-        buttons[localeService.t('valider')] = function () {
-            var $dialog = dialog.get(1);
-            var error = false;
-            var $form = $('form.main_form', $dialog.getDomElement());
-
-            $('.required_text', $form).each(function (i, el) {
-                if ($.trim($(el).val()) === '') {
-                    $(el).addClass('error');
-                    error = true;
-                }
-            });
-
-            if (error) {
-                alert(localeService.t('feed_require_fields'));
-            }
-
-            if ($('input[name="feed_id"]', $form).val() === '') {
-                alert(localeService.t('feed_require_feed'));
-                error = true;
-            }
-
-            if (error) {
-                return false;
-            }
-
-            $.ajax({
-                type: 'POST',
-                url: $form.attr('action'),
-                data: $form.serializeArray(),
-                dataType: 'json',
-                beforeSend: function () {
-                    $('button', $dialog.getDomElement()).prop('disabled', true);
-                },
-                error: function () {
-                    $('button', $dialog.getDomElement()).prop('disabled', false);
-                },
-                timeout: function () {
-                    $('button', $dialog.getDomElement()).prop('disabled', false);
-                },
-                success: function (data) {
-                    $('button', $dialog.getDomElement()).prop('disabled', false);
-                    if (data.error === true) {
-                        alert(data.message);
-                        return;
-                    }
-
-                    if ($('form.main_form', $dialog.getDomElement()).hasClass('entry_update')) {
-                        var id = $('form input[name="entry_id"]', $dialog.getDomElement()).val();
-                        var container = $('#entry_' + id);
-
-                        container.replaceWith(data.datas);
-
-                        container.hide().fadeIn();
-
-                        // @TODO: something was happening here
-                        $answers.find('img.lazyload').lazyload({
-                            container: $answers
-                        });
-                    }
-
-                    $dialog.close(1);
-                }
-            });
-            //$dialog.close(1);
-        };
+        buttons[localeService.t('valider')] = onSubmitPublication;
 
         modal.setOption('buttons', buttons);
         let $feeds_item = $('.feeds .feed', modal.getDomElement());
@@ -304,11 +241,101 @@ const publication = (services) => {
             return false;
         });
 
+        let formMode = 'create';
+        // is edit mode?
+        if ($('input[name="item_id"]').length > 0) {
+            formMode = 'edit';
+        }
+
+        $('#modal_feed .record_list').sortable({
+            placeholder: 'ui-state-highlight',
+            stop: function (event, ui) {
+
+
+                var lst = [];
+                $('#modal_feed  .record_list .sortable form').each(function (i, el) {
+                    if (formMode === 'create') {
+                        lst.push($('input[name="sbas_id"]', el).val() + '_' + $('input[name="record_id"]', el).val());
+                    } else {
+                        lst.push($('input[name="item_id"]', el).val());
+
+                    }
+                });
+                $('#modal_feed form.main_form input[name="lst"]').val(lst.join(';'));
+            }
+        });
+
         return;
     };
 
+    const onSubmitPublication = () => {
+        var $dialog = dialog.get(1);
+        var error = false;
+        var $form = $('form.main_form', $dialog.getDomElement());
+
+        $('.required_text', $form).each(function (i, el) {
+            if ($.trim($(el).val()) === '') {
+                $(el).addClass('error');
+                error = true;
+            }
+        });
+
+        if (error) {
+            alert(localeService.t('feed_require_fields'));
+        }
+
+        if ($('input[name="feed_id"]', $form).val() === '') {
+            alert(localeService.t('feed_require_feed'));
+            error = true;
+        }
+
+        if (error) {
+            return false;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: $form.attr('action'),
+            data: $form.serializeArray(),
+            dataType: 'json',
+            beforeSend: function () {
+                $('button', $dialog.getDomElement()).prop('disabled', true);
+            },
+            error: function () {
+                $('button', $dialog.getDomElement()).prop('disabled', false);
+            },
+            timeout: function () {
+                $('button', $dialog.getDomElement()).prop('disabled', false);
+            },
+            success: function (data) {
+                $('button', $dialog.getDomElement()).prop('disabled', false);
+                if (data.error === true) {
+                    alert(data.message);
+                    return;
+                }
+
+                if ($('form.main_form', $dialog.getDomElement()).hasClass('entry_update')) {
+                    var id = $('form input[name="entry_id"]', $dialog.getDomElement()).val();
+                    var container = $('#entry_' + id);
+
+                    container.replaceWith(data.datas);
+
+                    container.hide().fadeIn();
+
+                    // @TODO: something was happening here
+                    $answers.find('img.lazyload').lazyload({
+                        container: $answers
+                    });
+                }
+
+                $dialog.close(1);
+            }
+        });
+    }
+
     var fetchPublications = function (page) {
         if (page === undefined) {
+            // @TODO $answers can be undefined
             $answers.empty();
         }
         curPage = page;

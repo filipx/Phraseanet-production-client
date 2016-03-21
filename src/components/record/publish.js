@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
-import publication from '../../publication';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
+import publication from '../publication';
 
 const recordPublishModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;

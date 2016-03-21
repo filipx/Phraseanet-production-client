@@ -7,7 +7,7 @@ import recordDownloadModal from '../actions/recordDownload';
 import propertyRecord from '../../record/property';
 import recordFeedbackModal from '../actions/recordFeedback';
 import recordPushModal from '../actions/recordPush';
-import recordPublishModal from '../actions/recordPublish';
+import recordPublish from '../../record/publish';
 import recordToolsModal from '../../record/tools/index';
 import recordPrintModal from '../actions/recordPrint';
 import recordBridge from '../actions/recordBridge';
@@ -214,7 +214,7 @@ const toolbar = (services) => {
          * tools > Push > Publish
          */
         $container.on('click', '.TOOL_publish_btn', function (event) {
-            _triggerModal(event, recordPublishModal(services).openModal);
+            _triggerModal(event, recordPublish(services).openModal);
 
         });
         /**
