@@ -55,7 +55,7 @@ const previewRecordService = (services) => {
                 let $el = $(event.currentTarget);
                 // env, pos, contId, reload
                 let reload = $el.data('reload') === true ? true : false;
-                _openPreview($el.data('kind'), $el.data('position'), $el.data('id'), $el.data('kind'));
+                _openPreview(event.currentTarget, $el.data('kind'), $el.data('position'), $el.data('id'), $el.data('kind'));
             });
         $previewContainer
             .on('click', '.preview-navigate-action', (event) => {
@@ -123,13 +123,20 @@ const previewRecordService = (services) => {
      * @param contId
      * @param reload
      */
-    function _openPreview(env, pos, contId, reload) {
+    function _openPreview(event, env, pos, contId, reload) {
 
         if (contId === undefined) {
             contId = '';
         }
         var roll = 0;
         var justOpen = false;
+
+        var options_serial = options.navigation.tot_options;
+        var query = options.navigation.tot_query;
+        var navigationContext = '';
+        // keep relative position for answer train:
+        var relativePos = pos;
+        var absolutePos = 0;
 
         if (!options.open) {
             $('#PREVIEWIMGCONT').disableSelection();
@@ -155,12 +162,20 @@ const previewRecordService = (services) => {
                 roll = 1;
             }
 
+            // if comes from story and in workzone
+            if (env === 'REG') {
+                navigationContext = 'storyFromResults';
+                var $source = $(event);
+                if ($source.hasClass('CHIM')) {
+                    navigationContext = 'storyFromWorkzone';
+                }
+            }
+
         }
 
         if (reload === true) {
             roll = 1;
         }
-
 
         $('#tooltip').css({
             display: 'none'
@@ -168,21 +183,16 @@ const previewRecordService = (services) => {
 
         $('#PREVIEWIMGCONT').empty();
 
-        var options_serial = options.navigation.tot_options;
-        var query = options.navigation.tot_query;
-
-        // keep relative position for answer train:
-        var relativePos = pos;
-        // update real absolute position with pagination:
-        var absolutePos = parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos, 10);
-
-        // if comes from story, work with relative positionning
-        if (env === 'REG') {
-            // @TODO - if event comes from workzone (basket|story),
-            // we can use the relative position in order to display the doubleclicked records
-            // except we can't know the original event in this implementation
+        if (navigationContext === 'storyFromWorkzone') {
+            // if event comes from workzone, set to relative position (CHIM == chutier image)
+            absolutePos = relativePos;
+        } else if (navigationContext === 'storyFromResults') {
             absolutePos = 0;
+        } else {
+            // update real absolute position with pagination for records:
+            absolutePos = parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1) + parseInt(pos, 10);
         }
+
         let posAsk = null;
         prevAjax = $.ajax({
             type: 'POST',
@@ -255,7 +265,6 @@ const previewRecordService = (services) => {
                 options.current.width = parseInt($('#PREVIEWIMGCONT input[name=width]').val(), 10);
                 options.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val(), 10);
                 options.current.tot = data.tot;
-                console.log('setting up current pos to', relativePos)
                 options.current.pos = relativePos;
 
                 if ($('#PREVIEWBOX img.record.zoomable').length > 0) {
@@ -360,7 +369,7 @@ const previewRecordService = (services) => {
             if (options.mode === 'RESULT') {
                 let posAsk = parseInt(options.current.pos, 10) + 1;
                 posAsk = (posAsk >= parseInt(options.navigation.tot, 10) || isNaN(posAsk)) ? 0 : posAsk;
-                _openPreview('RESULT', posAsk, '', false);
+                _openPreview(false, 'RESULT', posAsk, '', false);
             } else {
                 if (!$('#PREVIEWCURRENT li.selected').is(':last-child')) {
                     $('#PREVIEWCURRENT li.selected').next().children('img').trigger('click');
@@ -379,7 +388,7 @@ const previewRecordService = (services) => {
                 // may go to last result
                 posAsk = (posAsk < 0) ? ((parseInt(options.navigation.tot, 10) - 1)) : posAsk;
             }
-            _openPreview('RESULT', posAsk, '', false);
+            _openPreview(false, 'RESULT', posAsk, '', false);
         } else {
             if (!$('#PREVIEWCURRENT li.selected').is(':first-child')) {
                 $('#PREVIEWCURRENT li.selected').prev().children('img').trigger('click');
@@ -455,7 +464,7 @@ const previewRecordService = (services) => {
                     var absolutePos = jsopt[1];
                     var relativePos = parseInt(absolutePos, 10) - parseInt(options.navigation.perPage, 10) * (parseInt(options.navigation.page, 10) - 1);
                     // keep relative position for answer train:
-                    _openPreview(jsopt[0], relativePos, jsopt[2], false);
+                    _openPreview(this, jsopt[0], relativePos, jsopt[2], false);
                 });
             });
         }
