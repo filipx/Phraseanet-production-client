@@ -1,22 +1,22 @@
 import $ from 'jquery';
 const humane = require('humane-js');
-require('imports?define=>false&exports=>false!./components/utils/jquery-plugins/colorAnimation');
+require('imports?define=>false&exports=>false!./../components/utils/jquery-plugins/colorAnimation');
 import * as AppCommons from 'phraseanet-common';
-import publication from './components/publication';
-import workzone from './components/ui/workzone';
-import notify from './components/notify/index';
-import Locale from './components/locale';
-import ui from './components/ui';
-import ConfigService from './components/core/configService';
-import LocaleService from './components/locale';
+import publication from '../components/publication';
+import workzone from '../components/ui/workzone';
+import notify from '../components/notify/index';
+import Locale from '../components/locale';
+import ui from '../components/ui';
+import ConfigService from './../components/core/configService';
+import LocaleService from '../components/locale';
 import i18next from 'i18next';
 import defaultConfig from './config';
-import Emitter from './components/core/emitter';
-import user from './components/user';
-import basket from './components/basket';
-import search from './components/search';
-import utils from './components/utils/utils';
-import dialog from 'phraseanet-common/src/components/dialog';
+import Emitter from '../components/core/emitter';
+import user from '../components/user';
+import basket from '../components/basket';
+import search from '../components/search';
+import utils from './../components/utils/utils';
+import dialog from '../../node_modules/phraseanet-common/src/components/dialog';
 
 class Bootstrap {
 

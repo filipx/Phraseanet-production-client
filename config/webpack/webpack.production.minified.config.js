@@ -19,7 +19,7 @@ module.exports = Object.assign({}, webpackConfig, {
     watch: false,
     output: {
         path: config.distDir,
-        filename: config._app + '.min.js',
+        filename: '[name].min.js',
         libraryTarget: 'umd',
         library: config._app
     },

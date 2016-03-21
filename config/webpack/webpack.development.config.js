@@ -62,14 +62,19 @@ const config = require('../config');
 
 module.exports = {
     // entry points
-    entry: config.sourceDir,
+    entry: {
+        production: config.sourceDir + 'prod/index.js',
+        lightbox: config.sourceDir + 'lightbox/index.js',
+        permaview: config.sourceDir + 'permaview/index.js',
+        commons: [config.sourceDir + 'common/index.js']
+    },
     cache: true,
     debug: true,
     watch: true,
     devtool: 'eval',
     output: {
         path: config.distDir,
-        filename: config.dev,
+        filename: '[name].js',
         libraryTarget: 'umd',
         library: config._app,
         publicPath: '/assets/production/'
@@ -116,7 +121,13 @@ module.exports = {
             '__DEV__': true,
             'process.env.NODE_ENV': JSON.stringify('development'),
             VERSION: JSON.stringify(pkg.version)
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'commons',
+            chunks: ['production', 'lightbox'],
+            minChunks: 2
         })
+        // i18next
     ],
     externals: {
         jquery: 'jQuery',
