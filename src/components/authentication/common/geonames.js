@@ -1,7 +1,7 @@
 import $ from 'jquery';
+require('geonames-server-jquery-plugin/jquery.geonames.js');
+const geonames = {
 
-const geonames = () => {
-    return {
         init: function ($field, options) {
             var geocompleter = $field.geocompleter(options);
 
@@ -35,7 +35,7 @@ const geonames = () => {
 
             return geocompleter;
         }
-    }
+
 };
 
 export default geonames;

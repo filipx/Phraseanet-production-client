@@ -68,6 +68,7 @@ module.exports = {
         'lightbox-mobile': config.sourceDir + 'lightbox-mobile/index.js',
         permaview: config.sourceDir + 'permaview/index.js',
         authenticate: [config.sourceDir + 'authenticate/index.js'],
+        account: [config.sourceDir + 'account/index.js'],
         commons: [config.sourceDir + 'common/index.js']
     },
     cache: true,
