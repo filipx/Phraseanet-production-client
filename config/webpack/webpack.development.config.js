@@ -67,6 +67,7 @@ module.exports = {
         lightbox: config.sourceDir + 'lightbox/index.js',
         'lightbox-mobile': config.sourceDir + 'lightbox-mobile/index.js',
         permaview: config.sourceDir + 'permaview/index.js',
+        authenticate: [config.sourceDir + 'authenticate/index.js'],
         commons: [config.sourceDir + 'common/index.js']
     },
     cache: true,
@@ -106,6 +107,9 @@ module.exports = {
             loader: "imports?this=>window"
         }, {
             test: require.resolve('geonames-server-jquery-plugin/jquery.geonames'),
+            loader: "imports?this=>window"
+        }, {
+            test: require.resolve('bootstrap-multiselect'),
             loader: "imports?this=>window"
         }]
     },
