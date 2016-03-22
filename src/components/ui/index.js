@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
 import toolbar from './toolbar';
-import mainMenu from './mainMenu';
+import mainMenu from '../mainMenu';
 import keyboard from './keyboard';
 import cgu from '../cgu';
 import editRecordService from '../record/edit';

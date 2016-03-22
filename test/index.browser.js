@@ -5,7 +5,7 @@
 import chai from 'chai';
 const expect = chai.expect;
 
-import ProductionApplication from '../src';
+import ProductionApplication from '../src/prod';
 
 describe('ProductionApplication Browser test', () => {
 

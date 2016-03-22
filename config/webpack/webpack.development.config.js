@@ -65,6 +65,7 @@ module.exports = {
     entry: {
         production: config.sourceDir + 'prod/index.js',
         lightbox: config.sourceDir + 'lightbox/index.js',
+        'lightbox-mobile': config.sourceDir + 'lightbox-mobile/index.js',
         permaview: config.sourceDir + 'permaview/index.js',
         commons: [config.sourceDir + 'common/index.js']
     },

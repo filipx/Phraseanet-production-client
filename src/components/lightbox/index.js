@@ -1,9 +1,11 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
+
 import utils from 'phraseanet-common/src/components/utils';
+import download from './download';
 
 const lightbox = (services) => {
     const {configService, localeService, appEvents} = services;
+    const downloadService = download(services);
     var _releasable = false;
     var _bodySize = {
         x: 0,
@@ -27,9 +29,6 @@ const lightbox = (services) => {
             }
         });
 
-
-        $('#mainMenu, .unselectable').disableSelection();
-
         _display_basket();
 
         $(window).bind('mousedown', function () {
@@ -48,9 +47,11 @@ const lightbox = (services) => {
             document.location = '/lightbox/validate/' + id + '/';
             return;
         });
-        $('.basket_downloader').bind('click', function () {
-            _downloadBasket();
+
+        downloadService.initialize({
+            $container: $mainContainer
         });
+
         if ($('.right_column_wrapper_user').length > 0) {
             $('.right_column_title, #right_column_validation_toggle').bind('click', function () {
                 if (!$('.right_column_wrapper_caption').is(':visible')) {
@@ -326,7 +327,8 @@ const lightbox = (services) => {
 
         $('.download_button', options_container).bind('click', function () {
             //		$(this).blur();
-            _download($(this).next('form[name=download_form]').find('input').val());
+            downloadService.openModal($(this).next('form[name=download_form]').find('input').val())
+            // _download($(this).next('form[name=download_form]').find('input').val());
         });
 
         $('.comment_button', options_container).bind('click', function () {
@@ -730,29 +732,6 @@ const lightbox = (services) => {
         };
     }
 
-    function _downloadBasket() {
-        var ids = $.map($('#sc_container .download_form').toArray(), function (el, i) {
-            return $('input[name="basrec"]', $(el)).val();
-        });
-        _download(ids.join(';'));
-    }
-
-    function _download(value) {
-        var dialog = dialog.create({title: localeService.t('export')});
-
-        $.post('/prod/export/multi-export/', 'lst=' + value, function (data) {
-
-            dialog.setContent(data);
-
-            $('.tabs', dialog.getDomElement()).tabs();
-
-            $('.close_button', dialog.getDomElement()).bind('click', function () {
-                dialog.close();
-            });
-
-            return false;
-        });
-    }
 
     function _setSizeable(container) {
 

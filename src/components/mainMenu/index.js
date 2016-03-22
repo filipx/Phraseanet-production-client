@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import publication from '../../publication';
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const mainMenu = (services) => {
@@ -40,7 +39,7 @@ const mainMenu = (services) => {
 
         switch (stateName) {
             case 'publication':
-                appEvents.emit('publication.fetch');
+                appEvents.emit(`${stateName}.activeState`); // fetch
                 break;
             default:
                 console.log('navigation state error: state "' + stateName + '" not found');

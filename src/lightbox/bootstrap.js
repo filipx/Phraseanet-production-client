@@ -1,16 +1,14 @@
 import $ from 'jquery';
-import notify from '../components/notify/index';
-import Locale from '../components/locale';
-import ui from '../components/ui';
 import ConfigService from './../components/core/configService';
 import LocaleService from '../components/locale';
-import i18next from 'i18next';
 import defaultConfig from './config';
 import Emitter from '../components/core/emitter';
-import utils from './../components/utils/utils';
 import lightbox from './../components/lightbox/index';
-class Bootstrap {
+import mainMenu from './../components/mainMenu';
+require('phraseanet-common/src/components/tooltip');
+require('phraseanet-common/src/components/vendors/contextMenu');
 
+class Bootstrap {
     app;
     configService;
     localeService;
@@ -43,20 +41,22 @@ class Bootstrap {
             appEvents: this.appEvents
         };
 
-        this.appLightbox = lightbox(this.appServices);
+        window.bodySize = {
+            x: 0,
+            y: 0
+        };
 
         /**
          * add components
          */
 
         $(document).ready(() => {
-            // @TODO to be removed
             let $body = $('body');
-            // trigger default route
-            this.initJqueryPlugins();
-            this.initDom();
+            window.bodySize.y = $body.height();
+            window.bodySize.x = $body.width();
 
-            this.appLightbox.initialize({$container: $body});
+            lightbox(this.appServices).initialize({$container: $body});
+            mainMenu(this.appServices).initialize({$container: $body});
 
             let isReleasable = this.configService.get('releasable');
 
@@ -65,13 +65,6 @@ class Bootstrap {
             }
         });
 
-    }
-
-    initJqueryPlugins() {
-        // AppCommons.commonModule.initialize();
-    }
-
-    initDom() {
     }
 }
 

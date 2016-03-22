@@ -394,7 +394,12 @@ const publication = (services) => {
         return;
     };
 
+    const activatePublicationState = () => {
+        appEvents.emit('publication.fetch');
+    }
+
     appEvents.listenAll({
+        'publication.activeState': activatePublicationState,
         'publication.fetch': fetchPublications
     });
     return {
