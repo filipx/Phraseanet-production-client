@@ -9,7 +9,7 @@
 
 import $ from 'jquery';
 import _ from 'underscore';
-import FormView from './../../views/form';
+import FormView from './../form';
 
 var PasswordSetterForm = FormView.extend({
     events: function () {

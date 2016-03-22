@@ -8,7 +8,7 @@
  */
 
 import $ from 'jquery';
-import ForgotPassWordForm from '../legacy/es6/common/forms/views/form';
+import ForgotPassWordForm from './common/forms/views/form';
 
 const forgotPassword = (services) => {
     const { configService, localeService, appEvents } = services;

@@ -10,8 +10,8 @@
 // launch application
 import $ from 'jquery';
 import _ from 'underscore';
-import RegisterForm from '../legacy/es6/common/forms/views/formType/passwordSetter';
-import geonames from '../legacy/es6/common/geonames';
+import RegisterForm from './common/forms/views/formType/passwordSetter';
+import geonames from './common/geonames';
 
 const regiser = (services) => {
     const {configService, localeService, appEvents} = services;

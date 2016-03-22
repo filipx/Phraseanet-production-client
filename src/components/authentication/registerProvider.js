@@ -10,7 +10,7 @@
 // launch application
 import $ from 'jquery';
 import _ from 'underscore';
-import RegisterForm from '../legacy/es6/common/forms/views/form';
+import RegisterForm from './common/forms/views/form';
 
 const registerProvider = (services) => {
     const {configService, localeService, appEvents} = services;

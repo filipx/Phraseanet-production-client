@@ -8,7 +8,7 @@
  */
 
 import $ from 'jquery';
-import RenewEmailForm from '../legacy/es6/common/forms/views/form';
+import RenewEmailForm from './common/forms/views/form';
 
 const renewEmail = (services) => {
     const {configService, localeService, appEvents} = services;

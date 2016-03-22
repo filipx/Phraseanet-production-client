@@ -8,7 +8,7 @@
  */
 
 import $ from 'jquery';
-import LoginForm from '../legacy/es6/common/forms/views/form';
+import LoginForm from './common/forms/views/form';
 
 const login = (services) => {
     const {configService, localeService, appEvents} = services;

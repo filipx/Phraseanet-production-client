@@ -8,7 +8,7 @@
  */
 
 import $ from 'jquery';
-import RenewPasswordForm from '../legacy/es6/common/forms/views/formType/passwordSetter';
+import RenewPasswordForm from './common/forms/views/formType/passwordSetter';
 
 const renewPassword = (services) => {
     const {configService, localeService, appEvents} = services;

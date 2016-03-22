@@ -10,7 +10,7 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import Backbone from 'backbone';
-import ErrorView from './../views/error';
+import ErrorView from './error';
 import MultiViews from './../../multiviews';
 var InputView = Backbone.View.extend(_.extend({}, MultiViews, {
     initialize: function (options) {
