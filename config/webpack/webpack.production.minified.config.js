@@ -18,10 +18,17 @@ module.exports = Object.assign({}, webpackConfig, {
     build: true,
     watch: false,
     output: {
-        path: config.distDir,
+/*        path: config.distDir,
         filename: '[name].min.js',
         libraryTarget: 'umd',
-        library: config._app
+        library: config._app,*/
+
+        path: config.distDir,
+        filename: '[name].min.js',
+        chunkFilename: 'lazy-[name].min.js',
+        libraryTarget: 'umd',
+        library: config._app,
+        publicPath: '/assets/production/'
     },
     plugins: [
         new webpack.ProvidePlugin({
@@ -52,6 +59,11 @@ module.exports = Object.assign({}, webpackConfig, {
             '__DEV__': false,
             'process.env.NODE_ENV': JSON.stringify('production'),
             VERSION: JSON.stringify(PKG_LOCATION.version)
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'commons',
+            chunks: ['production', 'lightbox'],
+            minChunks: 2
         })
     ]
 });

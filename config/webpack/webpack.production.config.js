@@ -17,12 +17,6 @@ module.exports = Object.assign({}, webpackConfig, {
     hot: false,
     build: true,
     watch: false,
-    output: {
-        path: config.distDir,
-        filename: '[name].js',
-        libraryTarget: 'umd',
-        library: config._app
-    },
     plugins: [
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -41,6 +35,11 @@ module.exports = Object.assign({}, webpackConfig, {
             '__DEV__': false,
             'process.env.NODE_ENV': JSON.stringify('production'),
             VERSION: JSON.stringify(PKG_LOCATION.version)
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'commons',
+            chunks: ['production', 'lightbox'],
+            minChunks: 2
         })
     ]
 });
