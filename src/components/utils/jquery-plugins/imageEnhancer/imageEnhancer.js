@@ -1,3 +1,5 @@
+require('./imageEnhancer.scss');
+
 import $ from 'jquery';
 (function ($) {
 

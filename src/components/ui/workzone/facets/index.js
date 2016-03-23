@@ -1,3 +1,5 @@
+require('./facets.scss');
+
 import $ from 'jquery';
 require('jquery-ui');
 require('jquery.fancytree/src/jquery.fancytree');

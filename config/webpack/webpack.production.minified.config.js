@@ -7,29 +7,24 @@ const path = require('path');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const PKG_LOCATION = path.join(__dirname, '../../package.json');
 const config = require('../config');
-const webpackConfig = require('./webpack.development.config')
+const webpackConfig = require('./webpack.production.config')
 
 module.exports = Object.assign({}, webpackConfig, {
 
-    cache: false,
+    /*cache: false,
     debug: false,
     devtool: false,
     hot: false,
     build: true,
-    watch: false,
+    watch: false,*/
     output: {
-/*        path: config.distDir,
-        filename: '[name].min.js',
-        libraryTarget: 'umd',
-        library: config._app,*/
-
         path: config.distDir,
         filename: '[name].min.js',
         chunkFilename: 'lazy-[name].min.js',
         libraryTarget: 'umd',
         library: config._app,
         publicPath: '/assets/production/'
-    },
+    }/*,
     plugins: [
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -65,5 +60,5 @@ module.exports = Object.assign({}, webpackConfig, {
             chunks: ['production', 'lightbox'],
             minChunks: 2
         })
-    ]
+    ]*/
 });

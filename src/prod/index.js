@@ -1,4 +1,5 @@
 import $ from 'jquery';
+require('./style/main.scss');
 import * as utils from './../components/utils/utils.js';
 import bootstrap from './bootstrap.js';
 

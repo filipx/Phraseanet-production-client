@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
 let highlight = require('imports?$=jquery!../utils/jquery-plugins/highlight');
-let colorpicker = require('imports?$=jquery!../utils/jquery-plugins/colorpicker');
+let colorpicker = require('imports?$=jquery!../utils/jquery-plugins/colorpicker/colorpicker');
 const preferences = (services) => {
     const { configService, localeService, appEvents } = services;
     const initialize = (options = {}) => {

@@ -107,6 +107,13 @@ module.exports = {
                 presets: ['es2015', 'stage-0']
             }
         }, {
+            test: /\.(png|jpg|jpeg|gif)$/,
+            loader: 'file-loader'
+        }, {
+            test: /\.scss$/,
+            include: path.join(__dirname, '../../src'),
+            loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
+        }, {
             test: require.resolve('jquery-lazyload'),
             loader: "imports?this=>window"
         }, {
