@@ -3,7 +3,7 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const humane = require('humane-js');
 
 const exportRecord = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let $container = null;
     const initialize = () => {
@@ -68,6 +68,21 @@ const exportRecord = (services) => {
         });
 
         var tabs = $('.tabs', $dialog.getDomElement());
+
+
+        if (dataConfig.haveFtp === true) {
+            $('#ftp_form_selector').bind('change', function () {
+                $('#ftp .ftp_form').hide();
+                $('#ftp .ftp_form_' + $(this).val()).show();
+                $('.ftp_folder_check', dialog.get(1).getDomElement()).unbind('change').bind('change', function () {
+                    if ($(this).prop('checked')) {
+                        $(this).next().prop('disabled', false);
+                    } else {
+                        $(this).next().prop('disabled', true);
+                    }
+                });
+            }).trigger('change');
+        }
 
         $('a.TOUview').bind('click', function (event) {
             event.preventDefault();

@@ -977,9 +977,9 @@ const thesaurusService = (services) => {
             if (this._ctimer) {
                 clearTimeout(this._ctimer);
             }
-            // @TODO fix n test
-            var js = "options.thlist['s" + this.sbas_id + "'].search_delayed('" + txt.replace("'", "\\'") + "');";
-            this._ctimer = setTimeout(js, 100);
+            this._ctimer = setTimeout(() => {
+                return options.thlist['s' + this.sbas_id].search_delayed('"' + txt.replace("'", "\\'") + '"');
+            }, 100);
         };
         this.search_delayed = function (txt) {
             var me = this;

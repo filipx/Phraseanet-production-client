@@ -783,12 +783,12 @@ const recordEditorService = (services) => {
             if (options.T_fields[meta_struct_id] !== undefined) {
                 field = options.T_fields[meta_struct_id];
 
-                var name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
+                let name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
 
                 $('#idFieldNameEdit', options.$container).html(name);
 
 
-                var vocabType = options.T_fields[meta_struct_id].vocabularyControl;
+                let vocabType = options.T_fields[meta_struct_id].vocabularyControl;
 
                 $('#idEditZTextArea, #EditTextMultiValued').autocomplete({
                     minLength: 2,
@@ -1546,12 +1546,12 @@ const recordEditorService = (services) => {
         this._ctimer = null;
 
         this.search = function (txt) {
-            // @TODO - external call
             if (this._ctimer) {
                 clearTimeout(this._ctimer);
             }
-            let js = "ETHSeeker.search_delayed('" + txt.replace("'", "\\'") + "');";
-            this._ctimer = setTimeout(js, 125);
+            this._ctimer = setTimeout(() => {
+                return ETHSeeker.search_delayed('"' + txt.replace("'", "\\'") + '"')
+            }, 125);
         };
 
         this.search_delayed = function (txt) {

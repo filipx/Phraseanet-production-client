@@ -12,6 +12,7 @@ const Feedback = function (services, options) {
     let $container;
     let { containerId, context } = options;
 
+    this.url = url;
     this.container = $container = $(containerId);
 
     this.Context = context;
@@ -362,10 +363,9 @@ Feedback.prototype = {
     },
     loadUser: function (usr_id, callback) {
         var $this = this;
-
         $.ajax({
             type: 'GET',
-            url: '/prod/push/user/' + usr_id + '/',
+            url: `${this.url}prod/push/user/${usr_id}/`,
             dataType: 'json',
             data: {
                 usr_id: usr_id
@@ -397,11 +397,9 @@ Feedback.prototype = {
     addUser: function (options) {
         let {$userForm, callback} = options;
         var $this = this;
-
         $.ajax({
             type: 'POST',
-            // @TODO - load baseUrl from configService
-            url: '/prod/push/add-user/',
+            url: `${this.url}prod/push/add-user/`,
             dataType: 'json',
             data: $userForm.serializeArray(),
             success: function (data) {

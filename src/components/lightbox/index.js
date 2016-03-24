@@ -1,5 +1,5 @@
 import $ from 'jquery';
-
+require('jquery-ui');
 import utils from 'phraseanet-common/src/components/utils';
 import download from './download';
 

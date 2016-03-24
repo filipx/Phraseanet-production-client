@@ -1,4 +1,5 @@
 import $ from 'jquery';
+require('jquery-ui');
 require('geonames-server-jquery-plugin/jquery.geonames.js');
 const geonames = {
 
