@@ -10,7 +10,7 @@ require('phraseanet-common/src/components/tooltip');
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const workzone = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let workzoneOptions = {};
     let searchSelection = {asArray: [], serialized: ''};
@@ -157,7 +157,7 @@ const workzone = (services) => {
             selection: new Selectable(services, $('#baskets'), {selector: '.CHIM'}),
             refresh: refreshBaskets,
             addElementToBasket: function (options) {
-                let { sbas_id, record_id, event, singleSelection } = options;
+                let {sbas_id, record_id, event, singleSelection} = options;
                 singleSelection = !!singleSelection || false;
 
                 if ($('#baskets .SSTT.active').length === 1) {
@@ -220,7 +220,7 @@ const workzone = (services) => {
     const getResultSelectionStream = () => workzoneOptions.selection.stream;
 
     function refreshBaskets(options) {
-        let { basketId, sort, scrolltobottom, type } = options;
+        let {basketId = false, sort, scrolltobottom, type} = options || {};
         type = typeof type === 'undefined' ? 'basket' : type;
 
         var active = $('#baskets .SSTT.ui-state-active');

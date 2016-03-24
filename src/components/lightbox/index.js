@@ -143,7 +143,7 @@ const lightbox = (services) => {
 
             var sselcont_id = $(this).closest('.basket_element').attr('id').split('_').pop();
 
-            var agreement = $(this).hasClass('agree_button') ? '1' : '-1';
+            var agreement = $(this).hasClass('agree_button') ? 1 : -1;
 
             _setAgreement(event, $(this), sselcont_id, agreement);
             return false;
@@ -340,7 +340,6 @@ const lightbox = (services) => {
                 }
             }
         );
-
         _activateNotes(container);
 
         $('.previous_button', options_container).bind('click', function () {
@@ -379,7 +378,7 @@ const lightbox = (services) => {
         $('#record_wrapper .agree_' + sselcont_id + ', .big_box.agree')
             .bind('click',
                 function (event) {
-                    _setAgreement(event, $(this), sselcont_id, '1');
+                    _setAgreement(event, $(this), sselcont_id, 1);
                 }
             )
             .addClass('clickable');
@@ -387,7 +386,7 @@ const lightbox = (services) => {
         $('#record_wrapper .disagree_' + sselcont_id + ', .big_box.disagree')
             .bind('click',
                 function (event) {
-                    _setAgreement(event, $(this), sselcont_id, '-1');
+                    _setAgreement(event, $(this), sselcont_id, -1);
                 }
             )
             .addClass('clickable');
@@ -498,7 +497,7 @@ const lightbox = (services) => {
     }
 
 
-    function _setAgreement(event, el, sselcont_id, boolean_value) {
+    function _setAgreement(event, el, sselcont_id, agreeValue) {
         if (event.stopPropagation) {
             event.stopPropagation();
         }
@@ -511,11 +510,11 @@ const lightbox = (services) => {
                 url: '/lightbox/ajax/SET_ELEMENT_AGREEMENT/' + sselcont_id + '/',
                 dataType: 'json',
                 data: {
-                    agreement: boolean_value
+                    agreement: agreeValue
                 },
                 success: function (datas) {
                     if (!datas.error) {
-                        if (boolean_value === 1) {
+                        if (agreeValue === 1) {
                             $('.agree_' + sselcont_id + '').removeClass('not_decided');
                             $('.disagree_' + sselcont_id + '').addClass('not_decided');
                             $('.userchoice.me').addClass('agree').removeClass('disagree');
