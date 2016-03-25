@@ -201,6 +201,10 @@ Selectable.prototype = {
             }
         });
 
+        $this.stream.onNext({
+            asArray: $this.datas,
+            serialized: $this.serialize()
+        });
 
         if (typeof $this.options.selectStop === 'function') {
             $this.options.selectStop($.Event('selectStop'), $this);

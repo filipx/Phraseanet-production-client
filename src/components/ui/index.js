@@ -136,7 +136,7 @@ const ui = (services) => {
         switch (event.keyCode) {
             case 65:	// a
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
-                    $('.tools .answer_selector.all_selector').trigger('click');
+                    appEvents.emit('search.selection.selectAll');
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
