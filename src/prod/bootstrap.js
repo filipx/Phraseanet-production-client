@@ -125,7 +125,7 @@ class Bootstrap {
             });
             // on navigation object changes
             this.appSearch.getResultNavigationStream().subscribe((data) => {
-                this.appEvents.emit('broadcast.searchResultNavigation', data.object);
+                this.appEvents.emit('broadcast.searchResultNavigation', data);
             });
 
 

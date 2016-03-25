@@ -20,7 +20,7 @@ const previewRecordService = (services) => {
             page: 0
         }
     };
-    const getPreviewOptionStream = () => Rx.Observable.ofObjectChanges(options);
+    stream.onNext(options);
     const initialize = () => {
         $bodyContainer = $('body');
         $previewContainer = $('#PREVIEWBOX');
@@ -310,7 +310,7 @@ const previewRecordService = (services) => {
                 $('#EDIT_query').focus();
 
                 $('#PREVIEWOTHERSINNER .otherBaskToolTip').tooltip();
-
+                stream.onNext(options);
                 return;
             }
 
@@ -320,7 +320,7 @@ const previewRecordService = (services) => {
 
     function closePreview() {
         options.open = false;
-
+        stream.onNext(options);
         $('#PREVIEWBOX').fadeTo(500, 0);
         $('#PREVIEWBOX').queue(function () {
             $(this).css({
@@ -588,7 +588,7 @@ const previewRecordService = (services) => {
     return {
         initialize,
         onGlobalKeydown,
-        getPreviewOptionStream,
+        getPreviewStream: () => stream,
         //_openPreview,
         startSlide,
         stopSlide,

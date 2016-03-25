@@ -128,7 +128,7 @@
     "jquery-ui": "^1.10.5",
     "jquery.fancytree": "^2.15.0",
     "phraseanet-common": "^0.2.8",
-    "rx": "^4.0.7",
+    "rx": "^4.1.0",
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3",
     "zxcvbn": "^4.2.0"

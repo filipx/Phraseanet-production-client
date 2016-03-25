@@ -166,7 +166,9 @@ const search = (services) => {
     };
 
     const getResultSelectionStream = () => searchResult.selection.stream;
-    const getResultNavigationStream = () => Rx.Observable.ofObjectChanges(searchResult.navigation);
+    let resultNavigationStream = new Rx.Subject();
+    const getResultNavigationStream = () => resultNavigationStream; //Rx.Observable.ofObjectChanges(searchResult.navigation);
+    //const getResultNavigationStream = () => Rx.Observable.ofObjectChanges(searchResult.navigation);
 
     /*const onSpecialSearch = (data) => {
         let { qry, allbase } = data;
@@ -258,6 +260,7 @@ const search = (services) => {
                     tot_options: datas.form,
                     tot_query: datas.query
                 });
+                resultNavigationStream.onNext(searchResult.navigation);
 
                 if (datas.next_page) {
                     $('#NEXT_PAGE, #answersNext').bind('click', function () {

@@ -41,15 +41,8 @@ const ui = (services) => {
         let previewRecord = previewRecordService(services);
 
         let previewIsOpen = false;
-        previewRecord.getPreviewOptionStream().subscribe(function (data) {
-                previewIsOpen = data.object.open;
-                console.log('previewRecordService Next: ', data);
-            },
-            function (err) {
-                console.log('previewRecordService Error: %s', err);
-            },
-            function () {
-                console.log('previewRecordService Completed');
+        previewRecord.getPreviewStream().subscribe(function (previewOptions) {
+                previewIsOpen = previewOptions.open;
             });
         previewRecord.initialize();
 
