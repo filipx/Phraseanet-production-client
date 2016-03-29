@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
+import dialog from '../../../../node_modules/phraseanet-common/src/components/dialog';
 import Selectable from '../../utils/selectable';
-import pushAddUser from '../../push/addUser';
+import pushAddUser from './addUser';
 import * as _ from 'underscore';
 const humane = require('humane-js');
 require('phraseanet-common/src/components/tooltip');

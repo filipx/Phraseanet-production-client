@@ -1,6 +1,6 @@
 import $ from 'jquery';
 const printRecord = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let $container = null;
 
@@ -30,6 +30,10 @@ const printRecord = (services) => {
             doPrint(`${key}=${idContent}`);
         });
     };
+
+    const openModal = (datas) => {
+        return doPrint($.param(datas))
+    }
 
     function doPrint(value) {
         if ($('#DIALOG').data('ui-dialog')) {
@@ -67,7 +71,7 @@ const printRecord = (services) => {
         });
     }
 
-    return { initialize };
+    return {initialize, openModal};
 };
 
 export default printRecord;

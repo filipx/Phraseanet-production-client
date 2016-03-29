@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
-import recordBridge from '../recordBridge';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
+import recordBridge from './recordBridge/index';
 
 const bridgeRecord = (services) => {
     const { configService, localeService, appEvents } = services;

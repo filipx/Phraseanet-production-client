@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { sprintf } from 'sprintf-js';
 import * as AppCommons from 'phraseanet-common';
-import dialog from 'phraseanet-common/src/components/dialog';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const thesaurusService = (services) => {

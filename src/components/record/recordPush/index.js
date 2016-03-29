@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import Feedback from './feedback';
-import ListManager from './listManager';
-import dialog from 'phraseanet-common/src/components/dialog';
+import ListManager from './../../list/listManager';
+import dialog from '../../../../node_modules/phraseanet-common/src/components/dialog';
 const pushRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     let feedbackInstance = null;

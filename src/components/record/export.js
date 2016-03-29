@@ -29,8 +29,9 @@ const exportRecord = (services) => {
         });
     };
 
-    function doExport(datas) {
+    const openModal = (datas) => doExport(datas);
 
+    function doExport(datas) {
         var $dialog = dialog.create(services, {
             size: 'Medium',
             title: localeService.t('export')
@@ -363,7 +364,7 @@ const exportRecord = (services) => {
         return true;
     }
 
-    return {initialize};
+    return {initialize, openModal};
 };
 
 export default exportRecord;

@@ -1,10 +1,10 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 const humane = require('humane-js');
 
 let $dialog = null;
 
-const moveRecords = (services) => {
+const moveRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
 
@@ -99,4 +99,4 @@ const moveRecords = (services) => {
     return { openModal };
 };
 
-export default moveRecords;
+export default moveRecord;

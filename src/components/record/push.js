@@ -1,9 +1,9 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
-import pushRecord from '../recordPush';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
+import pushRecordWindow from './recordPush/index';
 
-const recordPushModal = (services, datas) => {
-    const { configService, localeService, appEvents } = services;
+const pushRecord = (services, datas) => {
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
 
 
@@ -24,7 +24,7 @@ const recordPushModal = (services, datas) => {
     };
 
     const _onDialogReady = () => {
-        pushRecord(services).initialize({
+        pushRecordWindow(services).initialize({
             feedback: {
                 containerId: '#PushBox',
                 context: 'Push'
@@ -36,7 +36,7 @@ const recordPushModal = (services, datas) => {
     };
 
 
-    return { openModal };
+    return {openModal};
 };
 
-export default recordPushModal;
+export default pushRecord;

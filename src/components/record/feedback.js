@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
-import pushRecord from '../recordPush';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
+import pushRecord from './recordPush/index';
 
 const recordFeedbackModal = (services, datas) => {
     const { configService, localeService, appEvents } = services;

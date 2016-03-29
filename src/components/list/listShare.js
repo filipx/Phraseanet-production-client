@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import dialog from 'phraseanet-common/src/components/dialog';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 import * as _ from 'underscore';
 const humane = require('humane-js');
 

@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import {Lists, List} from '../../list';
+import {Lists, List} from './model/index';
 import listEditor from './listEditor';
 import listShare from './listShare';
-import dialog from 'phraseanet-common/src/components/dialog';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 import * as _ from 'underscore';
 const humane = require('humane-js');
 

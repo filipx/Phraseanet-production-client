@@ -11,6 +11,7 @@ require('phraseanet-common/src/components/vendors/contextMenu');
 const search = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
+    let searchPromise = {};
     let searchResult = {
         selection: false,
         navigation: {
@@ -218,14 +219,14 @@ const search = (services) => {
     const onSearch = () => {
         var data = $searchForm.serializeArray();
 
-        let answAjax = $.ajax({
+        let searchPromise = $.ajax({
             type: 'POST',
             url: `${url}prod/query/`,
             data: data,
             dataType: 'json',
             beforeSend: function (formData) {
-                if (answAjaxrunning && answAjax.abort) {
-                    answAjax.abort();
+                if (answAjaxrunning && searchPromise.abort !== undefined) {
+                    searchPromise.abort();
                 }
                 beforeSearch();
             },

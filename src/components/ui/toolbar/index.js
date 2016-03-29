@@ -1,19 +1,18 @@
 import $ from 'jquery';
-import * as AppCommons from 'phraseanet-common';
-import moveRecords from '../actions/moveRecord';
+import moveRecords from '../../record/move';
 import editRecord from '../../record/edit';
 import deleteRecord from '../../record/delete';
-import recordDownloadModal from '../actions/recordDownload';
+import exportRecord from '../../record/export';
 import propertyRecord from '../../record/property';
-import recordFeedbackModal from '../actions/recordFeedback';
-import recordPushModal from '../actions/recordPush';
+import recordPushModal from '../../record/push';
 import recordPublish from '../../record/publish';
 import recordToolsModal from '../../record/tools/index';
-import recordPrintModal from '../actions/recordPrint';
-import recordBridge from '../actions/recordBridge';
+import printRecord from '../../record/print';
+import recordFeedbackModal from '../../record/feedback';
+import bridgeRecord from '../../record/bridge';
 
 const toolbar = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const $container = $('body');
     let workzoneSelection = [];
     let searchSelection = [];
@@ -195,19 +194,19 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_disktt_btn', function (event) {
             // can't be fully refactored
-            _triggerModal(event, recordDownloadModal(services).openModal);
+            _triggerModal(event, exportRecord(services).openModal);
         });
         /**
          * tools > Export > Print
          */
         $container.on('click', '.TOOL_print_btn', function (event) {
-            _triggerModal(event, recordPrintModal(services).openModal);
+            _triggerModal(event, printRecord(services).openModal);
         });
         /**
          * tools > Push > Bridge
          */
         $container.on('click', '.TOOL_bridge_btn', function (event) {
-            _triggerModal(event, recordBridge(services).openModal);
+            _triggerModal(event, bridgeRecord(services).openModal);
 
         });
         /**

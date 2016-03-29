@@ -3,7 +3,7 @@
  */
 import $ from 'jquery';
 import * as _ from 'underscore';
-import dialog from 'phraseanet-common/src/components/dialog';
+import dialog from '../../../../node_modules/phraseanet-common/src/components/dialog';
 require('geonames-server-jquery-plugin/jquery.geonames.js');
 
 const pushAddUser = (services) => {
