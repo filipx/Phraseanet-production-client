@@ -2,6 +2,7 @@ import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
 import { sprintf } from 'sprintf-js';
 import * as recordModel from '../../record/model';
+import searchReplace from './plugins/searchReplace';
 import * as Rx from 'rx';
 require('phraseanet-common/src/components/tooltip');
 require('phraseanet-common/src/components/vendors/contextMenu');
@@ -14,16 +15,11 @@ const recordEditorService = (services) => {
     let stream = new Rx.Subject();
     let ETHSeeker;
     var $editorContainer = null;
-    $(document).ready(function () {
-        $editorContainer = $('#EDITWINDOW');
-        $(window).bind('resize', function () {
-            _setPreviewEdit();
-            _setSizeLimits();
-        });
+    //$(document).ready(function () {
 
 
         // idEditZTextArea
-    });
+    //});
 
     let $ztextStatus;
     let $editTextArea;
@@ -40,8 +36,15 @@ const recordEditorService = (services) => {
         options.newrepresent = false;
         // editor.ssel = false;
 
+        $editorContainer = $('#EDITWINDOW');
+        $(window).bind('resize', function () {
+            _setPreviewEdit();
+            _setSizeLimits();
+        });
         $ztextStatus = $('#ZTextStatus', options.$container);
         $editTextArea = $('#idEditZTextArea', options.$container);
+
+
         _bindEvents();
     };
 
@@ -130,11 +133,6 @@ const recordEditorService = (services) => {
             .on('dblclick', '.thesaurus-branch-action', (event) => {
                 // dbl is handled by click event
                 event.preventDefault();
-            })
-
-            .on('change', '.toggle-replace-mode-action', (event) => {
-                event.preventDefault();
-                _toggleReplaceMode(event);
             })
 
             .on('click', '.apply-multi-desc-action', (event) => {
@@ -535,6 +533,9 @@ const recordEditorService = (services) => {
         } catch (err) {
 
         }
+
+        // init plugins
+        searchReplace(services).initialize({ $container: $editorContainer, parentOptions: options});
     }
 
     function _toggleGroupSelection() {
@@ -1683,19 +1684,6 @@ const recordEditorService = (services) => {
         return (false);
     }
 
-
-    function _toggleReplaceMode(ckRegExp) {
-
-
-        if (ckRegExp.checked) {
-            $('#EditSR_TX', options.$container).hide();
-            $('#EditSR_RX', options.$container).show();
-        } else {
-            $('#EditSR_RX', options.$container).hide();
-            $('#EditSR_TX', options.$container).show();
-        }
-    }
-
     function _setSizeLimits() {
         if (!$('#EDITWINDOW').is(':visible')) {
             return;
@@ -2092,7 +2080,8 @@ const recordEditorService = (services) => {
     }
 
     appEvents.listenAll({
-        'recordEditor.start': startThisEditing
+        'recordEditor.start': startThisEditing,
+        'recordEditor.onUpdateFields': _updateEditSelectedRecords
     });
 
 
