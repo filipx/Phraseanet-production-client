@@ -1,4 +1,5 @@
 import $ from 'jquery';
+const humane = require('humane-js');
 /**
  * Editor Right tab plugin
  */
@@ -16,7 +17,8 @@ const searchReplace = (services) => {
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
-        tRecords = parentOptions.T_records;
+        // recordCollection = parentOptions.recordCollection;
+        tRecords = parentOptions.recordCollection.getRecords();
 
 
         $($container).on('click', '.record-editor-searchReplace-action', (event) => {
@@ -24,7 +26,8 @@ const searchReplace = (services) => {
 
             let ntRecords = replace(tRecords);
 
-            /*humane.info($.sprintf(language.nFieldsChanged, n));*/
+            // @TODO - reactivate humane
+            // humane.info($.sprintf(localeService.t('nFieldsChanged', n)));
             appEvents.emit('recordEditor.onUpdateFields', ntRecords);
         });
 

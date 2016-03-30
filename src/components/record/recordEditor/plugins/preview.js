@@ -1,4 +1,5 @@
 import $ from 'jquery';
+require('jquery-ui');
 
 const preview = (services) => {
     const {configService, localeService, appEvents} = services;
@@ -34,8 +35,6 @@ const preview = (services) => {
         if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
             return false;
         }
-
-        //  var datas = editor.T_records[id].preview;
 
         var h = parseInt($('input[name=height]', container).val(), 10);
         var w = parseInt($('input[name=width]', container).val(), 10);
@@ -91,10 +90,10 @@ const preview = (services) => {
 
     }
 
-    function _previewEdit(options) {
-        let {record} = options;
-
-        $('#TH_Opreview .PNB10').empty().append(parentOptions.T_records[record].preview);
+    function _previewEdit(params) {
+        let {recordIndex} = params;
+        let currentRecord = parentOptions.recordCollection.getRecordByIndex(recordIndex);
+        $('#TH_Opreview .PNB10').empty().append(currentRecord.preview);
 
         if ($('img.PREVIEW_PIC.zoomable').length > 0) {
             $('img.PREVIEW_PIC.zoomable').draggable();

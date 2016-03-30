@@ -10,12 +10,10 @@ const geonameDatasource = (services) => {
         let initWith = {$container, parentOptions} = options;
 
         // @todo z-index issue
-        let geocompleterField = $('.geoname_field').geocompleter({
+        /*let geocompleterField = $('.geoname_field').geocompleter({
             server: configService.get('geonameServerUrl'),
             limit: 40
         });
-
-        console.log('geocompleterField init', $('.geoname_field'))
 
         geocompleterField.geocompleter('autocompleter', 'on', 'autocompletefocus', function (event, ui) {
             $('li', $(event.originalEvent.target)).closest('li').removeClass('selected');
@@ -43,8 +41,7 @@ const geonameDatasource = (services) => {
             $(this).removeClass('input-loading');
             $(this).addClass('input-error');
         });
-
-
+        */
     };
 
     return {initialize};

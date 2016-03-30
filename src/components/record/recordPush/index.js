@@ -3,15 +3,19 @@ import Feedback from './feedback';
 import ListManager from './../../list/listManager';
 import dialog from '../../../../node_modules/phraseanet-common/src/components/dialog';
 const pushRecord = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     let feedbackInstance = null;
     let listManagerInstance = null;
 
     const initialize = (options) => {
-        let { feedback, listManager } = options;
+        let {feedback, listManager} = options;
 
-        feedbackInstance = new Feedback(services, feedback);
-        listManagerInstance = new ListManager(services, listManager);
+        if ($('PushBox').length > 0) {
+            feedbackInstance = new Feedback(services, feedback);
+            listManagerInstance = new ListManager(services, listManager);
+        } else {
+            $('.close-dialog-action').on('click', () => dialog.close('1'))
+        }
     };
 
     function reloadBridge(url) {

@@ -142,9 +142,12 @@ const thesaurusDatasource = (services) => {
         if (e) {
             switch (e.id.substr(0, 4)) {
                 case 'TH_W':
-                    if (parentOptions.curField >= 0) {
+                    let currentFieldIndex = parentOptions.fieldCollection.getActiveFieldIndex();
+
+                    if (currentFieldIndex >= 0) {
                         let w = $(e).text();
-                        if (parentOptions.T_fields[parentOptions.curField].multi) {
+                        let field = parentOptions.fieldCollection.getActiveFieldIndex();
+                        if (field.multi) {
                             $('#EditTextMultiValued', parentOptions.$container).val(w);
                             $('#EditTextMultiValued').trigger('keyup.maxLength');
                             appEvents.emit('recordEditor.addMultivaluedField', {

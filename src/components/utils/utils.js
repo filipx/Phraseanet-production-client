@@ -14,7 +14,7 @@ const escapeHtml = function (string) {
     });
 };
 // @TODO - check legacy code
-const cleanTags = function(string) {
+const cleanTags = function (string) {
     let chars2replace = [{
         f: '&',
         t: '&amp;'
@@ -31,4 +31,4 @@ const cleanTags = function(string) {
     return string;
 }
 
-export {escapeHtml, cleanTags };
+export {escapeHtml, cleanTags};

@@ -6,9 +6,12 @@ const presetsModule = (services) => {
     const url = configService.get('baseUrl');
     let $container = null;
     let parentOptions = {};
-
+    let recordCollection;
+    let fieldCollection;
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
+        recordCollection = parentOptions.recordCollection;
+        fieldCollection = parentOptions.fieldCollection;
         initPresetsModal();
     };
 
@@ -40,28 +43,28 @@ const presetsModule = (services) => {
                 jtitle[0].focus();
                 return;
             }
-
-            var fields = [];
+            var addFields = [];
             $(':checkbox', form).each(function (idx, elem) {
                 var $el = $(elem);
                 if ($el.is(':checked')) {
-                    var val = $el.val();
+                    var fieldIndex = $el.val();
+                    let foundField = fieldCollection.getFieldByIndex(fieldIndex);
                     var field = {
-                        name: parentOptions.T_fields[val].name,
+                        name: foundField.name,
                         value: []
                     };
                     var tval;
-                    if (parentOptions.T_fields[val].multi) {
+                    if (foundField.multi) {
                         field.value = $.map(
-                            parentOptions.T_fields[val]._value.split(';'),
+                            foundField._value.split(';'),
                             function (obj, idx) {
                                 return obj.trim();
                             }
                         );
                     } else {
-                        field.value = [parentOptions.T_fields[val]._value.trim()];
+                        field.value = [foundField._value.trim()];
                     }
-                    fields.push(field);
+                    addFields.push(field);
                 }
             });
 
@@ -71,7 +74,7 @@ const presetsModule = (services) => {
                 data: {
                     sbas_id: parentOptions.sbas_id,
                     title: jtitle.val(),
-                    fields: fields
+                    fields: addFields
                 },
                 dataType: 'json',
                 success: function (data, textStatus) {
@@ -119,23 +122,21 @@ const presetsModule = (services) => {
                 _preset_paint(data);
             }
         });
-
-        $('#TH_Opresets button.adder').bind('click', function () {
+        $container.on('click', '#TH_Opresets button.adder', function () {
+            //$('#TH_Opresets button.adder').bind('click', function () {
             _preset_copy();
         });
     }
 
     function _preset_paint(data) {
         $('.EDIT_presets_list', parentOptions.$container).html(data.html);
-        $('.EDIT_presets_list A.triangle').click(
-            function () {
+
+        $container.on('click', '.EDIT_presets_list A.triangle', function () {
                 $(this).parent().parent().toggleClass('opened');
                 return false;
             }
         );
-
-        $('.EDIT_presets_list A.title').dblclick(
-            function () {
+        $container.on('dblclick', '.EDIT_presets_list A.title', function () {
                 var preset_id = $(this).parent().parent().attr('id');
                 if (preset_id.substr(0, 12) === 'EDIT_PRESET_') {
                     _preset_load(preset_id.substr(12));
@@ -143,9 +144,7 @@ const presetsModule = (services) => {
                 return false;
             }
         );
-
-        $('.EDIT_presets_list A.delete').click(
-            function () {
+        $container.on('click', '.EDIT_presets_list A.delete', function () {
                 var li = $(this).closest('LI');
                 var preset_id = li.attr('id');
                 var title = $(this).parent().children('.title').html();
@@ -159,15 +158,17 @@ const presetsModule = (services) => {
 
     function _preset_copy() {
         var html = '';
-        for (let i in parentOptions.T_fields) {
-            if (parentOptions.T_fields[i]._status === 1) {
-                if (parentOptions.T_fields[i].readonly) {
+        let fields = fieldCollection.getFields();
+
+        for (let fieldIndex in fields) {
+            let field = fieldCollection.getFieldByIndex(fieldIndex);
+            if (field._status === 1) {
+                if (field.readonly) {
                     continue;
                 }
-                var c = parentOptions.T_fields[i]._value === '' ? '' : 'checked="1"';
-                var v = parentOptions.T_fields[i]._value;
-                html += '<div><label class="checkbox" for="new_preset_' + parentOptions.T_fields[i].name + '"><input type="checkbox" class="checkbox" id="new_preset_' + parentOptions.T_fields[i].name + '" value="' + i + '" ' + c + '/>' + '<b>' + parentOptions.T_fields[i].label + ' : </b></label> ';
-                html += cleanTags(parentOptions.T_fields[i]._value) + '</div>';
+                var c = field._value === '' ? '' : 'checked="1"';
+                html += '<div><label class="checkbox" for="new_preset_' + field.name + '"><input type="checkbox" class="checkbox" id="new_preset_' + field.name + '" value="' + fieldIndex + '" ' + c + '/>' + '<b>' + field.label + ' : </b></label> ';
+                html += cleanTags(field._value) + '</div>';
             }
         }
         $('#Edit_copyPreset_dlg FORM DIV').html(html);
@@ -201,29 +202,37 @@ const presetsModule = (services) => {
                 if ($('#Edit_copyPreset_dlg').data('ui-dialog')) {
                     $('#Edit_copyPreset_dlg').dialog('close');
                 }
+                let records = recordCollection.getRecords();
+                let fields = fieldCollection.getFields();
 
-                for (let i in parentOptions.T_fields) {
-                    parentOptions.T_fields[i].preset = null;
-                    if (typeof (data.fields[parentOptions.T_fields[i].name]) !== 'undefined') {
-                        parentOptions.T_fields[i].preset = data.fields[parentOptions.T_fields[i].name];
+                for (let fieldIndex in fields) {
+                    let field = fieldCollection.getFieldByIndex(fieldIndex);
+                    field.preset = null;
+                    if (typeof (data.fields[field.name]) !== 'undefined') {
+                        field.preset = data.fields[field.name];
                     }
+                    fieldCollection.updateField(fieldIndex, field);
                 }
-                for (let r = 0; r < parentOptions.T_records.length; r++) {
-                    if (!parentOptions.T_records[r]._selected) {
+                for (let recordIndex in records) {
+                    let record = recordCollection.getRecordByIndex(recordIndex);
+                    if (!record._selected) {
                         continue;
                     }
 
-                    for (let i in parentOptions.T_fields) {
-                        if (parentOptions.T_fields[i].preset !== null) {
-                            for (let val in parentOptions.T_fields[i].preset) {
+                    for (let fieldIndex in fields) {
+                        let field = fieldCollection.getFieldByIndex(fieldIndex);
+                        if (field.preset !== null) {
+                            console.log('ok a preset has been found')
+                            for (let val in field.preset) {
                                 // fix : some (old, malformed) presets values may need trim()
-                                parentOptions.T_records[r].fields['' + i].addValue(parentOptions.T_fields[i].preset[val].trim(), false, null);
+                                recordCollection.addRecordFieldValue(recordIndex, fieldIndex, {
+                                    value: field.preset[val].trim(), merge: false, vocabularyId: null
+                                });
                             }
                         }
                     }
                 }
                 appEvents.emit('recordEditor.onUpdateFields');
-                // _updateEditSelectedRecords();
             }
         });
     }
