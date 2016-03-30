@@ -1,14 +1,24 @@
 import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
-import { sprintf } from 'sprintf-js';
+import {cleanTags} from '../../utils/utils';
+import {sprintf} from 'sprintf-js';
 import * as recordModel from '../../record/model';
+import recordEditorLayout from './layout';
+import presetsModule from './presets';
 import searchReplace from './plugins/searchReplace';
+import preview from './plugins/preview';
+import thesaurusDatasource from './plugins/thesaurusDatasource';
+import geonameDatasource from './plugins/geonameDatasource';
+
+import RecordCollection from './models/recordCollection';
+import FieldCollection from './models/fieldCollection';
+
 import * as Rx from 'rx';
 require('phraseanet-common/src/components/tooltip');
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const recordEditorService = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let $container = null;
     let options = {};
@@ -18,7 +28,7 @@ const recordEditorService = (services) => {
     //$(document).ready(function () {
 
 
-        // idEditZTextArea
+    // idEditZTextArea
     //});
 
     let $ztextStatus;
@@ -37,10 +47,7 @@ const recordEditorService = (services) => {
         // editor.ssel = false;
 
         $editorContainer = $('#EDITWINDOW');
-        $(window).bind('resize', function () {
-            _setPreviewEdit();
-            _setSizeLimits();
-        });
+
         $ztextStatus = $('#ZTextStatus', options.$container);
         $editTextArea = $('#idEditZTextArea', options.$container);
 
@@ -49,9 +56,7 @@ const recordEditorService = (services) => {
     };
 
     const _bindEvents = () => {
-        let cclicks = 0;
-        const cDelay = 350;
-        let cTimer = null;
+
         // edit_clk_editimg
         $editorContainer
             .on('click', '.select-record-action', (event) => {
@@ -77,7 +82,7 @@ const recordEditorService = (services) => {
             .on('click', '.edit-field-action', (event) => {
                 let $el = $(event.currentTarget);
                 if (!options.textareaIsDirty || edit_validField(event, 'ask_ok') === true) {
-                    _editField(event, $el.data('id'));
+                    selectField(event, $el.data('id'));
                 }
                 return false;
             })
@@ -93,7 +98,7 @@ const recordEditorService = (services) => {
                 let $el = $(event.currentTarget);
                 let fieldValue = $('#' + $el.data('input-id')).val();
 
-                _addMultivaluedField(fieldValue, null);
+                _addMultivaluedField({value: fieldValue});
             })
             .on('click', '.edit-multivalued-field-action', (event) => {
                 event.preventDefault();
@@ -114,34 +119,13 @@ const recordEditorService = (services) => {
             })
 
 
-            .on('click', '.edit-thesaurus-action', (event) => {
-                event.preventDefault();
-                cclicks++;
-
-                if (cclicks === 1) {
-                    cTimer = setTimeout(function () {
-                        edit_clickThesaurus(event);
-                        cclicks = 0;
-                    }, cDelay);
-
-                } else {
-                    clearTimeout(cTimer);
-                    edit_dblclickThesaurus(event);
-                    cclicks = 0;
-                }
-            })
-            .on('dblclick', '.thesaurus-branch-action', (event) => {
-                // dbl is handled by click event
-                event.preventDefault();
-            })
-
             .on('click', '.apply-multi-desc-action', (event) => {
                 event.preventDefault();
-                edit_applyMultiDesc(event);
+                submitChanges({event});
             })
             .on('click', '.cancel-multi-desc-action', (event) => {
                 event.preventDefault();
-                edit_cancelMultiDesc(event);
+                cancelChanges({event});
             })
 
             .on('mouseup mousedown keyup keydown', '#idEditZTextArea', function (event) {
@@ -179,7 +163,7 @@ const recordEditorService = (services) => {
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
             case 27:
-                edit_cancelMultiDesc(event);
+                cancelChanges({event});
                 specialKeyState.isShortcutKey = true;
                 break;
 
@@ -201,7 +185,7 @@ const recordEditorService = (services) => {
     };
 
     function startThisEditing(params) {// sbas_id, what, regbasprid, ssel) {
-        let { hasMultipleDatabases, databoxId, mode, notActionable, notActionableMsg, state } = params;
+        let {hasMultipleDatabases, databoxId, mode, notActionable, notActionableMsg, state} = params;
 
         if (hasMultipleDatabases === true) {
             $('#EDITWINDOW').hide();
@@ -229,8 +213,13 @@ const recordEditorService = (services) => {
         // editor.ssel = ssel;
         $editTextArea = $('#idEditZTextArea', options.$container);
 
-        let recordCollection = options.T_records;
-        for (let r in recordCollection) {
+        
+        
+        // let recordCollection = new RecordCollection(options.T_records);
+        //
+        // recordCollection.setFields(options.T_fields);
+        
+        for (let r in options.T_records) {
             var fields = {};
 
             for (let f in options.T_records[r].fields) {
@@ -333,162 +322,6 @@ const recordEditorService = (services) => {
             });
         }
 
-        _hsplit1();
-        _vsplit2();
-        _vsplit1();
-
-        $('#EDIT_TOP', options.$container).resizable({
-            handles: 's',
-            minHeight: 100,
-            resize: function () {
-                _hsplit1();
-                _setPreviewEdit();
-            },
-            stop: function () {
-                _hsplit1();
-                appCommons.userModule.setPref('editing_top_box', Math.floor($('#EDIT_TOP').height() * 100 / $('#EDIT_ALL').height()));
-                _setSizeLimits();
-            }
-        });
-
-        $('#divS_wrapper', options.$container).resizable({
-            handles: 'e',
-            minWidth: 200,
-            resize: function () {
-                _vsplit1();
-                _setPreviewEdit();
-            },
-            stop: function () {
-                appCommons.userModule.setPref('editing_right_box', Math.floor($('#divS').width() * 100 / $('#EDIT_MID_L').width()));
-                _vsplit1();
-                _setSizeLimits();
-            }
-        });
-
-        $('#EDIT_MID_R')
-            .css('left', $('#EDIT_MID_L').position().left + $('#EDIT_MID_L').width() + 15)
-            .resizable({
-                handles: 'w',
-                minWidth: 200,
-                resize: function () {
-                    _vsplit2();
-                    _setPreviewEdit();
-                },
-                stop: function () {
-                    appCommons.userModule.setPref('editing_left_box', Math.floor($('#EDIT_MID_R').width() * 100 / $('#EDIT_MID').width()));
-                    _vsplit2();
-                    _setSizeLimits();
-                }
-            });
-
-        $('#EDIT_ZOOMSLIDER', options.$container).slider({
-            min: 60,
-            max: 300,
-            value: options.diapoSize,
-            slide: function (event, ui) {
-                var v = $(ui.value)[0];
-                $('#EDIT_FILM2 .diapo', options.$container).width(v).height(v);
-            },
-            change: function (event, ui) {
-                options.diapoSize = $(ui.value)[0];
-                appCommons.userModule.setPref('editing_images_size', options.diapoSize);
-            }
-        });
-
-        let buttons = {};
-        buttons[localeService.t('valider')] = function (e) {
-            $(this).dialog('close');
-            edit_applyMultiDesc(e);
-        };
-        buttons[localeService.t('annuler')] = function (e) {
-            $(this).dialog('close');
-            edit_cancelMultiDesc(e);
-        };
-
-        $('#EDIT_CLOSEDIALOG', options.$container).dialog({
-            autoOpen: false,
-            closeOnEscape: true,
-            resizable: false,
-            draggable: false,
-            modal: true,
-            buttons: buttons
-        });
-
-        buttons[localeService.t('valider')] = function () {
-            var form = $('#Edit_copyPreset_dlg FORM');
-            var jtitle = $('.EDIT_presetTitle', form);
-            if (jtitle.val() === '') {
-                alert(localeService.t('needTitle'));
-                jtitle[0].focus();
-                return;
-            }
-
-            var fields = [];
-            $(':checkbox', form).each(function (idx, elem) {
-                var $el = $(elem);
-                if ($el.is(':checked')) {
-                    var val = $el.val();
-                    var field = {
-                        name: options.T_fields[val].name,
-                        value: []
-                    };
-                    var tval;
-                    if (options.T_fields[val].multi) {
-                        field.value = $.map(
-                            options.T_fields[val]._value.split(';'),
-                            function (obj, idx) {
-                                return obj.trim();
-                            }
-                        );
-                    } else {
-                        field.value = [options.T_fields[val]._value.trim()];
-                    }
-                    fields.push(field);
-                }
-            });
-
-            $.ajax({
-                type: 'POST',
-                url: `${url}prod/records/edit/presets`,
-                data: {
-                    sbas_id: options.sbas_id,
-                    title: jtitle.val(),
-                    fields: fields
-                },
-                dataType: 'json',
-                success: function (data, textStatus) {
-                    _preset_paint(data);
-
-                    if ($('#Edit_copyPreset_dlg').data('ui-dialog')) {
-                        $('#Edit_copyPreset_dlg').dialog('close');
-                    }
-                }
-            });
-        };
-
-        buttons[localeService.t('annuler')] = function () {
-            $(this).dialog('close');
-
-        };
-
-        $('#Edit_copyPreset_dlg', options.$container).dialog({
-            stack: true,
-            closeOnEscape: true,
-            resizable: false,
-            draggable: false,
-            autoOpen: false,
-            modal: true,
-            width: 600,
-            title: localeService.t('newPreset'),
-            close: function (event, ui) {
-                $(this).dialog('widget').css('z-index', 'auto');
-            },
-            open: function (event, ui) {
-                $(this).dialog('widget').css('z-index', '5000');
-                $('.EDIT_presetTitle')[0].focus();
-            },
-            buttons: buttons
-        });
 
         $('#idEditDateZone', options.$container).datepicker({
             changeYear: true,
@@ -506,27 +339,9 @@ const recordEditorService = (services) => {
             }
         });
 
-        ETHSeeker = new _EditThesaurusSeeker(options.sbas_id);
-
-        _setSizeLimits();
-
-        $.ajax({
-            type: 'GET',
-            url: `${url}prod/records/edit/presets`,
-            data: {
-                sbas_id: options.sbas_id
-            },
-            dataType: 'json',
-            success: function (data, textStatus) {
-                _preset_paint(data);
-            }
-        });
 
         _check_required();
 
-        $('#TH_Opresets button.adder').bind('click', function () {
-            _preset_copy();
-        });
 
         try {
             $('#divS .edit_field:first').trigger('mousedown');
@@ -534,8 +349,22 @@ const recordEditorService = (services) => {
 
         }
 
+
+        // ETHSeeker = new _EditThesaurusSeeker(options.sbas_id);
+        recordEditorLayout(services).initialize({$container: $editorContainer, parentOptions: options});
+        presetsModule(services).initialize({$container: $editorContainer, parentOptions: options});
         // init plugins
-        searchReplace(services).initialize({ $container: $editorContainer, parentOptions: options});
+        searchReplace(services).initialize({$container: $editorContainer, parentOptions: options});
+        preview(services).initialize({$container: $editorContainer, parentOptions: options});
+        geonameDatasource(services).initialize({
+            $container: $editorContainer,
+            parentOptions: options
+        });
+        ETHSeeker = thesaurusDatasource(services).initialize({
+            $container: $editorContainer,
+            parentOptions: options,
+            $editTextArea
+        });
     }
 
     function _toggleGroupSelection() {
@@ -544,192 +373,6 @@ const recordEditorService = (services) => {
 
     }
 
-    function _preset_paint(data) {
-        $('.EDIT_presets_list', options.$container).html(data.html);
-        $('.EDIT_presets_list A.triangle').click(
-            function () {
-                $(this).parent().parent().toggleClass('opened');
-                return false;
-            }
-        );
-
-        $('.EDIT_presets_list A.title').dblclick(
-            function () {
-                var preset_id = $(this).parent().parent().attr('id');
-                if (preset_id.substr(0, 12) === 'EDIT_PRESET_') {
-                    _preset_load(preset_id.substr(12));
-                }
-                return false;
-            }
-        );
-
-        $('.EDIT_presets_list A.delete').click(
-            function () {
-                var li = $(this).closest('LI');
-                var preset_id = li.attr('id');
-                var title = $(this).parent().children('.title').html();
-                if (preset_id.substr(0, 12) === 'EDIT_PRESET_' && confirm("supprimer le preset '" + title + "' ?")) {
-                    _preset_delete(preset_id.substr(12), li);
-                }
-                return false;
-            }
-        );
-    }
-
-    function _preset_copy() {
-        var html = '';
-        for (let i in options.T_fields) {
-            if (options.T_fields[i]._status === 1) {
-                if (options.T_fields[i].readonly) {
-                    continue;
-                }
-                var c = options.T_fields[i]._value === '' ? '' : 'checked="1"';
-                var v = options.T_fields[i]._value;
-                html += '<div><label class="checkbox" for="new_preset_' + options.T_fields[i].name + '"><input type="checkbox" class="checkbox" id="new_preset_' + options.T_fields[i].name + '" value="' + i + '" ' + c + '/>' + '<b>' + options.T_fields[i].label + ' : </b></label> ';
-                html += _cleanTags(options.T_fields[i]._value) + '</div>';
-            }
-        }
-        $('#Edit_copyPreset_dlg FORM DIV').html(html);
-        var $dialog = $('#Edit_copyPreset_dlg');
-        if ($dialog.data('ui-dialog')) {
-            // to show dialog on top of edit window
-            $dialog.dialog('widget').css('z-index', 1300);
-            $dialog.dialog('open');
-        }
-    }
-
-    function _preset_delete(presetId, li) {
-        $.ajax({
-            type: 'DELETE',
-            url: `${url}prod/records/edit/presets/${presetId}`,
-            data: {},
-            dataType: 'json',
-            success: function (data, textStatus) {
-                li.remove();
-            }
-        });
-    }
-
-    function _preset_load(presetId) {
-        $.ajax({
-            type: 'GET',
-            url: `${url}prod/records/edit/presets/${presetId}`,
-            data: {},
-            dataType: 'json',
-            success: function (data, textStatus) {
-                if ($('#Edit_copyPreset_dlg').data('ui-dialog')) {
-                    $('#Edit_copyPreset_dlg').dialog('close');
-                }
-
-                for (let i in options.T_fields) {
-                    options.T_fields[i].preset = null;
-                    if (typeof (data.fields[options.T_fields[i].name]) !== 'undefined') {
-                        options.T_fields[i].preset = data.fields[options.T_fields[i].name];
-                    }
-                }
-                for (let r = 0; r < options.T_records.length; r++) {
-                    if (!options.T_records[r]._selected) {
-                        continue;
-                    }
-
-                    for (let i in options.T_fields) {
-                        if (options.T_fields[i].preset !== null) {
-                            for (let val in options.T_fields[i].preset) {
-                                // fix : some (old, malformed) presets values may need trim()
-                                options.T_records[r].fields['' + i].addValue(options.T_fields[i].preset[val].trim(), false, null);
-                            }
-                        }
-                    }
-                }
-                _updateEditSelectedRecords();
-            }
-        });
-    }
-
-    function _setPreviewEdit() {
-        if (!$('#TH_Opreview').is(':visible')) {
-            return false;
-        }
-
-        var selected = $('#EDIT_FILM2 .diapo.selected');
-
-        if (selected.length !== 1) {
-            return false;
-        }
-
-        var id = selected.attr('id').split('_').pop();
-
-        var container = $('#TH_Opreview');
-        var zoomable = $('img.record.zoomable', container);
-
-        if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
-            return false;
-        }
-
-        //  var datas = editor.T_records[id].preview;
-
-        var h = parseInt($('input[name=height]', container).val(), 10);
-        var w = parseInt($('input[name=width]', container).val(), 10);
-
-        var t = 0;
-        var de = 0;
-
-        var margX = 0;
-        var margY = 0;
-
-        if ($('img.record.record_audio', container).length > 0) {
-            margY = 100;
-            de = 60;
-        }
-
-        var display_box = $('#TH_Opreview .PNB10');
-        var dwidth = display_box.width();
-        var dheight = display_box.height();
-
-
-        //  if(datas.doctype != 'flash')
-        //  {
-        var ratioP = w / h;
-        var ratioD = dwidth / dheight;
-
-        if (ratioD > ratioP) {
-            // je regle la hauteur d'abord
-            if ((parseInt(h, 10) + margY) > dheight) {
-                h = Math.round(dheight - margY);
-                w = Math.round(h * ratioP);
-            }
-        } else {
-            if ((parseInt(w, 10) + margX) > dwidth) {
-                w = Math.round(dwidth - margX);
-                h = Math.round(w / ratioP);
-            }
-        }
-        //  }
-        //  else
-        //  {
-        //
-        //    h = Math.round(dheight - margY);
-        //    w = Math.round(dwidth - margX);
-        //  }
-        t = Math.round((dheight - h - de) / 2);
-        var l = Math.round((dwidth - w) / 2);
-        $('.record', container).css({
-            width: w,
-            height: h,
-            top: t,
-            left: l
-        }).attr('width', w).attr('height', h);
-
-    }
-
-    function _previewEdit(r) {
-        $('#TH_Opreview .PNB10').empty().append(options.T_records[r].preview);
-
-        if ($('img.PREVIEW_PIC.zoomable').length > 0) {
-            $('img.PREVIEW_PIC.zoomable').draggable();
-        }
-        _setPreviewEdit();
-    }
 
     function skipImage(evt, step) {
         let cache = $('#EDIT_FILM2');
@@ -763,7 +406,14 @@ const recordEditorService = (services) => {
 // // on change de champ courant
 // // ---------------------------------------------------------------------------
 
-    function _editField(evt, meta_struct_id) {
+    /**
+     * Set a field active by it's meta struct id
+     * Open it's editor
+     * @param evt
+     * @param metaStructId
+     * @private
+     */
+    function selectField(evt, metaStructId) {
         document.getElementById('idEditZTextArea').blur();
         document.getElementById('EditTextMultiValued').blur();
         $('.editDiaButtons', options.$container).hide();
@@ -771,9 +421,9 @@ const recordEditorService = (services) => {
         $('#idEditZTextArea, #EditTextMultiValued').unbind('keyup.maxLength');
 
 
-        options.curField = meta_struct_id;
+        options.curField = metaStructId;
 
-        if (meta_struct_id >= 0) {
+        if (metaStructId >= 0) {
 
 
             let field = null;
@@ -781,15 +431,15 @@ const recordEditorService = (services) => {
                 return;
             }
 
-            if (options.T_fields[meta_struct_id] !== undefined) {
-                field = options.T_fields[meta_struct_id];
+            if (options.T_fields[metaStructId] !== undefined) {
+                field = options.T_fields[metaStructId];
 
                 let name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
 
                 $('#idFieldNameEdit', options.$container).html(name);
 
 
-                let vocabType = options.T_fields[meta_struct_id].vocabularyControl;
+                let vocabType = options.T_fields[metaStructId].vocabularyControl;
 
                 $('#idEditZTextArea, #EditTextMultiValued').autocomplete({
                     minLength: 2,
@@ -809,31 +459,31 @@ const recordEditorService = (services) => {
                     },
                     select: function (event, ui) {
 
-                        _addMultivaluedField(ui.item.label, ui.item.id);
+                        _addMultivaluedField({value: ui.item.label, vocabularyId: ui.item.id});
 
                         return false;
                     }
                 });
 
 
-                if (options.T_fields[meta_struct_id].maxLength > 0) {
+                if (options.T_fields[metaStructId].maxLength > 0) {
                     var idexplain = $('#idExplain');
                     idexplain.html('');
 
                     $('#idEditZTextArea, #EditTextMultiValued').bind('keyup.maxLength', function () {
-                        var remaining = Math.max((options.T_fields[meta_struct_id].maxLength - $(this).val().length), 0);
-                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + '/' + meta_struct_id + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + '</span>');
+                        var remaining = Math.max((options.T_fields[metaStructId].maxLength - $(this).val().length), 0);
+                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + '/' + metaStructId + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + '</span>');
                         $('.metadatas_restrictionsTips', idexplain).tooltip();
                     }).trigger('keyup.maxLength');
                 } else {
                     $('#idExplain').html('');
                 }
 
-                if (!options.T_fields[meta_struct_id].multi) {
+                if (!options.T_fields[metaStructId].multi) {
                     // champ monovalue : textarea
                     $('.editDiaButtons', options.$container).hide();
 
-                    if (options.T_fields[meta_struct_id].type === 'date') {
+                    if (options.T_fields[metaStructId].type === 'date') {
                         $editTextArea.css('height', '16px');
                         $('#idEditDateZone', options.$container).show();
                     } else {
@@ -845,19 +495,19 @@ const recordEditorService = (services) => {
                     $('#ZTextMultiValued', options.$container).hide();
                     $('#ZTextMonoValued', options.$container).show();
 
-                    if (options.T_fields[meta_struct_id]._status === 2) {
+                    if (options.T_fields[metaStructId]._status === 2) {
                         // heterogene
                         $editTextArea.val(options.fieldLastValue = '');
                         $editTextArea.addClass('hetero');
                         $('#idDivButtons', options.$container).show();	// valeurs h�t�rog�nes : les 3 boutons remplacer/ajouter/annuler
                     } else {
                         // homogene
-                        $editTextArea.val(options.fieldLastValue = options.T_fields[meta_struct_id]._value);
+                        $editTextArea.val(options.fieldLastValue = options.T_fields[metaStructId]._value);
                         $editTextArea.removeClass('hetero');
 
                         $('#idDivButtons', options.$container).hide();	// valeurs homog�nes
-                        if (options.T_fields[meta_struct_id].type === 'date') {
-                            let v = options.T_fields[meta_struct_id]._value.split(' ');
+                        if (options.T_fields[metaStructId].type === 'date') {
+                            let v = options.T_fields[metaStructId]._value.split(' ');
                             let d = v[0].split('/');
                             let dateObj = new Date();
                             if (d.length === 3) {
@@ -886,7 +536,7 @@ const recordEditorService = (services) => {
 
                     $('#idDivButtons', options.$container).hide();	// valeurs homogenes
 
-                    _updateCurrentMval(meta_struct_id);
+                    _updateCurrentMval(metaStructId);
 
                     $('#EditTextMultiValued', options.$container).val('');
                     $('#idEditZone', options.$container).show();
@@ -904,7 +554,7 @@ const recordEditorService = (services) => {
             $('.editDiaButtons', options.$container).hide();
 
         }
-        _activeField();
+        setActiveField(metaStructId);
     }
 
     function _updateEditSelectedRecords(evt) {
@@ -1009,7 +659,7 @@ const recordEditorService = (services) => {
                                 if (options.T_fields[options.curField].multi) {
                                     $('#EditTextMultiValued', options.$container).val(label);
                                     $('#EditTextMultiValued').trigger('keyup.maxLength');
-                                    _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
+                                    _addMultivaluedField({value: $('#EditTextMultiValued', options.$container).val()});
                                 } else {
                                     if (appCommons.utilsModule.is_ctrl_key(e)) {
                                         var t = $editTextArea.val();
@@ -1039,7 +689,7 @@ const recordEditorService = (services) => {
                         beforeShow: function (a, b, c, d) {
                             var fid = this.target.getAttribute('id').substr(10);
                             if (!options.textareaIsDirty || edit_validField(null, 'ask_ok') === true) {
-                                _editField(null, fid);
+                                selectField(null, fid);
                                 return (true);
                             } else {
                                 return (false);
@@ -1059,7 +709,7 @@ const recordEditorService = (services) => {
         if (options.curField === -1) {
             _editStatus(evt);
         } else {
-            _editField(evt, options.curField);
+            selectField(evt, options.curField);
         }
     }
 
@@ -1101,7 +751,7 @@ const recordEditorService = (services) => {
                 } else {
                     var v = options.T_fields[f]._value;
                     v = (v instanceof (Array)) ? v.join(';') : v;
-                    o.innerHTML = _cleanTags(v).replace(/\n/gm, "<span style='color:#0080ff'>&para;</span><br/>");
+                    o.innerHTML = cleanTags(v).replace(/\n/gm, "<span style='color:#0080ff'>&para;</span><br/>");
                 }
             }
         }
@@ -1127,7 +777,7 @@ const recordEditorService = (services) => {
 
         document.getElementById('editFakefocus').focus();
         options.curField = -1;
-        _activeField();
+        setActiveField(-1);
     }
 
     function _updateCurrentMval(meta_struct_id, HighlightValue, vocabularyId) {
@@ -1213,7 +863,7 @@ const recordEditorService = (services) => {
             let value = span.text();
             let vocab_id = span.attr('vocabid');
 
-            _addMultivaluedField(value, vocab_id);
+            _addMultivaluedField({value: value, vocabularyId: vocab_id});
             _updateFieldDisplay();
             return false;
         });
@@ -1282,7 +932,7 @@ const recordEditorService = (services) => {
         options.textareaIsDirty = false;
 
 
-        _editField(evt, options.curField);
+        selectField(evt, options.curField);
         return (true);
     }
 
@@ -1378,7 +1028,9 @@ const recordEditorService = (services) => {
         if (selected.length === 1) {
 
             let r = selected.attr('id').split('_').pop();
-            _previewEdit(r);
+            appEvents.emit('recordEditor.onSelectRecord', {
+                record: r
+            })
         }
 
         options.lastClickId = i;
@@ -1388,13 +1040,14 @@ const recordEditorService = (services) => {
     // ----------------------------------------------------------------------------------
 // on a clique sur le 'ok' general : save
 // ----------------------------------------------------------------------------------
-    function edit_applyMultiDesc(evt) {
+    function submitChanges(options) {
+        let {event} = options;
         let sendorder = '';
         let sendChuOrder = '';
 
         let t = [];
 
-        if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
+        if (options.textareaIsDirty && edit_validField(event, 'ask_ok') === false) {
             return false;
         }
 
@@ -1486,18 +1139,18 @@ const recordEditorService = (services) => {
 
     }
 
-    function edit_cancelMultiDesc(evt) {
-
+    function cancelChanges(options) {
+        let {event} = options;
 
         let dirty = false;
 
-        evt.cancelBubble = true;
-        if (evt.stopPropagation) {
-            evt.stopPropagation();
+        event.cancelBubble = true;
+        if (event.stopPropagation) {
+            event.stopPropagation();
         }
 
         if (options.curField >= 0) {
-            if (options.textareaIsDirty && edit_validField(evt, 'ask_ok') === false) {
+            if (options.textareaIsDirty && edit_validField(event, 'ask_ok') === false) {
                 return;
             }
         }
@@ -1534,219 +1187,17 @@ const recordEditorService = (services) => {
         }
     }
 
-    function _EditThesaurusSeeker(sbas_id) {
-        this.jq = null;
 
-        this.sbas_id = sbas_id;
+    function setActiveField(metaStructId) {
+        // let metaStructId = parseInt(options.curField, 10);
 
-        let zid = ('' + sbas_id).replace(new RegExp('\\.', 'g'), '\\.') + '\\.T';
-
-        this.TH_P_node = $('#TH_P\\.' + zid, options.$container);
-        this.TH_K_node = $('#TH_K\\.' + zid, options.$container);
-
-        this._ctimer = null;
-
-        this.search = function (txt) {
-            if (this._ctimer) {
-                clearTimeout(this._ctimer);
-            }
-            this._ctimer = setTimeout(() => {
-                return ETHSeeker.search_delayed('"' + txt.replace("'", "\\'") + '"')
-            }, 125);
-        };
-
-        this.search_delayed = function (txt) {
-            if (this.jq && typeof this.jq.abort === 'function') {
-                this.jq.abort();
-                this.jq = null;
-            }
-            txt = txt.replace("'", "\\'");
-            let url = '/xmlhttp/openbranches_prod.h.php';
-            let parms = {
-                bid: this.sbas_id,
-                lng: localeService.getLocale(),
-                t: txt,
-                mod: 'TREE',
-                u: Math.random()
-            };
-
-            let me = this;
-
-            this.jq = $.ajax({
-                url: url,
-                data: parms,
-                type: 'POST',
-                success: function (ret) {
-                    me.TH_P_node.html('...');
-                    me.TH_K_node.attr('class', 'h').html(ret);
-                    me.jq = null;
-                }
-            });
-        };
-
-        this.openBranch = function (id, thid) {
-            if (this.jq) {
-                this.jq.abort();
-                this.jq = null;
-            }
-            let url = '/xmlhttp/getterm_prod.h.php';
-            let parms = {
-                bid: this.sbas_id,
-                lng: localeService.getLocale(),
-                sortsy: 1,
-                id: thid,
-                typ: 'TH'
-            };
-            let me = this;
-
-
-            this.jq = $.ajax({
-                url: url,
-                data: parms,
-                success: function (ret) {
-                    let zid = '#TH_K\\.' + id.replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
-                    $(zid, options.$container).html(ret);
-                    me.jq = null;
-                }
-            });
-        };
-    }
-
-// onclick dans le thesaurus
-    function edit_clickThesaurus(event) {
-        let e;
-        for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode);
-
-        if (e) {
-            switch (e.id.substr(0, 4)) {
-                case 'TH_P':	// +/- de deploiement de mot
-                    edit_thesaurus_ow(e.id.substr(5));
-                    break;
-                default:
-            }
-        }
-        return (false);
-    }
-
-// ondblclick dans le thesaurus
-    function edit_dblclickThesaurus(event) {
-        let e;
-        for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode);
-
-        if (e) {
-            switch (e.id.substr(0, 4)) {
-                case 'TH_W':
-                    if (options.curField >= 0) {
-                        let w = $(e).text();
-                        if (options.T_fields[options.curField].multi) {
-                            $('#EditTextMultiValued', options.$container).val(w);
-                            $('#EditTextMultiValued').trigger('keyup.maxLength');
-                            _addMultivaluedField($('#EditTextMultiValued', options.$container).val(), null);
-                        } else {
-                            $editTextArea.val(w);
-                            $('#idEditZTextArea').trigger('keyup.maxLength');
-                            options.textareaIsDirty = true;
-                        }
-                    }
-                    break;
-                default:
-            }
-        }
-        return (false);
-    }
-
-// on ouvre ou ferme une branche de thesaurus
-    function edit_thesaurus_ow(id) {
-        let o = document.getElementById('TH_K.' + id);
-        if (o.className === 'o') {
-            // on ferme
-            o.className = 'c';
-            document.getElementById('TH_P.' + id).innerHTML = '+';
-            document.getElementById('TH_K.' + id).innerHTML = localeService.t('loading');
-        } else if (o.className === 'c' || o.className === 'h') {
-            // on ouvre
-            o.className = 'o';
-            document.getElementById('TH_P.' + id).innerHTML = '-';
-
-            let t_id = id.split('.');
-            let sbas_id = t_id[0];
-            t_id.shift();
-            let thid = t_id.join('.');
-            let url = '/xmlhttp/getterm_prod.x.php';
-            let parms = 'bid=' + sbas_id;
-            parms += '&lng=' + localeService.getLocale();
-            parms += '&sortsy=1';
-            parms += '&id=' + thid;
-            parms += '&typ=TH';
-
-            ETHSeeker.openBranch(id, thid);
-        }
-        return (false);
-    }
-
-    function _setSizeLimits() {
-        if (!$('#EDITWINDOW').is(':visible')) {
-            return;
-        }
-
-        if ($('#EDIT_TOP').data('ui-resizable')) {
-            $('#EDIT_TOP').resizable('option', 'maxHeight', ($('#EDIT_ALL').height() - $('#buttonEditing').height() - 10 - 160));
-        }
-        if ($('#divS_wrapper').data('ui-resizable')) {
-            $('#divS_wrapper').resizable('option', 'maxWidth', ($('#EDIT_MID_L').width() - 270));
-        }
-        if ($('#EDIT_MID_R').data('ui-resizable')) {
-            $('#EDIT_MID_R').resizable('option', 'maxWidth', ($('#EDIT_MID_R').width() + $('#idEditZone').width() - 240));
-        }
-    }
-
-    function _hsplit1() {
-        let el = $('#EDIT_TOP');
-        if (el.length === 0) {
-            return;
-        }
-        let h = $(el).outerHeight();
-        $(el).height(h);
-        let t = $(el).offset().top + h;
-
-        $('#EDIT_MID', options.$container).css('top', (t) + 'px');
-    }
-
-    function _vsplit1() {
-        $('#divS_wrapper').height('auto');
-
-        let el = $('#divS_wrapper');
-        if (el.length === 0) {
-            return;
-        }
-        let a = $(el).width();
-        el.width(a);
-
-        $('#idEditZone', options.$container).css('left', (a + 20));
-    }
-
-    function _vsplit2() {
-        let el = $('#EDIT_MID_R');
-        if (el.length === 0) {
-            return;
-        }
-        let a = $(el).width();
-        el.width(a);
-        let v = $('#EDIT_ALL').width() - a - 20;
-
-        $('#EDIT_MID_L', options.$container).width(v);
-    }
-
-    function _activeField() {
-        let meta_struct_id = parseInt(options.curField, 10);
-
-        meta_struct_id = (isNaN(meta_struct_id) || meta_struct_id < 0) ? 'status' : meta_struct_id;
+        metaStructId = (isNaN(metaStructId) || metaStructId < 0) ? 'status' : metaStructId;
 
         $('#divS div.active, #divS div.hover').removeClass('active hover');
-        $('#EditFieldBox_' + meta_struct_id).addClass('active');
+        $('#EditFieldBox_' + metaStructId).addClass('active');
 
         let cont = $('#divS');
-        let calc = $('#EditFieldBox_' + meta_struct_id).offset().top - cont.offset().top;// hauteur relative par rapport au visible
+        let calc = $('#EditFieldBox_' + metaStructId).offset().top - cont.offset().top;// hauteur relative par rapport au visible
 
         if (calc > cont.height() || calc < 0) {
             cont.scrollTop(calc + cont.scrollTop());
@@ -1768,25 +1219,6 @@ const recordEditorService = (services) => {
         return (na < nb ? -1 : 1);
     }
 
-    // ---------------------------------------------------------------------
-// nettoie
-// ---------------------------------------------------------------------
-    function _cleanTags(string) {
-        let chars2replace = [{
-            f: '&',
-            t: '&amp;'
-        }, {
-            f: '<',
-            t: '&lt;'
-        }, {
-            f: '>',
-            t: '&gt;'
-        }];
-        for (let c in chars2replace) {
-            string = string.replace(RegExp(chars2replace[c].f, 'g'), chars2replace[c].t);
-        }
-        return string;
-    }
 
     function _check_required(id_r, id_f) {
         let required_fields = false;
@@ -1929,7 +1361,11 @@ const recordEditorService = (services) => {
     // ---------------------------------------------------------------------------
 // on a clique sur le bouton 'ajouter' un mot dans le multi-val
 // ---------------------------------------------------------------------------
-    function _addMultivaluedField(value, VocabularyId) {
+    function _addMultivaluedField(params) {
+        let {value, vocabularyId} = params;
+
+        vocabularyId = vocabularyId === undefined ? null : vocabularyId;
+
         let meta_struct_id = options.curField;		// le champ en cours d'editing
 
         // on ajoute le mot dans tous les records selectionnes
@@ -1938,7 +1374,7 @@ const recordEditorService = (services) => {
                 continue;
             }
 
-            options.T_records[r].fields[meta_struct_id].addValue(value, false, VocabularyId);
+            options.T_records[r].fields[meta_struct_id].addValue(value, false, vocabularyId);
         }
 
         _updateEditSelectedRecords(null);
@@ -2081,23 +1517,17 @@ const recordEditorService = (services) => {
 
     appEvents.listenAll({
         'recordEditor.start': startThisEditing,
-        'recordEditor.onUpdateFields': _updateEditSelectedRecords
+        'recordEditor.addMultivaluedField': _addMultivaluedField,
+        'recordEditor.onUpdateFields': _updateEditSelectedRecords,
+        'recordEditor.submitAllChanges': submitChanges,
+        'recordEditor.cancelAllChanges': cancelChanges
     });
 
 
     return {
-        initialize: initialize,
-        onGlobalKeydown: onGlobalKeydown,
-        startThisEditing: startThisEditing,
-        setRegDefault: setRegDefault,
-        skipImage: skipImage,
-        edit_clkstatus: edit_clkstatus,
-        edit_validField: edit_validField,
-        edit_applyMultiDesc: edit_applyMultiDesc,
-        edit_cancelMultiDesc: edit_cancelMultiDesc,
-        edit_clickThesaurus: edit_clickThesaurus,
-        edit_dblclickThesaurus: edit_dblclickThesaurus,
-        edit_thesaurus_ow: edit_thesaurus_ow
+        initialize,
+        //onGlobalKeydown: onGlobalKeydown,
+        startThisEditing
     };
 };
 export default recordEditorService;

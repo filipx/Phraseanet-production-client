@@ -13,7 +13,22 @@ const escapeHtml = function (string) {
         return entityMap[s];
     });
 };
+// @TODO - check legacy code
+const cleanTags = function(string) {
+    let chars2replace = [{
+        f: '&',
+        t: '&amp;'
+    }, {
+        f: '<',
+        t: '&lt;'
+    }, {
+        f: '>',
+        t: '&gt;'
+    }];
+    for (let c in chars2replace) {
+        string = string.replace(RegExp(chars2replace[c].f, 'g'), chars2replace[c].t);
+    }
+    return string;
+}
 
-export default Object.assign({
-    escapeHtml
-}, AppCommons.utilsModule);
+export {escapeHtml, cleanTags };
