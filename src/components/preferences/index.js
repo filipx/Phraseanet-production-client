@@ -32,54 +32,54 @@ const preferences = (services) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('view', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
 
         $container.on('change', '.preferences-options-presentation-list', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('view', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
 
         $container.on('change', '.preferences-options-rollover-caption', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('rollover_thumbnail', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
 
         $container.on('change', '.preferences-options-rollover-preview', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('rollover_thumbnail', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
 
         $container.on('change', '.preferences-options-technical-display', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('technical_display', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
         $container.on('change', '.preferences-options-rollover-preview', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('technical_display', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
         $container.on('change', '.preferences-options-rollover-preview', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('technical_display', $el.val());
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
 
         $container.on('change', '.preferences-options-doctype-display', (event) => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('doctype_display', $el.prop('checked') ? '1' : '0');
-            appEvents.emit('search.doSearch');
+            appEvents.emit('search.doRefreshState');
         });
 
         $container.on('change', '.preferences-options-basket-status', (event) => {

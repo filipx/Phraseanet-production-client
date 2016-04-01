@@ -91,10 +91,10 @@ const ui = (services) => {
                 } else {
                     switch (getActiveZone()) {
                         case 'rightFrame':
-                            _searchResultKeyDownEvent(event, specialKeyState);
+                            specialKeyState = _searchResultKeyDownEvent(event, specialKeyState);
                             break;
                         case 'idFrameC':
-                            _workzoneKeyDownEvent(event, specialKeyState);
+                            specialKeyState = _workzoneKeyDownEvent(event, specialKeyState);
                             break;
                         case 'mainMenu':
                             break;
@@ -131,6 +131,11 @@ const ui = (services) => {
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
                     appEvents.emit('search.selection.selectAll');
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
+                    console.log('ctrl+a');
+                    event.cancelBubble = true;
+                    if (event.stopPropagation) {
+                        event.stopPropagation();
+                    }
                 }
                 break;
             case 80:// P
@@ -173,6 +178,7 @@ const ui = (services) => {
                 break;
             default:
         }
+        return specialKeyState;
     };
 
     // @TODO to be moved
@@ -227,6 +233,7 @@ const ui = (services) => {
                 break;
             default:
         }
+        return specialKeyState;
     };
 
     const hideOverlay = (n) => {

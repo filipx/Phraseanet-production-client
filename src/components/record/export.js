@@ -65,7 +65,7 @@ const exportRecord = (services) => {
         $('.tabs', $dialog.getDomElement()).tabs();
 
         $('.close_button', $dialog.getDomElement()).bind('click', function () {
-            $dialog.Close();
+            $dialog.close();
         });
 
         var tabs = $('.tabs', $dialog.getDomElement());

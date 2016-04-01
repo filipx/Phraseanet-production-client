@@ -7,16 +7,16 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const resultInfos = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    let searchSelectionSerialized = '';
+    let searchSelectionSerialized = '0';
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
-            searchSelectionSerialized = selection.serialized;
+            updateSelectionCounter(selection.asArray.length);
         }
     });
 
     const initialize = (options) => {
         let {$container} = options;
-
+        updateSelectionCounter(0);
         $container.on('click', '.search-display-info', (event) => {
             event.preventDefault();
             const $el = $(event.currentTarget);
@@ -31,6 +31,13 @@ const resultInfos = (services) => {
             openModal(dialogOptions, dialogContent);
         });
     };
+    const render = (template, selectionCount) => {
+        $('#tool_results').empty().append(template);
+        updateSelectionCounter(selectionCount);
+    }
+    const updateSelectionCounter = (selectionLength) => {
+        $('#nbrecsel').empty().append(selectionLength);
+    }
 
     const openModal = (options = {}, content) => {
         const url = configService.get('baseUrl');
@@ -45,7 +52,7 @@ const resultInfos = (services) => {
         $dialog.setContent(content);
     };
 
-    return {initialize};
+    return {initialize, render};
 };
 
 export default resultInfos;

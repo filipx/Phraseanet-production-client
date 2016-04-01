@@ -150,7 +150,7 @@ class Bootstrap {
                 break;
             default:
                 // trigger a search on loading
-                this.appEvents.emit('search.doSearch');
+                this.appEvents.emit('search.doRefreshState');
             //$('#searchForm').trigger('submit');
             // $('form[name="phrasea_query"]').addClass('triggerAfterInit');
             // trigger last search
