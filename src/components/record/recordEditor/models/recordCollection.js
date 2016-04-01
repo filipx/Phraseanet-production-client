@@ -79,7 +79,6 @@ class RecordCollection {
 
             t_selcol[bid] = 1;
             ncolsel++;
-            console.log('nocolsel', ncolsel)
             for (let f in this.predefinedValues[bid]) {
                 if (!suggestedValuesCollection[f]) {
                     suggestedValuesCollection[f] = {};
@@ -102,7 +101,6 @@ class RecordCollection {
             // toutes les fiches selectionnees
             if (this.records[id]._selected) {
                 if (this.records[id].editableStatus === true) {
-                    console.log('ok can edit status', val)
                     this.records[id].statbits[bit].value = val;
                     this.records[id].statbits[bit].dirty = true;
                 }

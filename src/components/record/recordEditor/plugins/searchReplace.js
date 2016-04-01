@@ -87,7 +87,6 @@ const searchReplace = (services) => {
 
     function _toggleReplaceMode(ckRegExp) {
 
-        console.log('ckRegExp 1', ckRegExp)
         if (ckRegExp.checked) {
             $('#EditSR_TX', $container).hide();
             $('#EditSR_RX', $container).show();

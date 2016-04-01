@@ -7,6 +7,7 @@ const thesaurusDatasource = (services) => {
     let ETHSeeker = null;
     let $editTextArea;
 
+
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
         let cclicks = 0;
@@ -19,13 +20,13 @@ const thesaurusDatasource = (services) => {
 
                 if (cclicks === 1) {
                     cTimer = setTimeout(function () {
-                        edit_clickThesaurus(event);
+                        onSelectBranch(event);
                         cclicks = 0;
                     }, cDelay);
 
                 } else {
                     clearTimeout(cTimer);
-                    edit_dblclickThesaurus(event);
+                    onSelectTerm(event);
                     cclicks = 0;
                 }
             })
@@ -34,13 +35,21 @@ const thesaurusDatasource = (services) => {
                 event.preventDefault();
             })
 
-        ETHSeeker = new _EditThesaurusSeeker(parentOptions.sbas_id);
+        ETHSeeker = new ThesaurusSeeker(parentOptions.sbas_id);
 
         return ETHSeeker;
     };
 
+    const searchValue = (params) => {
+        let {event, value, field} = params;
+        // ok a thesaurus branch match
+        if (field.tbranch !== undefined) {
+            return ETHSeeker.search(value);
+        }
+    }
 
-    function _EditThesaurusSeeker(sbas_id) {
+
+    function ThesaurusSeeker(sbas_id) {
         this.jq = null;
 
         this.sbas_id = sbas_id;
@@ -119,14 +128,14 @@ const thesaurusDatasource = (services) => {
     }
 
 // onclick dans le thesaurus
-    function edit_clickThesaurus(event) {
+    function onSelectBranch(event) {
         let e;
         for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode);
 
         if (e) {
             switch (e.id.substr(0, 4)) {
                 case 'TH_P':	// +/- de deploiement de mot
-                    edit_thesaurus_ow(e.id.substr(5));
+                    toggleBranch(e.id.substr(5));
                     break;
                 default:
             }
@@ -135,7 +144,7 @@ const thesaurusDatasource = (services) => {
     }
 
 // ondblclick dans le thesaurus
-    function edit_dblclickThesaurus(event) {
+    function onSelectTerm(event) {
         let e;
         for (e = event.srcElement ? event.srcElement : event.target; e && ((!e.tagName) || (!e.id)); e = e.parentNode);
 
@@ -146,19 +155,7 @@ const thesaurusDatasource = (services) => {
 
                     if (currentFieldIndex >= 0) {
                         let w = $(e).text();
-                        let field = parentOptions.fieldCollection.getActiveFieldIndex();
-                        if (field.multi) {
-                            $('#EditTextMultiValued', parentOptions.$container).val(w);
-                            $('#EditTextMultiValued').trigger('keyup.maxLength');
-                            appEvents.emit('recordEditor.addMultivaluedField', {
-                                value: $('#EditTextMultiValued', parentOptions.$container).val()
-                            })
-                            // _addMultivaluedField($('#EditTextMultiValued', parentOptions.$container).val(), null);
-                        } else {
-                            $editTextArea.val(w);
-                            $('#idEditZTextArea').trigger('keyup.maxLength');
-                            parentOptions.textareaIsDirty = true;
-                        }
+                        appEvents.emit('recordEditor.addValueFromDataSource', {value: w});
                     }
                     break;
                 default:
@@ -168,7 +165,7 @@ const thesaurusDatasource = (services) => {
     }
 
 // on ouvre ou ferme une branche de thesaurus
-    function edit_thesaurus_ow(id) {
+    function toggleBranch(id) {
         let o = document.getElementById('TH_K.' + id);
         if (o.className === 'o') {
             // on ferme
@@ -195,6 +192,10 @@ const thesaurusDatasource = (services) => {
         }
         return (false);
     }
+
+    appEvents.listenAll({
+        'recordEditor.userInputValue': searchValue
+    });
 
     return {initialize};
 };

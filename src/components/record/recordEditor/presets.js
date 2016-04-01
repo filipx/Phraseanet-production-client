@@ -222,7 +222,6 @@ const presetsModule = (services) => {
                     for (let fieldIndex in fields) {
                         let field = fieldCollection.getFieldByIndex(fieldIndex);
                         if (field.preset !== null) {
-                            console.log('ok a preset has been found')
                             for (let val in field.preset) {
                                 // fix : some (old, malformed) presets values may need trim()
                                 recordCollection.addRecordFieldValue(recordIndex, fieldIndex, {

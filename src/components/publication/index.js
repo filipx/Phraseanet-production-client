@@ -211,7 +211,6 @@ const publication = (services) => {
     };
 
     var openModal = function (data) {
-        console.log('publish edit')
         let buttons = {};
         let modal = dialog.create(services, {
             size: 'Full',

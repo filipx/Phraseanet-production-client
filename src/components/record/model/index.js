@@ -151,9 +151,9 @@ var recordField = function (databoxField, arrayValues) {
                 }
             }
 
-            if (window.console) {
+            /*if (window.console) {
                 console.log('adding a value : ', arrayValues[v]);
-            }
+            }*/
 
             this.datas.push(arrayValues[v]);
             first = false;
@@ -226,9 +226,9 @@ recordField.prototype = {
 
                     if (!this.hasValue(value, VocabularyId)) {
                         if (this.datas.length === 0) {
-                            if (window.console) {
+                            /*if (window.console) {
                                 console.log('Adding new value ', value);
-                            }
+                            }*/
                             this.datas.push(new recordFieldValue(null, value, VocabularyId));
                         } else {
                             if (window.console) {

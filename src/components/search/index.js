@@ -130,8 +130,8 @@ const search = (services) => {
             $dialog.getDomElement().find('.adv_options').show();
             $dialog.getDomElement().find('.adv_trigger').hide();
 
-            $dialog.getDomElement().find('form').bind('submit.conbo', function () {
-                $(this).unbind('submit.conbo');
+            $searchForm.on('submit', function () {
+                $(this).off('submit');
                 $dialog.close();
                 return false;
             });
@@ -217,9 +217,9 @@ const search = (services) => {
     };
 
     const onSearch = () => {
-        var data = $searchForm.serializeArray();
-
-        let searchPromise = $.ajax({
+        let data = $searchForm.serializeArray();
+        let searchPromise = {};
+        searchPromise = $.ajax({
             type: 'POST',
             url: `${url}prod/query/`,
             data: data,
@@ -611,7 +611,7 @@ const search = (services) => {
     const navigate = (page) => {
         $('#searchForm input[name="sel"]').val(searchResult.selection.serialize());
         $('#formAnswerPage').val(page);
-        $('#searchForm').submit();
+        $searchForm.submit();
     };
 
 

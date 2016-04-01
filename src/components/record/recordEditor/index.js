@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import _ from 'underscore';
 import * as appCommons from 'phraseanet-common';
 import {cleanTags} from '../../utils/utils';
 import {sprintf} from 'sprintf-js';
@@ -25,15 +26,14 @@ const recordEditorService = (services) => {
     let options = {};
     let stream = new Rx.Subject();
     let ETHSeeker;
-    var $editorContainer = null;
-    //$(document).ready(function () {
-
-
-    // idEditZTextArea
-    //});
-
+    let $editorContainer = null;
     let $ztextStatus;
     let $editTextArea;
+    let $editMonoValTextArea;
+    let $editMultiValTextArea;
+    let $toolsTabs;
+    let $idExplain;
+
     const initialize = () => {
         options = {};
         // options.curField = '?'; // "?";
@@ -51,9 +51,13 @@ const recordEditorService = (services) => {
 
         $ztextStatus = $('#ZTextStatus', options.$container);
         $editTextArea = $('#idEditZTextArea', options.$container);
-
-
+        $editMonoValTextArea = $('#ZTextMonoValued', options.$container);
+        $editMultiValTextArea = $('#EditTextMultiValued', options.$container);
+        $toolsTabs = $('#EDIT_MID_R .tabs');
+        $idExplain = $('#idExplain', options.$container);
+        onUserInputComplete = _.debounce(onUserInputComplete, 300);
         _bindEvents();
+
     };
 
     const _bindEvents = () => {
@@ -122,12 +126,10 @@ const recordEditorService = (services) => {
 
             .on('click', '.apply-multi-desc-action', (event) => {
                 event.preventDefault();
-                console.log('apply changes')
                 submitChanges({event});
             })
             .on('click', '.cancel-multi-desc-action', (event) => {
                 event.preventDefault();
-                console.log('cancel changes')
                 cancelChanges({event});
             })
 
@@ -212,18 +214,17 @@ const recordEditorService = (services) => {
         options.sbas_id = databoxId;
         options.what = mode;
         options = Object.assign(options, state);
-        $editTextArea = $('#idEditZTextArea', options.$container);
 
 
         options.fieldCollection = new FieldCollection(options.T_fields);
         options.statusCollection = new StatusCollection(options.T_statbits);
         options.recordCollection = new RecordCollection(options.T_records, options.fieldCollection, options.statusCollection, options.T_sgval);
 
-        $('#EditTextMultiValued').bind('keyup', function () {
+        $editMultiValTextArea.bind('keyup', function () {
             _reveal_mval($(this).val());
         });
 
-        $('#EDIT_MID_R .tabs').tabs();
+        $toolsTabs.tabs();
 
         $('#divS div.edit_field:odd').addClass('odd');
         $('#divS div').bind('mouseover', function () {
@@ -281,7 +282,7 @@ const recordEditorService = (services) => {
                 if (lval !== dateText) {
                     options.fieldLastValue = lval;
                     $editTextArea.val(dateText);
-                    $('#idEditZTextArea').trigger('keyup.maxLength');
+                    $editTextArea.trigger('keyup.maxLength');
                     options.textareaIsDirty = true;
                     validateFieldChanges(null, 'ok');
                 }
@@ -299,21 +300,28 @@ const recordEditorService = (services) => {
         }
 
 
-        // ETHSeeker = new _EditThesaurusSeeker(options.sbas_id);
         recordEditorLayout(services).initialize({$container: $editorContainer, parentOptions: options});
         presetsModule(services).initialize({$container: $editorContainer, parentOptions: options});
         // init plugins
         searchReplace(services).initialize({$container: $editorContainer, parentOptions: options});
         preview(services).initialize({$container: $editorContainer, parentOptions: options});
+
+
         geonameDatasource(services).initialize({
             $container: $editorContainer,
-            parentOptions: options
+            parentOptions: options,
+            $editTextArea,
+            $editMultiValTextArea
         });
+
         ETHSeeker = thesaurusDatasource(services).initialize({
             $container: $editorContainer,
             parentOptions: options,
-            $editTextArea
+            $editTextArea,
+            $editMultiValTextArea
         });
+
+
     }
 
     function _toggleGroupSelection() {
@@ -363,11 +371,11 @@ const recordEditorService = (services) => {
      */
     function onSelectField(evt, fieldIndex) {
 
-        document.getElementById('idEditZTextArea').blur();
-        document.getElementById('EditTextMultiValued').blur();
+        $editTextArea.blur();
+        $editMultiValTextArea.blur();
         $('.editDiaButtons', options.$container).hide();
 
-        $('#idEditZTextArea, #EditTextMultiValued').unbind('keyup.maxLength');
+        $($editTextArea, $editMultiValTextArea).unbind('keyup.maxLength');
         let fields = options.fieldCollection.getFields();
         let field = options.fieldCollection.getFieldByIndex(fieldIndex);
 
@@ -384,8 +392,8 @@ const recordEditorService = (services) => {
 
                 let name = field.required ? field.label + '<span style="font-weight:bold;font-size:16px;"> * </span>' : field.label;
                 $('#idFieldNameEdit', options.$container).html(name);
-
-                $('#idEditZTextArea, #EditTextMultiValued').autocomplete({
+                // attachFieldVocabularyAutocomplete
+                $($editTextArea, $editMultiValTextArea).autocomplete({
                     minLength: 2,
                     appendTo: '#idEditZone',
                     source: function (request, response) {
@@ -409,18 +417,21 @@ const recordEditorService = (services) => {
                     }
                 });
 
-
+                // attachFieldLengthRestriction
                 if (field.maxLength > 0) {
-                    var idexplain = $('#idExplain');
-                    idexplain.html('');
+                    $idExplain.html('');
 
-                    $('#idEditZTextArea, #EditTextMultiValued').bind('keyup.maxLength', function () {
+                    $($editTextArea, $editMultiValTextArea).bind('keyup.maxLength', function (event) {
+                        let $this = $(event.currentTarget);
                         var remaining = Math.max((field.maxLength - $(this).val().length), 0);
-                        idexplain.html("<span class='metadatas_restrictionsTips' tooltipsrc='../prod/tooltip/metas/restrictionsInfos/" + options.sbas_id + '/' + fieldIndex + "/'><img src='/assets/common/images/icons/help32.png' /><!--<img src='/assets/common/images/icons/alert.png' />--> Caracteres restants : " + (remaining) + '</span>');
-                        $('.metadatas_restrictionsTips', idexplain).tooltip();
+                        $idExplain.html(`
+                        <span class='metadatas_restrictionsTips' tooltipsrc="${url}prod/tooltip/metas/restrictionsInfos/${options.sbas_id}/${fieldIndex}/">
+                        <img src='/assets/common/images/icons/help32.png' /> Caracteres restants : ${remaining}</span>
+                        `);
+                        $('.metadatas_restrictionsTips', $idExplain).tooltip();
                     }).trigger('keyup.maxLength');
                 } else {
-                    $('#idExplain').html('');
+                    $idExplain.html('');
                 }
 
                 if (!field.multi) {
@@ -437,7 +448,7 @@ const recordEditorService = (services) => {
 
                     $ztextStatus.hide();
                     $('#ZTextMultiValued', options.$container).hide();
-                    $('#ZTextMonoValued', options.$container).show();
+                    $editMonoValTextArea.show();
 
                     if (field._status === 2) {
                         // heterogene
@@ -469,25 +480,25 @@ const recordEditorService = (services) => {
 
                     $('#idEditZone', options.$container).show();
 
-                    $('#idEditZTextArea').trigger('keyup.maxLength');
+                    $editTextArea.trigger('keyup.maxLength');
 
-                    self.setTimeout("document.getElementById('idEditZTextArea').focus();", 50);
+                    self.setTimeout(() => $editTextArea.focus(), 50);
                 } else {
                     // champ multivalue : liste
                     $ztextStatus.hide();
-                    $('#ZTextMonoValued', options.$container).hide();
+                    $editMonoValTextArea.hide();
                     $('#ZTextMultiValued', options.$container).show();
 
                     $('#idDivButtons', options.$container).hide();	// valeurs homogenes
 
                     _updateCurrentMval(fieldIndex);
 
-                    $('#EditTextMultiValued', options.$container).val('');
+                    $editMultiValTextArea.val('');
                     $('#idEditZone', options.$container).show();
 
-                    $('#EditTextMultiValued').trigger('keyup.maxLength');
+                    $editMultiValTextArea.trigger('keyup.maxLength');
 
-                    self.setTimeout("document.getElementById('EditTextMultiValued').focus();", 50);
+                    self.setTimeout(() => $editMultiValTextArea.focus(), 50);
 
                     //      reveal_mval();
                 }
@@ -568,9 +579,9 @@ const recordEditorService = (services) => {
                         let currentField = options.fieldCollection.getActiveField();
 
                         if (currentField.multi === true) {
-                            $('#EditTextMultiValued', options.$container).val(label);
-                            $('#EditTextMultiValued').trigger('keyup.maxLength');
-                            addValueInMultivaluedField({value: $('#EditTextMultiValued', options.$container).val()});
+                            $editMultiValTextArea.val(label);
+                            $editMultiValTextArea.trigger('keyup.maxLength');
+                            addValueInMultivaluedField({value: $editMultiValTextArea.val()});
                         } else {
                             if (appCommons.utilsModule.is_ctrl_key(e)) {
                                 var t = $editTextArea.val();
@@ -578,7 +589,7 @@ const recordEditorService = (services) => {
                             } else {
                                 $editTextArea.val(label);
                             }
-                            $('#idEditZTextArea').trigger('keyup.maxLength');
+                            $editTextArea.trigger('keyup.maxLength');
                             options.textareaIsDirty = true;
                             if (currentField._status !== 2) {
                                 validateFieldChanges(evt, 'ask_ok');
@@ -684,14 +695,14 @@ const recordEditorService = (services) => {
     function enableStatusField(evt) {
         $('.editDiaButtons', options.$container).hide();
 
-        document.getElementById('idEditZTextArea').blur();
-        document.getElementById('EditTextMultiValued').blur();
+        $editTextArea.blur();
+        $editMultiValTextArea.blur();
 
         $('#idFieldNameEdit', options.$container).html('[STATUS]');
-        $('#idExplain', options.$container).html('&nbsp;');
+        $idExplain.html('&nbsp;');
 
         $('#ZTextMultiValued', options.$container).hide();
-        $('#ZTextMonoValued', options.$container).hide();
+        $editMonoValTextArea.hide();
         $ztextStatus.show();
 
         $('#idEditZone', options.$container).show();
@@ -822,7 +833,7 @@ const recordEditorService = (services) => {
         if (action === 'cancel') {
             // on restore le contenu du champ
             $editTextArea.val(options.fieldLastValue);
-            $('#idEditZTextArea').trigger('keyup.maxLength');
+            $editTextArea.trigger('keyup.maxLength');
             options.textareaIsDirty = false;
             return (true);
         }
@@ -1172,13 +1183,19 @@ const recordEditorService = (services) => {
             vocabularyId = null;
         }
 
-        let textZone = $('#EditTextMultiValued');
-
-        if (currentField.tbranch) {
-            if (value !== '') {
-                ETHSeeker.search(value);
-            }
-        }
+        /*if (currentField.tbranch) {
+         if (value !== '') {
+         appEvents.emit('recordEditor.userInputValue', {
+         context: {
+         event: false,
+         currentField,
+         },
+         value
+         });
+         // ETHSeeker.search(value);
+         }
+         }*/
+        onUserInputComplete(false, value, currentField);
 
         if (value !== '') {
             // 		let nsel = 0;
@@ -1209,7 +1226,7 @@ const recordEditorService = (services) => {
             $('.editDiaButtons', options.$container).show();
         }
 
-        textZone.trigger('focus');
+        $editMultiValTextArea.trigger('focus');
         return (true);
     }
 
@@ -1260,6 +1277,7 @@ const recordEditorService = (services) => {
         refreshFields(null);
     }
 
+
     // ---------------------------------------------------------------------------
     // on a clique sur une des multi-valeurs dans la liste
     // ---------------------------------------------------------------------------
@@ -1306,20 +1324,7 @@ const recordEditorService = (services) => {
     }
 
 
-    // ---------------------------------------------------------------------------
-// on a clique sur le peudo champ 'status'
-// ---------------------------------------------------------------------------
-    /*function edit_mdwn_status(evt) {
-     if (!editor.textareaIsDirty || edit_validField(evt, "ask_ok") == true)
-     _editStatus(evt);
-     evt.cancelBubble = true;
-     if (evt.stopPropagation)
-     evt.stopPropagation();
-     return(false);
-     }*/
-
-
-    function _onTextareaKeyDown(event) {
+    const _onTextareaKeyDown = (event) => {
         let currentField = options.fieldCollection.getActiveField();
         let $el = $(event.currentTarget);
         let cancelKey = false;
@@ -1347,27 +1352,23 @@ const recordEditorService = (services) => {
     // ----------------------------------------------------------------------------------------------
 // des events sur le textarea pour tracker la selection (chercher dans le thesaurus...)
 // ----------------------------------------------------------------------------------------------
-    function _onTextareaMouseDown(evt) {
+    const _onTextareaMouseDown = (evt) => {
         evt.cancelBubble = true;
         return (true);
     }
 
     // mouse up textarea
-    function _onTextareaMouseUp(event, obj) {
+    const _onTextareaMouseUp = (event, obj) => {
         let currentField = options.fieldCollection.getActiveField();
         let $el = $(event.currentTarget);
         let value = $el.val();
 
-        if (currentField.tbranch) {
-            if (value !== '') {
-                ETHSeeker.search(value);
-            }
-        }
+        onUserInputComplete(event, value, currentField);
         return (true);
     }
 
     // key up textarea
-    function _onTextareaKeyUp(event, obj) {
+    const _onTextareaKeyUp = (event, obj) => {
         let currentField = options.fieldCollection.getActiveField();
         let $el = $(event.currentTarget);
         let cancelKey = false;
@@ -1393,21 +1394,129 @@ const recordEditorService = (services) => {
             options.textareaIsDirty = true;
         }
 
-        let s = $el.val(); // obj.value;
-        if (currentField.tbranch) {
-            if (s !== '') {
-                ETHSeeker.search(s);
-            }
-        }
+        let searchValue = $el.val(); // obj.value;
+
+        onUserInputComplete(event, searchValue, currentField);
         return (true);
     }
+
+
+    /**
+     * debounceable method
+     * @param event
+     * @param value
+     * @param field
+     */
+    let onUserInputComplete = (event, value, field) => {
+        if (value !== '') {
+            appEvents.emit('recordEditor.userInputValue', {
+                event,
+                value,
+                field
+            });
+        }
+    };
+
+    /**
+     * add field value from a datasource
+     * if the field is not specified, use active one
+     * @param params
+     */
+    const addValueFromDataSource = (params) => {
+        let {value, field} = params;
+
+        if (field === undefined || field === null) {
+            field = options.fieldCollection.getActiveField();
+        }
+
+        if (field.multi) {
+            $editMultiValTextArea.val(value);
+            $editMultiValTextArea.trigger('keyup.maxLength');
+            appEvents.emit('recordEditor.addMultivaluedField', {
+                value: $editMultiValTextArea.val()
+            });
+        } else {
+            $editTextArea.val(value);
+            $editTextArea.trigger('keyup.maxLength');
+            options.textareaIsDirty = true;
+        }
+    };
+
+    /**
+     * Bulk field update
+     * @param params
+     */
+    const addPresetValuesFromDataSource = (params) => {
+        let {data, mode} = params;
+        let records = options.recordCollection.getRecords();
+        let fields = options.fieldCollection.getFields();
+
+        for (let fieldIndex in fields) {
+            let field = options.fieldCollection.getFieldByIndex(fieldIndex);
+            field.preset = null;
+            if (typeof (data.fields[field.name]) !== 'undefined') {
+                field.preset = data.fields[field.name];
+            }
+            options.fieldCollection.updateField(fieldIndex, field);
+        }
+
+        // apply new preset value on each record's fields
+        for (let recordIndex in records) {
+            let record = options.recordCollection.getRecordByIndex(recordIndex);
+            if (!record._selected) {
+                continue;
+            }
+
+            for (let fieldIndex in fields) {
+                let field = options.fieldCollection.getFieldByIndex(fieldIndex);
+                if (field.preset !== null) {
+                    for (let val in field.preset) {
+
+                        // don't update filled fields in emptyOnly mode:
+                        if (mode === 'emptyOnly' && field._value !== '' && !record.fields[fieldIndex].isDirty()) {
+                            continue;
+                        }
+
+                        options.recordCollection.addRecordFieldValue(recordIndex, fieldIndex, {
+                            value: field.preset[val].trim(), merge: false, vocabularyId: null
+                        });
+                    }
+                }
+            }
+        }
+        appEvents.emit('recordEditor.onUpdateFields');
+    };
+
+    const addToolTab = (tabProperties, position = 0) => {
+        const firstTab = $('ul', $toolsTabs).find('li:eq(0)');
+        const newTab = `<li><a href="#${tabProperties.id}">${tabProperties.title}</a></li>`;
+        firstTab.after(newTab);
+
+        const firstTabContent = $toolsTabs.find('div:eq(0)');
+        firstTabContent.after(`<div id="${tabProperties.id}"></div>`);
+        $toolsTabs.tabs();
+        $toolsTabs.tabs('refresh');
+
+        appEvents.emit('recordEditor.addToolTab.complete', {
+            origParams: tabProperties
+        })
+    };
+    const activateToolTab = (tabId) => {
+        $toolsTabs.tabs('option', 'active', $toolsTabs.find(`#${tabId}`).index() - 1);
+    };
 
     appEvents.listenAll({
         'recordEditor.start': startThisEditing,
         'recordEditor.addMultivaluedField': addValueInMultivaluedField,
         'recordEditor.onUpdateFields': refreshFields,
         'recordEditor.submitAllChanges': submitChanges,
-        'recordEditor.cancelAllChanges': cancelChanges
+        'recordEditor.cancelAllChanges': cancelChanges,
+
+        'recordEditor.addValueFromDataSource': addValueFromDataSource,
+        'recordEditor.addPresetValuesFromDataSource': addPresetValuesFromDataSource,
+
+        'recordEditor.addToolTab': addToolTab,
+        'recordEditor.activateToolTab': activateToolTab
     });
 
 
