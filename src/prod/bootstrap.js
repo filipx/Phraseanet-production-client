@@ -28,9 +28,10 @@ class Bootstrap {
     appPublication;
     appWorkzone;
     appSearch;
+    ready;
 
     constructor(userConfig) {
-
+        this.ready = $.Deferred();
         const configuration = Object.assign({}, defaultConfig, userConfig);
 
         this.appEvents = new Emitter();
@@ -49,8 +50,10 @@ class Bootstrap {
                 this.onConfigReady();
             });
         this.utils = utils;
-
         return this;
+    }
+    getServices() {
+        return this.ready;
     }
 
     onConfigReady() {
@@ -118,13 +121,17 @@ class Bootstrap {
 
             this.appWorkzone.initialize();
             this.appPublication.initialize();
-
+            this.ready.resolve({
+                search: this.appSearch,
+                workzone: this.appWorkzone
+            })
             // proxy selection
             this.appSearch.getResultSelectionStream().subscribe((data) => {
                 this.appEvents.emit('broadcast.searchResultSelection', data);
             });
             // on navigation object changes
             this.appSearch.getResultNavigationStream().subscribe((data) => {
+
                 this.appEvents.emit('broadcast.searchResultNavigation', data);
             });
 
