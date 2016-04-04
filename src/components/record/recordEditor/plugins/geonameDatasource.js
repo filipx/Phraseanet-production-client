@@ -14,17 +14,20 @@ const geonameDatasource = (services) => {
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
 
-        appEvents.emit('recordEditor.addToolTab', {
-            id: tabContainerName,
-            title: localeService.t('Geoname Datasource')
+        appEvents.emit('recordEditor.appendTab', {
+            tabProperties: {
+                id: tabContainerName,
+                title: localeService.t('Geoname Datasource'),
+            },
+            position: 1
         });
         // reset for each fields
         autoActivateTabOnce = true;
     };
 
-    const onAddToolTabComplete = (params) => {
+    const onTabAdded = (params) => {
         let {origParams} = params;
-        if (origParams.id === tabContainerName) {
+        if (origParams.tabProperties.id === tabContainerName) {
             $tabContent = $(`#${tabContainerName}`, $container);
             bindEvents();
         }
@@ -198,7 +201,7 @@ const geonameDatasource = (services) => {
     };
 
     appEvents.listenAll({
-        'recordEditor.addToolTab.complete': onAddToolTabComplete,
+        'recordEditor.appendTab.complete': onTabAdded,
         'recordEditor.userInputValue': searchValue
     });
 

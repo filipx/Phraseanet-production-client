@@ -91,6 +91,15 @@ module.exports = {
             include: path.join(__dirname, '../../src')
         }],
         loaders: [{
+            test: /\.css$/,
+            loader: 'style-loader!css-loader'
+        }, {
+            test: /\.png/,
+            loader: 'url-loader?limit=100000'
+        },  {
+            test: /\.(png|jpg|jpeg|gif)$/,
+            loader: 'file-loader'
+        }, {
             test: /\.js$/,
             exclude: /node_modules\/(?!phraseanet-common)/,
             loader: 'babel',

@@ -30,14 +30,29 @@ Emitter.prototype.listenAll = function (group, name, handler) {
     }
 };
 
-Emitter.prototype.dispose = function () {
+Emitter.prototype.disposeOf = function (startWith) {
+    var search = new RegExp('^\\$' + startWith);
     var subjects = this.subjects;
     for (let prop in subjects) {
         if (hasOwnProp.call(subjects, prop)) {
-            subjects[prop].dispose();
+            if (search.test(prop)) {
+                console.log('remove', prop);
+                subjects[prop].dispose();
+            }
         }
     }
 
     this.subjects = {};
 };
+/*Emitter.prototype.dispose = function () {
+    var subjects = this.subjects;
+    for (let prop in subjects) {
+        if (hasOwnProp.call(subjects, prop)) {
+            console.log('dispose of', prop)
+            subjects[prop].dispose();
+        }
+    }
+
+    this.subjects = {};
+};*/
 export default Emitter;

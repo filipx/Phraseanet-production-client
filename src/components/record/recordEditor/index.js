@@ -10,6 +10,7 @@ import searchReplace from './plugins/searchReplace';
 import preview from './plugins/preview';
 import thesaurusDatasource from './plugins/thesaurusDatasource';
 import geonameDatasource from './plugins/geonameDatasource';
+import leafletMap from './plugins/leafletMap';
 
 import RecordCollection from './models/recordCollection';
 import FieldCollection from './models/fieldCollection';
@@ -24,7 +25,7 @@ const recordEditorService = (services) => {
     const url = configService.get('baseUrl');
     let $container = null;
     let options = {};
-    let stream = new Rx.Subject();
+    let recordConfig = {};
     let ETHSeeker;
     let $editorContainer = null;
     let $ztextStatus;
@@ -34,30 +35,34 @@ const recordEditorService = (services) => {
     let $toolsTabs;
     let $idExplain;
 
-    const initialize = () => {
+    const initialize = (params) => {
+        let initWith = {$container, recordConfig} = params;
         options = {};
-        // options.curField = '?'; // "?";
-        options.$container = $('#idFrameE');
+        $editorContainer = options.$container = $container; //$('#idFrameE');
         options.textareaIsDirty = false;
         options.fieldLastValue = '';
         options.lastClickId = null;
         options.sbas_id = false;
         options.what = false;
-        // editor.regbasprid = false;
         options.newrepresent = false;
-        // editor.ssel = false;
 
-        $editorContainer = $('#EDITWINDOW');
+        // $editorContainer = $('#EDITWINDOW');
 
         $ztextStatus = $('#ZTextStatus', options.$container);
         $editTextArea = $('#idEditZTextArea', options.$container);
         $editMonoValTextArea = $('#ZTextMonoValued', options.$container);
         $editMultiValTextArea = $('#EditTextMultiValued', options.$container);
-        $toolsTabs = $('#EDIT_MID_R .tabs');
+        $toolsTabs = $('#EDIT_MID_R .tabs', options.$container);
         $idExplain = $('#idExplain', options.$container);
+
+        $toolsTabs.tabs({
+            activate: function (event, ui) {
+                appEvents.emit('recordEditor.tabChange');
+            }
+        });
         onUserInputComplete = _.debounce(onUserInputComplete, 300);
         _bindEvents();
-
+        startThisEditing(recordConfig);
     };
 
     const _bindEvents = () => {
@@ -206,25 +211,23 @@ const recordEditorService = (services) => {
             });
             return;
         }
-
         if (notActionable > 0) {
             alert(notActionableMsg);
         }
 
+        console.log('should init with ', Object.assign({}, options));
         options.sbas_id = databoxId;
         options.what = mode;
         options = Object.assign(options, state);
 
-
-        options.fieldCollection = new FieldCollection(options.T_fields);
-        options.statusCollection = new StatusCollection(options.T_statbits);
-        options.recordCollection = new RecordCollection(options.T_records, options.fieldCollection, options.statusCollection, options.T_sgval);
+        options.fieldCollection = new FieldCollection(state.T_fields);
+        options.statusCollection = new StatusCollection(state.T_statbits);
+        options.recordCollection = new RecordCollection(state.T_records, options.fieldCollection, options.statusCollection, state.T_sgval);
 
         $editMultiValTextArea.bind('keyup', function () {
             _reveal_mval($(this).val());
         });
 
-        $toolsTabs.tabs();
 
         $('#divS div.edit_field:odd').addClass('odd');
         $('#divS div').bind('mouseover', function () {
@@ -308,6 +311,13 @@ const recordEditorService = (services) => {
 
 
         geonameDatasource(services).initialize({
+            $container: $editorContainer,
+            parentOptions: options,
+            $editTextArea,
+            $editMultiValTextArea
+        });
+
+        leafletMap(services).initialize({
             $container: $editorContainer,
             parentOptions: options,
             $editTextArea,
@@ -1055,10 +1065,16 @@ const recordEditorService = (services) => {
              e.style.display = "";
              }*/
             // display all thesaurus
-            $('.thesaurus-db-root').show(); // @TODO to be removed
+            //$('.thesaurus-db-root').show(); // @TODO to be removed
+            $toolsTabs.hide().tabs('destroy');
+            $container.find('*').addBack().off();
+            $container.fadeOut().empty();
+            options = {};
+            appEvents.disposeOf('recordEditor.appendTab');
+            setTimeout(() => {
+                //$('#EDITWINDOW').fadeOut();
 
-            $editorContainer.find('*').addBack().off();
-            self.setTimeout(() => $('#EDITWINDOW').fadeOut(), 100);
+            }, 100);
 
         }
     }
@@ -1487,26 +1503,35 @@ const recordEditorService = (services) => {
         appEvents.emit('recordEditor.onUpdateFields');
     };
 
-    const addToolTab = (tabProperties, position = 0) => {
-        const firstTab = $('ul', $toolsTabs).find('li:eq(0)');
+    const appendTab = (params) => {
+        let {tabProperties, position} = params;
+        console.log('append', tabProperties.id)
+        const $appendAfterTab = $(`.tabs ul li:eq(${position - 1})`, $container);
+
         const newTab = `<li><a href="#${tabProperties.id}">${tabProperties.title}</a></li>`;
-        firstTab.after(newTab);
+        $appendAfterTab.after(newTab);
 
-        const firstTabContent = $toolsTabs.find('div:eq(0)');
-        firstTabContent.after(`<div id="${tabProperties.id}"></div>`);
-        $toolsTabs.tabs();
-        $toolsTabs.tabs('refresh');
+        const appendAfterTabContent = $(`.tabs > div:eq(${position - 1})`, $container);
+        console.log('append after', appendAfterTabContent)
+        appendAfterTabContent.after(`<div id="${tabProperties.id}"></div>`);
 
-        appEvents.emit('recordEditor.addToolTab.complete', {
-            origParams: tabProperties
+
+        try {
+            $toolsTabs.tabs('refresh')
+
+        } catch (e) {
+        }
+
+        appEvents.emit('recordEditor.appendTab.complete', {
+            origParams: params
         })
     };
     const activateToolTab = (tabId) => {
+        console.log('activate new tab')
         $toolsTabs.tabs('option', 'active', $toolsTabs.find(`#${tabId}`).index() - 1);
     };
 
     appEvents.listenAll({
-        'recordEditor.start': startThisEditing,
         'recordEditor.addMultivaluedField': addValueInMultivaluedField,
         'recordEditor.onUpdateFields': refreshFields,
         'recordEditor.submitAllChanges': submitChanges,
@@ -1515,7 +1540,7 @@ const recordEditorService = (services) => {
         'recordEditor.addValueFromDataSource': addValueFromDataSource,
         'recordEditor.addPresetValuesFromDataSource': addPresetValuesFromDataSource,
 
-        'recordEditor.addToolTab': addToolTab,
+        'recordEditor.appendTab': appendTab,
         'recordEditor.activateToolTab': activateToolTab
     });
 
@@ -1523,7 +1548,6 @@ const recordEditorService = (services) => {
     return {
         initialize,
         //onGlobalKeydown: onGlobalKeydown,
-        startThisEditing
     };
 };
 export default recordEditorService;
