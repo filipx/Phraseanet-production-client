@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 const thesaurusDatasource = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const {configService, localeService, recordEditorEvents} = services;
     let $container = null;
     let parentOptions = {};
     let ETHSeeker = null;
@@ -155,7 +155,7 @@ const thesaurusDatasource = (services) => {
 
                     if (currentFieldIndex >= 0) {
                         let w = $(e).text();
-                        appEvents.emit('recordEditor.addValueFromDataSource', {value: w});
+                        recordEditorEvents.emit('recordEditor.addValueFromDataSource', {value: w});
                     }
                     break;
                 default:
@@ -193,7 +193,7 @@ const thesaurusDatasource = (services) => {
         return (false);
     }
 
-    appEvents.listenAll({
+    recordEditorEvents.listenAll({
         'recordEditor.userInputValue': searchValue
     });
 

@@ -11,7 +11,7 @@ import preview from './plugins/preview';
 import thesaurusDatasource from './plugins/thesaurusDatasource';
 import geonameDatasource from './plugins/geonameDatasource';
 import leafletMap from './plugins/leafletMap';
-
+import Emitter from '../../core/emitter';
 import RecordCollection from './models/recordCollection';
 import FieldCollection from './models/fieldCollection';
 import StatusCollection from './models/statusCollection';
@@ -23,6 +23,7 @@ require('phraseanet-common/src/components/vendors/contextMenu');
 const recordEditorService = (services) => {
     const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
+    let recordEditorEvents = new Emitter();
     let $container = null;
     let options = {};
     let recordConfig = {};
@@ -57,7 +58,7 @@ const recordEditorService = (services) => {
 
         $toolsTabs.tabs({
             activate: function (event, ui) {
-                appEvents.emit('recordEditor.tabChange');
+                recordEditorEvents.emit('recordEditor.tabChange');
             }
         });
         onUserInputComplete = _.debounce(onUserInputComplete, 300);
@@ -302,29 +303,31 @@ const recordEditorService = (services) => {
 
         }
 
+        let recordEditorServices = {configService, localeService, recordEditorEvents};
 
-        recordEditorLayout(services).initialize({$container: $editorContainer, parentOptions: options});
-        presetsModule(services).initialize({$container: $editorContainer, parentOptions: options});
+
+        recordEditorLayout(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
+        presetsModule(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
         // init plugins
-        searchReplace(services).initialize({$container: $editorContainer, parentOptions: options});
-        preview(services).initialize({$container: $editorContainer, parentOptions: options});
+        searchReplace(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
+        preview(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
 
 
-        geonameDatasource(services).initialize({
+        geonameDatasource(recordEditorServices).initialize({
             $container: $editorContainer,
             parentOptions: options,
             $editTextArea,
             $editMultiValTextArea
         });
 
-        leafletMap(services).initialize({
+        leafletMap(recordEditorServices).initialize({
             $container: $editorContainer,
             parentOptions: options,
             $editTextArea,
             $editMultiValTextArea
         });
 
-        ETHSeeker = thesaurusDatasource(services).initialize({
+        ETHSeeker = thesaurusDatasource(recordEditorServices).initialize({
             $container: $editorContainer,
             parentOptions: options,
             $editTextArea,
@@ -972,7 +975,7 @@ const recordEditorService = (services) => {
         if (selected.length === 1) {
 
             let r = selected.attr('id').split('_').pop();
-            appEvents.emit('recordEditor.onSelectRecord', {
+            recordEditorEvents.emit('recordEditor.onSelectRecord', {
                 recordIndex: r
             })
         }
@@ -1020,14 +1023,15 @@ const recordEditorService = (services) => {
             type: 'POST',
             success: function (data) {
                 if (options.what === 'GRP' || options.what === 'SSEL') {
-                    appEvents.emit('workzone.refresh', {
+                    recordEditorEvents.emit('workzone.refresh', {
                         basketId: 'current'
                     });
                 }
-                $('#Edit_copyPreset_dlg').remove();
-                $('#EDITWINDOW').hide();
-                $editorContainer.find('*').addBack().off();
-                appEvents.emit('preview.doReload');
+                closeModal();
+                // $('#Edit_copyPreset_dlg').remove();
+                // $('#EDITWINDOW').hide();
+                // $editorContainer.find('*').addBack().off();
+                recordEditorEvents.emit('preview.doReload');
                 return;
             }
         });
@@ -1053,30 +1057,20 @@ const recordEditorService = (services) => {
 
         dirty = options.recordCollection.isDirty();
         if (!dirty || confirm(localeService.t('confirm_abandon'))) {
-            $('#Edit_copyPreset_dlg').remove();
-            $('#idFrameE .ww_content', options.$container).empty();
-
-            // on reaffiche tous les thesaurus
-            /*for (let i in p4.thesau.thlist)	// tous les thesaurus
-             {
-             let bid = p4.thesau.thlist[i].sbas_id;
-             let e = document.getElementById('TH_T.' + bid + '.T');
-             if (e)
-             e.style.display = "";
-             }*/
-            // display all thesaurus
-            //$('.thesaurus-db-root').show(); // @TODO to be removed
-            $toolsTabs.hide().tabs('destroy');
-            $container.find('*').addBack().off();
-            $container.fadeOut().empty();
-            options = {};
-            appEvents.disposeOf('recordEditor.appendTab');
-            setTimeout(() => {
-                //$('#EDITWINDOW').fadeOut();
-
-            }, 100);
+            closeModal();
 
         }
+    }
+    const closeModal = () => {
+        $('#Edit_copyPreset_dlg').remove();
+        $('#idFrameE .ww_content', options.$container).empty();
+
+        $toolsTabs.hide().tabs('destroy');
+        $container.find('*').addBack().off();
+        $container.fadeOut().empty();
+        options = {};
+        recordEditorEvents.dispose();
+       //  appEvents.disposeOf('recordEditor.appendTab');
     }
 
 
@@ -1425,7 +1419,7 @@ const recordEditorService = (services) => {
      */
     let onUserInputComplete = (event, value, field) => {
         if (value !== '') {
-            appEvents.emit('recordEditor.userInputValue', {
+            recordEditorEvents.emit('recordEditor.userInputValue', {
                 event,
                 value,
                 field
@@ -1448,7 +1442,7 @@ const recordEditorService = (services) => {
         if (field.multi) {
             $editMultiValTextArea.val(value);
             $editMultiValTextArea.trigger('keyup.maxLength');
-            appEvents.emit('recordEditor.addMultivaluedField', {
+            recordEditorEvents.emit('recordEditor.addMultivaluedField', {
                 value: $editMultiValTextArea.val()
             });
         } else {
@@ -1500,7 +1494,7 @@ const recordEditorService = (services) => {
                 }
             }
         }
-        appEvents.emit('recordEditor.onUpdateFields');
+        recordEditorEvents.emit('recordEditor.onUpdateFields');
     };
 
     const appendTab = (params) => {
@@ -1522,7 +1516,7 @@ const recordEditorService = (services) => {
         } catch (e) {
         }
 
-        appEvents.emit('recordEditor.appendTab.complete', {
+        recordEditorEvents.emit('recordEditor.appendTab.complete', {
             origParams: params
         })
     };
@@ -1531,7 +1525,7 @@ const recordEditorService = (services) => {
         $toolsTabs.tabs('option', 'active', $toolsTabs.find(`#${tabId}`).index() - 1);
     };
 
-    appEvents.listenAll({
+    recordEditorEvents.listenAll({
         'recordEditor.addMultivaluedField': addValueInMultivaluedField,
         'recordEditor.onUpdateFields': refreshFields,
         'recordEditor.submitAllChanges': submitChanges,

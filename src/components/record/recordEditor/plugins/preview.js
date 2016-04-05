@@ -2,11 +2,11 @@ import $ from 'jquery';
 require('jquery-ui');
 
 const preview = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const {configService, localeService, recordEditorEvents} = services;
     let $container = null;
     let parentOptions = {};
 
-    appEvents.listenAll({
+    recordEditorEvents.listenAll({
         // @TODO debounce
         'recordEditor.uiResize': _setPreviewEdit,
         'recordEditor.onSelectRecord': _previewEdit

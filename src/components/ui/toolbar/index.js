@@ -19,6 +19,7 @@ const toolbar = (services) => {
 
     appEvents.listenAll({
         'broadcast.searchResultSelection': (selection) => {
+            console.log('selection have changed', selection.serialized);
             searchSelection = selection.serialized;
         },
         'broadcast.workzoneResultSelection': (selection) => {
@@ -49,6 +50,7 @@ const toolbar = (services) => {
             group: null, //
             type: null // story | basket
         };
+        console.log('searchSelection', searchSelection)
         switch (from) {
             case 'search-result':
                 if (searchSelection.length > 0) {

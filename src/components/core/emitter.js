@@ -44,15 +44,14 @@ Emitter.prototype.disposeOf = function (startWith) {
 
     this.subjects = {};
 };
-/*Emitter.prototype.dispose = function () {
+Emitter.prototype.dispose = function () {
     var subjects = this.subjects;
     for (let prop in subjects) {
         if (hasOwnProp.call(subjects, prop)) {
-            console.log('dispose of', prop)
             subjects[prop].dispose();
         }
     }
 
     this.subjects = {};
-};*/
+};
 export default Emitter;

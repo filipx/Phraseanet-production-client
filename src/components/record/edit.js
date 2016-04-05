@@ -73,6 +73,7 @@ const editRecord = (services) => {
 
     // open Modal
     function _doEdit(options) {
+        console.log('do edit', options)
         let {type, value} = options;
         var datas = {
             lst: '',

@@ -124,9 +124,10 @@ class Bootstrap {
             this.ready.resolve({
                 search: this.appSearch,
                 workzone: this.appWorkzone
-            })
+            });
             // proxy selection
             this.appSearch.getResultSelectionStream().subscribe((data) => {
+                console.log('should broadcast')
                 this.appEvents.emit('broadcast.searchResultSelection', data);
             });
             // on navigation object changes

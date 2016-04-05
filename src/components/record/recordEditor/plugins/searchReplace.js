@@ -7,11 +7,11 @@ const humane = require('humane-js');
 // EditReplace
 
 const searchReplace = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const {configService, localeService, recordEditorEvents} = services;
     let $container = null;
     let tRecords = {};
     let parentOptions = {};
-    appEvents.listenAll({
+    recordEditorEvents.listenAll({
         'recordEditor.plugin.searchReplace.replace': 'replace'
     });
 
@@ -28,7 +28,7 @@ const searchReplace = (services) => {
 
             // @TODO - reactivate humane
             // humane.info($.sprintf(localeService.t('nFieldsChanged', n)));
-            appEvents.emit('recordEditor.onUpdateFields', ntRecords);
+            recordEditorEvents.emit('recordEditor.onUpdateFields', ntRecords);
         });
 
 

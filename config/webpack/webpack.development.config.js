@@ -121,6 +121,9 @@ module.exports = {
         }, {
             test: require.resolve('bootstrap-multiselect'),
             loader: "imports?this=>window"
+        }, {
+            test: /\.json$/,
+            loader: "json"
         }]
     },
     resolve: {
