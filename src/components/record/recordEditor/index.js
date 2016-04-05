@@ -216,7 +216,6 @@ const recordEditorService = (services) => {
             alert(notActionableMsg);
         }
 
-        console.log('should init with ', Object.assign({}, options));
         options.sbas_id = databoxId;
         options.what = mode;
         options = Object.assign(options, state);
@@ -1499,14 +1498,12 @@ const recordEditorService = (services) => {
 
     const appendTab = (params) => {
         let {tabProperties, position} = params;
-        console.log('append', tabProperties.id)
         const $appendAfterTab = $(`.tabs ul li:eq(${position - 1})`, $container);
 
         const newTab = `<li><a href="#${tabProperties.id}">${tabProperties.title}</a></li>`;
         $appendAfterTab.after(newTab);
 
         const appendAfterTabContent = $(`.tabs > div:eq(${position - 1})`, $container);
-        console.log('append after', appendAfterTabContent)
         appendAfterTabContent.after(`<div id="${tabProperties.id}"></div>`);
 
 
@@ -1521,7 +1518,6 @@ const recordEditorService = (services) => {
         })
     };
     const activateToolTab = (tabId) => {
-        console.log('activate new tab')
         $toolsTabs.tabs('option', 'active', $toolsTabs.find(`#${tabId}`).index() - 1);
     };
 

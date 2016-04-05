@@ -62,7 +62,7 @@ const leafletMap = (services) => {
 
             if (pois.length > 0) {
                 if (poiIsValid(pois[0])) {
-                    defaultPosition = [pois[0].Longitude, pois[0].Latitude];
+                    defaultPosition = [pois[0].Latitude, pois[0].Longitude];
                     defaultZoom = 13;
                 }
             }
@@ -75,7 +75,7 @@ const leafletMap = (services) => {
                         type: 'Feature',
                         geometry: {
                             type: 'Point',
-                            coordinates: [poi.Longitude, poi.Latitude]
+                            coordinates: [poi.Latitude, poi.Longitude]
                         },
                         properties: {
                             description: `<p>${poi.FileName}</p>`,
@@ -98,7 +98,7 @@ const leafletMap = (services) => {
             for (let poiIndex in pois) {
                 let poi = pois[poiIndex];
                 if (poiIsValid(poi)) {
-                    let poiMark = L.marker([poi.Longitude, poi.Latitude]).addTo(map)
+                    let poiMark = L.marker([poi.Latitude, poi.Longitude]).addTo(map)
                         .bindPopup(`<p>${poi.FileName}</p>`);
                 }
             }

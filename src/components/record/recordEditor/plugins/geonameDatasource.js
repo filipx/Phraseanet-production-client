@@ -13,7 +13,6 @@ const geonameDatasource = (services) => {
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
-        console.log('[appendTab][emit] geonameDatasource')
         recordEditorEvents.emit('recordEditor.appendTab', {
             tabProperties: {
                 id: tabContainerName,

@@ -13,7 +13,6 @@ const editRecord = (services) => {
     const initialize = () => {
 
 
-        console.log('recordEditor initialization', recordEditor)
         $container = $('body');
         $container.on('click', '.edit-record-action', function (event) {
             event.preventDefault();
@@ -73,7 +72,6 @@ const editRecord = (services) => {
 
     // open Modal
     function _doEdit(options) {
-        console.log('do edit', options)
         let {type, value} = options;
         var datas = {
             lst: '',

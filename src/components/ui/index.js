@@ -35,8 +35,8 @@ const ui = (services) => {
         preferences(services).initialize(options);
         order(services).initialize(options);
 
-        /*let editRecord = editRecordService(services);
-        editRecord.initialize();*/
+        let editRecord = editRecordService(services);
+        editRecord.initialize();
 
         let previewRecord = previewRecordService(services);
 
