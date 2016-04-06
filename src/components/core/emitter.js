@@ -36,7 +36,6 @@ Emitter.prototype.disposeOf = function (startWith) {
     for (let prop in subjects) {
         if (hasOwnProp.call(subjects, prop)) {
             if (search.test(prop)) {
-                console.log('remove', prop);
                 subjects[prop].dispose();
             }
         }

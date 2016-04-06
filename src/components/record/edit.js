@@ -49,7 +49,6 @@ const editRecord = (services) => {
             dataType: 'html',
             data: datas,
             success: (data) => {
-
                 $('#EDITWINDOW').removeClass('loading').empty().html(data);
                 // let recordEditor = recordEditorService(services);
                 recordEditor.initialize({

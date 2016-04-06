@@ -29,6 +29,13 @@ const cleanTags = function (string) {
         string = string.replace(RegExp(chars2replace[c].f, 'g'), chars2replace[c].t);
     }
     return string;
-}
+};
 
-export {escapeHtml, cleanTags};
+const generateRandStr = (sLength = 5) => {
+    var s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    return Array(sLength).join().split(',').map(function () {
+        return s.charAt(Math.floor(Math.random() * s.length));
+    }).join('');
+};
+
+export {escapeHtml, cleanTags, generateRandStr};

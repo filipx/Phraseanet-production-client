@@ -13,7 +13,7 @@ const geonameDatasource = (services) => {
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
-        recordEditorEvents.emit('recordEditor.appendTab', {
+        recordEditorEvents.emit('appendTab', {
             tabProperties: {
                 id: tabContainerName,
                 title: localeService.t('Geoname Datasource'),
@@ -205,7 +205,7 @@ const geonameDatasource = (services) => {
     };
 
     recordEditorEvents.listenAll({
-        'recordEditor.appendTab.complete': onTabAdded,
+        'appendTab.complete': onTabAdded,
         'recordEditor.userInputValue': searchValue
     });
 

@@ -10,7 +10,7 @@ import searchReplace from './plugins/searchReplace';
 import preview from './plugins/preview';
 import thesaurusDatasource from './plugins/thesaurusDatasource';
 import geonameDatasource from './plugins/geonameDatasource';
-import leafletMap from './plugins/leafletMap';
+import leafletMap from './../../geolocalisation/leafletMap';
 import Emitter from '../../core/emitter';
 import RecordCollection from './models/recordCollection';
 import FieldCollection from './models/fieldCollection';
@@ -58,7 +58,7 @@ const recordEditorService = (services) => {
 
         $toolsTabs.tabs({
             activate: function (event, ui) {
-                recordEditorEvents.emit('recordEditor.tabChange');
+                recordEditorEvents.emit('tabChange');
             }
         });
         onUserInputComplete = _.debounce(onUserInputComplete, 300);
@@ -319,11 +319,12 @@ const recordEditorService = (services) => {
             $editMultiValTextArea
         });
 
-        leafletMap(recordEditorServices).initialize({
+        leafletMap({configService, localeService, eventEmitter: recordEditorEvents}).initialize({
             $container: $editorContainer,
             parentOptions: options,
-            $editTextArea,
-            $editMultiValTextArea
+            tabOptions: {
+                position: 2
+            }
         });
 
         ETHSeeker = thesaurusDatasource(recordEditorServices).initialize({
@@ -969,17 +970,26 @@ const recordEditorService = (services) => {
         }
 
         $('#TH_Opreview .PNB10').empty();
-
+        let selection = [];
         let selected = $('#EDIT_FILM2 .diapo.selected');
         if (selected.length === 1) {
 
             let r = selected.attr('id').split('_').pop();
             recordEditorEvents.emit('recordEditor.onSelectRecord', {
                 recordIndex: r
-            })
+            });
+            selection.push(r);
+        } else {
+            for (let pos = 0; pos < selected.length; pos++) {
+                let $record = $(selected[pos]);
+                selection.push($record.attr('id').split('_').pop());
+            }
         }
 
         options.lastClickId = recordIndex;
+        recordEditorEvents.emit('recordSelection.changed', {
+            selection: loadSelectedRecords()
+        });
         refreshFields(event);
     }
 
@@ -1069,7 +1079,6 @@ const recordEditorService = (services) => {
         $container.fadeOut().empty();
         options = {};
         recordEditorEvents.dispose();
-       //  appEvents.disposeOf('recordEditor.appendTab');
     }
 
 
@@ -1496,6 +1505,42 @@ const recordEditorService = (services) => {
         recordEditorEvents.emit('recordEditor.onUpdateFields');
     };
 
+    /**
+     * get selected records field values
+     * @returns {Array}
+     */
+    const loadSelectedRecords = () => {
+        let records = options.recordCollection.getRecords();
+        let fields = options.fieldCollection.getFields();
+        let selectedRecords = [];
+        for (let recordIndex in records) {
+            let recordFieldValue = {};
+            let record = options.recordCollection.getRecordByIndex(recordIndex);
+            if (!record._selected) {
+                continue;
+            }
+            for (let fieldIndex in fields) {
+                let field = options.fieldCollection.getFieldByIndex(fieldIndex);
+                let value = null;
+
+                // retrieve original record value (of field)
+                if (field.multi) {
+                    value = record.fields[fieldIndex].getSerializedValues()
+                } else {
+                    let fieldData = record.fields[fieldIndex].getValue();
+                    if (fieldData !== null) {
+                        if (fieldData.datas !== undefined) {
+                            value = fieldData.datas.value;
+                        }
+                    }
+                }
+                recordFieldValue[field.name] = value;
+            }
+            selectedRecords.push(recordFieldValue);
+        }
+        return selectedRecords;
+    };
+
     const appendTab = (params) => {
         let {tabProperties, position} = params;
         const $appendAfterTab = $(`.tabs ul li:eq(${position - 1})`, $container);
@@ -1513,8 +1558,9 @@ const recordEditorService = (services) => {
         } catch (e) {
         }
 
-        recordEditorEvents.emit('recordEditor.appendTab.complete', {
-            origParams: params
+        recordEditorEvents.emit('appendTab.complete', {
+            origParams: params,
+            selection: loadSelectedRecords()
         })
     };
     const activateToolTab = (tabId) => {
@@ -1529,8 +1575,8 @@ const recordEditorService = (services) => {
 
         'recordEditor.addValueFromDataSource': addValueFromDataSource,
         'recordEditor.addPresetValuesFromDataSource': addPresetValuesFromDataSource,
-
-        'recordEditor.appendTab': appendTab,
+        /* eslint-disable quote-props */
+        'appendTab': appendTab,
         'recordEditor.activateToolTab': activateToolTab
     });
 
