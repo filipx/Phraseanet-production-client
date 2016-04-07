@@ -42,18 +42,26 @@ const leafletMap = (services) => {
                 accessToken = provider['public-key'];
             }
         });
-
+        if (accessToken === undefined) {
+            return;
+        }
         eventEmitter.emit('appendTab', tabPlist);
         onResizeEditor = _.debounce(onResizeEditor, 300);
     };
 
     const onRecordSelectionChanged = (params) => {
+        if (accessToken === undefined) {
+            return;
+        }
         let {selection} = params;
         // let pois = loadSelectedRecords();
         refreshMarkers(selection);
     };
 
     const onTabAdded = (params) => {
+        if (accessToken === undefined) {
+            return;
+        }
         let {origParams, selection} = params;
         if (origParams.tabProperties.id === tabContainerName) {
             $tabContent = $(`#${tabContainerName}`, parentOptions.$container);
@@ -143,6 +151,9 @@ const leafletMap = (services) => {
     };
 
     let onResizeEditor = () => {
+        if (accessToken === undefined) {
+            return;
+        }
         if (map !== null) {
             map.invalidateSize();
             if (featureLayer.getLayers().length > 0) {
