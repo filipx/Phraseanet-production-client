@@ -47,7 +47,7 @@ module.exports = {
         }]
     },
     resolve: {
-        extensions: ['', '.js']
+        extensions: ['', '.js', '.css']
     },
     externals: {
         jquery: 'jQuery',
