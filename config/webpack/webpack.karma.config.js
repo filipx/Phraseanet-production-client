@@ -53,5 +53,7 @@ module.exports = {
         jquery: 'jQuery',
         ui: 'jQuery.ui'
     },
-    plugins: []
+    plugins: [
+        new webpack.NormalModuleReplacementPlugin(/\.css$/, path.resolve('./src', './empty.js'))
+    ]
 };
