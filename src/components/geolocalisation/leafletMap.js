@@ -19,7 +19,7 @@ const leafletMap = (services) => {
     let tabContainerName = 'leafletTabContainer';
     let defaultPosition = [2.335062, 48.879162];
     let defaultZoom = 2;
-    let accessToken = '';
+    let accessToken;
     const initialize = (options) => {
         let initWith = {$container, parentOptions, tabOptions} = options;
 
@@ -34,7 +34,6 @@ const leafletMap = (services) => {
             },
             position: 1
         }, tabOptions);
-        eventEmitter.emit('appendTab', tabPlist);
 
         // select geocoding provider:
         let geocodingProviders = configService.get('geocodingProviders');
@@ -44,6 +43,7 @@ const leafletMap = (services) => {
             }
         });
 
+        eventEmitter.emit('appendTab', tabPlist);
         onResizeEditor = _.debounce(onResizeEditor, 300);
     };
 
