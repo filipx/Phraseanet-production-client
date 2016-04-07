@@ -51,6 +51,9 @@ module.exports = Object.assign({}, webpackConfig, {
         }, {
             test: require.resolve('bootstrap-multiselect'),
             loader: "imports?this=>window"
+        }, {
+            test: /\.json$/,
+            loader: "json"
         }]
     },
     plugins: [

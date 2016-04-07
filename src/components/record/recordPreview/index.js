@@ -1,4 +1,4 @@
-require('./recordPreview.css');
+require('./recordPreview.scss');
 
 import $ from 'jquery';
 import merge from 'lodash.merge';
