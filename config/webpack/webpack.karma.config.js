@@ -17,6 +17,15 @@ module.exports = {
             loader: 'istanbul-instrumenter'
         }],
         loaders: [{
+            test: /\.css$/,
+            loader: 'style-loader!css-loader'
+        }, {
+            test: /\.png/,
+            loader: 'url-loader?limit=100000'
+        },  {
+            test: /\.(png|jpg|jpeg|gif)$/,
+            loader: 'file-loader'
+        }, {
             test: /\.js?$/,
             exclude: /node_modules\/(?!phraseanet-common)/,
             loader: 'babel',
@@ -32,14 +41,19 @@ module.exports = {
         }, {
             test: require.resolve('phraseanet-common/src/components/vendors/contextMenu'),
             loader: "imports?this=>window"
+        }, {
+            test: /\.json$/,
+            loader: "json"
         }]
     },
     resolve: {
-        extensions: ['', '.js']
+        extensions: ['', '.js', '.css']
     },
     externals: {
         jquery: 'jQuery',
         ui: 'jQuery.ui'
     },
-    plugins: []
+    plugins: [
+        new webpack.NormalModuleReplacementPlugin(/\.css$/, path.resolve('./src', './empty.js'))
+    ]
 };

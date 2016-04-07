@@ -24,7 +24,7 @@ class RecordCollection {
 
     initializeRecordModels() {
         for (let recordIndex in this.records) {
-            let fields = this.setRecordFields(recordIndex);
+            // let fields = this.setRecordFields(recordIndex);
             this.records[recordIndex].fields = this.setRecordFields(recordIndex);
             //options.fields = fields;
 
@@ -33,7 +33,6 @@ class RecordCollection {
     setRecordFields(recordIndex) {
         let fields = {};
         for (let fieldIndex in this.records[recordIndex].fields) {
-
             var meta_struct_id = this.records[recordIndex].fields[fieldIndex].meta_struct_id;
 
 

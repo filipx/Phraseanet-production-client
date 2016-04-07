@@ -3,14 +3,14 @@ import * as appCommons from 'phraseanet-common';
 
 
 const recordEditorLayout = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const {configService, localeService, recordEditorEvents} = services;
     let $container = null;
     let parentOptions = {};
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
         $(window).bind('resize', function () {
-            appEvents.emit('recordEditor.uiResize');
+            recordEditorEvents.emit('recordEditor.uiResize');
             _setSizeLimits();
         });
 
@@ -24,7 +24,7 @@ const recordEditorLayout = (services) => {
             minHeight: 100,
             resize: function () {
                 _hsplit1();
-                appEvents.emit('recordEditor.uiResize');
+                recordEditorEvents.emit('recordEditor.uiResize');
             },
             stop: function () {
                 _hsplit1();
@@ -38,7 +38,7 @@ const recordEditorLayout = (services) => {
             minWidth: 200,
             resize: function () {
                 _vsplit1();
-                appEvents.emit('recordEditor.uiResize');
+                recordEditorEvents.emit('recordEditor.uiResize');
             },
             stop: function () {
                 appCommons.userModule.setPref('editing_right_box', Math.floor($('#divS').width() * 100 / $('#EDIT_MID_L').width()));
@@ -54,7 +54,7 @@ const recordEditorLayout = (services) => {
                 minWidth: 200,
                 resize: function () {
                     _vsplit2();
-                    appEvents.emit('recordEditor.uiResize');
+                    recordEditorEvents.emit('recordEditor.uiResize');
                 },
                 stop: function () {
                     appCommons.userModule.setPref('editing_left_box', Math.floor($('#EDIT_MID_R').width() * 100 / $('#EDIT_MID').width()));

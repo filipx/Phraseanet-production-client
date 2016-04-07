@@ -131,7 +131,6 @@ const ui = (services) => {
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
                     appEvents.emit('search.selection.selectAll');
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
-                    console.log('ctrl+a');
                     event.cancelBubble = true;
                     if (event.stopPropagation) {
                         event.stopPropagation();

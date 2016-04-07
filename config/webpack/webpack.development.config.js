@@ -91,6 +91,15 @@ module.exports = {
             include: path.join(__dirname, '../../src')
         }],
         loaders: [{
+            test: /\.css$/,
+            loader: 'style-loader!css-loader'
+        }, {
+            test: /\.png/,
+            loader: 'url-loader?limit=100000'
+        },  {
+            test: /\.(png|jpg|jpeg|gif)$/,
+            loader: 'file-loader'
+        }, {
             test: /\.js$/,
             exclude: /node_modules\/(?!phraseanet-common)/,
             loader: 'babel',
@@ -112,10 +121,13 @@ module.exports = {
         }, {
             test: require.resolve('bootstrap-multiselect'),
             loader: "imports?this=>window"
+        }, {
+            test: /\.json$/,
+            loader: "json"
         }]
     },
     resolve: {
-        extensions: ['', '.js']
+        extensions: ['', '.js', '.css']
     },
     plugins: [
         new WebpackNotifierPlugin({

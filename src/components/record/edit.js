@@ -1,16 +1,18 @@
 import $ from 'jquery';
-import recordEditorService from './recordEditor';
+import recordEditorService from './recordEditor/index';
 
 const editRecord = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     let $container = null;
-
+    let recordEditor = recordEditorService(services);
     appEvents.listenAll({
         'record.doEdit': _doEdit
     });
 
     const initialize = () => {
+
+
         $container = $('body');
         $container.on('click', '.edit-record-action', function (event) {
             event.preventDefault();
@@ -32,11 +34,11 @@ const editRecord = (services) => {
             _doEdit({type: type, value: idContent});
         });
 
+
     };
 
     const openModal = (datas) => {
-
-        $('#idFrameE').empty().addClass('loading');
+        $('#EDITWINDOW').empty().addClass('loading');
         //commonModule.showOverlay(2);
 
         $('#EDITWINDOW').show();
@@ -46,14 +48,13 @@ const editRecord = (services) => {
             type: 'POST',
             dataType: 'html',
             data: datas,
-            success: function (data) {
-                let recordEditor = recordEditorService(services);
-
-
-                $('#idFrameE').removeClass('loading').empty().html(data);
-
-                recordEditor.initialize();
-                recordEditor.startThisEditing(window.recordEditorConfig);
+            success: (data) => {
+                $('#EDITWINDOW').removeClass('loading').empty().html(data);
+                // let recordEditor = recordEditorService(services);
+                recordEditor.initialize({
+                    $container: $('#EDITWINDOW'),
+                    recordConfig: window.recordEditorConfig
+                });
 
                 $('#tooltip').hide();
                 return;
@@ -93,27 +94,6 @@ const editRecord = (services) => {
         }
 
         return openModal(datas);
-
-        /*$.ajax({
-            url: `${url}${editTemplateEndPoint}`,
-            type: "POST",
-            dataType: "html",
-            data: datas,
-            success: function (data) {
-                recordEditor(services).initialize();
-                //recordEditorModule.initialize();
-                $('#idFrameE').removeClass('loading').empty().html(data);
-                $('#tooltip').hide();
-                return;
-            },
-            error: function (XHR, textStatus, errorThrown) {
-                if (XHR.status === 0) {
-                    return false;
-                }
-            }
-        });
-
-        return;*/
     }
 
     return { initialize, openModal };

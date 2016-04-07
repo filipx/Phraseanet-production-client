@@ -1,12 +1,18 @@
+require('./recordPreview.css');
+
 import $ from 'jquery';
 import * as Rx from 'rx';
+import Emitter from '../../core/emitter';
+import leafletMap from './../../geolocalisation/leafletMap';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
 require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {
     const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
+    let recordPreviewEvents = new Emitter();
     let $bodyContainer = null;
     let $previewContainer = null;
+    let $previewTabContainer;
     let prevAjax;
     let prevAjaxrunning;
     prevAjaxrunning = false;
@@ -24,8 +30,12 @@ const previewRecordService = (services) => {
     const initialize = () => {
         $bodyContainer = $('body');
         $previewContainer = $('#PREVIEWBOX');
-
-        $('#PREVIEWIMGDESC').tabs();
+        $previewTabContainer = $('#PREVIEWIMGDESC');
+        $previewTabContainer.tabs({
+            activate: function (event, ui) {
+                recordPreviewEvents.emit('tabChange');
+            }
+        });
 
         // if contained in record editor (p4.edit.editBox):
         $('#PREVIEWBOX .gui_vsplitter').draggable({
@@ -42,6 +52,18 @@ const previewRecordService = (services) => {
                 resizePreview();
             }
         });
+
+        leafletMap({configService, localeService, eventEmitter: recordPreviewEvents}).initialize({
+            $container: $previewContainer,
+            parentOptions: options,
+            tabOptions: {
+                /*tabProperties: {
+                 classes: 'descBoxes',
+                 },*/
+                position: 3
+            }
+        });
+
         _bindEvents();
     };
 
@@ -266,6 +288,11 @@ const previewRecordService = (services) => {
                 options.current.height = parseInt($('#PREVIEWIMGCONT input[name=height]').val(), 10);
                 options.current.tot = data.tot;
                 options.current.pos = relativePos;
+                options.current.captions = data.recordCaptions;
+
+                recordPreviewEvents.emit('recordSelection.changed', {
+                    selection: [data.recordCaptions]
+                });
 
                 if ($('#PREVIEWBOX img.record.zoomable').length > 0) {
                     $('#PREVIEWBOX img.record.zoomable').draggable();
@@ -578,11 +605,38 @@ const previewRecordService = (services) => {
         options.navigation = Object.assign(options.navigation, navigation);
     };
 
+    const appendTab = (params) => {
+        let {tabProperties, position} = params;
+        const $appendAfterTab = $(`ul li:eq(${position - 1})`, $previewTabContainer);
+
+        const newTab = `<li><a href="#${tabProperties.id}">${tabProperties.title}</a></li>`;
+        $appendAfterTab.after(newTab);
+
+        const appendAfterTabContent = $(` > div:eq(${position - 1})`, $previewTabContainer);
+        appendAfterTabContent.after(`<div id="${tabProperties.id}" class="${tabProperties.classes}"></div>`);
+
+
+        try {
+            $previewTabContainer.tabs('refresh')
+
+        } catch (e) {
+        }
+        recordPreviewEvents.emit('appendTab.complete', {
+            origParams: params,
+            selection: []
+        })
+    };
+
     appEvents.listenAll({
         'broadcast.searchResultNavigation': onNavigationChanged,
         'preview.doResize': shouldResize,
         'preview.doReload': shouldReload,
         'preview.close': closePreview
+    });
+
+    recordPreviewEvents.listenAll({
+        /* eslint-disable quote-props */
+        'appendTab': appendTab
     });
 
     return {

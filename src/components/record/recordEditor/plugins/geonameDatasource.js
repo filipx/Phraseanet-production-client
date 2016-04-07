@@ -3,7 +3,7 @@ import _ from 'underscore';
 require('geonames-server-jquery-plugin/jquery.geonames.js');
 
 const geonameDatasource = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const {configService, localeService, recordEditorEvents} = services;
     const tabContainerName = 'geonameTabContainer';
     let autoActivateTabOnce = true;
     let $container = null;
@@ -13,18 +13,20 @@ const geonameDatasource = (services) => {
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
-
-        appEvents.emit('recordEditor.addToolTab', {
-            id: tabContainerName,
-            title: localeService.t('Geoname Datasource')
+        recordEditorEvents.emit('appendTab', {
+            tabProperties: {
+                id: tabContainerName,
+                title: localeService.t('Geoname Datasource'),
+            },
+            position: 1
         });
         // reset for each fields
         autoActivateTabOnce = true;
     };
 
-    const onAddToolTabComplete = (params) => {
+    const onTabAdded = (params) => {
         let {origParams} = params;
-        if (origParams.id === tabContainerName) {
+        if (origParams.tabProperties.id === tabContainerName) {
             $tabContent = $(`#${tabContainerName}`, $container);
             bindEvents();
         }
@@ -82,13 +84,16 @@ const geonameDatasource = (services) => {
             }
         };
 
-        appEvents.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, mode: 'emptyOnly'});
+        recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, mode: 'emptyOnly'});
 
         // force update on current field:
-        appEvents.emit('recordEditor.addValueFromDataSource', {value: value, field: field});
+        recordEditorEvents.emit('recordEditor.addValueFromDataSource', {value: value, field: field});
     };
 
     const highlight = (s, t) => {
+        if (t === '') {
+            return s;
+        }
         var matcher = new RegExp('(' + t + ')', 'ig');
         return s.replace(matcher, '<span class="ui-state-highlight">$1</span>');
     };
@@ -140,7 +145,7 @@ const geonameDatasource = (services) => {
 
         // switch tab only on the first search:
         if (autoActivateTabOnce === true) {
-            appEvents.emit('recordEditor.activateToolTab', tabContainerName);
+            recordEditorEvents.emit('recordEditor.activateToolTab', tabContainerName);
             autoActivateTabOnce = false;
         }
 
@@ -170,11 +175,13 @@ const geonameDatasource = (services) => {
             success: function (data) {
                 let template = '';
                 _.map(data || [], function (item) {
-                    let country = country ? country : name;
-                    let labelName = highlight(item.name, name);
-                    let labelCountry = highlight((item.country ? item.country.name || '' : ''), country);
+                    let matchWith = datas.name !== '' ? datas.name : datas.country;
+
+                    let labelName = highlight(item.name, matchWith);
+                    let labelCountry = highlight((item.country ? item.country.name || '' : ''), matchWith);
                     let regionName = (item.region ? item.region.name || '' : '');
                     let labelRegion = highlight(regionName, name);
+
                     let location = {
                         value: labelName + (labelRegion !== '' ? ', <span class="region">' + labelRegion + '</span>' : ''),
                         label: (labelCountry !== '' ? labelCountry : ''),
@@ -197,8 +204,8 @@ const geonameDatasource = (services) => {
         });
     };
 
-    appEvents.listenAll({
-        'recordEditor.addToolTab.complete': onAddToolTabComplete,
+    recordEditorEvents.listenAll({
+        'appendTab.complete': onTabAdded,
         'recordEditor.userInputValue': searchValue
     });
 

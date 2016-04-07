@@ -2,7 +2,7 @@ import $ from 'jquery';
 import {cleanTags} from '../../utils/utils';
 
 const presetsModule = (services) => {
-    const {configService, localeService, appEvents} = services;
+    const {configService, localeService, recordEditorEvents} = services;
     const url = configService.get('baseUrl');
     let $container = null;
     let parentOptions = {};
@@ -19,11 +19,11 @@ const presetsModule = (services) => {
         let buttons = {};
         buttons[localeService.t('valider')] = function (event) {
             $(this).dialog('close');
-            appEvents.emit('recordEditor.submitAllChanges', {event});
+            recordEditorEvents.emit('recordEditor.submitAllChanges', {event});
         };
         buttons[localeService.t('annuler')] = function (event) {
             $(this).dialog('close');
-            appEvents.emit('recordEditor.cancelAllChanges', {event});
+            recordEditorEvents.emit('recordEditor.cancelAllChanges', {event});
         };
 
         $('#EDIT_CLOSEDIALOG', $container).dialog({
@@ -231,7 +231,7 @@ const presetsModule = (services) => {
                         }
                     }
                 }
-                appEvents.emit('recordEditor.onUpdateFields');
+                recordEditorEvents.emit('recordEditor.onUpdateFields');
             }
         });
     }

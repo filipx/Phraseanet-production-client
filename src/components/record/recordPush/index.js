@@ -9,8 +9,7 @@ const pushRecord = (services) => {
 
     const initialize = (options) => {
         let {feedback, listManager} = options;
-
-        if ($('PushBox').length > 0) {
+        if ($('#PushBox').length > 0) {
             feedbackInstance = new Feedback(services, feedback);
             listManagerInstance = new ListManager(services, listManager);
         } else {
