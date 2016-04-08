@@ -17,9 +17,11 @@ const leafletMap = (services) => {
     let map = null;
     let $tabContent;
     let tabContainerName = 'leafletTabContainer';
-    let defaultPosition = [2.335062, 48.879162];
-    let defaultZoom = 2;
+    let defaultPosition;
+    let defaultZoom;
     let accessToken;
+    let fieldPosition;
+    let markerDefaultZoom;
     const initialize = (options) => {
         let initWith = {$container, parentOptions, tabOptions} = options;
 
@@ -35,19 +37,54 @@ const leafletMap = (services) => {
             position: 1
         }, tabOptions);
 
+        if (configureGeoProvider() === true) {
+            eventEmitter.emit('appendTab', tabPlist);
+        }
+        onResizeEditor = _.debounce(onResizeEditor, 300);
+    };
+
+    const configureGeoProvider = () => {
+        let isValid = false;
         // select geocoding provider:
         let geocodingProviders = configService.get('geocodingProviders');
         _.each(geocodingProviders, (provider) => {
-            if (provider.name === 'mapBox') {
+            if (provider.enabled === true) {
                 accessToken = provider['public-key'];
+                let fieldMapping = provider['position-fields'];
+
+                if (fieldMapping.length > 0) {
+                    fieldPosition = {};
+                    _.each(fieldMapping, (mapping) => {
+                        // latitude and longitude are combined in a composite field
+                        if (mapping.type === 'latlng') {
+                            fieldPosition = {
+                                latitude: (poi) => extractFromPosition('lat', poi[mapping.name]),
+                                longitude: (poi) => extractFromPosition('lng', poi[mapping.name])
+                            };
+                        } else if (mapping.type === 'lat') {
+                            // if latitude field mapping is provided, fallback:
+                            fieldPosition.latitude = (poi) => isNaN(parseFloat(poi[mapping.name], 10)) ? false : parseFloat(poi[mapping.name], 10);
+                        } else if (mapping.type === 'lng') {
+                            // if longitude field mapping is provided, fallback:
+                            fieldPosition.longitude = (poi) => isNaN(parseFloat(poi[mapping.name], 10)) ? false : parseFloat(poi[mapping.name], 10);
+                        }
+                    });
+                    if (fieldPosition.latitude !== undefined && fieldPosition.longitude !== undefined) {
+                        isValid = true;
+                    }
+                }
+                // set default values:
+                defaultPosition = provider['default-position'];
+                defaultZoom = provider['default-zoom'] || 2;
+                markerDefaultZoom = provider['marker-default-zoom'] || 12;
+
             }
         });
         if (accessToken === undefined) {
-            return;
+            isValid = false;
         }
-        eventEmitter.emit('appendTab', tabPlist);
-        onResizeEditor = _.debounce(onResizeEditor, 300);
-    };
+        return isValid;
+    }
 
     const onRecordSelectionChanged = (params) => {
         if (accessToken === undefined) {
@@ -73,17 +110,32 @@ const leafletMap = (services) => {
         require.ensure([], () => {
             // select geocoding provider:
             mapbox = require('mapbox.js');
+            require('leaflet-contextmenu');
 
             $tabContent.empty().append(`<div id="${mapUID}" class="" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
-            /*if (pois.length > 0) {
-             if (poiIsValid(pois[0])) {
-             defaultPosition = extractCoords(pois[0])
-             defaultZoom = 13;
-             }
-             }*/
             L.mapbox.accessToken = accessToken;
-            map = L.mapbox.map(mapUID, 'mapbox.streets')
+            map = L.mapbox.map(mapUID, 'mapbox.streets'/*, {
+                 contextmenu: true,
+                 contextmenuWidth: 140,
+                 contextmenuItems: [{
+                 text: 'Show coordinates',
+                 callback: (e) => {
+                 console.log(e.latlng);
+                 }
+                 }, {
+                 text: 'Center map here',
+                 callback: centerMap
+                 }, '-', {
+                 text: 'Zoom in',
+                 icon: 'images/zoom-in.png',
+                 callback: zoomIn
+                 }, {
+                 text: 'Zoom out',
+                 icon: 'images/zoom-out.png',
+                 callback: zoomOut
+                 }]
+                 }*/)
                 .setView(defaultPosition, defaultZoom);
 
             featureLayer = L.mapbox.featureLayer([]).addTo(map);
@@ -96,19 +148,21 @@ const leafletMap = (services) => {
         let geoJsonPoiCollection = [];
         for (let poiIndex in pois) {
             let poi = pois[poiIndex];
-            if (poiIsValid(poi)) {
+
+            let poiCoords = extractCoords(poi);
+            if (poiCoords[0] !== false && poiCoords[1] !== false) {
                 geoJsonPoiCollection.push({
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
-                        coordinates: extractCoords(poi)
+                        coordinates: poiCoords
                     },
                     properties: {
                         //description: `<p>${poi.FileName}</p>`,
                         'marker-color': '0c4554',
                         //'marker-size': 'medium',
                         //'marker-symbol': 'music',
-                        'marker-zoom': '14',
+                        'marker-zoom': '5',
                         title: `${poi.FileName}`
                     }
                 });
@@ -122,32 +176,44 @@ const leafletMap = (services) => {
         featureLayer.setGeoJSON(geoJsonPoiCollection);
 
         if (featureLayer.getLayers().length > 0) {
-            map.fitBounds(featureLayer.getBounds(), {maxZoom: 10});
+            map.fitBounds(featureLayer.getBounds(), {maxZoom: markerDefaultZoom});
         } else {
             // set default position
             map.setView(defaultPosition, defaultZoom);
         }
-    }
-
-
-    const poiIsValid = (poi) => {
-        if (poi.Longitude === undefined || poi.Latitude === undefined) {
-            return false;
-        }
-        if (poi.Longitude === null || poi.Latitude === null) {
-            return false;
-        }
-        if (isNaN(poi.Longitude) || isNaN(poi.Latitude)) {
-            return false;
-        }
-        if (poi.Longitude === '' || poi.Latitude === '') {
-            return false;
-        }
-        return true;
     };
 
     const extractCoords = (poi) => {
-        return [parseFloat(poi.Longitude, 10), parseFloat(poi.Latitude, 10)]
+        return [fieldPosition.longitude(poi), fieldPosition.latitude(poi)];
+    };
+
+    /**
+     * extract latitude or longitude from a position
+     * @param name
+     * @param source
+     * @returns {*}
+     */
+    const extractFromPosition = (name, source) => {
+        if (source === undefined || source === null) {
+            return false;
+        }
+
+        let position = source.split(' ');
+
+        if (position.length !== 2) {
+            position = source.split(',');
+        }
+
+        // ok parse lat
+        if (position.length === 2) {
+            if (name === 'lat' || name === 'latitude') {
+                return parseFloat(position[0], 10)
+            }
+            return parseFloat(position[1], 10)
+        } else {
+            // invalid
+            return false;
+        }
     };
 
     let onResizeEditor = () => {
@@ -157,7 +223,7 @@ const leafletMap = (services) => {
         if (map !== null) {
             map.invalidateSize();
             if (featureLayer.getLayers().length > 0) {
-                map.fitBounds(featureLayer.getBounds());
+                map.fitBounds(featureLayer.getBounds(), {maxZoom: markerDefaultZoom});
             } else {
                 // set default position
                 map.setView(defaultPosition, defaultZoom);

@@ -132,6 +132,7 @@
     "jquery-ui": "^1.10.5",
     "jquery.fancytree": "^2.15.0",
     "leaflet": "^0.7.7",
+    "leaflet-contextmenu": "^1.0.0",
     "mapbox.js": "^2.4.0",
     "phraseanet-common": "^0.2.8",
     "rx": "^4.1.0",
