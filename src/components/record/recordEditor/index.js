@@ -3,7 +3,6 @@ import _ from 'underscore';
 import * as appCommons from 'phraseanet-common';
 import {cleanTags} from '../../utils/utils';
 import {sprintf} from 'sprintf-js';
-import * as recordModel from '../../record/model';
 import recordEditorLayout from './layout';
 import presetsModule from './presets';
 import searchReplace from './plugins/searchReplace';
@@ -16,14 +15,13 @@ import RecordCollection from './models/recordCollection';
 import FieldCollection from './models/fieldCollection';
 import StatusCollection from './models/statusCollection';
 
-import * as Rx from 'rx';
 require('phraseanet-common/src/components/tooltip');
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const recordEditorService = (services) => {
     const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
-    let recordEditorEvents = new Emitter();
+    let recordEditorEvents;
     let $container = null;
     let options = {};
     let recordConfig = {};
@@ -38,6 +36,7 @@ const recordEditorService = (services) => {
 
     const initialize = (params) => {
         let initWith = {$container, recordConfig} = params;
+        recordEditorEvents = new Emitter();
         options = {};
         $editorContainer = options.$container = $container; //$('#idFrameE');
         options.textareaIsDirty = false;
@@ -46,8 +45,6 @@ const recordEditorService = (services) => {
         options.sbas_id = false;
         options.what = false;
         options.newrepresent = false;
-
-        // $editorContainer = $('#EDITWINDOW');
 
         $ztextStatus = $('#ZTextStatus', options.$container);
         $editTextArea = $('#idEditZTextArea', options.$container);
@@ -61,14 +58,26 @@ const recordEditorService = (services) => {
                 recordEditorEvents.emit('tabChange');
             }
         });
-        onUserInputComplete = _.debounce(onUserInputComplete, 300);
         _bindEvents();
         startThisEditing(recordConfig);
     };
 
     const _bindEvents = () => {
+        onUserInputComplete = _.debounce(onUserInputComplete, 300);
 
-        // edit_clk_editimg
+        recordEditorEvents.listenAll({
+            'recordEditor.addMultivaluedField': addValueInMultivaluedField,
+            'recordEditor.onUpdateFields': refreshFields,
+            'recordEditor.submitAllChanges': submitChanges,
+            'recordEditor.cancelAllChanges': cancelChanges,
+
+            'recordEditor.addValueFromDataSource': addValueFromDataSource,
+            'recordEditor.addPresetValuesFromDataSource': addPresetValuesFromDataSource,
+            /* eslint-disable quote-props */
+            'appendTab': appendTab,
+            'recordEditor.activateToolTab': activateToolTab
+        });
+
         $editorContainer
             .on('click', '.select-record-action', (event) => {
                 let $el = $(event.currentTarget);
@@ -1070,6 +1079,7 @@ const recordEditorService = (services) => {
 
         }
     }
+
     const closeModal = () => {
         $('#Edit_copyPreset_dlg').remove();
         $('#idFrameE .ww_content', options.$container).empty();
@@ -1566,19 +1576,6 @@ const recordEditorService = (services) => {
     const activateToolTab = (tabId) => {
         $toolsTabs.tabs('option', 'active', $toolsTabs.find(`#${tabId}`).index() - 1);
     };
-
-    recordEditorEvents.listenAll({
-        'recordEditor.addMultivaluedField': addValueInMultivaluedField,
-        'recordEditor.onUpdateFields': refreshFields,
-        'recordEditor.submitAllChanges': submitChanges,
-        'recordEditor.cancelAllChanges': cancelChanges,
-
-        'recordEditor.addValueFromDataSource': addValueFromDataSource,
-        'recordEditor.addPresetValuesFromDataSource': addPresetValuesFromDataSource,
-        /* eslint-disable quote-props */
-        'appendTab': appendTab,
-        'recordEditor.activateToolTab': activateToolTab
-    });
 
 
     return {
