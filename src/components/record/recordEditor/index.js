@@ -333,7 +333,8 @@ const recordEditorService = (services) => {
             parentOptions: options,
             tabOptions: {
                 position: 2
-            }
+            },
+            editable: true
         });
 
         ETHSeeker = thesaurusDatasource(recordEditorServices).initialize({
@@ -1504,7 +1505,6 @@ const recordEditorService = (services) => {
                         if (mode === 'emptyOnly' && field._value !== '' && !record.fields[fieldIndex].isDirty()) {
                             continue;
                         }
-
                         options.recordCollection.addRecordFieldValue(recordIndex, fieldIndex, {
                             value: field.preset[val].trim(), merge: false, vocabularyId: null
                         });

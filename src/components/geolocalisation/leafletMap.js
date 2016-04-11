@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 import $ from 'jquery';
 import _ from 'underscore';
+import markerCollection from './markerCollection';
 import {generateRandStr} from '../utils/utils';
 require('./leafletMap.css');
 const leafletMap = (services) => {
@@ -22,8 +23,12 @@ const leafletMap = (services) => {
     let accessToken;
     let fieldPosition;
     let markerDefaultZoom;
+    let editable;
+    let activeProvider;
     const initialize = (options) => {
         let initWith = {$container, parentOptions, tabOptions} = options;
+
+        editable = options.editable || false;
 
         mapUID = 'leafletMap' + generateRandStr(5);
 
@@ -49,6 +54,7 @@ const leafletMap = (services) => {
         let geocodingProviders = configService.get('geocodingProviders');
         _.each(geocodingProviders, (provider) => {
             if (provider.enabled === true) {
+                activeProvider = provider;
                 accessToken = provider['public-key'];
                 let fieldMapping = provider['position-fields'];
 
@@ -110,32 +116,12 @@ const leafletMap = (services) => {
         require.ensure([], () => {
             // select geocoding provider:
             mapbox = require('mapbox.js');
-            require('leaflet-contextmenu');
+            // require('leaflet-contextmenu');
 
-            $tabContent.empty().append(`<div id="${mapUID}" class="" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
+            $tabContent.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
             L.mapbox.accessToken = accessToken;
-            map = L.mapbox.map(mapUID, 'mapbox.streets'/*, {
-                 contextmenu: true,
-                 contextmenuWidth: 140,
-                 contextmenuItems: [{
-                 text: 'Show coordinates',
-                 callback: (e) => {
-                 console.log(e.latlng);
-                 }
-                 }, {
-                 text: 'Center map here',
-                 callback: centerMap
-                 }, '-', {
-                 text: 'Zoom in',
-                 icon: 'images/zoom-in.png',
-                 callback: zoomIn
-                 }, {
-                 text: 'Zoom out',
-                 icon: 'images/zoom-out.png',
-                 callback: zoomOut
-                 }]
-                 }*/)
+            map = L.mapbox.map(mapUID, 'mapbox.streets')
                 .setView(defaultPosition, defaultZoom);
 
             featureLayer = L.mapbox.featureLayer([]).addTo(map);
@@ -148,7 +134,6 @@ const leafletMap = (services) => {
         let geoJsonPoiCollection = [];
         for (let poiIndex in pois) {
             let poi = pois[poiIndex];
-
             let poiCoords = extractCoords(poi);
             if (poiCoords[0] !== false && poiCoords[1] !== false) {
                 geoJsonPoiCollection.push({
@@ -158,10 +143,7 @@ const leafletMap = (services) => {
                         coordinates: poiCoords
                     },
                     properties: {
-                        //description: `<p>${poi.FileName}</p>`,
                         'marker-color': '0c4554',
-                        //'marker-size': 'medium',
-                        //'marker-symbol': 'music',
                         'marker-zoom': '5',
                         title: `${poi.FileName}`
                     }
@@ -173,7 +155,9 @@ const leafletMap = (services) => {
         } else {
             featureLayer = L.mapbox.featureLayer([]).addTo(map);
         }
-        featureLayer.setGeoJSON(geoJsonPoiCollection);
+
+        let markerColl = markerCollection(services);
+        markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
 
         if (featureLayer.getLayers().length > 0) {
             map.fitBounds(featureLayer.getBounds(), {maxZoom: markerDefaultZoom});
@@ -231,11 +215,40 @@ const leafletMap = (services) => {
         }
     };
 
+    let onMarkerChange = (params) => {
+        let {marker, position} = params;
+
+        if (editable) {
+            let fieldMapping = activeProvider['position-fields'];
+            let presetFields = {};
+            if (fieldMapping.length > 0) {
+                fieldPosition = {};
+                _.each(fieldMapping, (mapping) => {
+                    // latitude and longitude are combined in a composite field
+                    if (mapping.type === 'latlng') {
+                        presetFields[mapping.name] = [`${position.lat} ${position.lng}`];
+                    } else if (mapping.type === 'lat') {
+                        presetFields[mapping.name] = [`${position.lat}`];
+                    } else if (mapping.type === 'lng') {
+                        presetFields[mapping.name] = [`${position.lng}`];
+                    }
+                });
+            }
+
+            let presets = {
+                fields: presetFields
+            };
+
+            eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets});
+        }
+    }
+
 
     eventEmitter.listenAll({
         'recordSelection.changed': onRecordSelectionChanged,
         'appendTab.complete': onTabAdded,
         /* eslint-disable quote-props */
+        'markerChange': onMarkerChange,
         'tabChange': onResizeEditor,
     });
     return {initialize}
