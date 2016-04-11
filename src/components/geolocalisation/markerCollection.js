@@ -30,55 +30,71 @@ const markerCollection = (services) => {
     };
 
     const setMarkerPopup = (marker) => {
+        switch (marker.feature.geometry.type) {
+            case 'Polygon':
+                break;
+            case 'Point':
+                setPoint(marker);
+                break;
+            default:
+        }
+    };
+
+    const setPoint = (marker) => {
+        markerCollection[marker._leaflet_id] = marker;
         let $content = $('<div style="min-width: 200px"/>');
-        let originalPosition = marker.getLatLng();
 
-        let template = `
-        <p>${marker.feature.properties.title}</p> 
-        `;
+        let template = `<p>${marker.feature.properties.title}</p> `;
 
-        if (editable === true) {
+        if (editable === true && marker.dragging !== undefined) {
             template += `
-        <div class="view-mode">
-                <button class="edit-position btn btn-inverse btn-small btn-block">${localeService.t('edit')}</button>
-        </div>
-        <div class="edit-mode">
-            <p class="help">drag the pin where you want</p>
-            <p><span class="updated-position"></span></p>
-            <div>
-                <button class="cancel-position btn btn-inverse btn-small btn-block">${localeService.t('annuler')}</button>
-                <button class="submit-position btn btn-inverse btn-small btn-block">${localeService.t('valider')}</button>
+            <div class="view-mode">
+                    <button class="edit-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('edit')}</button>
             </div>
-        </div>
-        `;
+            <div class="edit-mode">
+                <p class="help">drag the pin where you want</p>
+                <p><span class="updated-position"></span></p>
+                <div>
+                    <button class="cancel-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('annuler')}</button>
+                    <button class="submit-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('valider')}</button>
+                </div>
+            </div>`;
         }
 
         $content.append(template);
 
         $content.find('.edit-mode').hide();
 
-        $content.on('click', '.edit-position', () => {
+        $content.on('click', '.edit-position', (event) => {
+            let $el = $(event.currentTarget);
+            let marker = getMarker($el.data('marker-id'));
+            marker._originalPosition = marker.getLatLng();
             marker.dragging.enable();
             $content.find('.view-mode').hide();
             $content.find('.edit-mode').show();
             $content.find('.help').show();
         });
 
-        $content.on('click', '.submit-position', () => {
+        $content.on('click', '.submit-position', (event) => {
+            let $el = $(event.currentTarget);
+            let marker = getMarker($el.data('marker-id'));
+
             marker.dragging.disable();
             $content.find('.view-mode').show();
             $content.find('.help').hide();
             $content.find('.edit-mode').hide();
-            originalPosition = marker.getLatLng();
+            marker._originalPosition = marker.getLatLng();
             eventEmitter.emit('markerChange', {marker, position: marker.getLatLng()});
         });
 
 
-        $content.on('click', '.cancel-position', () => {
+        $content.on('click', '.cancel-position', (event) => {
+            let $el = $(event.currentTarget);
+            let marker = getMarker($el.data('marker-id'));
             marker.dragging.disable();
             $content.find('.view-mode').show();
 
-            marker.setLatLng(originalPosition);
+            marker.setLatLng(marker._originalPosition);
             triggerRefresh();
         });
 
@@ -91,7 +107,12 @@ const markerCollection = (services) => {
             marker.bindPopup($content.get(0));
             marker.openPopup();
         })
-    };
+
+    }
+
+    const getMarker = (markerId) => {
+        return markerCollection[markerId];
+    }
 
     return {
         initialize, setCollection

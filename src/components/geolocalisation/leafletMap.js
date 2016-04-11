@@ -16,6 +16,7 @@ const leafletMap = (services) => {
     let featureLayer = null;
     let pois = [];
     let map = null;
+    let geocoder = null;
     let $tabContent;
     let tabContainerName = 'leafletTabContainer';
     let defaultPosition;
@@ -121,17 +122,63 @@ const leafletMap = (services) => {
             $tabContent.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
             L.mapbox.accessToken = accessToken;
+
             map = L.mapbox.map(mapUID, 'mapbox.streets')
                 .setView(defaultPosition, defaultZoom);
 
-            featureLayer = L.mapbox.featureLayer([]).addTo(map);
+            geocoder = L.mapbox.geocoder('mapbox.places');
 
+
+            addMarkersLayer();
             refreshMarkers(pois);
         });
     };
+    const addMarkersLayer = () => {
+        if (featureLayer !== null) {
+            featureLayer.clearLayers();
+        } else {
+            featureLayer = L.mapbox.featureLayer([], {
+                pointToLayer: function (feature, latlon) {
+                    if (feature.properties.radius !== undefined) {
+                        // L.circleMarker() draws a circle with fixed radius in pixels.
+                        // To draw a circle overlay with a radius in meters, use L.circle()
+                        return L.circleMarker(latlon, {radius: feature.properties.radius || 10});
+                    } else {
+                        let marker = require('mapbox.js/src/marker.js'); //L.marker(feature);
+                        return marker.style(feature, latlon, {accessToken: accessToken});
+                    }
+                }
+            }).addTo(map);
+        }
+    };
 
     const refreshMarkers = (pois) => {
+
+        buildGeoJson(pois).then((geoJsonPoiCollection) => {
+            addMarkersLayer();
+
+            let markerColl = markerCollection(services);
+            markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
+
+            if (featureLayer.getLayers().length > 0) {
+                map.fitBounds(featureLayer.getBounds(), {maxZoom: markerDefaultZoom});
+            } else {
+                // set default position
+                map.setView(defaultPosition, defaultZoom);
+            }
+        })
+
+    };
+    /**
+     * build geoJson features return as a promise
+     * @param pois
+     * @returns {*}
+     */
+    const buildGeoJson = (pois) => {
         let geoJsonPoiCollection = [];
+        let asyncQueries = [];
+        let geoJsonPromise = $.Deferred();
+
         for (let poiIndex in pois) {
             let poi = pois[poiIndex];
             let poiCoords = extractCoords(poi);
@@ -143,28 +190,65 @@ const leafletMap = (services) => {
                         coordinates: poiCoords
                     },
                     properties: {
+                        recordIndex: poiIndex,
                         'marker-color': '0c4554',
                         'marker-zoom': '5',
                         title: `${poi.FileName}`
                     }
                 });
+            } else {
+                // coords are not available, fallback on city/province/country if available
+
+                let query = '';
+                query += poi.City !== undefined && poi.City !== null ? poi.City : '';
+                query += poi.Country !== undefined && poi.Country !== null ? `, ${poi.Country} ` : '';
+
+                if (query !== '') {
+                    let geoPromise = $.Deferred();
+                    geocoder.query(query, (err, data) => {
+                        // take the first feature if exists
+                        if (data.results !== undefined) {
+                            if (data.results.features.length > 0) {
+
+                                /*let circleArea = {
+                                 type: 'Feature',
+                                 geometry: {
+                                 type: 'Point',
+                                 coordinates: data.results.features[0].center //[[ data.bounds ]]
+                                 },
+                                 properties: {
+                                 title: `${poi.FileName}`
+                                 }
+                                 };
+                                 circleArea.properties['marker-zoom'] = 5;
+                                 circleArea.properties.radius = 50;
+
+                                 geoJsonPoiCollection.push(circleArea);*/
+
+                                let bestResult = data.results.features[0];
+                                bestResult.properties.recordIndex = poiIndex;
+                                bestResult.properties['marker-zoom'] = 5;
+                                bestResult.properties.title = `${poi.FileName}`;
+                                geoJsonPoiCollection.push(bestResult);
+                            }
+
+                        }
+
+                        geoPromise.resolve(geoJsonPoiCollection)
+                    });
+                    asyncQueries.push(geoPromise);
+                }
             }
         }
-        if (featureLayer !== null) {
-            featureLayer.clearLayers();
-        } else {
-            featureLayer = L.mapbox.featureLayer([]).addTo(map);
-        }
 
-        let markerColl = markerCollection(services);
-        markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
-
-        if (featureLayer.getLayers().length > 0) {
-            map.fitBounds(featureLayer.getBounds(), {maxZoom: markerDefaultZoom});
+        if (asyncQueries.length > 0) {
+            $.when.apply(null, asyncQueries).done(function () {
+                geoJsonPromise.resolve(geoJsonPoiCollection)
+            });
         } else {
-            // set default position
-            map.setView(defaultPosition, defaultZoom);
+            geoJsonPromise.resolve(geoJsonPoiCollection)
         }
+        return geoJsonPromise.promise();
     };
 
     const extractCoords = (poi) => {
@@ -238,10 +322,11 @@ const leafletMap = (services) => {
             let presets = {
                 fields: presetFields
             };
+            let recordIndex = marker.feature.properties.recordIndex;
 
-            eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets});
+            eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, recordIndex});
         }
-    }
+    };
 
 
     eventEmitter.listenAll({

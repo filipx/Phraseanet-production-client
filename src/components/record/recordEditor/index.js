@@ -1476,7 +1476,10 @@ const recordEditorService = (services) => {
      * @param params
      */
     const addPresetValuesFromDataSource = (params) => {
-        let {data, mode} = params;
+        let {data} = params;
+        let mode = params.mode || '';
+        let preselectedRecord = params.recordIndex || false;
+
         let records = options.recordCollection.getRecords();
         let fields = options.fieldCollection.getFields();
 
@@ -1500,7 +1503,12 @@ const recordEditorService = (services) => {
                 let field = options.fieldCollection.getFieldByIndex(fieldIndex);
                 if (field.preset !== null) {
                     for (let val in field.preset) {
-
+                        if (preselectedRecord !== false) {
+                            if (preselectedRecord !== recordIndex) {
+                                // only update preselected record
+                                continue;
+                            }
+                        }
                         // don't update filled fields in emptyOnly mode:
                         if (mode === 'emptyOnly' && field._value !== '' && !record.fields[fieldIndex].isDirty()) {
                             continue;
