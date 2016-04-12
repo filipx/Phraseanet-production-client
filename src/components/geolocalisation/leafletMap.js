@@ -4,6 +4,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import markerCollection from './markerCollection';
 import {generateRandStr} from '../utils/utils';
+require('mapbox.js/theme/style.css');
 require('./leafletMap.css');
 const leafletMap = (services) => {
     const {configService, localeService, eventEmitter} = services;
@@ -98,7 +99,7 @@ const leafletMap = (services) => {
             return;
         }
         let {selection} = params;
-        // let pois = loadSelectedRecords();
+
         refreshMarkers(selection);
     };
 
@@ -125,6 +126,15 @@ const leafletMap = (services) => {
 
             map = L.mapbox.map(mapUID, 'mapbox.streets')
                 .setView(defaultPosition, defaultZoom);
+
+            var layers = {
+                Streets: L.mapbox.tileLayer('mapbox.streets'),
+                Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
+                Satellite: L.mapbox.tileLayer('mapbox.satellite')
+            };
+
+            layers.Streets.addTo(map);
+            L.control.layers(layers).addTo(map);
 
             geocoder = L.mapbox.geocoder('mapbox.places');
 
@@ -182,6 +192,7 @@ const leafletMap = (services) => {
         for (let poiIndex in pois) {
             let poi = pois[poiIndex];
             let poiCoords = extractCoords(poi);
+            let poiTitle = poi.FileName || poi.Filename || poi.Title;
             if (poiCoords[0] !== false && poiCoords[1] !== false) {
                 geoJsonPoiCollection.push({
                     type: 'Feature',
@@ -193,7 +204,7 @@ const leafletMap = (services) => {
                         recordIndex: poiIndex,
                         'marker-color': '0c4554',
                         'marker-zoom': '5',
-                        title: `${poi.FileName}`
+                        title: `${poiTitle}`
                     }
                 });
             } else {
@@ -228,7 +239,7 @@ const leafletMap = (services) => {
                                 let bestResult = data.results.features[0];
                                 bestResult.properties.recordIndex = poiIndex;
                                 bestResult.properties['marker-zoom'] = 5;
-                                bestResult.properties.title = `${poi.FileName}`;
+                                bestResult.properties.title = `${poiTitle}`;
                                 geoJsonPoiCollection.push(bestResult);
                             }
 
@@ -306,7 +317,7 @@ const leafletMap = (services) => {
             let fieldMapping = activeProvider['position-fields'];
             let presetFields = {};
             if (fieldMapping.length > 0) {
-                fieldPosition = {};
+                //fieldPosition = {};
                 _.each(fieldMapping, (mapping) => {
                     // latitude and longitude are combined in a composite field
                     if (mapping.type === 'latlng') {

@@ -93,13 +93,13 @@ module.exports = {
         loaders: [{
             test: /\.css$/,
             loader: 'style-loader!css-loader'
-        }, {
-            test: /\.png/,
-            loader: 'url-loader?limit=100000'
-        },  {
+        }/*,  {
             test: /\.(png|jpg|jpeg|gif)$/,
             loader: 'file-loader'
-        }, {
+        }*/, {
+            test: /\.(woff|png|jpg|gif)$/,
+            loader: 'url-loader?limit=10000&prefix=img/&name=[path][name].[ext]?[hash]'
+        },{
             test: /\.js$/,
             exclude: /node_modules\/(?!phraseanet-common)/,
             loader: 'babel',
