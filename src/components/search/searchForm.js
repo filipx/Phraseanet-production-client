@@ -1,28 +1,38 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
-import * as appCommons from 'phraseanet-common';
 import resultInfos from './resultInfos';
+import user from 'phraseanet-common/src/components/user';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
-import searchAdvancedForm from './searchAdvancedForm';
-
+import searchAdvancedForm from './advSearch/searchAdvancedForm';
+import searchGeoForm from './geoSearch/searchGeoForm';
 const searchForm = (services) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
+    let $searchValue = null;
     let isAdvancedDialogOpen = false;
     let $dialog = null;
-
-
+    let geoForm;
+    let searchPreferences = {};
     const initialize = (options) => {
         let initWith = {$container} = options;
+        $searchValue = $('#EDIT_query');
 
         searchAdvancedForm(services).initialize({
             $container: $container
         });
+        geoForm = searchGeoForm(services);
 
         $container.on('click', '.adv_search_button', (event) => {
             event.preventDefault();
             openAdvancedForm();
+        });
+
+        $container.on('click', '.geo-search-action-btn', (event) => {
+            event.preventDefault();
+            geoForm.openModal({
+                drawnItems: searchPreferences.drawnItems || false
+            });
         });
 
 
@@ -44,10 +54,40 @@ const searchForm = (services) => {
                 isAdvancedDialogOpen = false;
             }
             appEvents.emit('facets.doResetSelectedFacets');
-            appEvents.emit('search.doNewSearch', $('#EDIT_query').val())
+            appEvents.emit('search.doNewSearch', $searchValue.val())
             return false;
         });
     };
+
+    const updateSearchValue = (params) => {
+        let {searchValue} = params;
+        let reset = params.reset !== undefined ? params.reset : false;
+        let submit = params.submit !== undefined ? params.submit : false;
+        $searchValue.val(searchValue);
+
+        if (submit === true) {
+            if (reset === true) {
+                appEvents.emit('search.doNewSearch', $searchValue.val())
+            } else {
+                appEvents.emit('search.doRefreshState');
+            }
+        }
+
+        return searchValue;
+    }
+    const getSearchValue = () => {
+        return $searchValue.val();
+    }
+
+    const updateSearchPreferences = (preferences) => {
+        for (let prefKey in preferences) {
+            if (preferences.hasOwnProperty(prefKey)) {
+                console.log('saving locally', prefKey, preferences[prefKey])
+                searchPreferences[prefKey] = preferences[prefKey];
+                user.setPref(prefKey, JSON.stringify(preferences[prefKey]));
+            }
+        }
+    }
 
     /**
      * Move entire search form into dialog
@@ -80,7 +120,11 @@ const searchForm = (services) => {
         isAdvancedDialogOpen = true;
 
     }
-
+    appEvents.listenAll({
+        'search.getSearchValue': getSearchValue,
+        'search.updateSearchValue': updateSearchValue,
+        'search.updatePreferences': updateSearchPreferences
+    })
     return {initialize};
 };
 

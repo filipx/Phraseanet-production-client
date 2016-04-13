@@ -3,7 +3,7 @@ require('./recordPreview.css');
 import $ from 'jquery';
 import * as Rx from 'rx';
 import Emitter from '../../core/emitter';
-import leafletMap from './../../geolocalisation/leafletMap';
+import leafletMap from './../../geolocalisation/providers/mapbox';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
 require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {

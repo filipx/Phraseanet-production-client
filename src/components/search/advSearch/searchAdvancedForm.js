@@ -1,9 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
-import * as appCommons from 'phraseanet-common';
-import resultInfos from './resultInfos';
-import dialog from 'phraseanet-common/src/components/dialog';
-import Selectable from '../utils/selectable';
+import user from 'phraseanet-common/src/components/user';
 
 const searchAdvancedForm = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -49,8 +46,10 @@ const searchAdvancedForm = (services) => {
          * @TODO refactor
          */
         $('#EDIT_query').bind('focus', function () {
+            console.log('FOCUSED!!!!!')
             $(this).addClass('focused');
         }).bind('blur', function () {
+            console.log('BLUR!!!!!')
             $(this).removeClass('focused');
         });
     };
@@ -264,7 +263,7 @@ const searchAdvancedForm = (services) => {
         }
 
         if (save === true) {
-            appCommons.userModule.setPref('search', JSON.stringify(search));
+            user.setPref('search', JSON.stringify(search));
         }
     };
 

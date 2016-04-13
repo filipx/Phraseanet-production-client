@@ -9,7 +9,7 @@ import searchReplace from './plugins/searchReplace';
 import preview from './plugins/preview';
 import thesaurusDatasource from './plugins/thesaurusDatasource';
 import geonameDatasource from './plugins/geonameDatasource';
-import leafletMap from './../../geolocalisation/leafletMap';
+import leafletMap from './../../geolocalisation/providers/mapbox';
 import Emitter from '../../core/emitter';
 import RecordCollection from './models/recordCollection';
 import FieldCollection from './models/fieldCollection';
