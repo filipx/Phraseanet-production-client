@@ -121,18 +121,15 @@ const leafletMap = (services) => {
         // should restore drawn items?
         // user.getPreferences
         let drawingGroup;
-        /*        if( drawnItems !== false) {
-         drawingGroup = L.geoJson(drawnItems);
-         } else {
-         }*/
         console.log('init drawing group with drawn items', drawnItems)
-        drawingGroup = L.geoJson(drawnItems, {
-            style: function (feature) {
-                return {
-                    color: '#0c4554'
-                }; //feature.properties && feature.properties.style;
-            }
-        }); //new L.FeatureGroup();
+        /*drawingGroup = L.geoJson([], {
+         style: function (feature) {
+         return {
+         color: '#0c4554'
+         }; //feature.properties && feature.properties.style;
+         }
+         });*/
+        drawingGroup = new L.FeatureGroup();
 
 
         map.addLayer(drawingGroup);
@@ -153,6 +150,7 @@ const leafletMap = (services) => {
                         timeout: 1000
                     },
                     shapeOptions: {
+                        shapeType: 'custom RectangleType',
                         color: '#0c4554'
                     },
                     showArea: true
@@ -194,7 +192,7 @@ const leafletMap = (services) => {
                  }*/
             }
         });
-        let shapesDrawed = {};
+        let shapesDrawned = {};
         map.addControl(drawControl);
 
         map.on('draw:created', (event) => {
@@ -202,37 +200,75 @@ const leafletMap = (services) => {
             let layer = event.layer;
             let layerId = drawingGroup.getLayerId(layer);
 
-            shapesDrawed[layerId] = {
+            shapesDrawned[layerId] = {
                 type: type,
+                options: layer.options,
+                latlng: layer.getLatLngs(),
                 bounds: getMappedFieldsCollection(layer.getLatLngs())
             };
-            console.log('>>>>>> send serialized version', drawingGroup, drawingGroup.toGeoJSON())
             drawingGroup.addLayer(layer);
-            eventEmitter.emit('shapeCreated', {shapes: shapesDrawed, drawnItems: drawingGroup.toGeoJSON()});
+            eventEmitter.emit('shapeCreated', {shapes: shapesDrawned, drawnItems: shapesDrawned});
         });
+
         map.on('draw:edited', (event) => {
             let layers = event.layers;
+
             layers.eachLayer(function (layer) {
                 let layerId = drawingGroup.getLayerId(layer);
                 // get type from drawed shape:
-                let currentType = shapesDrawed[layerId].type;
-                shapesDrawed[layerId] = {
-                    type: currentType,
+                let currentType = shapesDrawned[layerId].type;
+                shapesDrawned[layerId] = Object.assign(shapesDrawned[layerId], {
+                    options: layer.options,
+                    latlng: layer.getLatLngs(),
                     bounds: getMappedFieldsCollection(layer.getLatLngs())
-                }
+                })
             });
-            eventEmitter.emit('shapeEdited', {shapes: shapesDrawed, drawnItems: drawingGroup.toGeoJSON()});
+            eventEmitter.emit('shapeEdited', {shapes: shapesDrawned, drawnItems: shapesDrawned});
         });
+
         map.on('draw:deleted', (event) => {
             let layers = event.layers;
             layers.eachLayer(function (layer) {
                 let layerId = drawingGroup.getLayerId(layer);
-                delete shapesDrawed[layerId];
+                delete shapesDrawned[layerId];
             });
-            eventEmitter.emit('shapeRemoved', {shapes: shapesDrawed, drawnItems: drawingGroup.toGeoJSON()});
+            eventEmitter.emit('shapeRemoved', {shapes: shapesDrawned, drawnItems: shapesDrawned});
         });
+
+        // draw serialized items:
+        applyDrawings(drawnItems, drawingGroup);
     };
 
+    /***
+     * Draw serialized shapes
+     * @param shapesDrawned
+     * @param drawingGroup
+     */
+    const applyDrawings = (shapesDrawned, drawingGroup) => {
+        for (let shapeIndex in shapesDrawned) {
+            if (shapesDrawned.hasOwnProperty(shapeIndex)) {
+                let shape = shapesDrawned[shapeIndex];
+
+                let newShape = L.rectangle(shape.latlng, shape.options);
+                let newShapeType = '';
+                switch (shape.type) {
+                    case 'rectangle':
+                        newShape = L.rectangle(shape.latlng, shape.options);
+                        newShapeType = L.Draw.Rectangle.TYPE;
+                        break;
+                    default:
+                        newShape = L.rectangle(shape.latlng, shape.options);
+                        newShapeType = L.Draw.Rectangle.TYPE;
+                }
+                // start editor for new shape:
+                newShape.editing.enable();
+                drawingGroup.addLayer(newShape);
+                // fire created event manually:
+                map.fire('draw:created', {layer: newShape, layerType: newShapeType});
+                newShape.editing.disable();
+            }
+        }
+    }
     const addMarkersLayers = () => {
         if (featureLayer !== null) {
             featureLayer.clearLayers();
@@ -383,7 +419,7 @@ const leafletMap = (services) => {
                     wrappedMappedFields[mappedFieldIndex] = [mappedFields[mappedFieldIndex]]
                 }
             }
-            console.log('values has been wrapped', wrappedMappedFields)
+
             let presets = {
                 fields: wrappedMappedFields //presetFields
             };
