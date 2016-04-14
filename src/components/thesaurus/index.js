@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import _ from 'underscore';
 import { sprintf } from 'sprintf-js';
 import * as AppCommons from 'phraseanet-common';
 import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
@@ -77,13 +78,14 @@ const thesaurusService = (services) => {
             })
             .on('keyup', '.thesaurus-filter-suggest-action', (event) => {
                 event.preventDefault();
-                T_Gfilter_delayed($(event.currentTarget).val(), 300);
+                searchValue($(event.currentTarget).val());
             })
             .on('submit', '.thesaurus-filter-submit-action', (event) => {
                 event.preventDefault();
                 T_Gfilter(event.currentTarget);
             });
 
+        searchValue = _.debounce(searchValue, 300);
     };
 
 
@@ -107,7 +109,7 @@ const thesaurusService = (services) => {
             options.currentWizard = wizard;
 
             if (refreshFilter) {
-                T_Gfilter_delayed($('#THPD_WIZARDS .gform', options.tabs).eq(0).val(), 0);
+                searchValue($('#THPD_WIZARDS .gform', options.tabs).eq(0).val());
             }
             // browse
             if (wizard === 'wiz_0') {
@@ -137,7 +139,7 @@ const thesaurusService = (services) => {
             f = $(o).val();
         }
 
-        T_Gfilter_delayed(f, 0);
+        searchValue(f);
 
         switch (options.currentWizard) {
             case 'wiz_0':	// browse
@@ -153,16 +155,16 @@ const thesaurusService = (services) => {
     }
 
 // here when a key is pressed in the 'filter' form
-    function T_Gfilter_delayed(f, delay) {
+    let searchValue = (f) => {
         switch (options.currentWizard) {
             case 'wiz_0':	// browse
-                T_filter_delayed2(f, delay, 'ALL');
+                searchValueByMode(f, 'ALL');
                 break;
             case 'wiz_1':	// accept
-                T_filter_delayed2(f, delay, 'CANDIDATE');
+                searchValueByMode(f, 'CANDIDATE');
                 break;
             case 'wiz_2':	// replace
-                T_filter_delayed2(f, delay, 'CANDIDATE');
+                searchValueByMode(f, 'CANDIDATE');
                 break;
             default:
                 break;
@@ -198,84 +200,64 @@ const thesaurusService = (services) => {
         confirmBox.setContent(msg);
     }
 
-    let timer = null;
+    function searchValueByMode(f, mode) {
 
-    function T_filter_delayed2(f, delay, mode) {
-        if (timer) {
-            window.clearTimeout(timer);
-            timer = null;
+        if (mode === 'ALL') {
+            // search in every base, everywhere
             for (let i in sbas) {
-                if (sbas[i].seeker) {
-                    sbas[i].seeker.abort();
+                let zurl = '/xmlhttp/search_th_term_prod.j.php'
+                    + '?sbid=' + sbas[i].sbid
+                    + '&t=' + encodeURIComponent(f);
+
+                sbas[i].seeker = $.ajax({
+                    url: zurl,
+                    type: 'POST',
+                    data: [],
+                    dataType: 'json',
+                    success: function (j) {
+                        var z = '#TX_P\\.' + j.parm.sbid + '\\.T';
+
+                        var o = $(z);
+                        var isLast = o.hasClass('last');
+
+                        o.replaceWith(j.html);
+
+                        if (isLast) {
+                            $(z).addClass('last');
+                        }
+                    }
+                });
+            }
+        } else if (mode === 'CANDIDATE') {
+            // search only on the good base and the good branch(es)
+            for (let i in sbas) {
+                var zurl = '/xmlhttp/search_th_term_prod.j.php?sbid=' + sbas[i].sbid;
+
+                if (sbas[i].sbid === trees.C._selInfos.sbas) {
+                    zurl += '&t=' + encodeURIComponent(f)
+                        + '&field=' + encodeURIComponent(trees.C._selInfos.field);
                 }
+                sbas[i].seeker = $.ajax({
+                    url: zurl,
+                    type: 'POST',
+                    data: [],
+                    dataType: 'json',
+                    success: function (j) {
+                        var z = '#TX_P\\.' + j.parm.sbid + '\\.T';
+
+                        var o = $(z);
+                        var isLast = o.hasClass('last');
+
+                        o.replaceWith(j.html);
+
+                        if (isLast) {
+                            $(z).addClass('last');
+                        }
+                    }
+                });
+
             }
         }
-
-        if (delay < 10) {
-            delay = 10;
-        }
-
-        timer = window.setTimeout(
-            function () {
-                if (mode === 'ALL') {
-                    // search in every base, everywhere
-                    for (let i in sbas) {
-                        let zurl = '/xmlhttp/search_th_term_prod.j.php'
-                            + '?sbid=' + sbas[i].sbid
-                            + '&t=' + encodeURIComponent(f);
-
-                        sbas[i].seeker = $.ajax({
-                            url: zurl,
-                            type: 'POST',
-                            data: [],
-                            dataType: 'json',
-                            success: function (j) {
-                                var z = '#TX_P\\.' + j.parm.sbid + '\\.T';
-
-                                var o = $(z);
-                                var isLast = o.hasClass('last');
-
-                                o.replaceWith(j.html);
-
-                                if (isLast) {
-                                    $(z).addClass('last');
-                                }
-                            }
-                        });
-                    }
-                } else if (mode === 'CANDIDATE') {
-                    // search only on the good base and the good branch(es)
-                    for (let i in sbas) {
-                        var zurl = '/xmlhttp/search_th_term_prod.j.php?sbid=' + sbas[i].sbid;
-
-                        if (sbas[i].sbid === trees.C._selInfos.sbas) {
-                            zurl += '&t=' + encodeURIComponent(f)
-                                + '&field=' + encodeURIComponent(trees.C._selInfos.field);
-                        }
-                        sbas[i].seeker = $.ajax({
-                            url: zurl,
-                            type: 'POST',
-                            data: [],
-                            dataType: 'json',
-                            success: function (j) {
-                                var z = '#TX_P\\.' + j.parm.sbid + '\\.T';
-
-                                var o = $(z);
-                                var isLast = o.hasClass('last');
-
-                                o.replaceWith(j.html);
-
-                                if (isLast) {
-                                    $(z).addClass('last');
-                                }
-                            }
-                        });
-
-                    }
-                }
-            },
-            delay
-        );
     }
 
 
