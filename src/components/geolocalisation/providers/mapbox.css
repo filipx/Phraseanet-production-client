@@ -1,6 +1,7 @@
 .ui-widget-content .leaflet-popup-content {
     color: #555555;
 }
+
 .mapbox-logo {
     display: none;
 }
@@ -21,17 +22,21 @@
     width: 30px;
     height: 15px;
 }
+
 .phrasea-popup .leaflet-popup-content p {
     color: #FFF;
 
 }
+
 .phrasea-popup .leaflet-popup-content p.help {
     text-align: center;
     font-style: italic;
 }
+
 .phrasea-popup .leaflet-popup-tip {
-  border-top: 10px solid #3b3b3b;
+    border-top: 10px solid #3b3b3b;
 }
+
 .updated-position {
     text-align: center;
 }
@@ -39,12 +44,14 @@
 .ui-widget-content .leaflet-container {
     color: #555555;
 }
+
 .ui-widget-content .leaflet-container label {
     color: #555555;
     display: block;
     font-size: 12px;
     padding: 0 15px;
 }
+
 .ui-widget-content .leaflet-container form {
     margin: 10px 0 0 0;
 }
@@ -53,8 +60,18 @@
     margin: -4px 0 0 0;
     padding: 0;
 }
+
 .leaflet-control-layers-selector {
     margin-top: 2px;
     position: relative;
     top: 1px;
+}
+
+.leaflet-control-mapbox-geocoder .leaflet-control-mapbox-geocoder-form input {
+    box-shadow: none;
+    font-size: 12px;
+}
+
+.ui-widget-content .leaflet-container form {
+    margin-top: 0;
 }

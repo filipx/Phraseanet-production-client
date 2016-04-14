@@ -13,6 +13,7 @@ const searchGeoForm = (services) => {
     let mapBoxService;
     let searchQuery;
     let drawnItems;
+    let $geoSearchBtn;
     const mapContainerName = 'geo-search-map-container';
 
     const openModal = (options) => {
@@ -29,6 +30,7 @@ const searchGeoForm = (services) => {
     };
 
     const onModalReady = (options) => {
+
         $container.on('click', '.submit-geo-search-action', (event) => {
             event.preventDefault();
             appEvents.emit('search.updateSearchValue', {
@@ -55,8 +57,8 @@ const searchGeoForm = (services) => {
         // @TODO cleanup styles
         return `
         <div style="overflow:hidden">
-        <div id="${mapContainerName}" style="top: 0px; left: 0;    bottom: 30px;    position: absolute;height: auto;width: 100%;overflow: hidden;"></div>
-        <div style="position: absolute;bottom: 0; text-align:center; height: 28px; width: 98%;overflow: hidden;"><button class="submit-geo-search-action btn btn-inverse">${localeService.t('Valider')}</button></div>
+        <div id="${mapContainerName}" style="top: 0px; left: 0;    bottom: 42px;    position: absolute;height: auto;width: 100%;overflow: hidden;"></div>
+        <div style="position: absolute;bottom: 0; text-align:center; height: 35px; width: 98%;overflow: hidden;"><button class="submit-geo-search-action btn" style="font-size: 14px">${localeService.t('Valider')}</button></div>
         </div>`;
     };
 

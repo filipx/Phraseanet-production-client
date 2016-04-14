@@ -1,5 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
+import _ from 'underscore';
 import resultInfos from './resultInfos';
 import user from 'phraseanet-common/src/components/user';
 import dialog from 'phraseanet-common/src/components/dialog';
@@ -14,6 +15,7 @@ const searchForm = (services) => {
     let $dialog = null;
     let geoForm;
     let searchPreferences = {};
+    let $geoSearchTriggerImg;
     const initialize = (options) => {
         let initWith = {$container} = options;
         $searchValue = $('#EDIT_query');
@@ -27,6 +29,8 @@ const searchForm = (services) => {
             event.preventDefault();
             openAdvancedForm();
         });
+
+        toggleSearchState();
 
         $container.on('click', '.geo-search-action-btn', (event) => {
             event.preventDefault();
@@ -59,11 +63,26 @@ const searchForm = (services) => {
         });
     };
 
+    const toggleSearchState = () => {
+        $geoSearchTriggerImg = $('.geo-search-action-btn').find('img');
+        $geoSearchTriggerImg.attr('src', '/assets/common/images/icons/map.png');
+        if (searchPreferences.drawnItems !== undefined) {
+            if (!_.isEmpty(searchPreferences.drawnItems)) {
+                $geoSearchTriggerImg.attr('src', '/assets/common/images/icons/map-active.png');
+            }
+
+        }
+    }
+
     const updateSearchValue = (params) => {
         let {searchValue} = params;
         let reset = params.reset !== undefined ? params.reset : false;
         let submit = params.submit !== undefined ? params.submit : false;
         $searchValue.val(searchValue);
+
+        // toogle states:
+        toggleSearchState();
+
 
         if (submit === true) {
             if (reset === true) {
@@ -82,7 +101,6 @@ const searchForm = (services) => {
     const updateSearchPreferences = (preferences) => {
         for (let prefKey in preferences) {
             if (preferences.hasOwnProperty(prefKey)) {
-                console.log('saving locally', prefKey, preferences[prefKey])
                 searchPreferences[prefKey] = preferences[prefKey];
                 user.setPref(prefKey, JSON.stringify(preferences[prefKey]));
             }

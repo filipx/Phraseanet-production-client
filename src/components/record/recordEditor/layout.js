@@ -66,14 +66,14 @@ const recordEditorLayout = (services) => {
         $('#EDIT_ZOOMSLIDER', parentOptions.$container).slider({
             min: 60,
             max: 300,
-            value: parentOptions.diapoSize,
+            value: parentOptions.recordConfig.diapoSize,
             slide: function (event, ui) {
                 var v = $(ui.value)[0];
                 $('#EDIT_FILM2 .diapo', parentOptions.$container).width(v).height(v);
             },
             change: function (event, ui) {
-                parentOptions.diapoSize = $(ui.value)[0];
-                appCommons.userModule.setPref('editing_images_size', parentOptions.diapoSize);
+                parentOptions.recordConfig.diapoSize = $(ui.value)[0];
+                appCommons.userModule.setPref('editing_images_size', parentOptions.recordConfig.diapoSize);
             }
         });
 

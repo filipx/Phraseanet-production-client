@@ -52,10 +52,10 @@ const previewRecordService = (services) => {
                 resizePreview();
             }
         });
-
         leafletMap({configService, localeService, eventEmitter: recordPreviewEvents}).initialize({
             $container: $previewContainer,
             parentOptions: options,
+            searchable: true,
             tabOptions: {
                 /*tabProperties: {
                  classes: 'descBoxes',

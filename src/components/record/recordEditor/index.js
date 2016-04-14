@@ -39,6 +39,7 @@ const recordEditorService = (services) => {
         recordEditorEvents = new Emitter();
         options = {};
         $editorContainer = options.$container = $container; //$('#idFrameE');
+        options.recordConfig = recordConfig || {};
         options.textareaIsDirty = false;
         options.fieldLastValue = '';
         options.lastClickId = null;
@@ -331,6 +332,7 @@ const recordEditorService = (services) => {
         leafletMap({configService, localeService, eventEmitter: recordEditorEvents}).initialize({
             $container: $editorContainer,
             parentOptions: options,
+            searchable: true,
             tabOptions: {
                 position: 2
             },

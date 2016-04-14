@@ -5,10 +5,11 @@ import _ from 'underscore';
 import markerCollection from './markerCollection';
 import {generateRandStr} from '../../utils/utils';
 import provider from '../provider';
-
+import leafletLocaleFr from './locales/fr';
 require('mapbox.js/theme/style.css');
 require('./mapbox.css');
 require('leaflet-draw/dist/leaflet.draw.css');
+require('leaflet-contextmenu/dist/leaflet.contextmenu.css');
 const leafletMap = (services) => {
     const {configService, localeService, eventEmitter} = services;
     let $container = null;
@@ -25,6 +26,7 @@ const leafletMap = (services) => {
     let tabContainerName = 'leafletTabContainer';
     let editable;
     let drawable;
+    let searchable;
     let drawnItems;
     let activeProvider = {};
     const initialize = (options) => {
@@ -33,6 +35,7 @@ const leafletMap = (services) => {
         mapOptions = options.mapOptions !== undefined ? _.extend(mapOptions, options.mapOptions) : mapOptions;
         editable = options.editable || false;
         drawable = options.drawable || false;
+        searchable = options.searchable || false;
         drawnItems = options.drawnItems || false;
 
         mapUID = 'leafletMap' + generateRandStr(5);
@@ -88,15 +91,37 @@ const leafletMap = (services) => {
             // select geocoding provider:
             mapbox = require('mapbox.js');
             leafletDraw = require('leaflet-draw');
-            // require('leaflet-contextmenu');
+            require('leaflet-contextmenu');
 
             $container.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
-            L.mapbox.accessToken = activeProvider.accessToken;
-            console.log('passed options', mapOptions)
-            map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions)
-                .setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+            if (editable) {
+                // init add marker context menu only if 1 record is available and has no coords
+                if (pois.length === 1) {
+                    let poiIndex = 0;
+                    let selectedPoi = pois[poiIndex];
+                    let poiCoords = haveValidCoords(selectedPoi);
+                    if (poiCoords === false) {
+                        mapOptions = Object.assign({
+                            contextmenu: true,
+                            contextmenuWidth: 140,
+                            contextmenuItems: [{
+                                text: localeService.t('mapMarkerAdd'),
+                                callback: (e) => {
+                                    addMarkerOnce(e, poiIndex, selectedPoi)
+                                }
+                            }]
+                        }, mapOptions);
+                    }
+                }
+            }
 
+            L.mapbox.accessToken = activeProvider.accessToken;
+            map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
+            map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+            if (searchable) {
+                map.addControl(L.mapbox.geocoderControl('mapbox.places'));
+            }
             var layers = {
                 Streets: L.mapbox.tileLayer('mapbox.streets'),
                 Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
@@ -118,19 +143,13 @@ const leafletMap = (services) => {
 
     const addDrawableLayers = () => {
 
+        if (localeService.getLocale() === 'fr') {
+            L.drawLocal = leafletLocaleFr;
+        }
         // should restore drawn items?
         // user.getPreferences
         let drawingGroup;
-        console.log('init drawing group with drawn items', drawnItems)
-        /*drawingGroup = L.geoJson([], {
-         style: function (feature) {
-         return {
-         color: '#0c4554'
-         }; //feature.properties && feature.properties.style;
-         }
-         });*/
         drawingGroup = new L.FeatureGroup();
-
 
         map.addLayer(drawingGroup);
 
@@ -150,46 +169,13 @@ const leafletMap = (services) => {
                         timeout: 1000
                     },
                     shapeOptions: {
-                        shapeType: 'custom RectangleType',
                         color: '#0c4554'
                     },
                     showArea: true
-                },
+                }
             },
             edit: {
-                featureGroup: drawingGroup,
-                // @TODO tranlations
-                /*toolbar: {
-                 actions: {
-                 save: {
-                 title: 'Save changes.',
-                 text: 'Save'
-                 },
-                 cancel: {
-                 title: 'Cancel editing, discards all changes.',
-                 text: 'Cancel'
-                 }
-                 },
-                 buttons: {
-                 edit: 'Edit layers.',
-                 editDisabled: 'No layers to edit.',
-                 remove: 'Delete layers.',
-                 removeDisabled: 'No layers to delete.'
-                 }
-                 },
-                 handlers: {
-                 edit: {
-                 tooltip: {
-                 text: 'Drag handles, or marker to edit feature.',
-                 subtext: 'Click cancel to undo changes.'
-                 }
-                 },
-                 remove: {
-                 tooltip: {
-                 text: 'Click on a feature to remove'
-                 }
-                 }
-                 }*/
+                featureGroup: drawingGroup
             }
         });
         let shapesDrawned = {};
@@ -269,6 +255,27 @@ const leafletMap = (services) => {
             }
         }
     }
+    const addMarkerOnce = (e, poiIndex, poi) => {
+        // inject coords into poi's fields:
+        let mappedCoords = getMappedFields(e.latlng);
+        let pois = [Object.assign(poi, mappedCoords)];
+        refreshMarkers(pois).then(() => {
+            // broadcast event:
+            let wrappedMappedFields = {};
+            // values needs to be wrapped in a array:
+            for (let fieldIndex in mappedCoords) {
+                if (mappedCoords.hasOwnProperty(fieldIndex)) {
+                    wrappedMappedFields[fieldIndex] = [mappedCoords[fieldIndex]]
+                }
+            }
+
+            let presets = {
+                fields: wrappedMappedFields //presetFields
+            };
+            map.contextmenu.disable();
+            eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, recordIndex: poiIndex});
+        });
+    }
     const addMarkersLayers = () => {
         if (featureLayer !== null) {
             featureLayer.clearLayers();
@@ -290,7 +297,7 @@ const leafletMap = (services) => {
 
     const refreshMarkers = (pois) => {
 
-        buildGeoJson(pois).then((geoJsonPoiCollection) => {
+        return buildGeoJson(pois).then((geoJsonPoiCollection) => {
             addMarkersLayers();
 
             let markerColl = markerCollection(services);
@@ -391,6 +398,9 @@ const leafletMap = (services) => {
     const extractCoords = (poi) => {
         return [activeProvider.fieldPosition.longitude(poi), activeProvider.fieldPosition.latitude(poi)];
     };
+    const haveValidCoords = (poi) => {
+        return activeProvider.fieldPosition.longitude(poi) && activeProvider.fieldPosition.latitude(poi)
+    }
 
     let onResizeEditor = () => {
         if (activeProvider.accessToken === undefined) {

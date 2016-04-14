@@ -49,14 +49,14 @@ const markerCollection = (services) => {
         if (editable === true && marker.dragging !== undefined) {
             template += `
             <div class="view-mode">
-                    <button class="edit-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('edit')}</button>
+                    <button class="edit-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('mapMarkerEdit')}</button>
             </div>
             <div class="edit-mode">
-                <p class="help">drag the pin where you want</p>
+                <p class="help">${localeService.t('mapMarkerMoveLabel')}</p>
                 <p><span class="updated-position"></span></p>
                 <div>
-                    <button class="cancel-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('annuler')}</button>
-                    <button class="submit-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('valider')}</button>
+                    <button class="cancel-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('mapMarkerEditCancel')}</button>
+                    <button class="submit-position btn btn-inverse btn-small btn-block" data-marker-id="${marker._leaflet_id}">${localeService.t('mapMarkerEditSubmit')}</button>
                 </div>
             </div>`;
         }

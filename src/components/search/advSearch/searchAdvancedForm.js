@@ -3,7 +3,7 @@ import $ from 'jquery';
 import user from 'phraseanet-common/src/components/user';
 
 const searchAdvancedForm = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let $container = null;
     const initialize = (options) => {
@@ -46,10 +46,9 @@ const searchAdvancedForm = (services) => {
          * @TODO refactor
          */
         $('#EDIT_query').bind('focus', function () {
-            console.log('FOCUSED!!!!!')
+            console.log('bind focus')
             $(this).addClass('focused');
         }).bind('blur', function () {
-            console.log('BLUR!!!!!')
             $(this).removeClass('focused');
         });
     };
