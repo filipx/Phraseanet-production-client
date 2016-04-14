@@ -147,7 +147,8 @@ const workzone = (services) => {
         });
         activeBaskets();
 
-        $('a.story_unfix').on('click', function () {
+        $('a.story_unfix').on('click', function (event) {
+            event.preventDefault();
             unfix($(this).attr('href'));
 
             return false;

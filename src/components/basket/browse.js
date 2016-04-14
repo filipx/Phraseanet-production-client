@@ -112,7 +112,8 @@ const basketBrowse = (services) => {
             let confirmBox = {};
             let buttons = {};
 
-            $('a.result', $scope).bind('click', function () {
+            $('a.result', $scope).bind('click', function (event) {
+                event.preventDefault();
                 var $this = $(this);
 
                 loadResults({}, $this.attr('href'));
@@ -120,7 +121,8 @@ const basketBrowse = (services) => {
                 return false;
             });
 
-            $('a.basket_link', $scope).bind('click', function () {
+            $('a.basket_link', $scope).bind('click', function (event) {
+                event.preventDefault();
                 var $this = $(this);
 
                 loadBasket($this.attr('href'));
@@ -188,7 +190,8 @@ const basketBrowse = (services) => {
 
             $('.infoTips, .previewTips', $scope).tooltip();
 
-            $('a.archive_toggler', $scope).bind('click', function () {
+            $('a.archive_toggler', $scope).bind('click', function (event) {
+                event.preventDefault();
                 const $this = $(this);
                 const parent = $this.parent();
 
