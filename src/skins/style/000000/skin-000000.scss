@@ -159,5 +159,5 @@ $proposalsTitleHoverColor: lighten($proposalsTitleColor, 10); // $mediumTextHove
 $proposalsTitleBorder: #303030;
 $proposalsFacetHoverColor: #FFF;
 
-@import '../../shared/jquery-ui/dark-hive';
+@import '../../../../stylesheets/shared/jquery-ui/dark-hive';
 @import '../skin-shared';

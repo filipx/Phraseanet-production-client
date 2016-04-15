@@ -59,7 +59,12 @@ const pkg = require('../../package.json');
 // const banner = require('../banner');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const config = require('../config');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+// add loader for external stylesheets:
+var extractCSS = new ExtractTextPlugin('[name].css', {
+    allChunks: true
+});
 module.exports = {
     // entry points
     entry: {
@@ -69,7 +74,10 @@ module.exports = {
         permaview: config.sourceDir + 'permaview/index.js',
         authenticate: [config.sourceDir + 'authenticate/index.js'],
         account: [config.sourceDir + 'account/index.js'],
-        commons: [config.sourceDir + 'common/index.js']
+        commons: [config.sourceDir + 'common/index.js'],
+        'skin-000000': [config.sourceDir + 'skins/skin-000000.js'],
+        'skin-959595': [config.sourceDir + 'skins/skin-959595.js'],
+        'skin-FFFFFF': [config.sourceDir + 'skins/skin-FFFFFF.js']
     },
     cache: true,
     debug: true,
@@ -109,11 +117,20 @@ module.exports = {
         }, {
             test: /\.(png|jpg|jpeg|gif)$/,
             loader: 'file-loader'
-        }, {
+        },
+            // exclude skins as inline-css in dev env
+            {
             test: /\.scss$/,
-            include: path.join(__dirname, '../../src'),
+            exclude: /src\/skins\//,
             loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
-        }, {
+        },
+            // only skins are extracted as external file in dev env:
+            {
+            test: /\.scss$/,
+            exclude: /src\/(?!skins)/,
+            include: [path.join(__dirname, '../../src'), path.join(__dirname, '../../stylesheets')],
+            loader: ExtractTextPlugin.extract('css!resolve-url!sass?sourceMap', { publicPath: './'})
+        },{
             test: require.resolve('jquery-lazyload'),
             loader: "imports?this=>window"
         }, {
@@ -152,7 +169,8 @@ module.exports = {
             name: 'commons',
             chunks: ['production', 'lightbox'],
             minChunks: 2
-        })
+        }),
+        extractCSS
         // i18next
     ],
     externals: {

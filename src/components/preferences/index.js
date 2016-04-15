@@ -3,9 +3,11 @@ import * as appCommons from 'phraseanet-common';
 let highlight = require('imports?$=jquery!../utils/jquery-plugins/highlight');
 let colorpicker = require('imports?$=jquery!../utils/jquery-plugins/colorpicker/colorpicker');
 const preferences = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     const initialize = (options = {}) => {
-        const { $container } = options;
+        const {$container} = options;
+
+        render();
 
         $container.on('click', '.open-preferences', (event) => {
             event.preventDefault();
@@ -100,6 +102,18 @@ const preferences = (services) => {
             appCommons.userModule.setPref('basket_title_display', $el.prop('checked') ? '1' : '0');
         });
 
+        $container.on('click', '.preference-change-theme-action', (event) => {
+            let $el = $(event.currentTarget);
+            let color = $el.data('theme');
+            let minified = configService.get('debug') ? '' : '.min';
+            // setCss()
+            $('#skinCss').attr("href", `/assets/production/skin-${color}${minified}.css`);
+            $.post(`${configService.get('baseUrl')}/user/preferences/`, {
+                prop: "css",
+                value: color,
+                t: Math.random()
+            });
+        });
 
         $('#nperpage_slider').slider({
             value: parseInt($('#nperpage_value').val(), 10),
@@ -170,6 +184,18 @@ const preferences = (services) => {
         $('#look_box .tabs').tabs();
     };
 
+    const render = () => {
+        let availableThemes = configService.get('availableThemes');
+        let themeTpl = ``;
+
+        for (let t in availableThemes) {
+            let curTheme = availableThemes[t];
+            themeTpl += `<div class="colorpicker_box preference-change-theme-action" data-theme="${curTheme.name}" style="width:16px;height:16px;background-color:#${curTheme.name};">&nbsp;</div>`;
+        }
+        // generates themes
+        $('#theme-container').empty().append(themeTpl);
+    }
+
 // look_box
     function setInitialStateOptions() {
         var el = $('#look_box_settings select[name=start_page]');
@@ -217,6 +243,7 @@ const preferences = (services) => {
             }
         }).dialog('open');
     }
+
     return {
         initialize,
         openModal
