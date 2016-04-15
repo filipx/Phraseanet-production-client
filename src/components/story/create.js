@@ -3,6 +3,7 @@
  */
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
+import merge from 'lodash.merge';
 
 const storyCreate = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -31,7 +32,7 @@ const storyCreate = (services) => {
 
     const openModal = (options = {}) => {
 
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Small',
             loading: false
         }, options);

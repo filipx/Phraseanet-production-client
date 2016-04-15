@@ -5,6 +5,14 @@ const leafletLocaleFr = {
                 title: 'Annulez le dessin',
                 text: 'Annuler'
             },
+            finish: {
+                title: 'Terminer le dessin',
+                text: 'Terminer'
+            },
+            undo: {
+                title: 'Supprimer le dernier point',
+                text: 'Supprimer le dernier point'
+            },
             buttons: {
                 polyline: 'Dessiner une polyligne',
                 polygon: 'Dessiner un polygone',

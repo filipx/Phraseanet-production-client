@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import ConfigService from './../components/core/configService';
 import LocaleService from '../components/locale';
-
+import merge from 'lodash.merge';
 import defaultConfig from './config';
 import Emitter from '../components/core/emitter';
 import account from './../components/account';
@@ -16,7 +16,7 @@ class Bootstrap {
 
     constructor(userConfig) {
 
-        const configuration = Object.assign({}, defaultConfig, userConfig);
+        const configuration = merge({}, defaultConfig, userConfig);
 
         this.appEvents = new Emitter();
         this.configService = new ConfigService(configuration);

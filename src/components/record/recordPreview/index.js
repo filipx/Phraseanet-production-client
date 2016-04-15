@@ -1,6 +1,7 @@
 require('./recordPreview.css');
 
 import $ from 'jquery';
+import merge from 'lodash.merge';
 import * as Rx from 'rx';
 import Emitter from '../../core/emitter';
 import leafletMap from './../../geolocalisation/providers/mapbox';
@@ -602,7 +603,7 @@ const previewRecordService = (services) => {
     };
 
     const onNavigationChanged = (navigation = {}) => {
-        options.navigation = Object.assign(options.navigation, navigation);
+        options.navigation = merge(options.navigation, navigation);
     };
 
     const appendTab = (params) => {

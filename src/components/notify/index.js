@@ -3,7 +3,7 @@ import $ from 'jquery';
 import notifyLayout from './notifyLayout';
 import notifyService from './notifyService';
 import * as Rx from 'rx';
-
+import merge from 'lodash.merge';
 const notify = (services) => {
 
     const { configService, localeService, appEvents } = services;
@@ -27,7 +27,7 @@ const notify = (services) => {
             return defaultConfig;
         }
 
-        return Object.assign({}, defaultConfig, {
+        return merge({}, defaultConfig, {
             url: state.url,
             moduleId: state.moduleId,
             userId: state.userId,

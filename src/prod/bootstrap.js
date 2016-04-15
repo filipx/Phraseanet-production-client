@@ -17,7 +17,7 @@ import basket from '../components/basket';
 import search from '../components/search';
 import utils from './../components/utils/utils';
 import dialog from '../../node_modules/phraseanet-common/src/components/dialog';
-
+import merge from 'lodash.merge';
 class Bootstrap {
 
     app;
@@ -32,7 +32,7 @@ class Bootstrap {
 
     constructor(userConfig) {
         this.ready = $.Deferred();
-        const configuration = Object.assign({}, defaultConfig, userConfig);
+        const configuration = merge({}, defaultConfig, userConfig);
 
         this.appEvents = new Emitter();
         // this.appEvents.listenAll(user().subscribeToEvents);

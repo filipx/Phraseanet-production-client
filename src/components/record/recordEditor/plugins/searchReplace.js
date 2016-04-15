@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import merge from 'lodash.merge';
 const humane = require('humane-js');
 /**
  * Editor Right tab plugin
@@ -82,7 +83,7 @@ const searchReplace = (services) => {
             }
         }
 
-        return Object.assign({}, tRecords);
+        return merge({}, tRecords);
     };
 
     function _toggleReplaceMode(ckRegExp) {

@@ -3,6 +3,7 @@
  */
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
+import merge from 'lodash.merge';
 const humane = require('humane-js');
 
 const basketUpdate = (services) => {
@@ -32,7 +33,7 @@ const basketUpdate = (services) => {
 
     const openModal = (options = {}) => {
 
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Medium',
             loading: false
         }, options);

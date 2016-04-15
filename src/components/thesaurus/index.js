@@ -1,27 +1,29 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import { sprintf } from 'sprintf-js';
+import {sprintf} from 'sprintf-js';
 import * as AppCommons from 'phraseanet-common';
 import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 require('phraseanet-common/src/components/vendors/contextMenu');
 
 const thesaurusService = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     let options = {};
     let config = {};
     let sbas;
     let bas2sbas;
     let trees; // @TODO remove global
     const initialize = (params) => {
-        let { $container } = params;
+        let {$container} = params;
 
         config = configService.get('thesaurusConfig');
-
         // set up thlist:
         options.thlist = {};
         options.tabs = null;
-        for (let db of config.availableDatabases) {
-            options.thlist['s' + db.id] = new ThesauThesaurusSeeker(db.id);
+        for (let db in config.availableDatabases) {
+            if (config.availableDatabases.hasOwnProperty(db)) {
+                let curDb = config.availableDatabases[db];
+                options.thlist['s' + curDb.id] = new ThesauThesaurusSeeker(curDb.id);
+            }
         }
 
         startThesaurus();
@@ -208,7 +210,7 @@ const thesaurusService = (services) => {
                 let zurl = '/xmlhttp/search_th_term_prod.j.php'
                     + '?sbid=' + sbas[i].sbid
                     + '&t=' + encodeURIComponent(f);
-
+                $('#THPD_T_treeBox').addClass('loading');
                 sbas[i].seeker = $.ajax({
                     url: zurl,
                     type: 'POST',
@@ -225,6 +227,8 @@ const thesaurusService = (services) => {
                         if (isLast) {
                             $(z).addClass('last');
                         }
+                    }, complete: function () {
+                        $('#THPD_T_treeBox').removeClass('loading');
                     }
                 });
             }
@@ -232,7 +236,7 @@ const thesaurusService = (services) => {
             // search only on the good base and the good branch(es)
             for (let i in sbas) {
                 var zurl = '/xmlhttp/search_th_term_prod.j.php?sbid=' + sbas[i].sbid;
-
+                $('#THPD_T_treeBox').addClass('loading');
                 if (sbas[i].sbid === trees.C._selInfos.sbas) {
                     zurl += '&t=' + encodeURIComponent(f)
                         + '&field=' + encodeURIComponent(trees.C._selInfos.field);
@@ -253,6 +257,8 @@ const thesaurusService = (services) => {
                         if (isLast) {
                             $(z).addClass('last');
                         }
+                    }, complete: function () {
+                        $('#THPD_T_treeBox').removeClass('loading');
                     }
                 });
 

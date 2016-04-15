@@ -3,6 +3,7 @@
  */
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
+import merge from 'lodash.merge';
 
 const resultInfos = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -42,7 +43,7 @@ const resultInfos = (services) => {
     const openModal = (options = {}, content) => {
         const url = configService.get('baseUrl');
 
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Medium',
             loading: false
         }, options);

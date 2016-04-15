@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import _ from 'underscore';
+import merge from 'lodash.merge';
 import * as appCommons from 'phraseanet-common';
 import {cleanTags} from '../../utils/utils';
 import {sprintf} from 'sprintf-js';
@@ -228,7 +229,7 @@ const recordEditorService = (services) => {
 
         options.sbas_id = databoxId;
         options.what = mode;
-        options = Object.assign(options, state);
+        options = merge(options, state);
 
         options.fieldCollection = new FieldCollection(state.T_fields);
         options.statusCollection = new StatusCollection(state.T_statbits);

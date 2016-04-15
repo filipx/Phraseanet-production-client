@@ -5,6 +5,7 @@ import $ from 'jquery';
 import * as _ from 'underscore';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
+import merge from 'lodash.merge';
 
 const storyReorderContent = (services) => {
     const { configService, localeService, appEvents } = services;
@@ -26,7 +27,7 @@ const storyReorderContent = (services) => {
 
     const openModal = (dbId, recordId, options = {}) => {
 
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Medium',
             loading: false
         }, options);

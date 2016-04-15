@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
+import merge from 'lodash.merge';
 require('phraseanet-common/src/components/tooltip');
 const humane = require('humane-js');
 
@@ -23,7 +24,7 @@ const basketBrowse = (services) => {
 
     const openModal = (options = {}) => {
 
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Medium',
             loading: false
         }, options);

@@ -4,6 +4,7 @@
 import $ from 'jquery';
 import * as _ from 'underscore';
 import dialog from '../../../../node_modules/phraseanet-common/src/components/dialog';
+import merge from 'lodash.merge';
 require('geonames-server-jquery-plugin/jquery.geonames.js');
 
 const pushAddUser = (services) => {
@@ -34,7 +35,7 @@ const pushAddUser = (services) => {
 
     const openModal = (options = {}) => {
         const url = configService.get('baseUrl');
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Medium',
             loading: false
         }, options);

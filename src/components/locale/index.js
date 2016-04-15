@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import Backend from 'i18next-xhr-backend';
+import $ from 'jquery';
 import * as Rx from 'rx';
 
 let instance = null;
@@ -43,26 +44,27 @@ class LocaleService {
 
     fetchTranslations(data) {
         data = data || {};
-        this.i18n = new Promise((resolve, reject) => {
-            i18next
-                .use(Backend)
-                .init({
-                    lng: this.locale,
-                    backend: {
-                        loadPath: this.path,
+        let i18nPromise = $.Deferred();
+        i18next
+            .use(Backend)
+            .init({
+                lng: this.locale,
+                backend: {
+                    loadPath: this.path,
 
-                    }
-                }, (err, t) => {
-                    this.isCached = true;
-                    this.translate = t;
-                    this.cachedTranslations = i18next.getResourceBundle(this.locale);
-                    resolve(instance);
-                    if (data.callback !== undefined) {
-                        data.callback();
-                    }
-                    //resolve(this.i18n);
-                });
-        });
+                }
+            }, (err, t) => {
+                this.isCached = true;
+                this.translate = t;
+                this.cachedTranslations = i18next.getResourceBundle(this.locale);
+                i18nPromise.resolve(instance);
+                if (data.callback !== undefined) {
+                    data.callback();
+                }
+                //resolve(this.i18n);
+            });
+        // });
+        this.i18n = i18nPromise.promise();
         this.stream = Rx.Observable.fromPromise(this.i18n);
         return this.i18n;
     }

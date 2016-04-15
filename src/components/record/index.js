@@ -1,32 +1,33 @@
-import { Observable } from 'rx';
-import { ajax } from 'jquery';
+import {Observable} from 'rx';
+// import {ajax} from 'jquery';
+import $ from 'jquery';
 
 let recordService = (services) => {
-    const { configService } = services;
+    const {configService} = services;
     const url = configService.get('baseUrl');
     const notificationEndPoint = 'session/notifications/';
     let initialize = () => {
     };
 
     let getNotification = (data) => {
-        return new Promise((resolve, reject) => {
-            ajax({
-                type: 'POST',
-                url: `${url}${notificationEndPoint}`,
-                data: data,
-                dataType: 'json'
-            }).done((data) => {
-                    data.status = data.status || false;
-                    if (data.status === 'ok') {
-                        resolve(data);
-                    } else {
-                        reject(data);
-                    }
-                })
-                .fail((data) => {
-                    reject(data);
-                });
-        });
+        let notificationPromise = $.Deferred();
+        $.ajax({
+            type: 'POST',
+            url: `${url}${notificationEndPoint}`,
+            data: data,
+            dataType: 'json'
+        }).done((data) => {
+                data.status = data.status || false;
+                if (data.status === 'ok') {
+                    notificationPromise.resolve(data);
+                } else {
+                    notificationPromise.reject(data);
+                }
+            })
+            .fail((data) => {
+                notificationPromise.reject(data);
+            });
+        return notificationPromise.promise();
     };
 
     let stream = Observable.fromPromise(getNotification);

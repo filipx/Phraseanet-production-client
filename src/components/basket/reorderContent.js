@@ -5,7 +5,7 @@ import $ from 'jquery';
 import * as _ from 'underscore';
 import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
-
+import merge from 'lodash.merge';
 const basketReorderContent = (services) => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
@@ -32,7 +32,7 @@ const basketReorderContent = (services) => {
 
     const openModal = (basketId, options = {}) => {
 
-        let dialogOptions = Object.assign({
+        let dialogOptions = merge({
             size: 'Medium',
             loading: false
         }, options);

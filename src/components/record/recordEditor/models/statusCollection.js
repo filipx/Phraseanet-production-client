@@ -1,3 +1,4 @@
+import merge from 'lodash.merge';
 class StatusCollection {
     status;
 
@@ -12,7 +13,7 @@ class StatusCollection {
     fillWithRecordValues(records) {
         let prefilledStatus = {};
         for (let statusIndex in this.status) {
-            prefilledStatus[statusIndex] = Object.assign({}, this.status[statusIndex]);
+            prefilledStatus[statusIndex] = merge({}, this.status[statusIndex]);
             prefilledStatus[statusIndex]._value = '-1';			// val unknown
             for (let i in records) {
                 if (!records[i]._selected) {

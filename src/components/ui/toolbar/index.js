@@ -10,6 +10,7 @@ import recordToolsModal from '../../record/tools/index';
 import printRecord from '../../record/print';
 import recordFeedbackModal from '../../record/feedback';
 import bridgeRecord from '../../record/bridge';
+import merge from 'lodash.merge';
 
 const toolbar = (services) => {
     const {configService, localeService, appEvents} = services;
@@ -79,7 +80,7 @@ const toolbar = (services) => {
 
         }
         //return originalSelection.concat(newSelection);
-        return Object.assign({}, originalSelection, newSelection);
+        return merge({}, originalSelection, newSelection);
     };
 
     const _prepareParams = (selection) => {

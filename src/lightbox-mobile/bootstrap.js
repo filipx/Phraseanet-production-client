@@ -5,6 +5,7 @@ import defaultConfig from './config';
 import Emitter from '../components/core/emitter';
 import lightbox from './../components/lightbox/index';
 import mainMenu from './../components/mainMenu';
+import merge from 'lodash.merge';
 require('phraseanet-common/src/components/tooltip');
 require('phraseanet-common/src/components/vendors/contextMenu');
 
@@ -19,7 +20,7 @@ class Bootstrap {
 
     constructor(userConfig) {
 
-        const configuration = Object.assign({}, defaultConfig, userConfig);
+        const configuration = merge({}, defaultConfig, userConfig);
 
         this.appEvents = new Emitter();
         this.configService = new ConfigService(configuration);

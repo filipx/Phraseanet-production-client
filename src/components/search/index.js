@@ -1,8 +1,7 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
-import * as appCommons from 'phraseanet-common';
+import merge from 'lodash.merge';
 import resultInfos from './resultInfos';
-import dialog from 'phraseanet-common/src/components/dialog';
 import Selectable from '../utils/selectable';
 let lazyload = require('jquery-lazyload');
 require('phraseanet-common/src/components/tooltip');
@@ -161,7 +160,7 @@ const search = (services) => {
                     $('#IMGT_' + el).addClass('selected');
                 });
 
-                searchResult.navigation = Object.assign(searchResult.navigation, datas.navigation, {
+                searchResult.navigation = merge(searchResult.navigation, datas.navigation, {
                     tot: datas.total_answers,
                     tot_options: datas.form,
                     tot_query: datas.query

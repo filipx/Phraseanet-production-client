@@ -6,6 +6,7 @@ import markerCollection from './markerCollection';
 import {generateRandStr} from '../../utils/utils';
 import provider from '../provider';
 import leafletLocaleFr from './locales/fr';
+import merge from 'lodash.merge';
 require('mapbox.js/theme/style.css');
 require('./mapbox.css');
 require('leaflet-draw/dist/leaflet.draw.css');
@@ -102,7 +103,7 @@ const leafletMap = (services) => {
                     let selectedPoi = pois[poiIndex];
                     let poiCoords = haveValidCoords(selectedPoi);
                     if (poiCoords === false) {
-                        mapOptions = Object.assign({
+                        mapOptions = merge({
                             contextmenu: true,
                             contextmenuWidth: 140,
                             contextmenuItems: [{
@@ -203,7 +204,7 @@ const leafletMap = (services) => {
                 let layerId = drawingGroup.getLayerId(layer);
                 // get type from drawed shape:
                 let currentType = shapesDrawned[layerId].type;
-                shapesDrawned[layerId] = Object.assign(shapesDrawned[layerId], {
+                shapesDrawned[layerId] = merge(shapesDrawned[layerId], {
                     options: layer.options,
                     latlng: layer.getLatLngs(),
                     bounds: getMappedFieldsCollection(layer.getLatLngs())
@@ -258,7 +259,7 @@ const leafletMap = (services) => {
     const addMarkerOnce = (e, poiIndex, poi) => {
         // inject coords into poi's fields:
         let mappedCoords = getMappedFields(e.latlng);
-        let pois = [Object.assign(poi, mappedCoords)];
+        let pois = [merge(poi, mappedCoords)];
         refreshMarkers(pois).then(() => {
             // broadcast event:
             let wrappedMappedFields = {};

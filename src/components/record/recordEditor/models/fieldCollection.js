@@ -1,3 +1,5 @@
+import merge from 'lodash.merge';
+
 class FieldCollection {
     fields;
 
@@ -60,7 +62,7 @@ class FieldCollection {
 
     updateField(id, data) {
         if (this.fields[id] !== undefined) {
-            this.fields[id] = Object.assign(this.fields[id], data);
+            this.fields[id] = merge(this.fields[id], data);
             return this.fields[id];
         }
     }
