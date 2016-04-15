@@ -134,7 +134,7 @@ module.exports = {
         }]
     },
     resolve: {
-        extensions: ['', '.js', '.css']
+        extensions: ['', '.js', '.css', '.scss']
     },
     plugins: [
         new WebpackNotifierPlugin({
