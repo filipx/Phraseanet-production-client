@@ -146,13 +146,6 @@ const workzone = (services) => {
             return workzoneOptions.refresh('current');
         });
         activeBaskets();
-
-        $('a.story_unfix').on('click', function (event) {
-            event.preventDefault();
-            unfix($(this).attr('href'));
-
-            return false;
-        });
         // workzoneOptions
         workzoneOptions = {
             selection: new Selectable(services, $('#baskets'), {selector: '.CHIM'}),
@@ -257,6 +250,13 @@ const workzone = (services) => {
                 }
 
                 activeBaskets();
+                $('a.story_unfix').on('click', function (event) {
+                    event.preventDefault();
+                    unfix($(this).attr('href'));
+
+                    return false;
+                });
+
                 $('.basketTips').tooltip({
                     delay: 200
                 });
