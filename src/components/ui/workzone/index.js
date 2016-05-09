@@ -21,12 +21,12 @@ const workzone = (services) => {
 
     var nextBasketScroll = false;
     var warnOnRemove = true;
-    $(document).ready(function () {
-    });
-
+    let $container;
 
     const initialize = () => {
-        $('#idFrameC').resizable({
+        $container = $('#idFrameC');
+
+        $container.resizable({
             handles: 'e',
             resize: function () {
                 appEvents.emit('ui.answerSizer');
@@ -37,10 +37,10 @@ const workzone = (services) => {
                 var el = $('.SSTT.active').next().find('div:first');
                 var w = el.find('div.chim-wrapper:first').outerWidth();
                 var iw = el.innerWidth();
-                var diff = $('#idFrameC').width() - el.outerWidth();
+                var diff = $container.width() - el.outerWidth();
                 var n = Math.floor(iw / w);
 
-                $('#idFrameC').height('auto');
+                $container.height('auto');
 
                 var nwidth = (n) * w + diff + n;
                 if (isNaN(nwidth)) {
@@ -55,7 +55,7 @@ const workzone = (services) => {
                 }
 
 
-                $('#idFrameC').stop().animate({
+                $container.stop().animate({
                         width: nwidth
                     },
                     300,
@@ -69,8 +69,8 @@ const workzone = (services) => {
         });
 
         $('#idFrameC .ui-tabs-nav li').on('click', function (event) {
-            if ($('#idFrameC').attr('data-status') === 'closed') {
-                $('#idFrameC').width(300);
+            if ($container.attr('data-status') === 'closed') {
+                $container.width(300);
                 $('#rightFrame').css('left', 300);
                 $('#rightFrame').width($(window).width() - 300);
                 $('#baskets, #proposals, #thesaurus_tab').hide();
@@ -79,35 +79,35 @@ const workzone = (services) => {
                 $('#' + IDname).show();
             }
 
-            $('#idFrameC').attr('data-status', 'open');
+            $container.attr('data-status', 'open');
             $('.WZbasketTab').css('background-position', '9px 21px');
-            $('#idFrameC').removeClass('closed');
+            $container.removeClass('closed');
         });
 
         var previousTab = '';
 
         $('#idFrameC #retractableButton').bind('click', function (event) {
 
-            if ($('#idFrameC').attr('data-status') !== 'closed') {
+            if ($container.attr('data-status') !== 'closed') {
                 $(this).find('i').removeClass('icon-double-angle-left').addClass('icon-double-angle-right');
-                $('#idFrameC').width(80);
+                $container.width(80);
                 $('#rightFrame').css('left', 80);
                 $('#rightFrame').width($(window).width() - 80);
-                $('#idFrameC').attr('data-status', 'closed');
+                $container.attr('data-status', 'closed');
                 $('#baskets, #proposals, #thesaurus_tab, .ui-resizable-handle, #basket_menu_trigger').hide();
                 $('#idFrameC .ui-tabs-nav li').removeClass('ui-state-active');
                 $('.WZbasketTab').css('background-position', '15px 16px');
-                $('#idFrameC').addClass('closed');
+                $container.addClass('closed');
                 previousTab = $('#idFrameC .icon-menu').find('li.ui-tabs-active');
             } else {
                 $(this).find('i').removeClass('icon-double-angle-right').addClass('icon-double-angle-left');
-                $('#idFrameC').width(300);
+                $container.width(300);
                 $('#rightFrame').css('left', 300);
                 $('#rightFrame').width($(window).width() - 300);
-                $('#idFrameC').attr('data-status', 'open');
+                $container.attr('data-status', 'open');
                 $('.ui-resizable-handle, #basket_menu_trigger').show();
                 $('.WZbasketTab').css('background-position', '9px 16px');
-                $('#idFrameC').removeClass('closed');
+                $container.removeClass('closed');
                 $('#idFrameC .icon-menu li').last().find('a').trigger('click');
                 $('#idFrameC .icon-menu li').first().find('a').trigger('click');
                 $(previousTab).find('a').trigger('click');
@@ -147,13 +147,14 @@ const workzone = (services) => {
         });
         activeBaskets();
 
-        $('a.story_unfix').on('click', function (event) {
+        $('body').on('click', 'a.story_unfix', (event) => {
             event.preventDefault();
-            unfix($(this).attr('href'));
+            let $el = $(event.currentTarget);
+            unfix($el.attr('href'));
 
             return false;
         });
-        // workzoneOptions
+
         workzoneOptions = {
             selection: new Selectable(services, $('#baskets'), {selector: '.CHIM'}),
             refresh: refreshBaskets,
@@ -175,7 +176,7 @@ const workzone = (services) => {
                 }
             },
             close: function () {
-                const frame = $('#idFrameC');
+                const frame = $container;
                 const that = this;
 
                 if (!frame.hasClass('closed')) {
@@ -199,7 +200,7 @@ const workzone = (services) => {
                 }
             },
             open: function () {
-                var frame = $('#idFrameC');
+                var frame = $container;
 
                 if (frame.hasClass('closed')) {
                     var width = frame.data('openwidth') ? frame.data('openwidth') : 300;
