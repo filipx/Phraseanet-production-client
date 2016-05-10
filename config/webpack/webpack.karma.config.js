@@ -2,6 +2,12 @@
 import webpack from 'webpack';
 import path from 'path';
 import config from '../config';
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+// add loader for external stylesheets:
+var extractCSS = new ExtractTextPlugin('[name].css', {
+    allChunks: true
+});
 
 module.exports = {
     cache: true,
@@ -19,6 +25,9 @@ module.exports = {
         loaders: [{
             test: /\.css$/,
             loader: 'style-loader!css-loader'
+        }, {
+            test: /\.scss$/,
+            loader: ExtractTextPlugin.extract('css!resolve-url!sass?sourceMap', { publicPath: './'})
         }, {
             test: /\.png/,
             loader: 'url-loader?limit=100000'
@@ -54,6 +63,7 @@ module.exports = {
         ui: 'jQuery.ui'
     },
     plugins: [
-        new webpack.NormalModuleReplacementPlugin(/\.css$/, path.resolve('./src', './empty.js'))
+        new webpack.NormalModuleReplacementPlugin(/\.css$/, path.resolve('./src', './empty.js')),
+        extractCSS
     ]
 };
