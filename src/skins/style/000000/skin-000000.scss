@@ -139,7 +139,7 @@ $mainMenuMarginBottom: 0;
 $mainMenuLinkColor: #b1b1b1;
 $mainMenuLinkBackgroundHoverColor: transparent;
 $mainMenuLinkHoverColor: $textPrimaryHoverColor;
-@import '../../shared/variables';
+@import '../../../../stylesheets/shared/variables';
 
 /******** WORKZONE TABS CONFIG ********/
 $workzoneBackgroundColor: $mediumBackgroundColor;

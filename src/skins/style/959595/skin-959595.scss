@@ -156,7 +156,7 @@ $mainMenuMarginBottom: 0;
 $mainMenuLinkColor: #FFF;
 $mainMenuLinkBackgroundHoverColor: transparent; //$bgInverseHoverColor;
 $mainMenuLinkHoverColor: $textPrimaryHoverColor;
-@import '../../shared/variables';
+@import '../../../../stylesheets/shared/variables';
 
 /******** WORKZONE TABS CONFIG ********/
 $workzoneBackgroundColor: $mediumBackgroundColor;

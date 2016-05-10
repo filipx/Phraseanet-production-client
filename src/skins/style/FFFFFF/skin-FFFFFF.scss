@@ -151,7 +151,7 @@ $mainMenuMarginBottom: 0;
 $mainMenuLinkColor: #FFFFFF;
 $mainMenuLinkBackgroundHoverColor: transparent; //$bgInverseHoverColor;
 $mainMenuLinkHoverColor: darken($mainMenuLinkColor, 10);
-@import '../../shared/variables';
+@import '../../../../stylesheets/shared/variables';
 
 /******** PROPOSALS CONFIG ********/
 $proposalsTitleColor: #333;

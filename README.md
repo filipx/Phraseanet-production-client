@@ -1,20 +1,34 @@
 # Phraseanet Production Client
-[![Build Status](https://travis-ci.org/lostdalek/Phraseanet-production-client.svg?branch=master)](https://travis-ci.org/lostdalek/Phraseanet-production-client)
-[![devDependency Status](https://david-dm.org/lostdalek/Phraseanet-production-client/dev-status.svg)](https://david-dm.org/lostdalek/Phraseanet-production-client#info=devDependencies)
-[![Dependency Status](https://david-dm.org/lostdalek/Phraseanet-production-client.svg)](https://david-dm.org/lostdalek/Phraseanet-production-client)
-[![Coverage Status](https://coveralls.io/repos/github/lostdalek/Phraseanet-production-client/badge.svg?branch=master)](https://coveralls.io/github/lostdalek/Phraseanet-production-client?branch=master)
+[![Build Status](https://travis-ci.org/alchemy-fr/Phraseanet-production-client.svg?branch=master)](https://travis-ci.org/alchemy-fr/Phraseanet-production-client)
+[![devDependency Status](https://david-dm.org/alchemy-fr/Phraseanet-production-client/dev-status.svg)](https://david-dm.org/alchemy-fr/Phraseanet-production-client#info=devDependencies)
+[![Dependency Status](https://david-dm.org/alchemy-fr/Phraseanet-production-client.svg)](https://david-dm.org/alchemy-fr/Phraseanet-production-client)
+[![Coverage Status](https://coveralls.io/repos/github/alchemy-fr/Phraseanet-production-client/badge.svg?branch=master)](https://coveralls.io/github/alchemy-fr/Phraseanet-production-client?branch=master)
 
 
 ## Requirements
 
 Node `^5.0.0`.
 
-```js
-$ npm install                   # Install Node modules listed in ./package.json
-$ npm webpack                   # Build a non-minified version of the library
-```
+## Installation and dev workflow
 
-## Workflow
+- clone the project and ``` npm install ```
+- setup the dev workflow for [Phraseanet](https://github.com/alchemy-fr/Phraseanet/) with [npm link](https://docs.npmjs.com/cli/link):
+
+	- go into the Phraseanet Production Client project directory
+	- globally link the npm package with ``` npm link ```
+	- go into the Phraseanet project directory
+	- Register the linked package for Phraseanet with ``` npm link phraseanet-production-client ```
+
+Once phraseanet-production-client package is linked:
+
+ - go into the Phraseanet project directory
+ - start watch mode with ```npm run dev```
+ - go into the Phraseanet Production Client project directory:
+ - start watch mode with ```npm run dev```
+
+ Open `http://localhost:3000` to launch Phraseanet via Browser Sync
+
+## Available commands
 
 * `npm run production` - Build task that generate a minified script for production
 * `npm run clean` - Remove the `dist` folder and it's files
@@ -35,32 +49,11 @@ $ npm webpack                   # Build a non-minified version of the library
 * `npm run packages` - List installed packages
 * `npm run package:purge` - Remove all dependencies
 * `npm run package:reinstall` - Reinstall all dependencies
-* `npm run package:check` - shows a list over dependencies with a higher version number then the current one - if any 
+* `npm run package:check` - shows a list over dependencies with a higher version number then the current one - if any
 * `npm run package:upgrade` - Automaticly upgrade all devDependencies & dependencies, and update package.json
 * `npm run package:dev` - Automaticly upgrade all devDependencies and update package.json
 * `npm run package:prod` - Automaticly upgrade all dependencies and update package.json
 * `npm run asset-server` - starts a asset server with hot module replacement (WDS) on port 8080
-
-## Asset server
-
-asset server with hot module replacement (WDS) enabled on port 8080.
-
-```js
-npm run asset-server
-```
-
-Open `http://localhost:8080`, and you will see this message in your browser: `It works!`.
-
-## Installation
-
-Download the package, and run this from the command line:
-
-```
-npm install 
-```
-
-[trav_img]: https://api.travis-ci.org/lostdalek/Phraseanet-production-client.svg
-[trav_site]: https://travis-ci.org/lostdalek/Phraseanet-production-client.svg?branch=master
 
 ## Credits
 

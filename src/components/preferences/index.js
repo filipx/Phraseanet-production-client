@@ -107,9 +107,9 @@ const preferences = (services) => {
             let color = $el.data('theme');
             let minified = configService.get('debug') ? '' : '.min';
             // setCss()
-            $('#skinCss').attr("href", `/assets/production/skin-${color}${minified}.css`);
+            $('#skinCss').attr('href', `/assets/production/skin-${color}${minified}.css`);
             $.post(`${configService.get('baseUrl')}/user/preferences/`, {
-                prop: "css",
+                prop: 'css',
                 value: color,
                 t: Math.random()
             });
@@ -186,7 +186,7 @@ const preferences = (services) => {
 
     const render = () => {
         let availableThemes = configService.get('availableThemes');
-        let themeTpl = ``;
+        let themeTpl = '';
 
         for (let t in availableThemes) {
             let curTheme = availableThemes[t];
