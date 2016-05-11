@@ -20,7 +20,7 @@ const provider = (services) => {
             if (provider.enabled === true) {
                 activeProvider = provider;
                 accessToken = provider['public-key'];
-                let fieldMapping = provider['position-fields'];
+                let fieldMapping = provider['position-fields'] !== undefined ? provider['position-fields'] : [];
 
                 if (fieldMapping.length > 0) {
                     fieldPosition = {};

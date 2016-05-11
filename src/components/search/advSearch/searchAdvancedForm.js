@@ -46,7 +46,6 @@ const searchAdvancedForm = (services) => {
          * @TODO refactor
          */
         $('#EDIT_query').bind('focus', function () {
-            console.log('bind focus')
             $(this).addClass('focused');
         }).bind('blur', function () {
             $(this).removeClass('focused');

@@ -42,8 +42,9 @@ const leafletMap = (services) => {
         mapUID = 'leafletMap' + generateRandStr(5);
 
         let providerConfig = provider(services);
+        let isProviderInitalized = providerConfig.initialize();
 
-        if (providerConfig.initialize() === true) {
+        if (isProviderInitalized === true) {
             activeProvider = providerConfig.getConfiguration();
 
             if (tabOptions !== false) {
@@ -60,6 +61,7 @@ const leafletMap = (services) => {
             }
         }
         onResizeEditor = _.debounce(onResizeEditor, 300);
+        return isProviderInitalized;
     };
 
     const onRecordSelectionChanged = (params) => {
@@ -88,6 +90,10 @@ const leafletMap = (services) => {
     }
 
     const loadLeaflet = (pois) => {
+        // if not access token provided - stop mapbox loading
+        if (activeProvider.accessToken === undefined) {
+            throw new Error('MapBox require an access token');
+        }
         require.ensure([], () => {
             // select geocoding provider:
             mapbox = require('mapbox.js');
@@ -397,11 +403,18 @@ const leafletMap = (services) => {
     };
 
     const extractCoords = (poi) => {
-        return [activeProvider.fieldPosition.longitude(poi), activeProvider.fieldPosition.latitude(poi)];
+        if (poi !== undefined) {
+            return [activeProvider.fieldPosition.longitude(poi), activeProvider.fieldPosition.latitude(poi)];
+        }
+        return [false, false];
     };
+
     const haveValidCoords = (poi) => {
-        return activeProvider.fieldPosition.longitude(poi) && activeProvider.fieldPosition.latitude(poi)
-    }
+        if (poi !== undefined) {
+            return activeProvider.fieldPosition.longitude(poi) && activeProvider.fieldPosition.latitude(poi)
+        }
+        return false;
+    };
 
     let onResizeEditor = () => {
         if (activeProvider.accessToken === undefined) {
