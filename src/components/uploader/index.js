@@ -8,6 +8,9 @@ const uploader = (services) => {
     const { configService, localeService, appEvents } = services;
     let UploaderManager;
     const initialize = () => {
+        dragOnModalClosed();
+
+
         $('body').on('click', '.uploader-open-action', (event) => {
             event.preventDefault();
             var $this = $(event.currentTarget);
@@ -15,17 +18,48 @@ const uploader = (services) => {
             require.ensure([], () => {
                 // load uploader manager dep
                 UploaderManager = require('./uploaderService').default;
-                openModal($this);
+                openModal($this, []);
             });
         });
     };
 
-    const openModal = ($this) => {
+    const dragOnModalClosed = () => {
+        $('html').on('drop', (event) => {
+            let fileList = event.originalEvent.dataTransfer.files;
+            // open modal
+            require.ensure([], () => {
+                // load uploader manager dep
+                UploaderManager = require('./uploaderService').default;
+                openModal($('.uploader-open-action'), fileList);
+            });
+
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }).on('dragover', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        }).on('dragleave', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+    }
+
+    const disableDragOnModalClosed = () => {
+        $('html').off('drop');
+        $('html').off('dragover');
+        $('html').off('dragleave');
+    }
+
+    const openModal = ($this, filesList) => {
         var options = {
             size: 'Full',
             loading: true,
             title: $this.attr('title'),
-            closeOnEscape: true
+            closeOnEscape: true,
+            closeCallback: () => {
+                dragOnModalClosed();
+            }
         };
 
         let $dialog = dialog.create(services, options);
@@ -34,13 +68,14 @@ const uploader = (services) => {
             url: $this.attr('href'),
             dataType: 'html',
             success: function (data) {
+                disableDragOnModalClosed();
                 $dialog.setContent(data);
-                $(document).ready(() => onOpenModal());
+                $(document).ready(() => onOpenModal(filesList));
                 return;
             }
         });
     };
-    const onOpenModal = () => {
+    const onOpenModal = (filesList) => {
 
         // @TODO replace with feature detection:
         var iev = 0;
@@ -415,6 +450,11 @@ const uploader = (services) => {
                 data.context.find('.progress-bar').width('25%');
             }
         });
+
+        // if initialized with dropped files:
+        if (filesList !== undefined) {
+            $('#fileupload', uploaderInstance.getContainer()).fileupload('add', {files: filesList});
+        }
     };
 
     return {initialize};
