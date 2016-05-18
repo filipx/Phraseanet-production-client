@@ -1,5 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
+import _ from 'underscore';
 import user from 'phraseanet-common/src/components/user';
 
 const searchAdvancedForm = (services) => {
@@ -19,7 +20,7 @@ const searchAdvancedForm = (services) => {
         $container.on('click', '.toggle-database', (event) => {
             let $el = $(event.currentTarget);
             let state = $el.data('state') || false;
-            toggleDatabase(state);
+            toggleAllDatabase(state);
         });
 
         $container.on('change', '.select-database', (event) => {
@@ -57,7 +58,7 @@ const searchAdvancedForm = (services) => {
      *
      * @param bool
      */
-    const toggleDatabase = (bool) => {
+    const toggleAllDatabase = (bool) => {
         $('form.phrasea_query .sbas_list').each(function () {
 
             var sbas_id = $(this).find('input[name=reference]:first').val();
@@ -88,6 +89,17 @@ const searchAdvancedForm = (services) => {
         });
 
         checkFilters(true);
+    };
+    const activateDatabase = (databaseCollection) => {
+        // disable all db,
+        toggleAllDatabase(false);
+        // then enable only provided
+        _.each(databaseCollection, (databaseId) => {
+            _.each($('.sbascont_' + databaseId + ' :checkbox'), (checkbox) => {
+                $(checkbox).prop('checked', true);
+            });
+        });
+
     };
 
     const checkFilters = (save) => {
@@ -281,12 +293,13 @@ const searchAdvancedForm = (services) => {
         $('option:eq(0)', dateFilterSelect).prop('selected', true);
         $('#ADVSRCH_OPTIONS_ZONE .datepicker').val('');
         $('form.adv_search_bind input:text').val('');
-        toggleDatabase(true);
+        toggleAllDatabase(true);
     };
 
     appEvents.listenAll({
         'search.doCheckFilters': checkFilters,
         'search.doSelectDatabase': selectDatabase,
+        'search.activateDatabase': (params) => activateDatabase(params.databases),
         'search.doToggleCollection': toggleCollection,
     })
     return {initialize};

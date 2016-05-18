@@ -54,6 +54,7 @@ const thesaurusService = (services) => {
         $container
 
             .on('click', '.thesaurus-branch-action', (event) => {
+                let $el = $(event.currentTarget);
                 event.preventDefault();
                 cclicks++;
 
@@ -65,7 +66,12 @@ const thesaurusService = (services) => {
 
                 } else {
                     clearTimeout(cTimer);
-                    TXdblClick(event);
+
+                    if ($el.data('context') === 'thesaurus') {
+                        TXdblClick(event);
+                    } else {
+                        CXdblClick(event);
+                    }
                     cclicks = 0;
                 }
             })
@@ -688,56 +694,29 @@ const thesaurusService = (services) => {
         }
     }
 
-    /*function CXdblClick(e)
-     {
-     var x = e.srcElement ? e.srcElement : e.target;
-     switch(x.nodeName)
-     {
-     case "SPAN":		// term
-     var li = $(x).closest('li');
-     var field = li.closest('[field]').attr('field');
-     if(typeof(field) != "undefined")
-     {
-     var tid = li.attr('id');
-     if(tid.substr(0,5)=="CX_P.")
-     {
-     var sbid = tid.split(".")[1];
-     var term = $(x).text();
-     doThesSearch('C', sbid, term, field);
-     }
-     }
-     break;
-     default:
-     break;
-     }
-     }*/
+    function CXdblClick(e) {
+        var x = e.srcElement ? e.srcElement : e.target;
+        switch (x.nodeName) {
+            case 'SPAN':		// term
+                var li = $(x).closest('li');
+                var field = li.closest('[field]').attr('field');
+                if (typeof field !== 'undefined') {
+                    var tid = li.attr('id');
+                    if (tid.substr(0, 5) === 'CX_P.') {
+                        var sbid = tid.split('.')[1];
+                        var term = $(x).text();
+                        doThesSearch('C', sbid, term, field);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
     function doThesSearch(type, sbid, term, field) {
-        var nck = 0;
-        $('#searchForm .adv_options :checkbox[name="bases[]"]').each(
-            function (i, n) {
-                var base_id = $(n).val();
+        appEvents.emit('search.activateDatabase', {databases: [sbid]});
 
-                bas2sbas['b' + base_id].ckobj = this;
-                bas2sbas['b' + base_id].waschecked = this.checked;
-                if (bas2sbas['b' + base_id].sbid === sbid) {
-                    if (this.checked) {
-                        nck++;
-                    }
-                } else {
-                    this.checked = false;
-                }
-            }
-        );
-
-        if (nck === 0 || type === 'C') {
-            var i;
-            for (i in bas2sbas) {
-                if (bas2sbas[i].sbid === sbid) {
-                    bas2sbas[i].ckobj.checked = true;
-                }
-            }
-        }
         let queryString = '';
         if (type === 'T') {
             queryString = '[' + term + ']';
