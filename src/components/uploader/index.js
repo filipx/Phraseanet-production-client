@@ -25,17 +25,19 @@ const uploader = (services) => {
 
     const dragOnModalClosed = () => {
         $('html').on('drop', (event) => {
-            let fileList = event.originalEvent.dataTransfer.files;
-            // open modal
-            require.ensure([], () => {
-                // load uploader manager dep
-                UploaderManager = require('./uploaderService').default;
-                openModal($('.uploader-open-action'), fileList);
-            });
+            if (event.originalEvent.dataTransfer !== undefined) {
+                let fileList = event.originalEvent.dataTransfer.files;
+                // open modal
+                require.ensure([], () => {
+                    // load uploader manager dep
+                    UploaderManager = require('./uploaderService').default;
+                    openModal($('.uploader-open-action'), fileList);
+                });
 
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
         }).on('dragover', (event) => {
             event.preventDefault();
             event.stopPropagation();
