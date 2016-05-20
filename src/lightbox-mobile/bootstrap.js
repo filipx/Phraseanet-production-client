@@ -19,7 +19,6 @@ class Bootstrap {
     isReleasable;
 
     constructor(userConfig) {
-
         const configuration = merge({}, defaultConfig, userConfig);
 
         this.appEvents = new Emitter();
@@ -58,11 +57,10 @@ class Bootstrap {
             window.bodySize.y = $body.height();
             window.bodySize.x = $body.width();
 
-            lightbox(this.appServices).initialize({$container: $body});
+            this.appLightbox = lightbox(this.appServices);
+            this.appLightbox.initialize({$container: $body});
             mainMenu(this.appServices).initialize({$container: $body});
-            if (this.validatorLoaded === false) {
-                this.mobileValidator();
-            }
+            this.mobileValidator();
             this.isReleasable = this.configService.get('releasable');
 
             if (this.isReleasable !== null) {
@@ -75,7 +73,8 @@ class Bootstrap {
     mobileValidator() {
 
 
-        $('.confirm_report').on('click', (event) => {
+        $('body').on('touchstart click', '.confirm_report', (event) => {
+            event.preventDefault();
             const $el = $(event.currentTarget);
 
             $('.loader', $el).css({
@@ -111,9 +110,11 @@ class Bootstrap {
                     return;
                 }
             });
+            return false;
         });
 
-        $('.agreement_radio').on('mousedown', (event) => {
+        $('body').on('touchstart click', '.agreement_radio', (event) => {
+            //$('.agreement_radio').on('mousedown', (event) => {
             const $el = $(event.currentTarget);
             var sselcont_id = $el.attr('for').split('_').pop();
             var agreement = $('#' + $el.attr('for')).val() === 'yes' ? '1' : '-1';
@@ -147,7 +148,6 @@ class Bootstrap {
                             alert(datas.datas);
                             return;
                         }
-
                         this.isReleasable = datas.release;
                         this.appLightbox.setReleasable(this.isReleasable);
                     } else {
@@ -156,10 +156,12 @@ class Bootstrap {
                     return;
                 }
             });
-            return false;
+            //return false;
 
         });
-        $('.note_area_validate').on('click', (event) => {
+
+        $('body').on('touchstart click', '.note_area_validate', (event) => {
+
             const $el = $(event.currentTarget);
             var sselcont_id = $el.closest('form').find('input[name="sselcont_id"]').val();
 
