@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 import videoScreenCapture from './videoScreenCapture';
+import videoRangeCapture from './videoRangeCapture';
 import sharingManager from './sharingManager';
 import * as Rx from 'rx';
 
@@ -10,11 +11,12 @@ const recordToolsModal = (services, datas, activeTab = false) => {
     const {configService, localeService, appEvents} = services;
     const url = configService.get('baseUrl');
     let $dialog = null;
-    let dialogStream = new Rx.Subject();
+    let toolsStream = new Rx.Subject();
 
-    dialogStream.subscribe((params) => {
+    toolsStream.subscribe((params) => {
         switch (params.action) {
             case 'refresh':
+
                 console.log('trigger openModal')
                 openModal.apply(null, params.options);
 
@@ -97,11 +99,15 @@ const recordToolsModal = (services, datas, activeTab = false) => {
         });
 
 
-        videoScreenCapture(services).initialize({$container: $scope, data});
-        sharingManager({configService, localeService, dialogStream}).initialize({
-            $container: $dialog, data, tabs,
-            dialogParams: $dialog.getOption('contextArgs')
-        });
+        // available if only 1 record is selected:
+        if (data.selectionLength === 1) {
+            sharingManager({configService, localeService, toolsStream}).initialize({
+                $container: $dialog, data, tabs,
+                dialogParams: $dialog.getOption('contextArgs')
+            });
+            videoScreenCapture(services).initialize({$container: $scope, data});
+            videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data});
+        }
     };
 
     return {openModal};

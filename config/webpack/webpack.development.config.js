@@ -115,6 +115,10 @@ module.exports = {
 
         new webpack.optimize.OccurenceOrderPlugin(),
         // new webpack.BannerPlugin(banner),
+        new webpack.ProvidePlugin({
+            "videojs": "video.js",
+            "window.videojs": "video.js"
+        }),
         new webpack.DefinePlugin({
             '__DEV__': true,
             'process.env.NODE_ENV': JSON.stringify('development'),

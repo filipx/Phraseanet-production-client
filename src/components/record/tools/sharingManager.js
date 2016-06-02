@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 const sharingManager = (services, datas, activeTab = false) => {
-    const {configService, localeService, dialogStream} = services;
+    const {configService, localeService, toolsStream} = services;
     const url = configService.get('baseUrl');
     let $container = null;
     let dialogParams = {};
@@ -34,12 +34,10 @@ const sharingManager = (services, datas, activeTab = false) => {
             }).done(function (data) {
                 // self reload tab with current active tab:
                 activeTab = tabs.tabs('option', 'active');
-                dialogStream.onNext({
+                toolsStream.onNext({
                     action: 'refresh',
                     options: [dialogParams, activeTab]
-                })
-                // openModal($container.getOption('contextArgs'), activeTab);
-                //openToolModal($dialog.getOption('contextArgs'), activeTab);
+                });
             }).error(function (err) {
                 alert('forbidden action');
             });
