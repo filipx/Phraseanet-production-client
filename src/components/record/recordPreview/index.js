@@ -1,11 +1,11 @@
-require('./recordPreview.css');
+require('./recordPreview.scss');
 
 import $ from 'jquery';
 import merge from 'lodash.merge';
 import * as Rx from 'rx';
 import Emitter from '../../core/emitter';
 import leafletMap from './../../geolocalisation/providers/mapbox';
-let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer');
+let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer/imageEnhancer');
 require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {
     const {configService, localeService, appEvents} = services;

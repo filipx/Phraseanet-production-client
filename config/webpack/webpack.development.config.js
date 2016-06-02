@@ -1,57 +1,11 @@
 /**
  * WEBPACK CONFIG
  *
- * Notes on config properties:
- *
- * 'entry'
- * Entry point for the bundle.
- *
- * 'output'
- * If you pass an array - the modules are loaded on startup. The last one is exported.
- *
- * 'resolve'
- * Array of file extensions used to resolve modules.
- *
- * 'webpack-dev-server'
- * Is a little node.js Express server, which uses the webpack-dev-middleware to serve a webpack bundle.
- * It also has a little runtime which is connected to the server via Socket.IO.
- *
- * 'webpack/hot/dev-server'
- * By adding a script to your index.html file and a special entry point in your configuration
- * you will be able to get live reloads when doing changes to your files.
- *
- * devtool: 'eval-source-map'
- * http://www.cnblogs.com/Answer1215/p/4312265.html
- * The source map file will only be downloaded if you have source maps enabled and your dev tools open.
- *
- * HotModuleReplacementPlugin()
- * Hot Module Replacement (HMR) exchanges, adds or removes modules while an application is running without page reload.
- *
- * NoErrorsPlugin()
- * Hot loader is better when used with NoErrorsPlugin and hot/only-dev-server since it eliminates page reloads
- * altogether and recovers after syntax errors.
- *
- * 'react-hot'
- * React Hot Loader is a plugin for Webpack that allows instantaneous live refresh without losing state
- * while editing React components.
- *
- * 'babel'
- * Babel enables the use of ES6 today by transpiling your ES6 JavaScript into equivalent ES5 source
- * that is actually delivered to the end user browser.
  */
 /* eslint-disable no-var */
 require('babel-core/register');
 
 // Webpack config for development
-/*
-import webpack from 'webpack';
-import path from 'path';
-import pkg from '../../package.json';
-import banner from '../banner';
-import WebpackNotifierPlugin from 'webpack-notifier';
-import config from '../config';
-*/
-
 
 const webpack = require('webpack');
 const path = require('path');
@@ -59,7 +13,12 @@ const pkg = require('../../package.json');
 // const banner = require('../banner');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const config = require('../config');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+// add loader for external stylesheets:
+var extractCSS = new ExtractTextPlugin('[name].css', {
+    allChunks: true
+});
 module.exports = {
     // entry points
     entry: {
@@ -69,7 +28,10 @@ module.exports = {
         permaview: config.sourceDir + 'permaview/index.js',
         authenticate: [config.sourceDir + 'authenticate/index.js'],
         account: [config.sourceDir + 'account/index.js'],
-        commons: [config.sourceDir + 'common/index.js']
+        commons: [config.sourceDir + 'common/index.js'],
+        'skin-000000': [config.sourceDir + 'skins/skin-000000.js'],
+        'skin-959595': [config.sourceDir + 'skins/skin-959595.js'],
+        'skin-FFFFFF': [config.sourceDir + 'skins/skin-FFFFFF.js']
     },
     cache: true,
     debug: true,
@@ -91,15 +53,6 @@ module.exports = {
             include: path.join(__dirname, '../../src')
         }],
         loaders: [{
-            test: /\.css$/,
-            loader: 'style-loader!css-loader'
-        }/*,  {
-            test: /\.(png|jpg|jpeg|gif)$/,
-            loader: 'file-loader'
-        }*/, {
-            test: /\.(woff|png|jpg|gif)$/,
-            loader: 'url-loader?limit=10000&prefix=img/&name=[path][name].[ext]?[hash]'
-        },{
             test: /\.js$/,
             exclude: /node_modules\/(?!phraseanet-common)/,
             loader: 'babel',
@@ -107,6 +60,29 @@ module.exports = {
                 presets: ['es2015', 'stage-0']
             }
         }, {
+            test: /\.(woff|png|jpg|gif)$/,
+            loader: 'url-loader?limit=10000&prefix=img/&name=[path][name].[ext]?[hash]'
+        }, {
+            test: /\.(png|jpg|jpeg|gif)$/,
+            loader: 'file-loader'
+        }, {
+            test: /\.css$/,
+            loader: 'style-loader!css-loader'
+        },
+        // exclude skins as inline-css in dev env
+        // {
+        //     test: /\.scss$/,
+        //     exclude: /src\/skins\//,
+        //     loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
+        // },
+        // only skins are extracted as external file in dev env:
+        // every css should be exported as file in dev env
+        {
+            test: /\.scss$/,
+            // exclude: /src\/(?!skins)/,
+            // include: [path.join(__dirname, '../../src'), path.join(__dirname, '../../stylesheets')],
+            loader: ExtractTextPlugin.extract('css!resolve-url!sass', { publicPath: './'})
+        },{
             test: require.resolve('jquery-lazyload'),
             loader: "imports?this=>window"
         }, {
@@ -126,8 +102,11 @@ module.exports = {
             loader: "json"
         }]
     },
+    sassLoader: {
+        sourceMap: true
+    },
     resolve: {
-        extensions: ['', '.js', '.css']
+        extensions: ['', '.js', '.css', '.scss']
     },
     plugins: [
         new WebpackNotifierPlugin({
@@ -145,7 +124,8 @@ module.exports = {
             name: 'commons',
             chunks: ['production', 'lightbox'],
             minChunks: 2
-        })
+        }),
+        extractCSS
         // i18next
     ],
     externals: {

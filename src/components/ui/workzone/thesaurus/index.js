@@ -1,3 +1,5 @@
+require('./thesaurus.scss');
+
 import $ from 'jquery';
 import thesaurus from '../../../thesaurus/index';
 

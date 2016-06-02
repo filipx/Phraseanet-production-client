@@ -1,28 +1,21 @@
 require('babel-core/register');
 
-// Webpack config for creating the production bundle.
+// Webpack config for creating the minified production bundle.
 
 const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const PKG_LOCATION = path.join(__dirname, '../../package.json');
 const config = require('../config');
-const webpackConfig = require('./webpack.development.config')
+const webpackConfig = require('./webpack.production.config')
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+var extractCSS = new ExtractTextPlugin('[name].min.css', {
+    allChunks: true
+});
 module.exports = Object.assign({}, webpackConfig, {
-
-    cache: false,
-    debug: false,
-    devtool: false,
-    hot: false,
-    build: true,
-    watch: false,
     output: {
-/*        path: config.distDir,
-        filename: '[name].min.js',
-        libraryTarget: 'umd',
-        library: config._app,*/
-
         path: config.distDir,
         filename: '[name].min.js',
         chunkFilename: 'lazy-[name].min.js',
@@ -44,17 +37,6 @@ module.exports = Object.assign({}, webpackConfig, {
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.NoErrorsPlugin(),
-        new webpack.optimize.UglifyJsPlugin({
-            output: {
-                comments: false
-            },
-            compress: {
-                'unused': true,
-                'dead_code': true,
-                warnings: false,
-                screw_ie8: true
-            }
-        }),
         new webpack.DefinePlugin({
             '__DEV__': false,
             'process.env.NODE_ENV': JSON.stringify('production'),
@@ -64,6 +46,11 @@ module.exports = Object.assign({}, webpackConfig, {
             name: 'commons',
             chunks: ['production', 'lightbox'],
             minChunks: 2
+        }),
+        extractCSS,
+        new OptimizeCssAssetsPlugin({
+            assetNameRegExp: /\.min\.css$/,
+            cssProcessorOptions: { discardComments: { removeAll: true } }
         })
     ]
 });

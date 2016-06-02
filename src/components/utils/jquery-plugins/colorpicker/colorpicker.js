@@ -1,3 +1,5 @@
+require('./colorpicker.scss');
+
 import $ from 'jquery';
 /**
  *
