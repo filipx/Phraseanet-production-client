@@ -138,7 +138,7 @@
     "i18next-xhr-backend": "^0.5.3",
     "jquery": "^1.11.3",
     "jquery-lazyload": "^1.9.7",
-    "jquery-treeview": "git+ssh://git@github.com/lostdalek/jquery-treeview.git",
+    "jquery-treeview": "https://github.com/lostdalek/jquery-treeview.git",
     "jquery-ui": "^1.10.5",
     "jquery.fancytree": "^2.15.0",
     "leaflet": "^0.7.7",
