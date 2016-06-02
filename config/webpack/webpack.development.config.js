@@ -70,16 +70,17 @@ module.exports = {
             loader: 'style-loader!css-loader'
         },
         // exclude skins as inline-css in dev env
-        {
-            test: /\.scss$/,
-            exclude: /src\/skins\//,
-            loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
-        },
+        // {
+        //     test: /\.scss$/,
+        //     exclude: /src\/skins\//,
+        //     loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
+        // },
         // only skins are extracted as external file in dev env:
+        // every css should be exported as file in dev env
         {
             test: /\.scss$/,
-            exclude: /src\/(?!skins)/,
-            include: [path.join(__dirname, '../../src'), path.join(__dirname, '../../stylesheets')],
+            // exclude: /src\/(?!skins)/,
+            // include: [path.join(__dirname, '../../src'), path.join(__dirname, '../../stylesheets')],
             loader: ExtractTextPlugin.extract('css!resolve-url!sass', { publicPath: './'})
         },{
             test: require.resolve('jquery-lazyload'),

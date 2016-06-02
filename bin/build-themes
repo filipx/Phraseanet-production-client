@@ -1,6 +1,0 @@
-node-sass stylesheets/themes/000000/skin-000000.scss dist/css/skin-000000.min.css --output-style compressed --include-path node_modules
-node-sass stylesheets/themes/FFFFFF/skin-FFFFFF.scss dist/css/skin-FFFFFF.min.css --output-style compressed --include-path node_modules
-node-sass stylesheets/themes/959595/skin-959595.scss dist/css/skin-959595.min.css --output-style compressed --include-path node_modules
-node-sass stylesheets/themes/000000/skin-000000.scss dist/css/skin-000000.css --include-path stylesheets
-node-sass stylesheets/themes/FFFFFF/skin-FFFFFF.scss dist/css/skin-FFFFFF.css --include-path stylesheets
-node-sass stylesheets/themes/959595/skin-959595.scss dist/css/skin-959595.css --include-path stylesheets
