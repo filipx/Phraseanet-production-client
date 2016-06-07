@@ -1,0 +1,54 @@
+
+
+.range-capture-container {
+  background-color: #000;
+  height: 30px;
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  justify-content: space-between;
+  button {
+    //flex: 0 1;
+    width: 40px;
+    height: 30px;
+    margin: auto;
+    padding: 0;
+    .button {
+      flex: none;
+      outline: none;
+      position: relative;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 4em;
+    }
+  }
+  > span {
+    margin: auto;
+    flex-grow: 2;
+  }
+
+  .icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    fill: currentColor;
+  }
+  .icon-label {
+    display: none;
+  }
+  .display-time {
+    padding: 0 10px;
+  }
+}
+
+.vjs-range-container {
+  position: relative;
+  background-color: #FF0000;
+  height: 7px;
+  left: 0;
+  width: 0%;
+
+}
