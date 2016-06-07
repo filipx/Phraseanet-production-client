@@ -148,6 +148,7 @@
     "mapbox.js": "^2.4.0",
     "phraseanet-common": "^0.3.0",
     "pym.js": "^0.4.5",
+    "nouislider": "^8.5.1",
     "rx": "^4.1.0",
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3",

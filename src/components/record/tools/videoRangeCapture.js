@@ -10,6 +10,7 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
         playbackRates: [],
         fluid: true
     };
+    let rangeCapture;
     const initialize = (params) => {
         //{$container} = params;
         $container = params.$container;
@@ -33,41 +34,14 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
 
         require.ensure([], () => {
             // load videoJs lib
-            require('video.js').default;
-
-            render(initData);
+            //require('../../videoEditor/style/main.scss');
+            rangeCapture = require('../../videoEditor/rangeCapture').default;
+            let rangeCaptureInstance = rangeCapture(services);
+            rangeCaptureInstance.initialize(params, options);
+            //render(initData);
         });
 
     }
-
-    const render = (initData) => {
-        console.log('initData', initData.records)
-        let record = initData.records[0];
-        const coverUrl = '';
-        let generateSourcesTpl = (record) => {
-            console.log('pass record', record)
-            let recordSources = [];
-            _.each(record.sources, (s, i) => {
-                console.log('si',s,i)
-                recordSources.push(`<source src="${s.src}" type="${s.type}">`)
-            });
-            let sourcesTpl = recordSources.join(' ');
-            console.log(record.sources, recordSources, sourcesTpl)
-
-            return recordSources.join(' ');
-        };
-
-
-        let sources = generateSourcesTpl(record);
-        $container.append(
-            `<video id="embed-video" class="embed-resource video-js vjs-default-skin vjs-big-play-centered" controls
-               preload="none" width="100%" height="100%" poster="${coverUrl}">
-               ${sources} 
-            </video>`)
-
-        console.log('pass options', sources)
-        window.videojs('embed-video', options, () => {})
-    };
 
     return {initialize}
 }
