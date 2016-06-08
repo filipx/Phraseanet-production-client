@@ -1,4 +1,6 @@
 import videojs from 'video.js';
+import noUiSlider from 'noUiSlider';
+import RangeBar from './rangeBar';
 /**
  * VideoJs Range Bar Collection
  */
@@ -6,8 +8,10 @@ const Component = videojs.getComponent('Component');
 
 class RangeBarCollection extends Component {
     rangeCollection = {};
+
     constructor(player, settings) {
         super(player, settings);
+        this.settings = settings;
     }
 
     /**
@@ -19,29 +23,18 @@ class RangeBarCollection extends Component {
     createEl() {
         return super.createEl('div', {
             className: 'vjs-range-container',
-            innerHTML: '<div><span></span></div>'
+            innerHTML: ''
         });
     }
+
     updateRangeCollection = () => {
-        
+
     }
     updateRange = (range) => {
-        console.log('update range', range.id);
-        let videoDuration = this.player_.duration();
-        if( this.rangeCollection[range.id] === undefined ) {
-            this.rangeCollection[range.id] = {
-                style: {
-                    left: 0,
-                    width: '0%'
-                }
-            }
+        if (this.rangeCollection[range.id] === undefined) {
+            this.rangeCollection[range.id] = this.addChild('RangeBar', [this.player_, this.settings]);
         }
-        // set left side with percent update
-        this.el().style.left = ((range.startPosition/videoDuration) * 100) + '%';
-        console.log('left position (%)', videoDuration, range.startPosition, ((range.startPosition/videoDuration) * 100));
-        this.el().style.width = (range.endPosition - range.startPosition) + 'px';
-        console.log('right position (width in px)', range.endPosition - range.startPosition);
-
+        this.rangeCollection[range.id].updateRange(range);
     }
 }
 

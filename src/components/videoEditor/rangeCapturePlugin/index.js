@@ -1,8 +1,9 @@
-
 require('./style/main.scss');
+import * as Rx from 'rx';
 import videojs from 'video.js';
 import RangeBarCollection from './rangeBarCollection';
-import rangeControlBar from './rangeControlBar';
+import RangeControlBar from './rangeControlBar';
+// import rangeControls from './oldControlBar';
 
 const defaults = {
     align: 'top-left',
@@ -17,22 +18,134 @@ const defaults = {
 
 const Component = videojs.getComponent('Component');
 
-const plugin = function(options) {
+const plugin = function (options) {
     // this = options.videoPlayer;
     const settings = videojs.mergeOptions(defaults, options);
 
-    // push range bar into seekBar Component:
-    // let videojsPlayer = videojs.getComponent('Player');
+    this.rangeStream = new Rx.Subject();
     this.rangeBarCollection = this.controlBar.getChild('progressControl').getChild('seekBar').addChild('RangeBarCollection', settings);
-    
-    this.ready(() => {
-        // append range controls to player instance:
-        rangeControlBar(options).initialize(this.el_, this.rangeBarCollection);
+    this.rangeControlBar = this.addChild('RangeControlBar', settings);
+
+    // range actions:
+    this.rangeStream.subscribe((params) => {
+        params.handle = params.handle || false;
+        switch (params.action) {
+            case 'change':
+                this.rangeControlBar.updateActiveRange(params.range, params.handle);
+                this.rangeBarCollection.updateRange(params.range);
+                break;
+            case 'refresh':
+                this.rangeControlBar.updateCurrentTime();
+                break;
+            case 'drag-update':
+                // if changes come from range bar
+                this.rangeControlBar.updateActiveRange(params.range, params.handle);
+                break;
+            default:
+        }
     });
 
-    /*videojsPlayer.prototype.initRangeMenu = function ($container) {
-        rangeControls(options).initialize($container);
-    };*/
+    /*this.ready(() => {
+     });*/
+
+    this.getRangeCaptureHotkeys = () => {
+        return {
+            // Create custom hotkeys
+            playOnlyKey: {
+                key: function (e) {
+                    console.log('override', e.which)
+                    // L Key
+                    return (e.which === 76);
+                },
+                handler: function (player, options) {
+                    if (player.paused()) {
+                        player.play();
+                    }
+                }
+            },
+            pauseOnlyKey: {
+                key: function (e) {
+                    // K Key
+                    return (e.which === 75);
+                },
+                handler: function (player, options) {
+                    if (!player.paused()) {
+                        player.pause();
+                    }
+                }
+            },
+            frameBackward: {
+                key: function (e) {
+                    // < Key
+                    return (e.which === 188);
+                },
+                handler: function (player, options) {
+                    player.rangeControlBar.setPreviousFrame()
+                }
+            },
+            frameForward: {
+                key: function (e) {
+                    // MAJ + < = > Key
+                    return (e.which === 190);
+                },
+                handler: function (player, options) {
+                    player.rangeControlBar.setNextFrame()
+                }
+            },
+            entryCuePoint: {
+                key: function (e) {
+                    // I Key
+                    return (e.which === 73);
+                },
+                handler: function (player, options) {
+                    player.rangeStream.onNext({
+                        action: 'change',
+                        range: player.rangeControlBar.setStartPositon()
+                    });
+                }
+            },
+            endCuePoint: {
+                key: function (e) {
+                    // O Key
+                    return (e.which === 79);
+                },
+                handler: function (player, options) {
+                    player.rangeStream.onNext({
+                        action: 'change',
+                        range: player.rangeControlBar.setEndPositon()
+                    });
+                }
+            },
+            deleteRange: {
+                key: function (e) {
+                    // MAJ+SUPPR Key
+                    return (e.shiftKey && e.which === 46);
+                },
+                handler: function (player, options) {
+                    console.log('ok remove')
+                    player.rangeStream.onNext({
+                        action: 'change',
+                        range: player.rangeControlBar.removeRange()
+                    });
+                }
+            },
+            //73 i
+            //79 o
+            ctrldKey: {
+                key: function (e) {
+                    // Toggle something with CTRL + D Key
+                    return (e.ctrlKey && e.which === 68);
+                },
+                handler: function (player, options) {
+                    // Using mute as an example
+                    if (options.enableMute) {
+                        player.muted(!player.muted());
+                    }
+                }
+            }
+        }
+
+    }
 
 }
 videojs.plugin('rangeCapturePlugin', plugin);
