@@ -153,6 +153,7 @@
     "sprintf-js": "^1.0.3",
     "underscore": "^1.8.3",
     "video.js": "^5.10.2",
+    "videojs-hotkeys": "^0.2.14",
     "zxcvbn": "^4.2.0"
   }
 }

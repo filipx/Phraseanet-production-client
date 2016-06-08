@@ -1,5 +1,3 @@
-import $ from 'jquery';
-import _ from 'underscore';
 
 const videoRangeCapture = (services, datas, activeTab = false) => {
     const {configService, localeService, appEvents} = services;
@@ -12,21 +10,20 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
     };
     let rangeCapture;
     const initialize = (params) => {
-        //{$container} = params;
         $container = params.$container;
         initData = params.data;
         let aspectRatio = configService.get('resource.aspectRatio');
-            
 
-        if( configService.get('resource.aspectRatio') !== null ) {
+
+        if (configService.get('resource.aspectRatio') !== null) {
             options.aspectRatio = configService.get('resource.aspectRatio');
         }
 
-        if( configService.get('resource.autoplay') !== null ) {
+        if (configService.get('resource.autoplay') !== null) {
             options.autoplay = configService.get('resource.autoplay');
         }
 
-        if( configService.get('resource.playbackRates') !== null ) {
+        if (configService.get('resource.playbackRates') !== null) {
             options.playbackRates = configService.get('resource.playbackRates');
         }
 

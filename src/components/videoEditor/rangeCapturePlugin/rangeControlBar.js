@@ -1,5 +1,11 @@
 import $ from 'jquery';
 import _ from 'underscore';
+import videojs from 'video.js';
+/**
+ * VideoJs Range Control Bar
+ */
+const Component = videojs.getComponent('Component');
+
 
 const icons = `
 <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -44,6 +50,7 @@ const icons = `
 `;
 
 const formatTimeToHHMMSSFF = (currentTime, frameRate) => {
+    frameRate = frameRate || 24;
     let hours = Math.floor(currentTime / 3600);
     let s = currentTime - hours * 3600;
     let minutes = Math.floor(s / 60);
@@ -54,54 +61,11 @@ const formatTimeToHHMMSSFF = (currentTime, frameRate) => {
 
     return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + 's ' + ('0' + currentFrames).slice(-2) + 'f'
 }
-
-const rangeControlBar = (options) => {
-
-    let frameStep = 1;
-    let frameRate = 24;
-    let frameDuration = (1 / frameRate);
-    let rangeCollection = {};
-    let activeRange = 0;
-    let rangeBlueprint = {
-        id: 0,
-        startPosition: -1,
-        endPosition: -1
-    };
-    let rangeStream = new Rx.Subject();
-
-    onRefreshCurrentTime = _.debounce(onRefreshCurrentTime, 4, true);
-
-    rangeStream.subscribe((params) => {
-        console.log('subscribe', params)
-        switch (params.action) {
-            case 'change':
-                rangeBlueprint = params.range;
-                $('#display-start').html(formatTimeToHHMMSSFF(rangeBlueprint.startPosition, frameRate));
-                $('#display-end').html(formatTimeToHHMMSSFF(rangeBlueprint.endPosition, frameRate));
-                $('display-current').html(formatTimeToHHMMSSFF(options.videoPlayer.currentTime(), frameRate))
+const initTimecode = formatTimeToHHMMSSFF(0);
 
 
-                options.videoPlayer.rangeBarCollection.updateRange(params.range);
-
-                rangeCollection[params.range.id] = params.range;
-                console.log('rangeCollection updated:', rangeCollection)
-                break;
-            case 'refresh':
-                $('#display-current').html(formatTimeToHHMMSSFF(options.videoPlayer.currentTime(), frameRate))
-                break;
-            default:
-        }
-    })
-
-    const initialize = (playerEl, rangeCollection) => {
-        let $container = $(playerEl);
-        $container.append(icons);
-        $container.append(rangeMenu);
-        $('.button').tooltip({placement: 'bottom'})
-    }
-
-    const initTimecode = formatTimeToHHMMSSFF(0, frameRate);
-    let rangeMenu = `<div class="range-capture-container">
+// @TODO: convert into clickable components:
+let rangeMenu = `<div class="range-capture-container">
 
 <button class="button" id="start-range"  data-toggle="tooltip" title="first tooltip"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg><span class="icon-label"> icon-cue-start</span></button>
 <button class="button" id="end-range"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg><span class="icon-label"> icon-cue-end</span></button>
@@ -116,68 +80,150 @@ const rangeControlBar = (options) => {
 <span id="display-current" class="display-time"></span>
 </div>`;
 
-    options.videoPlayer.on('play', function (e) {
-        console.log('[RANGE PLUG] playback has started!');
-    });
-    options.videoPlayer.on('timeupdate', function (e) {
-        onRefreshCurrentTime();
-    });
+class RangeControlBar extends Component {
+    rangeControlBar;
+    rangeCollection;
 
-    // debounceable
-    let onRefreshCurrentTime = () => {
-        //$('#display-current').html(formatTimeToHHMMSSFF(options.videoPlayer.currentTime()))
-        document.getElementById("display-current").innerHTML = formatTimeToHHMMSSFF(options.videoPlayer.currentTime(), frameRate)
+    constructor(player, settings) {
+        super(player, settings);
+
+        //this.settings = settings;
+        this.rangeCollection = {};
+        this.frameStep = 1;
+        this.frameRate = 24;
+        this.frameDuration = (1 / this.frameRate);
+        this.rangeCollection = {};
+        this.activeRange = 0;
+        this.rangeBlueprint = {
+            id: 1,
+            startPosition: -1,
+            endPosition: -1
+        };
+        this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
+        //this.player_.rangeStream = new Rx.Subject();
+        /*this.player_.rangeStream.subscribe((params) => {
+         console.log('subscribe', params)
+         switch (params.action) {
+         case 'change':
+         // let rangeBlueprint = params.range;
+         $('#display-start').html(formatTimeToHHMMSSFF(params.range.startPosition, this.frameRate));
+         $('#display-end').html(formatTimeToHHMMSSFF(params.range.endPosition, this.frameRate));
+         $('display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate));
+
+
+         this.player_.rangeBarCollection.updateRange(params.range);
+
+         this.activeRange = this.rangeCollection[params.range.id] = params.range;
+         console.log('rangeCollection updated:', this.rangeCollection)
+         break;
+         case 'refresh':
+         $('#display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
+         break;
+         default:
+         }
+         })*/
     }
 
-    $(options.$container)
-        .on('click', '#start-range', (event) => {
-            event.preventDefault();
-            let range = {
-                id: 1
-            };
-
-            rangeStream.onNext({
-                action: 'change',
-                range: setStartPositon(range)
+    /**
+     * Create the component's DOM element
+     *
+     * @return {Element}
+     * @method createEl
+     */
+    createEl() {
+        this.rangeControlBar = super.createEl('div', {
+            className: 'vjs-range-control-bar',
+            innerHTML: ''
+        });
+        $(this.rangeControlBar)
+            .on('click', '#start-range', (event) => {
+                event.preventDefault();
+                this.player_.rangeStream.onNext({
+                    action: 'change',
+                    handle: 'start',
+                    range: this.setStartPositon()
+                });
+            })
+            .on('click', '#end-range', (event) => {
+                event.preventDefault();
+                this.player_.rangeStream.onNext({
+                    action: 'change',
+                    handle: 'end',
+                    range: this.setEndPositon()
+                });
+            })
+            .on('click', '#delete-range', (event) => {
+                event.preventDefault();
+                this.player_.rangeStream.onNext({
+                    action: 'change',
+                    range: this.removeRange()
+                });
+            })
+            .on('click', '#backward-frame', (event) => {
+                event.preventDefault();
+                this.setPreviousFrame();
+            })
+            .on('click', '#forward-frame', (event) => {
+                event.preventDefault();
+                this.setNextFrame();
             });
-        })
-        .on('click', '#end-range', (event) => {
-            event.preventDefault();
-            let range = {
-                id: 1
-            };
-            rangeStream.onNext({
-                action: 'change',
-                range: setEndPositon(range)
-            });
-        })
-        .on('click', '#backward-frame', (event) => {
-            event.preventDefault();
-            setPreviousFrame();
-        })
-        .on('click', '#forward-frame', (event) => {
-            event.preventDefault();
-            setNextFrame();
+        this.player_.on('timeupdate', (e) => {
+            this.onRefreshCurrentTime();
         });
 
 
-    const setStartPositon = (range) => {
-        let newRange = _.extend({}, rangeBlueprint, range);
+        $(this.rangeControlBar).append(icons);
+        $(this.rangeControlBar).append(rangeMenu);
+        $('.button').tooltip({placement: 'bottom'})
+        return this.rangeControlBar;
+    }
+
+    updateActiveRange(range, handle) {
+        handle = handle || false;
+        $('#display-start').html(formatTimeToHHMMSSFF(range.startPosition, this.frameRate));
+        $('#display-end').html(formatTimeToHHMMSSFF(range.endPosition, this.frameRate));
+        $('display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate));
+        this.activeRange = this.rangeCollection[range.id] = range;
+        console.log('handle', handle)
+        if (handle === 'start') {
+            this.player_.currentTime(range.startPosition)
+        } else if (handle === 'end') {
+            this.player_.currentTime(range.endPosition)
+        }
+    }
+
+    updateCurrentTime() {
+        $('#display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
+    }
+
+    loopBetween(range) {
+        range = range || this.activeRange;
+    }
+
+    setStartPositon(range) {
+        // if range is not defined take active one:
+        range = range || this.activeRange;
+        console.log('>>> args', range);
+        let newRange = _.extend({}, this.rangeBlueprint, range);
+        console.log('>>> merged', _.extend({}, newRange));
         // set start
-        newRange.startPosition = options.videoPlayer.currentTime();
+        newRange.startPosition = this.player_.currentTime();
 
         let firstTime = newRange.startPosition === -1 && newRange.endPosition === -1;
         let startBehindEnd = newRange.startPosition > newRange.endPosition;
 
         if (firstTime || startBehindEnd) {
-            newRange.endPosition = options.videoPlayer.duration()
+            newRange.endPosition = this.player_.duration()
         }
-
+        console.log('>>> final', newRange);
         return newRange;
     }
-    const setEndPositon = (range) => {
-        let newRange = _.extend({}, rangeBlueprint, range);
-        newRange.endPosition = options.videoPlayer.currentTime();
+
+    setEndPositon(range) {
+        // if range is not defined take active one:
+        range = range || this.activeRange;
+        let newRange = _.extend({}, this.rangeBlueprint, range);
+        newRange.endPosition = this.player_.currentTime();
         let firstTime = newRange.startPosition === -1 && newRange.endPosition === -1;
         let startBehindEnd = newRange.startPosition > newRange.endPosition;
         if (firstTime || startBehindEnd) {
@@ -186,31 +232,51 @@ const rangeControlBar = (options) => {
         return newRange;
     }
 
-    const removeRange = (range) => {
-        delete rangeCollection[range];
+    removeRange(range) {
+        delete this.rangeCollection[range];
+        this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
+        return this.activeRange;
     }
 
-    const setNextFrame = () => {
-        let position = options.videoPlayer.currentTime();
-        options.videoPlayer.pause();
-        options.videoPlayer.currentTime(position + (frameDuration * frameStep));
-        rangeStream.onNext({
+    /**
+     *
+     * @param step (frames)
+     */
+    setNextFrame(step) {
+        let position = this.player_.currentTime();
+        if (!this.player_.paused()) {
+            this.player_.pause();
+        }
+        step = step || this.frameStep;
+        this.player_.currentTime(position + (this.frameDuration * step));
+        this.player_.rangeStream.onNext({
             action: 'refresh'
         });
     }
-    const setPreviousFrame = () => {
-        let position = options.videoPlayer.currentTime();
-        options.videoPlayer.pause();
-        options.videoPlayer.currentTime(position - (frameDuration * frameStep));
-        rangeStream.onNext({
+
+    /**
+     *
+     * @param step (frames)
+     */
+    setPreviousFrame(step) {
+        let position = this.player_.currentTime();
+        if (!this.player_.paused()) {
+            this.player_.pause();
+        }
+        step = step || this.frameStep;
+        this.player_.currentTime(position - (this.frameDuration * this.frameStep));
+        this.player_.rangeStream.onNext({
             action: 'refresh'
         });
     }
 
-    return {
-        initialize
+    onRefreshCurrentTime() {
+        //$('#display-current').html(formatTimeToHHMMSSFF(options.videoPlayer.currentTime()))
+        document.getElementById('display-current').innerHTML = formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate)
     }
 
 }
 
-export default rangeControlBar;
+videojs.registerComponent('RangeControlBar', RangeControlBar);
+
+export default RangeControlBar;
