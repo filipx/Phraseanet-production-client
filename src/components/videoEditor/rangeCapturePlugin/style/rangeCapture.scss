@@ -55,7 +55,43 @@
   left: 0;
   right: 0;
 }
-
+.vjs-modal-dialog-content {
+  overflow: auto;
+  bottom: 6em;
+  height: auto;
+  .vjs-hotkeys-modal {
+    .shortcut-label {
+      display: inline-block;
+      padding: 3px 10px;
+      color: #4d4d4d;
+      background-color: #FFF;
+      border-radius: 2px;
+      min-width: 30px;
+      text-align: center;
+    }
+    .dl-horizontal dt{
+      width: 200px;
+    }
+  }
+}
+.video-js button.vjs-hotkeys-modal-button {
+  cursor: pointer;
+  height: 3em;
+  position: absolute;
+  right: 5px;
+  top: 0.5em;
+  z-index: 2;
+  background-color: rgba(0,0,0, .4);
+  border-radius: 3px;
+  .vjs-control-text {
+    display: inline-block;
+    width: 15px;
+    height: 10px;
+    font-size: 16px;
+    clip: inherit;
+    position: relative;
+  }
+}
 
 
 .vjs-range-container {

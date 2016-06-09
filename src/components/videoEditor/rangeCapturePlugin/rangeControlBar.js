@@ -100,28 +100,6 @@ class RangeControlBar extends Component {
             endPosition: -1
         };
         this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
-        //this.player_.rangeStream = new Rx.Subject();
-        /*this.player_.rangeStream.subscribe((params) => {
-         console.log('subscribe', params)
-         switch (params.action) {
-         case 'change':
-         // let rangeBlueprint = params.range;
-         $('#display-start').html(formatTimeToHHMMSSFF(params.range.startPosition, this.frameRate));
-         $('#display-end').html(formatTimeToHHMMSSFF(params.range.endPosition, this.frameRate));
-         $('display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate));
-
-
-         this.player_.rangeBarCollection.updateRange(params.range);
-
-         this.activeRange = this.rangeCollection[params.range.id] = params.range;
-         console.log('rangeCollection updated:', this.rangeCollection)
-         break;
-         case 'refresh':
-         $('#display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
-         break;
-         default:
-         }
-         })*/
     }
 
     /**
@@ -166,11 +144,25 @@ class RangeControlBar extends Component {
             .on('click', '#forward-frame', (event) => {
                 event.preventDefault();
                 this.setNextFrame();
+            })
+            .on('click', '#prev-forward-frame', (event) => {
+                event.preventDefault();
+                if (!this.player_.paused()) {
+                    this.player_.pause();
+                }
+                this.player_.currentTime(this.getStartPosition())
+            })
+            .on('click', '#next-forward-frame', (event) => {
+                event.preventDefault();
+                if (!this.player_.paused()) {
+                    this.player_.pause();
+                }
+                this.player_.currentTime(this.getEndPosition())
             });
+
         this.player_.on('timeupdate', (e) => {
             this.onRefreshCurrentTime();
         });
-
 
         $(this.rangeControlBar).append(icons);
         $(this.rangeControlBar).append(rangeMenu);
@@ -184,7 +176,7 @@ class RangeControlBar extends Component {
         $('#display-end').html(formatTimeToHHMMSSFF(range.endPosition, this.frameRate));
         $('display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate));
         this.activeRange = this.rangeCollection[range.id] = range;
-        console.log('handle', handle)
+
         if (handle === 'start') {
             this.player_.currentTime(range.startPosition)
         } else if (handle === 'end') {
@@ -203,9 +195,7 @@ class RangeControlBar extends Component {
     setStartPositon(range) {
         // if range is not defined take active one:
         range = range || this.activeRange;
-        console.log('>>> args', range);
         let newRange = _.extend({}, this.rangeBlueprint, range);
-        console.log('>>> merged', _.extend({}, newRange));
         // set start
         newRange.startPosition = this.player_.currentTime();
 
@@ -215,8 +205,14 @@ class RangeControlBar extends Component {
         if (firstTime || startBehindEnd) {
             newRange.endPosition = this.player_.duration()
         }
-        console.log('>>> final', newRange);
         return newRange;
+    }
+
+    getStartPosition(range) {
+        // if range is not defined take active one:
+        range = range || this.activeRange;
+
+        return range.startPosition;
     }
 
     setEndPositon(range) {
@@ -230,6 +226,13 @@ class RangeControlBar extends Component {
             newRange.startPosition = 0;
         }
         return newRange;
+    }
+
+    getEndPosition(range) {
+        // if range is not defined take active one:
+        range = range || this.activeRange;
+
+        return range.endPosition;
     }
 
     removeRange(range) {
