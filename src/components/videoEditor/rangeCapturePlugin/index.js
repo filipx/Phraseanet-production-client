@@ -1,6 +1,8 @@
 require('./style/main.scss');
 import * as Rx from 'rx';
 import videojs from 'video.js';
+import HotkeyModal from './hotkeysModal';
+import HotkeysModalButton from './hotkeysModalButton';
 import RangeBarCollection from './rangeBarCollection';
 import RangeControlBar from './rangeControlBar';
 // import rangeControls from './oldControlBar';
@@ -26,6 +28,8 @@ const plugin = function (options) {
     this.rangeBarCollection = this.controlBar.getChild('progressControl').getChild('seekBar').addChild('RangeBarCollection', settings);
     this.rangeControlBar = this.addChild('RangeControlBar', settings);
 
+    this.hotkeysModalButton = this.addChild('HotkeysModalButton', settings);
+
     // range actions:
     this.rangeStream.subscribe((params) => {
         params.handle = params.handle || false;
@@ -45,8 +49,8 @@ const plugin = function (options) {
         }
     });
 
-    /*this.ready(() => {
-     });*/
+    this.ready(() => {
+    });
 
     this.getRangeCaptureHotkeys = () => {
         return {
@@ -95,7 +99,7 @@ const plugin = function (options) {
             entryCuePoint: {
                 key: function (e) {
                     // I Key
-                    return (e.which === 73);
+                    return (!e.shiftKey && e.which === 73);
                 },
                 handler: function (player, options) {
                     player.rangeStream.onNext({
@@ -107,7 +111,7 @@ const plugin = function (options) {
             endCuePoint: {
                 key: function (e) {
                     // O Key
-                    return (e.which === 79);
+                    return (!e.shiftKey && e.which === 79);
                 },
                 handler: function (player, options) {
                     player.rangeStream.onNext({
@@ -116,13 +120,36 @@ const plugin = function (options) {
                     });
                 }
             },
+            PlayAtEntryCuePoint: {
+                key: function (e) {
+                    // I Key
+                    return (e.shiftKey && e.which === 73);
+                },
+                handler: function (player, options) {
+                    if (!player.paused()) {
+                        player.pause();
+                    }
+                    player.currentTime(player.rangeControlBar.getStartPosition())
+                }
+            },
+            PlayAtEndCuePoint: {
+                key: function (e) {
+                    // O Key
+                    return (e.shiftKey && e.which === 79);
+                },
+                handler: function (player, options) {
+                    if (!player.paused()) {
+                        player.pause();
+                    }
+                    player.currentTime(player.rangeControlBar.getEndPosition())
+                }
+            },
             deleteRange: {
                 key: function (e) {
                     // MAJ+SUPPR Key
                     return (e.shiftKey && e.which === 46);
                 },
                 handler: function (player, options) {
-                    console.log('ok remove')
                     player.rangeStream.onNext({
                         action: 'change',
                         range: player.rangeControlBar.removeRange()

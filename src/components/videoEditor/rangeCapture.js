@@ -40,15 +40,15 @@ const rangeCapture = (services, datas, activeTab = false) => {
         let sources = generateSourcesTpl(record);
         $container.append(
             `<video id="embed-video" class="embed-resource video-js vjs-default-skin vjs-big-play-centered" controls
-               preload="none" width="100%" height="100%" poster="${coverUrl}">${sources} </video>`);
+               preload="none" width="100%" height="100%" poster="${coverUrl}" data-setup='{"language":"${localeService.getLocale()}"}'>${sources} </video>`);
 
-        // hotkey plugins
         // window.videojs = videojs;
+        videojs.addLanguage(localeService.getLocale(), localeService.getTranslations());
         let videoPlayer = videojs('embed-video', options, () => {
         });
+
         videoPlayer.rangeCapturePlugin({videoPlayer, $container});
         videoPlayer.ready(() => {
-            console.log('get additionnal hotkeys', videoPlayer.getRangeCaptureHotkeys())
             videoPlayer.hotkeys({
                 alwaysCaptureHotkeys: true,
                 volumeStep: 0.1,
