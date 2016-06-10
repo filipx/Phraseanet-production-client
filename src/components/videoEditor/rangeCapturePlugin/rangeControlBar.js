@@ -10,6 +10,13 @@ const Component = videojs.getComponent('Component');
 const icons = `
 <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
+<symbol id="icon-loop-range" viewBox="0 0 30 30">
+<title>loop-range</title>
+<path class="path1" d="M25.707 9.92l-2.133 1.813h1.707c0.107 0 0.32 0.213 0.32 0.213v8.107c0 0.107-0.213 0.213-0.32 0.213h-11.093l-0.853 2.133h11.947c1.067 0 2.453-1.28 2.453-2.347v-8.107c0-1.067-1.067-1.92-2.027-2.027z"></path>
+<path class="path2" d="M7.040 22.4l1.92-2.133h-2.24c-0.107 0-0.32-0.213-0.32-0.213v-8.107c0 0 0.213-0.213 0.32-0.213h11.627l0.853-2.133h-12.48c-1.173 0-2.453 1.28-2.453 2.347v8.107c0 1.067 1.28 2.347 2.453 2.347h0.32z"></path>
+<path class="path3" d="M17.493 6.827l4.053 3.947-4.053 3.947z"></path>
+<path class="path4" d="M14.933 24.96l-3.947-3.84 3.947-3.947z"></path>
+</symbol>
 <symbol id="icon-prev-forward-frame" viewBox="0 0 30 30">
 <title>prev-forward-frame</title>
 <path class="path1" d="M25.432 9.942l-9.554 9.554-3.457-3.457 9.554-9.554 3.457 3.457z"></path>
@@ -70,6 +77,7 @@ let rangeMenu = `<div class="range-capture-container">
 <button class="button" id="start-range"  data-toggle="tooltip" title="first tooltip"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg><span class="icon-label"> icon-cue-start</span></button>
 <button class="button" id="end-range"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg><span class="icon-label"> icon-cue-end</span></button>
 <button class="button" id="delete-range"><svg class="icon icon-trash"><use xlink:href="#icon-trash"></use></svg><span class="icon-label"> remove</span></button>
+<button class="button" id="loop-range"><svg class="icon icon-loop-range"><use xlink:href="#icon-loop-range"></use></svg><span class="icon-label"> loop</span></button>
 <button class="button" id="prev-forward-frame"><svg class="icon icon-prev-forward-frame"><use xlink:href="#icon-prev-forward-frame"></use></svg><span class="icon-label"> prev forward frame</span></button>
 <button class="button" id="backward-frame"><svg class="icon icon-prev-frame"><use xlink:href="#icon-prev-frame"></use></svg><span class="icon-label"> prev frame</span></button>
 <span id="display-start" class="display-time">${initTimecode}</span>
@@ -158,11 +166,14 @@ class RangeControlBar extends Component {
                     this.player_.pause();
                 }
                 this.player_.currentTime(this.getEndPosition())
+            })
+            .on('click', '#loop-range', (event) => {
+                event.preventDefault();
+                if (!this.player_.paused()) {
+                    this.player_.pause();
+                }
+                this.loopBetween();
             });
-
-        this.player_.on('timeupdate', (e) => {
-            this.onRefreshCurrentTime();
-        });
 
         $(this.rangeControlBar).append(icons);
         $(this.rangeControlBar).append(rangeMenu);
@@ -190,9 +201,12 @@ class RangeControlBar extends Component {
 
     loopBetween(range) {
         range = range || this.activeRange;
+        this.player_.looping = !this.player_.looping;
+        this.player_.loop(range.startPosition, range.endPosition);
     }
 
     setStartPositon(range) {
+        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
         let newRange = _.extend({}, this.rangeBlueprint, range);
@@ -209,13 +223,14 @@ class RangeControlBar extends Component {
     }
 
     getStartPosition(range) {
+        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
-
         return range.startPosition;
     }
 
     setEndPositon(range) {
+        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
         let newRange = _.extend({}, this.rangeBlueprint, range);
@@ -229,6 +244,7 @@ class RangeControlBar extends Component {
     }
 
     getEndPosition(range) {
+        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
 
@@ -236,6 +252,7 @@ class RangeControlBar extends Component {
     }
 
     removeRange(range) {
+        this.player_.resetCustomEvents();
         delete this.rangeCollection[range];
         this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
         return this.activeRange;
@@ -246,6 +263,7 @@ class RangeControlBar extends Component {
      * @param step (frames)
      */
     setNextFrame(step) {
+        this.player_.resetCustomEvents();
         let position = this.player_.currentTime();
         if (!this.player_.paused()) {
             this.player_.pause();
@@ -262,6 +280,7 @@ class RangeControlBar extends Component {
      * @param step (frames)
      */
     setPreviousFrame(step) {
+        this.player_.resetCustomEvents();
         let position = this.player_.currentTime();
         if (!this.player_.paused()) {
             this.player_.pause();
