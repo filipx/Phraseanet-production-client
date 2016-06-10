@@ -23,7 +23,8 @@ const Component = videojs.getComponent('Component');
 const plugin = function (options) {
     // this = options.videoPlayer;
     const settings = videojs.mergeOptions(defaults, options);
-
+    this.looping = false;
+    this.loopData = [];
     this.rangeStream = new Rx.Subject();
     this.rangeBarCollection = this.controlBar.getChild('progressControl').getChild('seekBar').addChild('RangeBarCollection', settings);
     this.rangeControlBar = this.addChild('RangeControlBar', settings);
@@ -52,6 +53,41 @@ const plugin = function (options) {
     this.ready(() => {
     });
 
+    this.on('pause', () => {
+        // if a loop exists - remove it
+        this.resetCustomEvents();
+    });
+
+    this.on('timeupdate', () => {
+        this.rangeControlBar.onRefreshCurrentTime();
+        // if a loop exists
+        if (this.looping === true && this.loopData.length > 0) {
+
+            let start = this.loopData[0];
+            let end = this.loopData[1];
+
+            var current_time = this.currentTime();
+
+            if (current_time < start || end > 0 && current_time > end) {
+                this.currentTime(start);
+            }
+
+        }
+    });
+
+    this.loop = (start, end) => {
+        this.looping = true;
+        this.currentTime(start);
+        console.log('trigger loop')
+        this.loopData = [start, end];
+        if (this.paused()) {
+            this.play();
+        }
+    }
+
+    this.resetCustomEvents = () => {
+        this.looping = false;
+    }
     this.getRangeCaptureHotkeys = () => {
         return {
             // Create custom hotkeys
@@ -61,7 +97,8 @@ const plugin = function (options) {
                     // L Key
                     return (e.which === 76);
                 },
-                handler: function (player, options) {
+                handler: (player, options) => {
+                    this.resetCustomEvents();
                     if (player.paused()) {
                         player.play();
                     }
@@ -72,7 +109,8 @@ const plugin = function (options) {
                     // K Key
                     return (e.which === 75);
                 },
-                handler: function (player, options) {
+                handler: (player, options) => {
+                    this.resetCustomEvents();
                     if (!player.paused()) {
                         player.pause();
                     }
