@@ -26,16 +26,17 @@ const rangeCapture = (services, datas, activeTab = false) => {
 
     const render = (initData) => {
         let record = initData.records[0];
+        options.frameRates = {};
         const coverUrl = '';
         let generateSourcesTpl = (record) => {
             let recordSources = [];
             _.each(record.sources, (s, i) => {
                 recordSources.push(`<source src="${s.src}" type="${s.type}" data-frame-rate="${s.framerate}">`)
+                options.frameRates[s.src] = s.framerate;
             });
 
             return recordSources.join(' ');
         };
-
 
         let sources = generateSourcesTpl(record);
         $container.append(
@@ -47,10 +48,11 @@ const rangeCapture = (services, datas, activeTab = false) => {
         let videoPlayer = videojs('embed-video', options, () => {
         });
 
-        videoPlayer.rangeCapturePlugin({videoPlayer, $container});
+        videoPlayer.rangeCapturePlugin(options);
         videoPlayer.ready(() => {
             videoPlayer.hotkeys({
                 alwaysCaptureHotkeys: true,
+                enableNumbers: false,
                 volumeStep: 0.1,
                 seekStep: 5,
                 customKeys: videoPlayer.getRangeCaptureHotkeys()

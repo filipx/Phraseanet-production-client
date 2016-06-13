@@ -23,6 +23,10 @@
       height: 100%;
       width: 4em;
     }
+    &.active {
+      box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 30px rgba(0,0,0, 1) inset;
+      border-color: #000\9;
+    }
   }
   > span {
     margin: auto;
@@ -42,6 +46,34 @@
   .display-time {
     padding: 0 10px;
     text-align: center;
+  }
+  input.range-input {
+    background: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    font-size: 12px;
+    width: 22px;
+    margin: 0;
+    padding: 2px 3px;
+    color: #FFF;
+    display: inline-block;
+    &:focus {
+      box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+      //border: 1px solid rgba(81, 203, 238, 1);
+      &.has-error {
+        box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+      }
+      &.is-valid {
+        box-shadow: 0 0 5px rgba(0, 255, 0, 1);
+      }
+    }
+    &.has-error {
+      box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+    }
+    &.is-valid {
+      box-shadow: 0 0 5px rgba(0, 255, 0, 1);
+    }
   }
 }
 .video-js .vjs-control-bar {
