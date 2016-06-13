@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import _ from 'underscore';
+// import textMask from 'all-text-mask/vanilla/dist/textMask';
 import videojs from 'video.js';
+let textMask = require('all-text-mask/vanilla/dist/textMask');
 /**
  * VideoJs Range Control Bar
  */
@@ -68,7 +70,6 @@ const formatTimeToHHMMSSFF = (currentTime, frameRate) => {
 
     return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + 's ' + ('0' + currentFrames).slice(-2) + 'f'
 }
-const initTimecode = formatTimeToHHMMSSFF(0);
 
 
 // @TODO: convert into clickable components:
@@ -80,25 +81,39 @@ let rangeMenu = `<div class="range-capture-container">
 <button class="button" id="loop-range"><svg class="icon icon-loop-range"><use xlink:href="#icon-loop-range"></use></svg><span class="icon-label"> loop</span></button>
 <button class="button" id="prev-forward-frame"><svg class="icon icon-prev-forward-frame"><use xlink:href="#icon-prev-forward-frame"></use></svg><span class="icon-label"> prev forward frame</span></button>
 <button class="button" id="backward-frame"><svg class="icon icon-prev-frame"><use xlink:href="#icon-prev-frame"></use></svg><span class="icon-label"> prev frame</span></button>
-<span id="display-start" class="display-time">${initTimecode}</span>
-<span id="display-end" class="display-time">${initTimecode}</span>
+<span id="display-start" class="display-time">
+<input type="text" class="range-input" data-scope="start-range" id="start-range-input-hours" value="00" size="2"/>:
+<input type="text" class="range-input" data-scope="start-range" id="start-range-input-minutes" value="00" size="2"/>:
+<input type="text" class="range-input" data-scope="start-range" id="start-range-input-seconds" value="00" size="2"/>s
+<input type="text" class="range-input" data-scope="start-range" id="start-range-input-frames" value="00" size="2"/>f
+</span>
+<span id="display-end" class="display-time">
+<input type="text" class="range-input" data-scope="end-range" id="end-range-input-hours" value="00" size="2"/>:
+<input type="text" class="range-input" data-scope="end-range" id="end-range-input-minutes" value="00" size="2"/>:
+<input type="text" class="range-input" data-scope="end-range" id="end-range-input-seconds" value="00" size="2"/>s
+<input type="text" class="range-input" data-scope="end-range" id="end-range-input-frames" value="00" size="2"/>f</span>
 <button class="button" id="forward-frame"><svg class="icon icon-next-frame"><use xlink:href="#icon-next-frame"></use></svg><span class="icon-label"> next frame</span></button>
 <button class="button" id="next-forward-frame"><svg class="icon icon-next-forward-frame"><use xlink:href="#icon-next-forward-frame"></use></svg><span class="icon-label"> next forward frame</span></button>
 
 <span id="display-current" class="display-time"></span>
 </div>`;
-
+const defaults = {
+    frameRate: 24
+};
 class RangeControlBar extends Component {
     rangeControlBar;
     rangeCollection;
+    frameRate;
 
-    constructor(player, settings) {
-        super(player, settings);
+    constructor(player, options) {
+        super(player, options);
+        const settings = videojs.mergeOptions(defaults, options);
 
         //this.settings = settings;
         this.rangeCollection = {};
+        this.looping = false;
+        this.loopData = [];
         this.frameStep = 1;
-        this.frameRate = 24;
         this.frameDuration = (1 / this.frameRate);
         this.rangeCollection = {};
         this.activeRange = 0;
@@ -108,6 +123,8 @@ class RangeControlBar extends Component {
             endPosition: -1
         };
         this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
+
+        this.frameRate = settings.frameRates[this.player_.currentSrc()];
     }
 
     /**
@@ -169,22 +186,80 @@ class RangeControlBar extends Component {
             })
             .on('click', '#loop-range', (event) => {
                 event.preventDefault();
+
+                let $el = $(event.currentTarget);
                 if (!this.player_.paused()) {
                     this.player_.pause();
                 }
-                this.loopBetween();
+                this.looping = !this.looping;
+
+                if (this.looping) {
+                    $el.addClass('active');
+                    this.loopBetween();
+                } else {
+                    $el.removeClass('active');
+                }
+            })
+            .on('keyup', '.range-input', (event) => {
+                if (event.keyCode === 13) {
+                    $(event.currentTarget).blur();
+                }
+            })
+            .on('focus', '.range-input', (event) => {
+                event.currentTarget.setSelectionRange(0, event.currentTarget.value.length)
+            })
+            .on('blur', '.range-input', (event) => {
+                event.preventDefault();
+                let $el = $(event.currentTarget);
+
+                if (this.validateScopeInput($el.data('scope'))) {
+                    // this.validateScopeInput();
+                    let newCurrentTime = this.getScopeInputTime($el.data('scope'));
+                    this.player_.currentTime(newCurrentTime);
+                    $el.addClass('is-valid');
+                    setTimeout(() => $el.removeClass('is-valid'), 500);
+                } else {
+                    $el.addClass('has-error');
+                    setTimeout(() => $el.removeClass('has-error'), 1200);
+                }
+                // fallback on old values if have errors:
+                this.player_.rangeStream.onNext({
+                    action: 'change',
+                    handle: ($el.data('scope') === 'start-range' ? 'start' : 'end'),
+                    range: ($el.data('scope') === 'start-range' ? this.setStartPositon() : this.setEndPositon())
+                });
+
             });
 
         $(this.rangeControlBar).append(icons);
         $(this.rangeControlBar).append(rangeMenu);
         $('.button').tooltip({placement: 'bottom'})
+
+        this.player_.on('timeupdate', () => {
+            this.onRefreshCurrentTime();
+            // if a loop exists
+            if (this.looping === true && this.loopData.length > 0) {
+
+                let start = this.loopData[0];
+                let end = this.loopData[1];
+
+                var current_time = this.player_.currentTime();
+
+                if (current_time < start || end > 0 && current_time > end) {
+                    this.player_.currentTime(start);
+                }
+
+            }
+        });
         return this.rangeControlBar;
     }
 
     updateActiveRange(range, handle) {
         handle = handle || false;
-        $('#display-start').html(formatTimeToHHMMSSFF(range.startPosition, this.frameRate));
-        $('#display-end').html(formatTimeToHHMMSSFF(range.endPosition, this.frameRate));
+
+        this.updateRangeDisplay('start-range', range.startPosition);
+        this.updateRangeDisplay('end-range', range.endPosition);
+
         $('display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate));
         this.activeRange = this.rangeCollection[range.id] = range;
 
@@ -195,18 +270,81 @@ class RangeControlBar extends Component {
         }
     }
 
+    updateRangeDisplay(scope, currentTime) {
+        let hours = Math.floor(currentTime / 3600);
+        let s = currentTime - hours * 3600;
+        let minutes = Math.floor(s / 60);
+        let seconds = Math.floor(s - minutes * 60);
+
+        let currentRest = currentTime - (Math.floor(currentTime));
+        let currentFrames = Math.floor(this.frameRate * currentRest);
+
+        $(`#${scope}-input-hours`).val(('0' + hours).slice(-2));
+        $(`#${scope}-input-minutes`).val(('0' + minutes).slice(-2));
+        $(`#${scope}-input-seconds`).val(('0' + seconds).slice(-2));
+        $(`#${scope}-input-frames`).val(('0' + currentFrames).slice(-2));
+    }
+
+    getScopeInputs(scope) {
+        return {
+            hours: $(`#${scope}-input-hours`).val(),
+            minutes: $(`#${scope}-input-minutes`).val(),
+            seconds: $(`#${scope}-input-seconds`).val(),
+            frames: $(`#${scope}-input-frames`).val()
+        }
+    }
+
+    validateScopeInput(scope) {
+        let scopeInputs = this.getScopeInputs(scope);
+        var regex = /^\d+$/;    // allow only numbers [0-9]
+        if (regex.test(scopeInputs.hours) && regex.test(scopeInputs.minutes) && regex.test(scopeInputs.seconds) && regex.test(scopeInputs.frames)) {
+            if (scopeInputs.minutes < 0 || scopeInputs.minutes > 59) {
+                return false;
+            }
+            if (scopeInputs.seconds < 0 || scopeInputs.seconds > 59) {
+                return false;
+            }
+            if (scopeInputs.frames < 0 || scopeInputs.frames > this.frameRate) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    getScopeInputTime(scope) {
+        let scopeInputs = this.getScopeInputs(scope);
+        let hours = parseInt(scopeInputs.hours, 10);
+        let minutes = parseInt(scopeInputs.minutes, 10);
+        let seconds = parseInt(scopeInputs.seconds, 10);
+        let frames = parseInt(scopeInputs.frames, 10);
+
+        let milliseconds = frames === 0 ? 0 : (((1000 / this.frameRate) * frames) / 1000).toFixed(2);
+
+        return (hours * 3600) + (minutes * 60) + (seconds) + parseFloat(milliseconds);
+    }
+
     updateCurrentTime() {
         $('#display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
     }
 
     loopBetween(range) {
         range = range || this.activeRange;
-        this.player_.looping = !this.player_.looping;
-        this.player_.loop(range.startPosition, range.endPosition);
+        this.loop(range.startPosition, range.endPosition);
+    }
+
+    loop(start, end) {
+        this.looping = true;
+        this.player_.currentTime(start);
+
+        this.loopData = [start, end];
+
+        if (this.player_.paused()) {
+            this.player_.play();
+        }
     }
 
     setStartPositon(range) {
-        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
         let newRange = _.extend({}, this.rangeBlueprint, range);
@@ -223,14 +361,12 @@ class RangeControlBar extends Component {
     }
 
     getStartPosition(range) {
-        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
         return range.startPosition;
     }
 
     setEndPositon(range) {
-        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
         let newRange = _.extend({}, this.rangeBlueprint, range);
@@ -244,7 +380,6 @@ class RangeControlBar extends Component {
     }
 
     getEndPosition(range) {
-        this.player_.resetCustomEvents();
         // if range is not defined take active one:
         range = range || this.activeRange;
 
@@ -252,7 +387,6 @@ class RangeControlBar extends Component {
     }
 
     removeRange(range) {
-        this.player_.resetCustomEvents();
         delete this.rangeCollection[range];
         this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
         return this.activeRange;
@@ -263,7 +397,6 @@ class RangeControlBar extends Component {
      * @param step (frames)
      */
     setNextFrame(step) {
-        this.player_.resetCustomEvents();
         let position = this.player_.currentTime();
         if (!this.player_.paused()) {
             this.player_.pause();
@@ -280,7 +413,6 @@ class RangeControlBar extends Component {
      * @param step (frames)
      */
     setPreviousFrame(step) {
-        this.player_.resetCustomEvents();
         let position = this.player_.currentTime();
         if (!this.player_.paused()) {
             this.player_.pause();

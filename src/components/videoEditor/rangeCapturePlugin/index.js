@@ -21,7 +21,6 @@ const defaults = {
 const Component = videojs.getComponent('Component');
 
 const plugin = function (options) {
-    // this = options.videoPlayer;
     const settings = videojs.mergeOptions(defaults, options);
     this.looping = false;
     this.loopData = [];
@@ -51,43 +50,9 @@ const plugin = function (options) {
     });
 
     this.ready(() => {
+
     });
 
-    this.on('pause', () => {
-        // if a loop exists - remove it
-        this.resetCustomEvents();
-    });
-
-    this.on('timeupdate', () => {
-        this.rangeControlBar.onRefreshCurrentTime();
-        // if a loop exists
-        if (this.looping === true && this.loopData.length > 0) {
-
-            let start = this.loopData[0];
-            let end = this.loopData[1];
-
-            var current_time = this.currentTime();
-
-            if (current_time < start || end > 0 && current_time > end) {
-                this.currentTime(start);
-            }
-
-        }
-    });
-
-    this.loop = (start, end) => {
-        this.looping = true;
-        this.currentTime(start);
-        console.log('trigger loop')
-        this.loopData = [start, end];
-        if (this.paused()) {
-            this.play();
-        }
-    }
-
-    this.resetCustomEvents = () => {
-        this.looping = false;
-    }
     this.getRangeCaptureHotkeys = () => {
         return {
             // Create custom hotkeys
@@ -98,7 +63,6 @@ const plugin = function (options) {
                     return (e.which === 76);
                 },
                 handler: (player, options) => {
-                    this.resetCustomEvents();
                     if (player.paused()) {
                         player.play();
                     }
@@ -110,7 +74,6 @@ const plugin = function (options) {
                     return (e.which === 75);
                 },
                 handler: (player, options) => {
-                    this.resetCustomEvents();
                     if (!player.paused()) {
                         player.pause();
                     }
@@ -192,20 +155,6 @@ const plugin = function (options) {
                         action: 'change',
                         range: player.rangeControlBar.removeRange()
                     });
-                }
-            },
-            //73 i
-            //79 o
-            ctrldKey: {
-                key: function (e) {
-                    // Toggle something with CTRL + D Key
-                    return (e.ctrlKey && e.which === 68);
-                },
-                handler: function (player, options) {
-                    // Using mute as an example
-                    if (options.enableMute) {
-                        player.muted(!player.muted());
-                    }
                 }
             }
         }
