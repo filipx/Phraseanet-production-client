@@ -112,7 +112,7 @@ class RangeControlBar extends Component {
         //this.settings = settings;
         this.rangeCollection = {};
         this.looping = false;
-        this.loopData = [];
+        this.loopData = []; // @dprecated
         this.frameStep = 1;
         this.frameDuration = (1 / this.frameRate);
         this.rangeCollection = {};
@@ -240,8 +240,8 @@ class RangeControlBar extends Component {
             // if a loop exists
             if (this.looping === true && this.loopData.length > 0) {
 
-                let start = this.loopData[0];
-                let end = this.loopData[1];
+                let start = this.activeRange.startPosition; //this.loopData[0];
+                let end = this.activeRange.endPosition; //this.loopData[1];
 
                 var current_time = this.player_.currentTime();
 
@@ -337,6 +337,7 @@ class RangeControlBar extends Component {
         this.looping = true;
         this.player_.currentTime(start);
 
+        // @deprecated
         this.loopData = [start, end];
 
         if (this.player_.paused()) {

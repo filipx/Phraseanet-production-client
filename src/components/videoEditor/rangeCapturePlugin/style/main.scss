@@ -42,6 +42,8 @@ $icon-font-path: '../../../../../node_modules/videojs-font/fonts' ;
 @import "../../../../../node_modules/video.js/src/css/components/modal-dialog";
 @import "buttons";
 @import 'rangeCapture';
+@import 'skin';
+@import 'skin-big-play';
 
 .video-js-box, video.video-js {
   width: 100%;

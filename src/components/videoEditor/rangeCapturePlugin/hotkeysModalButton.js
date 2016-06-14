@@ -30,11 +30,18 @@ class HotkeysModalButton extends Button {
         this.hotkeysModal = this.player_.addChild('HotkeyModal', this.settings);
         this.hotkeysModal.initialize();
         this.hotkeysModal.open();
+        this.hotkeysModal.on('beforemodalclose', () => {
+            $(this.el()).show();
+        });
+        $(this.el()).hide();
     }
 
 }
 
-HotkeysModalButton.prototype.controlText_ = 'i';
+HotkeysModalButton.prototype.controlText_ = `<span class="icon-stack">
+                              <i class="icon-circle icon-stack-base"></i>
+                              <i class="icon-info icon-light"></i>
+                            </span>`;
 
 Component.registerComponent('HotkeysModalButton', HotkeysModalButton);
 export default HotkeysModalButton;

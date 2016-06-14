@@ -76,18 +76,29 @@
     }
   }
 }
-.video-js .vjs-control-bar {
-  //height: 6em;
-  bottom: 3em;
+.video-js .vjs-control-bar,
+.vjs-control-bar {
+  bottom: 1em;
 }
+
 .vjs-range-control-bar {
   flex: 1 100%;
   width: 100%;
   position: absolute;
-  bottom: 0;
+  bottom: -4em;
   left: 0;
   right: 0;
 }
+.vjs-fullscreen {
+  .vjs-range-control-bar {
+    bottom: 0;
+  }
+  .vjs-control-bar {
+    bottom: 4em;
+  }
+}
+
+
 .vjs-modal-dialog-content {
   overflow: auto;
   bottom: 6em;
@@ -107,6 +118,7 @@
     }
   }
 }
+
 .video-js button.vjs-hotkeys-modal-button {
   cursor: pointer;
   height: 3em;
@@ -118,11 +130,15 @@
   border-radius: 3px;
   .vjs-control-text {
     display: inline-block;
-    width: 15px;
-    height: 10px;
-    font-size: 16px;
+    width: 20px;
+    height: 20px;
+    //font-size: 16px;
+    color: #FFF;
     clip: inherit;
     position: relative;
+    .icon-info {
+      color: #000;
+    }
   }
 }
 

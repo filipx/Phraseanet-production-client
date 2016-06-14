@@ -54,7 +54,7 @@ const rangeCapture = (services, datas, activeTab = false) => {
                 alwaysCaptureHotkeys: true,
                 enableNumbers: false,
                 volumeStep: 0.1,
-                seekStep: 5,
+                seekStep: 1,
                 customKeys: videoPlayer.getRangeCaptureHotkeys()
             });
         });
