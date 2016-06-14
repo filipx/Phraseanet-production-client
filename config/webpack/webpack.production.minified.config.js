@@ -50,7 +50,7 @@ module.exports = Object.assign({}, webpackConfig, {
         extractCSS,
         new OptimizeCssAssetsPlugin({
             assetNameRegExp: /\.min\.css$/,
-            cssProcessorOptions: { discardComments: { removeAll: true } }
+            cssProcessorOptions: { discardComments: { removeAll: true }, zindex: false }
         })
     ]
 });
