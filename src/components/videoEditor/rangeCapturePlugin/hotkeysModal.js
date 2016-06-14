@@ -36,7 +36,6 @@ class HotkeyModal extends ModalDialog {
         this.fillWith(domTpl)
 
     }
-
 }
 
 videojs.registerComponent('HotkeyModal', HotkeyModal);
