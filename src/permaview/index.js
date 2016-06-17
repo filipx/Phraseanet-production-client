@@ -1,7 +1,12 @@
-let permaviewApplication = {};
+require('./style/main.scss');
+import bootstrap from './bootstrap.js';
+
+let PermaviewApplication = {
+    bootstrap
+};
 
 if (typeof window !== 'undefined') {
-    window.permaviewApplication = permaviewApplication;
+    window.PermaviewApplication = PermaviewApplication;
 }
 
-module.exports = permaviewApplication;
+module.exports = PermaviewApplication;

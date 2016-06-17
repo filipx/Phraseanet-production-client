@@ -1,4 +1,3 @@
-import * as _ from 'underscore';
 import ApplicationConfigService from './applicationConfigService';
 
 let instance = null;

@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
-import merge from 'lodash.merge';
 require('phraseanet-common/src/components/tooltip');
+import merge from 'lodash.merge';
 const humane = require('humane-js');
 
 const basketBrowse = (services) => {

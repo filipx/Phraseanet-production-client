@@ -5,6 +5,7 @@ import merge from 'lodash.merge';
 import * as Rx from 'rx';
 import Emitter from '../../core/emitter';
 import leafletMap from './../../geolocalisation/providers/mapbox';
+import pym from 'pym.js';
 let image_enhancer = require('imports?$=jquery!../../utils/jquery-plugins/imageEnhancer/imageEnhancer');
 require('phraseanet-common/src/components/tooltip');
 const previewRecordService = (services) => {
@@ -16,6 +17,7 @@ const previewRecordService = (services) => {
     let $previewTabContainer;
     let prevAjax;
     let prevAjaxrunning;
+    let activeThumbnailFrame;
     prevAjaxrunning = false;
     let stream = new Rx.Subject();
     let options = {
@@ -93,7 +95,17 @@ const previewRecordService = (services) => {
             .on('click', '.preview-stop-slideshow-action', (event) => {
                 event.preventDefault();
                 stopSlide();
+            })
+            .on('click', '.edit-record-action', (event) => {
+                if( activeThumbnailFrame !== undefined) {
+                    // tell child iframe to pause:
+                    activeThumbnailFrame.sendMessage('pause', 'ok');
+                }
+                event.preventDefault();
             });
+
+
+
     };
 
     /**
@@ -264,6 +276,19 @@ const previewRecordService = (services) => {
                 posAsk = data.pos - 1;
 
                 $('#PREVIEWIMGCONT').empty().append(data.html_preview);
+                if($('#phraseanet-embed-frame').length > 0 ) {
+                    activeThumbnailFrame = new pym.Parent('phraseanet-embed-frame', data.record.preview.url);
+                    activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
+                    /*
+                    // warning - if listening events/sendings events,
+                    // pym instances should be destroyed when preview is closed
+                    activeThumbnailFrame.onMessage('childReady', (child) => {
+                        activeThumbnailFrame.sendMessage('parentReady', 'handshake');
+
+                    });*/
+                }
+
+
                 $('#PREVIEWIMGCONT .thumb_wrapper')
                     .width('100%').height('100%').image_enhance({zoomable: true});
 
@@ -348,6 +373,10 @@ const previewRecordService = (services) => {
 
     function closePreview() {
         options.open = false;
+        if( activeThumbnailFrame !== undefined) {
+            // tell child iframe to shutdown:
+            activeThumbnailFrame.sendMessage('dispose', 'ok');
+        }
         stream.onNext(options);
         $('#PREVIEWBOX').fadeTo(500, 0);
         $('#PREVIEWBOX').queue(function () {
