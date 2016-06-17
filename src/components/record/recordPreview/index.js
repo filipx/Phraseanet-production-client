@@ -17,7 +17,7 @@ const previewRecordService = (services) => {
     let $previewTabContainer;
     let prevAjax;
     let prevAjaxrunning;
-    let activeThumbnailFrame;
+    let activeThumbnailFrame = false;
     prevAjaxrunning = false;
     let stream = new Rx.Subject();
     let options = {
@@ -97,13 +97,12 @@ const previewRecordService = (services) => {
                 stopSlide();
             })
             .on('click', '.edit-record-action', (event) => {
-                if( activeThumbnailFrame !== undefined) {
+                if (activeThumbnailFrame !== false) {
                     // tell child iframe to pause:
                     activeThumbnailFrame.sendMessage('pause', 'ok');
                 }
                 event.preventDefault();
             });
-
 
 
     };
@@ -276,16 +275,16 @@ const previewRecordService = (services) => {
                 posAsk = data.pos - 1;
 
                 $('#PREVIEWIMGCONT').empty().append(data.html_preview);
-                if($('#phraseanet-embed-frame').length > 0 ) {
+                if ($('#phraseanet-embed-frame').length > 0) {
                     activeThumbnailFrame = new pym.Parent('phraseanet-embed-frame', data.record.preview.url);
                     activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
                     /*
-                    // warning - if listening events/sendings events,
-                    // pym instances should be destroyed when preview is closed
-                    activeThumbnailFrame.onMessage('childReady', (child) => {
-                        activeThumbnailFrame.sendMessage('parentReady', 'handshake');
+                     // warning - if listening events/sendings events,
+                     // pym instances should be destroyed when preview is closed
+                     activeThumbnailFrame.onMessage('childReady', (child) => {
+                     activeThumbnailFrame.sendMessage('parentReady', 'handshake');
 
-                    });*/
+                     });*/
                 }
 
 
@@ -373,9 +372,11 @@ const previewRecordService = (services) => {
 
     function closePreview() {
         options.open = false;
-        if( activeThumbnailFrame !== undefined) {
+        if (activeThumbnailFrame !== false) {
             // tell child iframe to shutdown:
             activeThumbnailFrame.sendMessage('dispose', 'ok');
+
+            activeThumbnailFrame = false;
         }
         stream.onNext(options);
         $('#PREVIEWBOX').fadeTo(500, 0);
