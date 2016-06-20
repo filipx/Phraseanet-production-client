@@ -78,7 +78,9 @@ module.exports = Object.assign({}, webpackConfig, {
     plugins: [
         new webpack.ProvidePlugin({
             $: "jquery",
-            jQuery: "jquery"
+            jQuery: "jquery",
+            "videojs": "video.js",
+            "window.videojs": "video.js"
         }),
         // Notifier
         new WebpackNotifierPlugin({
