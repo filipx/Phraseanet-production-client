@@ -30,10 +30,10 @@ module.exports = Object.assign({}, webpackConfig, {
                 presets: ['es2015', 'stage-0']
             }
         }, {
-            test: /\.(woff|png|jpg|gif)$/,
+            test: /\.(ttf|eot|woff|svg|png|jpg|gif)$/,
             loader: 'url-loader?limit=10000&prefix=img/&name=[path][name].[ext]?[hash]'
         }, {
-            test: /\.(png|jpg|jpeg|gif)$/,
+            test: /\.(ttf|eot|woff|svg|png|jpg|jpeg|gif)$/,
             loader: 'file-loader'
         }, {
             test: /\.css$/,
