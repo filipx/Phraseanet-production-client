@@ -26,6 +26,7 @@ class HotkeyModal extends ModalDialog {
             <dt>${this.player_.localize('Previous cuepoint')}</dt><dd><span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">I</span></dd>
             <dt>${this.player_.localize('Next cuepoint')}</dt><dd><span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">O</span></dd>
             <dt>${this.player_.localize('Delete current')}</dt><dd><span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">${this.player_.localize('Suppr')}</span></dd>
+            <dt>${this.player_.localize('Toggle loop')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">${this.player_.localize('L')}</span></dd>
             </dl>
             </div>`;
     }
