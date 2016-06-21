@@ -39,9 +39,9 @@ $big-play-button--height: 75px;
 .video-js .vjs-big-play-button:focus {
   outline: 0;
   //border-color: $primary-foreground-color;
-
+  background-color: transparent;
   //@include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
-  @include transition(all 0s);
+  // @include transition(all 0s);
 }
 
 // Hide if controls are disabled, the video is playing, or native controls are used.

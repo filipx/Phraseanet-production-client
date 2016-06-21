@@ -11,7 +11,10 @@ const rangeCapture = (services, datas, activeTab = false) => {
     let options = {};
     let defaultOptions = {
         playbackRates: [],
-        fluid: true
+        fluid: true,
+        controlBar: {
+            muteToggle: false
+        }
     };
     const initialize = (params, userOptions) => {
         //{$container} = params;
@@ -19,13 +22,15 @@ const rangeCapture = (services, datas, activeTab = false) => {
         initData = params.data;
 
         options = _.extend(defaultOptions, userOptions, {$container: $container});
-
+        dispose();
         render(initData);
-
     }
 
     const render = (initData) => {
         let record = initData.records[0];
+        if (record.type !== 'video') {
+            return;
+        }
         options.frameRates = {};
         const coverUrl = '';
         let generateSourcesTpl = (record) => {
@@ -59,6 +64,15 @@ const rangeCapture = (services, datas, activeTab = false) => {
         });
 
     };
+
+    const dispose = () => {
+        try {
+            if (videojs.getPlayers()['embed-video']) {
+                delete videojs.getPlayers()['embed-video'];
+            }
+        } catch (e) {
+        }
+    }
 
     return {initialize}
 }

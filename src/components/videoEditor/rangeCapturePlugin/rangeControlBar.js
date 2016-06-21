@@ -95,7 +95,7 @@ let rangeMenu = `<div class="range-capture-container">
 <button class="button" id="forward-frame"><svg class="icon icon-next-frame"><use xlink:href="#icon-next-frame"></use></svg><span class="icon-label"> next frame</span></button>
 <button class="button" id="next-forward-frame"><svg class="icon icon-next-forward-frame"><use xlink:href="#icon-next-forward-frame"></use></svg><span class="icon-label"> next forward frame</span></button>
 
-<span id="display-current" class="display-time"></span>
+<span id="display-current" class="display-time">00:00:00s 00f</span>
 </div>`;
 const defaults = {
     frameRate: 24
@@ -114,7 +114,6 @@ class RangeControlBar extends Component {
         this.looping = false;
         this.loopData = []; // @dprecated
         this.frameStep = 1;
-        this.frameDuration = (1 / this.frameRate);
         this.rangeCollection = {};
         this.activeRange = 0;
         this.rangeBlueprint = {
@@ -125,6 +124,7 @@ class RangeControlBar extends Component {
         this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
 
         this.frameRate = settings.frameRates[this.player_.currentSrc()];
+        this.frameDuration = (1 / this.frameRate);
     }
 
     /**
@@ -186,19 +186,7 @@ class RangeControlBar extends Component {
             })
             .on('click', '#loop-range', (event) => {
                 event.preventDefault();
-
-                let $el = $(event.currentTarget);
-                if (!this.player_.paused()) {
-                    this.player_.pause();
-                }
-                this.looping = !this.looping;
-
-                if (this.looping) {
-                    $el.addClass('active');
-                    this.loopBetween();
-                } else {
-                    $el.removeClass('active');
-                }
+                this.toggleLoop();
             })
             .on('keyup', '.range-input', (event) => {
                 if (event.keyCode === 13) {
@@ -328,6 +316,21 @@ class RangeControlBar extends Component {
         $('#display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
     }
 
+    toggleLoop() {
+        let $el = $('#loop-range');
+        if (!this.player_.paused()) {
+            this.player_.pause();
+        }
+        this.looping = !this.looping;
+
+        if (this.looping) {
+            $el.addClass('active');
+            this.loopBetween();
+        } else {
+            $el.removeClass('active');
+        }
+    }
+
     loopBetween(range) {
         range = range || this.activeRange;
         this.loop(range.startPosition, range.endPosition);
@@ -426,8 +429,11 @@ class RangeControlBar extends Component {
     }
 
     onRefreshCurrentTime() {
+        let displayCurrent = document.getElementById('display-current');
         //$('#display-current').html(formatTimeToHHMMSSFF(options.videoPlayer.currentTime()))
-        document.getElementById('display-current').innerHTML = formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate)
+        if (displayCurrent !== null) {
+            displayCurrent.innerHTML = formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate)
+        }
     }
 
 }
