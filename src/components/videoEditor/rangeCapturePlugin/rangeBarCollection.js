@@ -30,11 +30,18 @@ class RangeBarCollection extends Component {
     updateRangeCollection = () => {
 
     }
+
     updateRange = (range) => {
         if (this.rangeCollection[range.id] === undefined) {
             this.rangeCollection[range.id] = this.addChild('RangeBar', [this.player_, this.settings]);
         }
         this.rangeCollection[range.id].updateRange(range);
+    }
+
+    removeRange = (range) => {
+        if (this.rangeCollection[range.id] !== undefined) {
+            this.rangeCollection[range.id] = this.removeChild('RangeBar');
+        }
     }
 }
 

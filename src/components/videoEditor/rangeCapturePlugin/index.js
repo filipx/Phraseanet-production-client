@@ -38,6 +38,9 @@ const plugin = function (options) {
                 this.rangeControlBar.updateActiveRange(params.range, params.handle);
                 this.rangeBarCollection.updateRange(params.range);
                 break;
+            case 'remove':
+                this.rangeBarCollection.removeRange(params.range);
+                break;
             case 'refresh':
                 this.rangeControlBar.updateCurrentTime();
                 break;
@@ -62,7 +65,6 @@ const plugin = function (options) {
             // Create custom hotkeys
             playOnlyKey: {
                 key: function (e) {
-                    console.log('override', e.which)
                     // L Key
                     return (!e.ctrlKey && e.which === 76);
                 },
@@ -151,7 +153,6 @@ const plugin = function (options) {
             },
             toggleLoop: {
                 key: function (e) {
-                    console.log('override', e.which)
                     // ctrl+ L Key
                     return (e.ctrlKey && e.which === 76);
                 },

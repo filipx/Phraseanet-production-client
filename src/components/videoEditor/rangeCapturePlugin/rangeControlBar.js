@@ -64,9 +64,10 @@ const formatTimeToHHMMSSFF = (currentTime, frameRate) => {
     let s = currentTime - hours * 3600;
     let minutes = Math.floor(s / 60);
     let seconds = Math.floor(s - minutes * 60);
-
+    // keep only milliseconds rest ()
     let currentRest = currentTime - (Math.floor(currentTime));
-    let currentFrames = Math.floor(frameRate * currentRest);
+    let currentFrames = Math.round(frameRate * currentRest);
+    // if( currentFrames >= )
 
     return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + 's ' + ('0' + currentFrames).slice(-2) + 'f'
 }
@@ -158,7 +159,7 @@ class RangeControlBar extends Component {
             .on('click', '#delete-range', (event) => {
                 event.preventDefault();
                 this.player_.rangeStream.onNext({
-                    action: 'change',
+                    action: 'remove',
                     range: this.removeRange()
                 });
             })
@@ -263,9 +264,8 @@ class RangeControlBar extends Component {
         let s = currentTime - hours * 3600;
         let minutes = Math.floor(s / 60);
         let seconds = Math.floor(s - minutes * 60);
-
         let currentRest = currentTime - (Math.floor(currentTime));
-        let currentFrames = Math.floor(this.frameRate * currentRest);
+        let currentFrames = Math.round(this.frameRate * currentRest);
 
         $(`#${scope}-input-hours`).val(('0' + hours).slice(-2));
         $(`#${scope}-input-minutes`).val(('0' + minutes).slice(-2));
@@ -306,7 +306,6 @@ class RangeControlBar extends Component {
         let minutes = parseInt(scopeInputs.minutes, 10);
         let seconds = parseInt(scopeInputs.seconds, 10);
         let frames = parseInt(scopeInputs.frames, 10);
-
         let milliseconds = frames === 0 ? 0 : (((1000 / this.frameRate) * frames) / 1000).toFixed(2);
 
         return (hours * 3600) + (minutes * 60) + (seconds) + parseFloat(milliseconds);
@@ -393,6 +392,9 @@ class RangeControlBar extends Component {
     removeRange(range) {
         delete this.rangeCollection[range];
         this.activeRange = this.rangeCollection[1] = this.rangeBlueprint;
+
+        this.updateRangeDisplay('start-range', 0);
+        this.updateRangeDisplay('end-range', 0);
         return this.activeRange;
     }
 
