@@ -53,6 +53,10 @@ const plugin = function (options) {
 
     });
 
+    // ensure control bar is always visible by simulating user activity:
+    this.on('timeupdate', () => {
+        this.userActive(true);
+    });
     this.getRangeCaptureHotkeys = () => {
         return {
             // Create custom hotkeys
@@ -60,7 +64,7 @@ const plugin = function (options) {
                 key: function (e) {
                     console.log('override', e.which)
                     // L Key
-                    return (e.which === 76);
+                    return (!e.ctrlKey && e.which === 76);
                 },
                 handler: (player, options) => {
                     if (player.paused()) {
@@ -143,6 +147,16 @@ const plugin = function (options) {
                         player.pause();
                     }
                     player.currentTime(player.rangeControlBar.getEndPosition())
+                }
+            },
+            toggleLoop: {
+                key: function (e) {
+                    console.log('override', e.which)
+                    // ctrl+ L Key
+                    return (e.ctrlKey && e.which === 76);
+                },
+                handler: function (player, options) {
+                    player.rangeControlBar.toggleLoop();
                 }
             },
             deleteRange: {

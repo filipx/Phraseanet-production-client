@@ -1,4 +1,4 @@
-
+import $ from 'jquery';
 import videojs from 'video.js';
 const Button = videojs.getComponent('Button');
 const Component = videojs.getComponent('Component');

@@ -1,3 +1,4 @@
+require('./style/main.scss');
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 import videoScreenCapture from './videoScreenCapture';
@@ -16,19 +17,16 @@ const recordToolsModal = (services, datas, activeTab = false) => {
     toolsStream.subscribe((params) => {
         switch (params.action) {
             case 'refresh':
-
-                console.log('trigger openModal')
                 openModal.apply(null, params.options);
-
                 break;
-
             default:
         }
     })
     const openModal = (datas, activeTab) => {
-        console.log('activeTab', activeTab)
         $dialog = dialog.create(services, {
-            size: 'Medium',
+            size: 'Custom',
+            customWidth: 770,
+            customHeight: 650,
             title: localeService.t('toolbox'),
             loading: true
         });
@@ -105,6 +103,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 $container: $dialog, data, tabs,
                 dialogParams: $dialog.getOption('contextArgs')
             });
+
             videoScreenCapture(services).initialize({$container: $scope, data});
             videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data});
         }
