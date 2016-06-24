@@ -18,7 +18,7 @@ class HotkeysModalButton extends Button {
      * @method buildCSSClass
      */
     buildCSSClass() {
-        return 'vjs-hotkeys-modal-button';
+        return 'vjs-hotkeys-modal-button vjs-button';
     }
 
     /**
