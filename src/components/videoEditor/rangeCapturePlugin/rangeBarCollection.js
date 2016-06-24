@@ -1,5 +1,4 @@
 import videojs from 'video.js';
-import noUiSlider from 'noUiSlider';
 import RangeBar from './rangeBar';
 /**
  * VideoJs Range Bar Collection
@@ -7,7 +6,7 @@ import RangeBar from './rangeBar';
 const Component = videojs.getComponent('Component');
 
 class RangeBarCollection extends Component {
-    rangeCollection = {};
+    activeRangeItem;
 
     constructor(player, settings) {
         super(player, settings);
@@ -27,20 +26,23 @@ class RangeBarCollection extends Component {
         });
     }
 
-    updateRangeCollection = () => {
-
-    }
-
-    updateRange = (range) => {
-        if (this.rangeCollection[range.id] === undefined) {
-            this.rangeCollection[range.id] = this.addChild('RangeBar', [this.player_, this.settings]);
+    refreshRangeSliderPosition = (range) => {
+        if (range.startPosition === -1 && range.endPosition === -1) {
+            this.removeActiveRange(range)
+            return;
         }
-        this.rangeCollection[range.id].updateRange(range);
+
+        if (this.activeRangeItem === undefined) {
+            this.activeRangeItem = new RangeBar(this.player_, this.settings);//this.addChild('RangeBar', [this.player_, this.settings]);
+        }
+        this.activeRangeItem.updateRange(range);
+
+        this.addChild(this.activeRangeItem);
     }
 
-    removeRange = (range) => {
-        if (this.rangeCollection[range.id] !== undefined) {
-            this.rangeCollection[range.id] = this.removeChild('RangeBar');
+    removeActiveRange = (range) => {
+        if (this.activeRangeItem !== undefined) {
+            this.removeChild(this.activeRangeItem);
         }
     }
 }

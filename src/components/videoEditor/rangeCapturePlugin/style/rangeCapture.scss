@@ -2,42 +2,12 @@
   margin: 10px;
 }
 
-.range-capture-container {
-  background-color: rgba(0,0,0,0.8);
-  height: 30px;
-  display: flex;
-  box-sizing: border-box;
-  width: 100%;
-  justify-content: space-between;
-  font-size: 12px;
-  font-family: verdana,"Helvetica Neue",Helvetica,Arial,sans-serif;
-  button {
-    //flex: 0 1;
-    width: 40px;
-    height: 30px;
-    margin: auto;
-    padding: 0;
-    .button {
-      flex: none;
-      outline: none;
-      position: relative;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 4em;
-    }
-    &.active {
-      box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 30px rgba(0,0,0, 0.7) inset;
-      border-color: #000\9;
-      background-color: #076882;
-    }
-  }
-  > span {
-    margin: auto;
-    flex-grow: 2;
-  }
 
+.video-js .vjs-control-bar,
+.vjs-control-bar {
+  bottom: 1em;
+}
+.video-range-editor-container {
   .icon {
     display: inline-block;
     width: 16px;
@@ -52,21 +22,87 @@
     padding: 0 10px;
     text-align: center;
   }
-  input.range-input {
-    background: none;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
+  .control-button {
+      background: none;
+      border: none;
+      color: inherit;
+      display: inline-block;
+
+      overflow: visible; // IE8
+      font-size: inherit; // IE in general. WTF.
+      line-height: inherit;
+      text-transform: none;
+      text-decoration: none;
+      transition: none;
+
+      -webkit-appearance: none;
+      -moz-appearance:    none;
+      appearance:         none;
+
+
+      width: 40px;
+      height: 30px;
+      margin: auto;
+      padding: 0;
+      flex: none;
+      outline: none;
+      position: relative;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      &.active {
+        box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 30px rgba(0,0,0, 0.7) inset;
+        border-color: #000\9;
+        background-color: #076882;
+      }
+
+  }
+  .btn-container{
+    margin: 10px 0;
+  }
+}
+
+.range-control-bar {
+  flex: 1 100%;
+  width: 100%;
+  margin-top: 1em;
+  .range-capture-container {
+    background-color: rgba(0,0,0,0.8);
+    height: 30px;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    justify-content: space-between;
     font-size: 12px;
-    width: 20px;
-    margin: 0;
-    margin-top: -2px;
-    padding: 0px 1px;
-    color: #FFF;
-    display: inline-block;
-    &:focus {
-      box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-      //border: 1px solid rgba(81, 203, 238, 1);
+    font-family: verdana,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    > span {
+      margin: auto;
+      flex-grow: 2;
+    }
+
+    input.range-input {
+      background: none;
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+      font-size: 12px;
+      width: 20px;
+      margin: 0;
+      margin-top: -2px;
+      padding: 0px 1px;
+      color: #FFF;
+      display: inline-block;
+      &:focus {
+        box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+        //border: 1px solid rgba(81, 203, 238, 1);
+        &.has-error {
+          box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+        }
+        &.is-valid {
+          box-shadow: 0 0 5px rgba(0, 255, 0, 1);
+        }
+      }
       &.has-error {
         box-shadow: 0 0 5px rgba(255, 0, 0, 1);
       }
@@ -74,29 +110,54 @@
         box-shadow: 0 0 5px rgba(0, 255, 0, 1);
       }
     }
-    &.has-error {
-      box-shadow: 0 0 5px rgba(255, 0, 0, 1);
-    }
-    &.is-valid {
-      box-shadow: 0 0 5px rgba(0, 255, 0, 1);
-    }
   }
 }
-.video-js .vjs-control-bar,
-.vjs-control-bar {
-  bottom: 1em;
-}
-
-.vjs-range-control-bar {
+.range-collection-container {
+  position: relative;
   flex: 1 100%;
   width: 100%;
-  position: absolute;
-  bottom: -4em;
-  left: 0;
-  right: 0;
+  margin-top: 1em;
+  .range-collection-item {
+    background-color: rgba(0,0,0,0.8);
+    height: 30px;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    justify-content: space-between;
+    font-size: 12px;
+    font-family: verdana,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    box-sizing: border-box;
+    cursor: pointer;
+    .spacer {
+      flex-grow: 2;
+    }
+    span {
+      margin: auto;
+    }
+    &.active {
+      // border: 2px solid rgba(255,255,255,0.1);
+      box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 30px rgba(0,0,0, 0.7) inset;
+      border-color: #000\9;
+      background-color: #076882;
+    }
+    .icon-container {
+      width: 40px;
+      height: 30px;
+      margin: 0;
+      padding: 0;
+      vertical-align: middle;
+
+      white-space: nowrap;
+      text-align: center;
+      display: inline-block;
+      line-height: 36px;
+    }
+
+  }
 }
 .vjs-fullscreen {
-  .vjs-range-control-bar {
+  .range-control-bar {
+    position: absolute;
     bottom: 0;
   }
   .vjs-control-bar {
@@ -125,6 +186,23 @@
     }
   }
 }
+.vjs-button {
+  background: none;
+  border: none;
+  color: inherit;
+  display: inline-block;
+
+  overflow: visible; // IE8
+  font-size: inherit; // IE in general. WTF.
+  line-height: inherit;
+  text-transform: none;
+  text-decoration: none;
+  transition: none;
+
+  -webkit-appearance: none;
+  -moz-appearance:    none;
+  appearance:         none;
+}
 
 .video-js button.vjs-hotkeys-modal-button {
   cursor: pointer;
@@ -133,7 +211,7 @@
   right: 5px;
   top: 0.5em;
   z-index: 2;
-  background-color: rgba(0,0,0, .4);
+  // background-color: rgba(0,0,0, .4);
   border-radius: 3px;
   .vjs-control-text {
     display: inline-block;
@@ -158,56 +236,4 @@
   left: 0;
   width: 100%;
 
-}
-
-
-@import "../../../../../node_modules/nouislider/src/nouislider.css";
-// sliders
-// create transparent sliders:
-.noUi-background {
- background-color: transparent;
-}
-.noUi-target {
-  border: none;
-  box-shadow: none;
-  //    box-shadow
-}
-.noUi-horizontal {
-  height: 9px;
-  .noUi-handle {
-    width: 8px;
-    height: 18px;
-    left: -4px;
-    top: -6px;
-    &::before {
-      top: 2px;
-      left: 2px;
-    }
-    &::after {
-      top: 2px;
-      left: 4px;
-    }
-  }
-}
-
-/* For this slider, disable the 'origin' size. */
-#connect .noUi-origin {
-  right: auto;
-  width: 0;
-}
-
-/* Position the bar and color it. */
-#connect .connect {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  background: #80C9F5;
-  // box-shadow: inset 0 0 3px rgba(51,51,51,0.45);
-}
-
-/* When the slider is moved by tap,
-   transition the connect bar like the handle. */
-#connect.noUi-state-tap .connect {
-  -webkit-transition: left 300ms, right 300ms;
-  transition: left 300ms, right 300ms;
 }

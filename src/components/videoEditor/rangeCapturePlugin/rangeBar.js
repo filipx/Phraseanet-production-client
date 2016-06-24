@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import videojs from 'video.js';
 import noUiSlider from 'noUiSlider';
 /**
@@ -77,14 +78,22 @@ class RangeBar extends Component {
 
         // convert back percent into time:
         if (this.activeRange !== undefined) {
-            this.activeRange.startPosition = (handlePositions[0] / 100) * videoDuration;
-            this.activeRange.endPosition = (handlePositions[1] / 100) * videoDuration;
-            this.activeHandlePositions = handlePositions;
-            this.player_.rangeStream.onNext({
-                action: 'drag-update',
-                handle: activeHandle === 1 ? 'end' : 'start',
-                range: this.activeRange
-            });
+            // checkif changes happened:
+            let oldRange = _.extend({}, this.activeRange);
+            let newStartPosition = (handlePositions[0] / 100) * videoDuration;
+            let newEndPosition = (handlePositions[1] / 100) * videoDuration;
+
+            if (oldRange.startPosition !== newStartPosition || oldRange.endPosition !== newEndPosition) {
+                this.activeRange.startPosition = newStartPosition;
+                this.activeRange.endPosition = newEndPosition;
+                this.activeHandlePositions = handlePositions;
+                this.player_.rangeStream.onNext({
+                    action: 'drag-update',
+                    handle: activeHandle === 1 ? 'end' : 'start',
+                    range: this.activeRange
+                });
+            }
+
         }
     }
 
