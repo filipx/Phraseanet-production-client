@@ -8,6 +8,11 @@
   bottom: 1em;
 }
 .video-range-editor-container {
+  #display-current {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+  }
   .icon {
     display: inline-block;
     width: 16px;
@@ -35,8 +40,6 @@
       text-decoration: none;
       transition: none;
 
-      -webkit-appearance: none;
-      -moz-appearance:    none;
       appearance:         none;
 
 
@@ -61,7 +64,82 @@
   .btn-container{
     margin: 10px 0;
   }
+  input.range-input {
+    background: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    font-size: 12px;
+    width: 20px;
+    margin: 0;
+    margin-top: -2px;
+    padding: 0px 1px;
+    color: #FFF;
+    display: inline-block;
+    &:focus {
+      box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+      //border: 1px solid rgba(81, 203, 238, 1);
+      &.has-error {
+        box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+      }
+      &.is-valid {
+        box-shadow: 0 0 5px rgba(0, 255, 0, 1);
+      }
+    }
+    &.has-error {
+      box-shadow: 0 0 5px rgba(255, 0, 0, 1);
+    }
+    &.is-valid {
+      box-shadow: 0 0 5px rgba(0, 255, 0, 1);
+    }
+    &.range-title {
+      width: 100%;
+    }
+    // need to be separated, otherwise ignored (http://stackoverflow.com/questions/2610497/change-an-inputs-html5-placeholder-color-with-css)
+    &::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+      font-style: italic;
+      color: #fff;
+    }
+    &:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+      font-style: italic;
+      color: #fff;
+      opacity:  1;
+    }
+    &::-moz-placeholder { /* Mozilla Firefox 19+ */
+      font-style: italic;
+      color: #fff;
+      opacity:  1;
+    }
+    &:-ms-input-placeholder { /* Internet Explorer 10-11 */
+      font-style: italic;
+      color: #fff;
+    }
+  }
+
+
+  .progress-container {
+    position: relative;
+    background-color: #000;
+    width: 100%;
+    height: 13px;
+    box-sizing: border-box;
+    border-radius: 2px;
+    border: 1px solid #054a5d;
+    .progress-bar {
+      position: absolute;
+      background-color: #076882;
+
+    }
+    .progress-value {
+      font-size: 10px;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+  }
 }
+
 
 .range-control-bar {
   flex: 1 100%;
@@ -81,35 +159,7 @@
       flex-grow: 2;
     }
 
-    input.range-input {
-      background: none;
-      background-color: transparent;
-      border: none;
-      box-shadow: none;
-      font-size: 12px;
-      width: 20px;
-      margin: 0;
-      margin-top: -2px;
-      padding: 0px 1px;
-      color: #FFF;
-      display: inline-block;
-      &:focus {
-        box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-        //border: 1px solid rgba(81, 203, 238, 1);
-        &.has-error {
-          box-shadow: 0 0 5px rgba(255, 0, 0, 1);
-        }
-        &.is-valid {
-          box-shadow: 0 0 5px rgba(0, 255, 0, 1);
-        }
-      }
-      &.has-error {
-        box-shadow: 0 0 5px rgba(255, 0, 0, 1);
-      }
-      &.is-valid {
-        box-shadow: 0 0 5px rgba(0, 255, 0, 1);
-      }
-    }
+
   }
 }
 .range-collection-container {
@@ -119,7 +169,7 @@
   margin-top: 1em;
   .range-collection-item {
     background-color: rgba(0,0,0,0.8);
-    height: 30px;
+    height: 50px;
     display: flex;
     box-sizing: border-box;
     width: 100%;
@@ -128,10 +178,28 @@
     font-family: verdana,"Helvetica Neue",Helvetica,Arial,sans-serif;
     box-sizing: border-box;
     cursor: pointer;
+    > div {
+      padding: 10px;
+    }
+    .range-item-index {
+      padding: 0 10px;
+      text-align: center;
+    }
+    .range-item-title {
+      padding-left: 10px;
+      padding-right: 10px;
+      flex-grow: 3;
+      box-sizing: border-box;
+    }
+    .range-item-time-data {
+      .display-time {
+        padding: 0 3px;
+      }
+    }
     .spacer {
       flex-grow: 2;
     }
-    span {
+    > span {
       margin: auto;
     }
     &.active {
@@ -151,6 +219,12 @@
       text-align: center;
       display: inline-block;
       line-height: 36px;
+      &.small-icon {
+        width: 18px;
+        height: 20px;
+        vertical-align: sub;
+        line-height: 20px;
+      }
     }
 
   }

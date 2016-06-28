@@ -107,7 +107,7 @@ class RangeControlBar extends Component {
 <button class="control-button" id="forward-frame"  videotip="${this.player_.localize('Go 1 frame forward')}"><svg class="icon icon-next-frame"><use xlink:href="#icon-next-frame"></use></svg><span class="icon-label"> next frame</span></button>
 <button class="control-button" id="next-forward-frame"  videotip="${this.player_.localize('Go to end point')}"><svg class="icon icon-next-forward-frame"><use xlink:href="#icon-next-forward-frame"></use></svg><span class="icon-label"> next forward frame</span></button>
 
-<span id="display-current" class="display-time">00:00:00s 00f</span>
+<span id="display-current" class="display-time" videotip="${this.player_.localize('Elapsed time')}">00:00:00s 00f</span>
 </div>`;
     }
 
@@ -171,6 +171,18 @@ class RangeControlBar extends Component {
                 event.preventDefault();
                 this.toggleLoop();
             })
+            .on('click', '#display-current', (event) => {
+                let $el = $(event.currentTarget);
+                let mode = $el.data('mode');
+                // toggle mode
+                if ($el.data('mode') === 'remaining') {
+                    $el.data('mode', 'current');
+                    $el.attr('videotip', this.player_.localize('Elapsed time'))
+                } else {
+                    $el.data('mode', 'remaining');
+                    $el.attr('videotip', this.player_.localize('Remaining time'))
+                }
+            })
             .on('keyup', '.range-input', (event) => {
                 if (event.keyCode === 13) {
                     $(event.currentTarget).blur();
@@ -202,12 +214,10 @@ class RangeControlBar extends Component {
 
             });
 
-        //$(this.rangeControlBar).append(icons);
         $(this.rangeControlBar).append(this.rangeMenuTemplate());
-        $('.button').tooltip({placement: 'bottom'})
 
         this.player_.on('timeupdate', () => {
-            this.onRefreshCurrentTime();
+            this.onRefreshDisplayTime();
             // if a loop exists
             if (this.looping === true && this.loopData.length > 0) {
 
@@ -229,9 +239,6 @@ class RangeControlBar extends Component {
         handle = handle || false;
         this.updateRangeDisplay('start-range', range.startPosition);
         this.updateRangeDisplay('end-range', range.endPosition);
-
-        $('display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate));
-        // this.player_.activeRange = range;
 
         if (handle === 'start') {
             this.player_.currentTime(range.startPosition)
@@ -286,10 +293,6 @@ class RangeControlBar extends Component {
         let milliseconds = frames === 0 ? 0 : (((1000 / this.frameRate) * frames) / 1000).toFixed(2);
 
         return (hours * 3600) + (minutes * 60) + (seconds) + parseFloat(milliseconds);
-    }
-
-    updateCurrentTime() {
-        $('#display-current').html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
     }
 
     toggleLoop() {
@@ -386,7 +389,6 @@ class RangeControlBar extends Component {
         }
         step = step || this.frameStep;
         this.player_.currentTime(position + (this.frameDuration * step));
-        this.updateCurrentTime();
     }
 
     /**
@@ -400,14 +402,18 @@ class RangeControlBar extends Component {
         }
         step = step || this.frameStep;
         this.player_.currentTime(position - (this.frameDuration * this.frameStep));
-        this.updateCurrentTime();
     }
 
-    onRefreshCurrentTime() {
-        let displayCurrent = document.getElementById('display-current');
-        //$('#display-current').html(formatTimeToHHMMSSFF(options.videoPlayer.currentTime()))
-        if (displayCurrent !== null) {
-            displayCurrent.innerHTML = formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate)
+    onRefreshDisplayTime() {
+        if (this.$displayCurrent === undefined) {
+            this.$displayCurrent = $('#display-current');
+        }
+        if (this.$displayCurrent.length > 0) {
+            if (this.$displayCurrent.data('mode') === 'remaining') {
+                this.$displayCurrent.html(formatTimeToHHMMSSFF(this.player_.remainingTime(), this.frameRate))
+            } else {
+                this.$displayCurrent.html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
+            }
         }
     }
 

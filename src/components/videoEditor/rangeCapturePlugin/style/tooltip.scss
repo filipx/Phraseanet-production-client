@@ -50,6 +50,20 @@
     }
   }
 
+  span[videotip]{
+    // arrow
+    &:before {
+      top: 18px;
+      left: 45%;
+    }
+    // content
+    &:after {
+      top: 24px;
+      left: 0px;
+      width: 100%;
+    }
+  }
+
 
 
 }
