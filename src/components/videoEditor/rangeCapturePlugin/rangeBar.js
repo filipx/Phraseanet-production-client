@@ -82,7 +82,6 @@ class RangeBar extends Component {
             let oldRange = _.extend({}, this.activeRange);
             let newStartPosition = (handlePositions[0] / 100) * videoDuration;
             let newEndPosition = (handlePositions[1] / 100) * videoDuration;
-
             if (oldRange.startPosition !== newStartPosition || oldRange.endPosition !== newEndPosition) {
                 this.activeRange.startPosition = newStartPosition;
                 this.activeRange.endPosition = newEndPosition;

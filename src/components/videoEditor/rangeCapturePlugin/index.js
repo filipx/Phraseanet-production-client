@@ -146,6 +146,9 @@ const plugin = function (options) {
                 // if changes come from range bar
                 this.rangeControlBar.refreshRangePosition(params.range, params.handle);
                 break;
+            case 'export-ranges':
+                
+                break;
             default:
         }
         console.log('<<< =================== RANGE EVENT COMPLETE')

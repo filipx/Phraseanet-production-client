@@ -37,5 +37,25 @@ const formatTimeToHHMMSSFF = (currentTime, frameRate) => {
     }
     return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + 's ' + ('0' + currentFrames).slice(-2) + 'f'
 }
+const formatTimeToHourMinuteSecond = (currentTime, frameRate) => {
+    frameRate = frameRate || 24;
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+    if (currentTime > 0) {
+        hours = Math.floor(currentTime / 3600);
+        let s = currentTime - hours * 3600;
+        minutes = Math.floor(s / 60);
+        seconds = Math.floor(s - minutes * 60);
+    }
+    let formatedOutput = [];
+    if (hours > 0) {
+        formatedOutput.push(('0' + hours).slice(-2) + 'h');
+    }
 
-export {formatMilliseconds, formatTimeToHHMMSSFF}
+    formatedOutput.push(('0' + minutes).slice(-2) + 'm');
+    formatedOutput.push(('0' + seconds).slice(-2) + 's');
+
+    return formatedOutput.join(' ');
+}
+export {formatMilliseconds, formatTimeToHHMMSSFF, formatTimeToHourMinuteSecond}

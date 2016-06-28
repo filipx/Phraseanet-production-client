@@ -11,7 +11,9 @@ class RangeCollection extends Component {
     uid = 0;
     defaultRange = {
         startPosition: -1,
-        endPosition: -1
+        endPosition: -1,
+        title: '',
+        handlePositions: []
     };
     rangeCollection = [];
     rangeItemComponentCollection = [];
@@ -28,12 +30,21 @@ class RangeCollection extends Component {
         });
 
         this.$el.on('click', '.add-range', (event) => {
+            event.preventDefault();
             let newRange = this.addRange(this.defaultRange);
             this.player_.rangeStream.onNext({
                 action: 'create',
                 range: newRange
             })
         });
+
+        this.$el.on('click', '.export-ranges', (event) => {
+            event.preventDefault();
+            this.player_.rangeStream.onNext({
+                action: 'export-ranges',
+                ranges: this.exportRanges()
+            })
+        })
     }
 
     initDefaultRange() {
@@ -64,7 +75,7 @@ class RangeCollection extends Component {
     <button class="button button-primary add-range" type="button"><i class="icon-plus"></i> ${this.player_.localize('Add new range')}</button>
 </div>
 <div class="btn-container">
-    <button class="btn btn-inverse btn-block" type="button">${this.player_.localize('Export ranges')}</button>
+    <button class="btn btn-inverse btn-block export-ranges" type="button">${this.player_.localize('Export ranges')}</button>
 </div>`);
         return $(this.el());
     }
@@ -118,7 +129,7 @@ class RangeCollection extends Component {
     addRange(range) {
         let lastId = this.uid = this.uid + 1;
         let newRange = _.extend({}, this.defaultRange, range, {id: lastId});
-
+        newRange = this.setHandlePositions(newRange);
         this.rangeCollection.push(newRange);
         this.refreshRangeCollection();
         return newRange;
@@ -128,12 +139,22 @@ class RangeCollection extends Component {
         if (range.id !== undefined) {
             this.rangeCollection = _.map(this.rangeCollection, (rangeData, index) => {
                 if (range.id === rangeData.id) {
+                    range = this.setHandlePositions(range);
                     return range;
                 }
                 return rangeData;
             });
         }
         this.refreshRangeCollection();
+        return range;
+    }
+
+    setHandlePositions(range) {
+        let videoDuration = this.player_.duration();
+        let left = ((range.startPosition / videoDuration) * 100);
+        let right = ((range.endPosition / videoDuration) * 100);
+
+        range.handlePositions = {left, right};
         return range;
     }
 
@@ -145,6 +166,17 @@ class RangeCollection extends Component {
             }
         }
         return foundRange;
+    }
+
+    exportRanges = () => {
+        let exportedRanges = [];
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            exportedRanges.push({
+                startPosition: this.rangeCollection[i].startPosition,
+                endPosition: this.rangeCollection[i].endPosition
+            })
+        }
+        return exportedRanges;
     }
 
     refreshRangeCollection = () => {
@@ -160,7 +192,7 @@ class RangeCollection extends Component {
 
         for (let i = 0; i < this.rangeCollection.length; i++) {
             let item = new RangeItem(this.player_, {
-                item: this.rangeCollection[i],
+                item: _.extend({index: i}, this.rangeCollection[i]),
                 isActive: this.rangeCollection[i].id === activeId ? true : false
             }, this.settings);
 
