@@ -1,9 +1,7 @@
 import $ from 'jquery';
 import _ from 'underscore';
-// import textMask from 'all-text-mask/vanilla/dist/textMask';
 import videojs from 'video.js';
 import {formatMilliseconds, formatTimeToHHMMSSFF} from './utils';
-let textMask = require('all-text-mask/vanilla/dist/textMask');
 /**
  * VideoJs Range Control Bar
  */
@@ -387,8 +385,12 @@ class RangeControlBar extends Component {
         if (!this.player_.paused()) {
             this.player_.pause();
         }
-        step = step || this.frameStep;
-        this.player_.currentTime(position + (this.frameDuration * step));
+
+        if (step !== undefined) {
+            this.player_.currentTime(position + step);
+        } else {
+            this.player_.currentTime(position + (this.frameDuration * this.frameStep));
+        }
     }
 
     /**
@@ -400,8 +402,12 @@ class RangeControlBar extends Component {
         if (!this.player_.paused()) {
             this.player_.pause();
         }
-        step = step || this.frameStep;
-        this.player_.currentTime(position - (this.frameDuration * this.frameStep));
+
+        if (step !== undefined) {
+            this.player_.currentTime(position - step);
+        } else {
+            this.player_.currentTime(position - (this.frameDuration * this.frameStep));
+        }
     }
 
     onRefreshDisplayTime() {

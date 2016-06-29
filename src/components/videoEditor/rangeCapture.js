@@ -54,13 +54,15 @@ const rangeCapture = (services, datas, activeTab = false) => {
         });
         videoPlayer.rangeCapturePlugin(options);
         videoPlayer.ready(() => {
-            videoPlayer.hotkeys({
+            let hotkeyOptions = _.extend({
                 alwaysCaptureHotkeys: true,
                 enableNumbers: false,
                 volumeStep: 0.1,
                 seekStep: 1,
                 customKeys: videoPlayer.getRangeCaptureHotkeys()
-            });
+            }, videoPlayer.getRangeCaptureOverridedHotkeys());
+
+            videoPlayer.hotkeys(hotkeyOptions);
         });
 
     };
