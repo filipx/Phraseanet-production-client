@@ -1,4 +1,3 @@
-
 const videoRangeCapture = (services, datas, activeTab = false) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
@@ -25,6 +24,11 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
 
         if (configService.get('resource.playbackRates') !== null) {
             options.playbackRates = configService.get('resource.playbackRates');
+        }
+
+        if (initData.videoEditorConfig !== null) {
+            options.seekBackwardStep = initData.videoEditorConfig.seekBackwardStep;
+            options.seekForwardStep = initData.videoEditorConfig.seekForwardStep;
         }
 
         options.techOrder = ['html5', 'flash'];

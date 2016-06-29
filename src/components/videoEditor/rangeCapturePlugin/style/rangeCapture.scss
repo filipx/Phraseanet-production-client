@@ -176,8 +176,9 @@
     justify-content: space-between;
     font-size: 12px;
     font-family: verdana,"Helvetica Neue",Helvetica,Arial,sans-serif;
-    box-sizing: border-box;
+    position: relative;
     cursor: pointer;
+    padding-left: 20px;
     > div {
       padding: 10px;
     }
@@ -226,6 +227,41 @@
         line-height: 20px;
       }
     }
+    &.drag-selected {
+      // background-color: #3FAB8F;
+      opacity: .2;
+    }
+    &:after {
+      content: '';
+      position: absolute;
+      box-sizing: border-box;
+      left: 5px;
+      top: 10%;
+      height: 80%;
+      width: 6px;
+      border: 2px dotted rgba(0, 0, 0, 0.1);
+      background: transparent;
+      cursor: move;
+    }
+    &:hover {
+      &:after {
+        border: 2px dotted rgba(0, 0, 0, 0.3);
+      }
+    }
+    &.drag-over {
+      background-color: transparent;
+      border: 3px dotted rgba(0, 0, 0, 0.3);
+      &:after {
+        display: none;
+      }
+      > * {
+        visibility: hidden;
+
+      }
+    }
+    &.over:after {
+      display: none;
+    }
 
   }
 }
@@ -233,6 +269,15 @@
   .range-control-bar {
     position: absolute;
     bottom: 0;
+  }
+  .range-collection-container {
+    position: absolute;
+    top: 40px;
+    width: 20%;
+    right: 20px;
+    margin: 0;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.3);
   }
   .vjs-control-bar {
     bottom: 4em;
@@ -310,4 +355,15 @@
   left: 0;
   width: 100%;
 
+}
+
+.drag-mousemove-container {
+  position: absolute;
+  z-index: 9999;
+  ul {
+    margin: -6px 0 0 10px;
+    padding: 5px 10px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 3px;
+  }
 }

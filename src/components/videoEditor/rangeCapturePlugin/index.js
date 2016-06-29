@@ -59,6 +59,8 @@ const icons = `
 `;
 
 const defaults = {
+    seekBackwardStep: 1000,
+    seekForwardStep: 1000,
     align: 'top-left',
     class: '',
     content: 'This overlay will show up while the video is playing',
@@ -88,7 +90,6 @@ const plugin = function (options) {
 
     this.setEditorHeight = () => {
         // gather components sizes
-        console.log('range collection height', $(this.rangeCollection.el()).height())
         let editorHeight = this.currentHeight() + $(this.rangeControlBar.el()).height() + $(this.rangeCollection.el()).height();
 
         if (editorHeight > 0) {
@@ -147,7 +148,7 @@ const plugin = function (options) {
                 this.rangeControlBar.refreshRangePosition(params.range, params.handle);
                 break;
             case 'export-ranges':
-                
+
                 break;
             default:
         }
@@ -164,9 +165,39 @@ const plugin = function (options) {
     this.on('timeupdate', () => {
         this.userActive(true);
     });
+    this.getRangeCaptureOverridedHotkeys = () => {
+        return {
+            // override existing key
+            rewindKey: function (event, player) {
+                // disable existing one
+                return false;
+            },
+            forwardKey: function (event, player) {
+                // disable existing one
+                return false;
+            },
+        }
+    }
     this.getRangeCaptureHotkeys = () => {
         return {
-            // Create custom hotkeys
+            rewindKey: {
+                key: function (e) {
+                    // Backward Arrow Key
+                    return (e.which === 37);
+                },
+                handler: (player, options) => {
+                    player.rangeControlBar.setPreviousFrame(parseInt(settings.seekBackwardStep, 10) / 1000)
+                }
+            },
+            forwardKey: {
+                key: function (e) {
+                    // forward Arrow Key
+                    return (e.which === 39);
+                },
+                handler: (player, options) => {
+                    player.rangeControlBar.setNextFrame(parseInt(settings.seekForwardStep, 10) / 1000)
+                }
+            },
             playOnlyKey: {
                 key: function (e) {
                     // L Key

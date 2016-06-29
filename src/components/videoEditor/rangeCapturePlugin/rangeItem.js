@@ -2,48 +2,50 @@ import _ from 'underscore';
 import $ from 'jquery';
 import videojs from 'video.js';
 import {formatTimeToHourMinuteSecond} from './utils';
+import SortableComponent from './sortableComponent';
 /**
  * VideoJs Range bar
  */
 const Component = videojs.getComponent('Component');
-let rangeItemTemplate = (item, frameRate) => {
+let rangeItemTemplate = (model, frameRate) => {
     return `
-<span class="range-item-index">${item.index + 1}</span>
+<span class="range-item-index">${model.index + 1}</span>
 <div class="range-item-time-data">
     <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
-    <span class="display-time">${formatTimeToHourMinuteSecond(item.startPosition, frameRate)}</span>
-    <span class="display-time">${formatTimeToHourMinuteSecond(item.endPosition, frameRate)}</span>
+    <span class="display-time">${formatTimeToHourMinuteSecond(model.startPosition, frameRate)}</span>
+    <span class="display-time">${formatTimeToHourMinuteSecond(model.endPosition, frameRate)}</span>
     <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
     <br>
     <div class="progress-container">
-    <div class="progress-bar" style="left:${item.handlePositions.left}%;width:${item.handlePositions.right - item.handlePositions.left}%; height: 100%"></div>
-    <div class="progress-value">${formatTimeToHourMinuteSecond(item.endPosition - item.startPosition, frameRate)}</div>
+    <div class="progress-bar" style="left:${model.handlePositions.left}%;width:${model.handlePositions.right - model.handlePositions.left}%; height: 100%"></div>
+    <div class="progress-value">${formatTimeToHourMinuteSecond(model.endPosition - model.startPosition, frameRate)}</div>
     </div>
 </div>
 <span class="range-item-title">
-<input class="range-title range-input" type="text" value="${item.title}" placeholder="entrez un titre">
+<input class="range-title range-input" type="text" value="${model.title}" placeholder="entrez un titre">
 </span>`;
     // <button class="control-button remove-range"><svg class="icon icon-trash"><use xlink:href="#icon-trash"></use></svg><span class="icon-label"> remove</span></button>
 };
 class RangeItem extends Component {
-    rangeItem;
+    rangeOptions;
     settings;
     item;
 
-    constructor(player, rangeItem, settings) {
-        super(player, rangeItem);
+    constructor(player, rangeOptions, settings) {
+        super(player, rangeOptions);
         this.frameRate = settings.frameRates[this.player_.cache_.src];
         this.settings = settings;
         this.$el = this.renderElContent();
 
+
         this.$el.on('click', (event) => {
-            event.preventDefault();
+            // event.preventDefault();
             let $el = $(event.currentTarget);
-            if (rangeItem.isActive === false) {
+            if (rangeOptions.isActive === false) {
                 // broadcast active state:
                 this.player_.rangeStream.onNext({
                     action: 'change',
-                    range: rangeItem.item
+                    range: rangeOptions.model
                 });
             }
         })
@@ -51,26 +53,36 @@ class RangeItem extends Component {
             event.preventDefault();
             this.player_.rangeStream.onNext({
                 action: 'remove',
-                range: rangeItem.item
+                range: rangeOptions.model
             });
             // don't trigger other events
             event.stopPropagation();
         })
+        this.$el.on('click focus', '.range-title', (event) => {
+            event.stopPropagation(); // stop unfocus
+        });
         this.$el.on('keydown', '.range-title', (event) => {
             event.stopPropagation();
         });
+        this.$el.on('keyup', '.range-title', (event) => {
+            if (event.keyCode === 13) {
+                $(event.currentTarget).blur();
+            }
+        })
         this.$el.on('blur', '.range-title', (event) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
             this.player_.rangeStream.onNext({
                 action: 'update',
-                range: _.extend(rangeItem.item, {
+                range: _.extend(rangeOptions.model, {
                     title: $el.val()
                 })
             });
             // don't trigger other events
             event.stopPropagation();
         })
+
+        this.sortable = new SortableComponent(rangeOptions, this.$el);
     }
 
     /**
@@ -80,20 +92,29 @@ class RangeItem extends Component {
      * @method createEl
      */
     createEl() {
-        this.rangeItem = super.createEl('div', {
+        this.rangeOptions = super.createEl('div', {
             className: 'range-collection-item',
             innerHTML: ''
+        }, {
+            draggable: true
         });
 
-        return this.rangeItem;
+        return this.rangeOptions;
     }
 
     renderElContent() {
-        $(this.el_).append(rangeItemTemplate(this.options_.item, this.frameRate));
+        $(this.el_).append(rangeItemTemplate(this.options_.model, this.frameRate));
         if (this.options_.isActive) {
             $(this.el_).addClass('active')
         }
         return $(this.el_);
+    }
+
+    dispose() {
+        this.$el.off();
+        this.sortable.dispose();
+        
+        console.log('ok dispose events')
     }
 }
 

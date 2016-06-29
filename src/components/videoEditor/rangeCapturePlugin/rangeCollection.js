@@ -179,20 +179,58 @@ class RangeCollection extends Component {
         return exportedRanges;
     }
 
+    get = (model) => {
+        if (model === undefined) {
+            return this.rangeCollection;
+        }
+        return this.getRangeById(model.id);
+    }
+
+    splice = (...args) => {
+        return Array.prototype.splice.apply(this.rangeCollection, args);
+    }
+
+    getIndex = (model) => {
+        let index = {};
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            if (this.rangeCollection[i].id === model.id) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    getSelection = () => {
+        return this.player_.activeRange;
+    }
+
+    resetSelection = () => {
+        // can't reset selection...
+    }
+
+    reset = (collection) => {
+        this.rangeCollection = collection;
+        this.refreshRangeCollection();
+    }
+
     refreshRangeCollection = () => {
         // remove any existing items
         for (let i = 0; i < this.rangeItemComponentCollection.length; i++) {
+            this.rangeItemComponentCollection[i].dispose();
             this.removeChild(this.rangeItemComponentCollection[i]);
         }
+        this.rangeItemComponentCollection = [];
 
         let activeId = 0;
         if (this.currentRange !== false) {
             activeId = this.currentRange.id;
         }
 
+        console.log('create', this.rangeCollection.length, 'items')
         for (let i = 0; i < this.rangeCollection.length; i++) {
             let item = new RangeItem(this.player_, {
-                item: _.extend({index: i}, this.rangeCollection[i]),
+                model: _.extend({}, this.rangeCollection[i], {index: i}),
+                collection: this,
                 isActive: this.rangeCollection[i].id === activeId ? true : false
             }, this.settings);
 
