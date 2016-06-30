@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import videojs from 'video.js';
-import {formatMilliseconds, formatTimeToHHMMSSFF} from './utils';
+import {formatMilliseconds, formatTime} from './utils';
 /**
  * VideoJs Range Control Bar
  */
@@ -416,9 +416,9 @@ class RangeControlBar extends Component {
         }
         if (this.$displayCurrent.length > 0) {
             if (this.$displayCurrent.data('mode') === 'remaining') {
-                this.$displayCurrent.html(formatTimeToHHMMSSFF(this.player_.remainingTime(), this.frameRate))
+                this.$displayCurrent.html(formatTime(this.player_.remainingTime(), '', this.frameRate))
             } else {
-                this.$displayCurrent.html(formatTimeToHHMMSSFF(this.player_.currentTime(), this.frameRate))
+                this.$displayCurrent.html(formatTime(this.player_.currentTime(), '', this.frameRate))
             }
         }
     }

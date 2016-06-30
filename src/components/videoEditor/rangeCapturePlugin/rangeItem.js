@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import $ from 'jquery';
 import videojs from 'video.js';
-import {formatTimeToHourMinuteSecond} from './utils';
+import {formatTime} from './utils';
 import SortableComponent from './sortableComponent';
 /**
  * VideoJs Range bar
@@ -12,13 +12,13 @@ let rangeItemTemplate = (model, frameRate) => {
 <span class="range-item-index">${model.index + 1}</span>
 <div class="range-item-time-data">
     <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
-    <span class="display-time">${formatTimeToHourMinuteSecond(model.startPosition, frameRate)}</span>
-    <span class="display-time">${formatTimeToHourMinuteSecond(model.endPosition, frameRate)}</span>
+    <span class="display-time">${formatTime(model.startPosition, 'hms', frameRate)}</span>
+    <span class="display-time">${formatTime(model.endPosition, 'hms',  frameRate)}</span>
     <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
     <br>
     <div class="progress-container">
     <div class="progress-bar" style="left:${model.handlePositions.left}%;width:${model.handlePositions.right - model.handlePositions.left}%; height: 100%"></div>
-    <div class="progress-value">${formatTimeToHourMinuteSecond(model.endPosition - model.startPosition, frameRate)}</div>
+    <div class="progress-value">${formatTime(model.endPosition - model.startPosition, 'hms', frameRate)}</div>
     </div>
 </div>
 <span class="range-item-title">
