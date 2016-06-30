@@ -27,7 +27,6 @@ class SortableComponent {
         if (!this.options.events) {
             this.options.events = {};
         }
-        console.log('attach event to el', this.$el)
         this.$el
             .on('mousedown', (event) => this.onMouseDown(event))
             .on('mouseup', (event) => this.onMouseUp(event))
@@ -49,7 +48,6 @@ class SortableComponent {
     }
 
     dispose() {
-        console.log('should dispose sortable');
         this.$el.off();
     }
 

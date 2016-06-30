@@ -105,16 +105,11 @@ const plugin = function (options) {
             case 'select':
             case 'create':
             case 'change':
-                console.log('************** action create, change **************')
-
             // flow through update:
             case 'update':
-                console.log('************** action update**************')
                 // set values
                 this.activeRange = this.rangeCollection.update(params.range);
 
-                console.log('active range', this.activeRange)
-                //this.activeRange = params.range;
                 this.activeRangeStream.onNext({
                     activeRange: this.activeRange
                 });
@@ -123,7 +118,6 @@ const plugin = function (options) {
                 this.rangeControlBar.refreshRangePosition(this.activeRange, params.handle);
                 break;
             case 'remove':
-                console.log('************** action remove **************')
                 // if a range is specified remove it from collection:
                 if (params.range !== undefined) {
                     this.rangeCollection.remove(params.range);
@@ -142,7 +136,6 @@ const plugin = function (options) {
 
                 break;
             case 'drag-update':
-                console.log('************** action drag update **************')
                 this.rangeCollection.update(params.range);
                 // if changes come from range bar
                 this.rangeControlBar.refreshRangePosition(params.range, params.handle);
@@ -151,7 +144,7 @@ const plugin = function (options) {
 
                 break;
             case 'export-vtt-ranges':
-                console.log('vtt geenrated', params.data)
+                console.log('vtt generated', params.data)
                 break;
             default:
         }
