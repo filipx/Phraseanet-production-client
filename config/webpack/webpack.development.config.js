@@ -60,11 +60,12 @@ module.exports = {
                 presets: ['es2015', 'stage-0']
             }
         }, {
-            test: /\.(woff|png|jpg|gif)$/,
-            loader: 'url-loader?limit=10000&prefix=img/&name=[path][name].[ext]?[hash]'
+            test: /\.(ttf|eot|woff|svg|png|jpg|gif)$/,
+            loader: 'url-loader?limit=10000&name=[name].[hash:6].[ext]',
+            exclude: /node_modules/
         }, {
-            test: /\.(png|jpg|jpeg|gif)$/,
-            loader: 'file-loader'
+            test: /\.(ttf|eot|woff|svg|png|jpg|jpeg|gif)$/,
+            loader: 'file-loader?name=[name].[hash:6].[ext]'
         }, {
             test: /\.css$/,
             loader: 'style-loader!css-loader'
