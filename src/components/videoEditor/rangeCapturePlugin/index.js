@@ -150,6 +150,9 @@ const plugin = function (options) {
             case 'export-ranges':
 
                 break;
+            case 'export-vtt-ranges':
+                console.log('vtt geenrated', params.data)
+                break;
             default:
         }
         console.log('<<< =================== RANGE EVENT COMPLETE')

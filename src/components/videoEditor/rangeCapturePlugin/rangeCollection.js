@@ -2,6 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import videojs from 'video.js';
 import RangeItem from './RangeItem';
+import {formatTime} from './utils';
 /**
  * VideoJs Range Collection
  */
@@ -45,6 +46,14 @@ class RangeCollection extends Component {
                 ranges: this.exportRanges()
             })
         })
+
+        this.$el.on('click', '.export-vtt-ranges', (event) => {
+            event.preventDefault();
+            this.player_.rangeStream.onNext({
+                action: 'export-vtt-ranges',
+                data: this.exportVttRanges()
+            })
+        })
     }
 
     initDefaultRange() {
@@ -73,9 +82,8 @@ class RangeCollection extends Component {
         $(this.el()).append(`
 <div class="btn-container">
     <button class="button button-primary add-range" type="button"><i class="icon-plus"></i> ${this.player_.localize('Add new range')}</button>
-</div>
-<div class="btn-container">
-    <button class="btn btn-inverse btn-block export-ranges" type="button">${this.player_.localize('Export ranges')}</button>
+    <button class="button button-primary export-vtt-ranges" type="button"><i class="icon-save"></i> ${this.player_.localize('Save as VTT')}</button>
+    <button class="button button-primary export-ranges" type="button"><i class="icon-cloud-download"></i> ${this.player_.localize('Export video ranges')}</button>
 </div>`);
         return $(this.el());
     }
@@ -178,6 +186,17 @@ class RangeCollection extends Component {
         }
         return exportedRanges;
     }
+    exportVttRanges = () => {
+        let exportedRanges = ['WEBVTT'];
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            exportedRanges.push(`
+${i + 1}
+${formatTime(this.rangeCollection[i].startPosition, 'hh:mm:ss.mmm')} --> ${formatTime(this.rangeCollection[i].endPosition, 'hh:mm:ss.mmm')}
+${this.rangeCollection[i].title}
+`)
+        }
+        return exportedRanges.join('');
+    }
 
     get = (model) => {
         if (model === undefined) {
@@ -226,7 +245,6 @@ class RangeCollection extends Component {
             activeId = this.currentRange.id;
         }
 
-        console.log('create', this.rangeCollection.length, 'items')
         for (let i = 0; i < this.rangeCollection.length; i++) {
             let item = new RangeItem(this.player_, {
                 model: _.extend({}, this.rangeCollection[i], {index: i}),
