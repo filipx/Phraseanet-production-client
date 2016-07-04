@@ -178,9 +178,21 @@
     font-family: verdana,"Helvetica Neue",Helvetica,Arial,sans-serif;
     position: relative;
     cursor: pointer;
-    padding-left: 20px;
+    // padding-left: 20px;
+    * {
+      user-drag: none;
+      user-select: none;
+      -moz-user-select: none;
+      -webkit-user-drag: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
     > div {
       padding: 10px;
+    }
+    .range-item-screenshot {
+      padding: 0 10px 0 0;
+
     }
     .range-item-index {
       padding: 0 10px;

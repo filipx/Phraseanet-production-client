@@ -364,6 +364,7 @@ class RangeControlBar extends Component {
         return newRange;
     }
 
+
     getEndPosition() {
         if (this.currentRange === false) {
             throw new Error('getEndPosition > no range provided')

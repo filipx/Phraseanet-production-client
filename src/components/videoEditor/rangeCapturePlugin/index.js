@@ -107,7 +107,7 @@ const plugin = function (options) {
             case 'change':
             // flow through update:
             case 'update':
-                // set values
+                params.range = this.takeSnapshot(params.range);
                 this.activeRange = this.rangeCollection.update(params.range);
 
                 this.activeRangeStream.onNext({
@@ -130,15 +130,22 @@ const plugin = function (options) {
                     this.rangeBarCollection.removeActiveRange();
                     this.rangeControlBar.removeActiveRange();
                     this.rangeCollection.remove(this.activeRange);
-
-                    // set another active range
                 }
 
                 break;
             case 'drag-update':
-                this.rangeCollection.update(params.range);
                 // if changes come from range bar
                 this.rangeControlBar.refreshRangePosition(params.range, params.handle);
+                this.rangeCollection.update(params.range);
+
+                // setting currentTime may take some additionnal time,
+                // so let's wait:
+                setTimeout(() => {
+                    if (params.handle === 'start') {
+                        params.range = this.takeSnapshot(params.range);
+                        this.rangeCollection.update(params.range);
+                    }
+                }, 900);
                 break;
             case 'export-ranges':
 
@@ -152,6 +159,32 @@ const plugin = function (options) {
         this.setEditorHeight()
 
     });
+
+
+    this.takeSnapshot = (range) => {
+        if (Math.round(range.startPosition) !== Math.round(this.currentTime())) {
+            return range;
+        }
+        let video = this.el().querySelector('video');
+        let canvas = document.createElement('canvas');
+        let ratio = settings.ratios[this.cache_.src];
+        canvas.width = 50 * ratio;
+        canvas.height = 50;
+        let context = canvas.getContext('2d');
+
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        let dataURI = canvas.toDataURL('image/jpeg');
+
+        range.image = {
+            src: dataURI,
+            ratio: settings.ratios[this.cache_.src],
+            width: canvas.width,
+            height: canvas.height
+        }
+        return range;
+    }
 
     this.ready(() => {
         this.setEditorHeight()

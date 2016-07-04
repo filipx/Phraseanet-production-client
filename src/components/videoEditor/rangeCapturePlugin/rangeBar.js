@@ -18,6 +18,7 @@ class RangeBar extends Component {
             startPosition: -1,
             endPosition: -1
         };
+        this.onUpdatedRange = _.debounce(this.onUpdatedRange, 300);
     }
 
     /**

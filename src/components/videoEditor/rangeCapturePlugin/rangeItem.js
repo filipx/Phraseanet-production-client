@@ -8,12 +8,18 @@ import SortableComponent from './sortableComponent';
  */
 const Component = videojs.getComponent('Component');
 let rangeItemTemplate = (model, frameRate) => {
-    return `
+    let image = '';
+    if (model.image.src !== '') {
+        image = `<div class="range-item-screenshot"><div><img src="${model.image.src}" style="height: auto;width:100%;"></div></div>`;
+    }
+
+    return `${image}
+
 <span class="range-item-index">${model.index + 1}</span>
 <div class="range-item-time-data">
     <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
     <span class="display-time">${formatTime(model.startPosition, 'hms', frameRate)}</span>
-    <span class="display-time">${formatTime(model.endPosition, 'hms',  frameRate)}</span>
+    <span class="display-time">${formatTime(model.endPosition, 'hms', frameRate)}</span>
     <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
     <br>
     <div class="progress-container">
@@ -83,6 +89,7 @@ class RangeItem extends Component {
         })
 
         this.sortable = new SortableComponent(rangeOptions, this.$el);
+
     }
 
     /**
@@ -113,8 +120,6 @@ class RangeItem extends Component {
     dispose() {
         this.$el.off();
         this.sortable.dispose();
-        
-        console.log('ok dispose events')
     }
 }
 

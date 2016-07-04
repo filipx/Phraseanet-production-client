@@ -32,12 +32,14 @@ const rangeCapture = (services, datas, activeTab = false) => {
             return;
         }
         options.frameRates = {};
+        options.ratios = {};
         const coverUrl = '';
         let generateSourcesTpl = (record) => {
             let recordSources = [];
             _.each(record.sources, (s, i) => {
                 recordSources.push(`<source src="${s.src}" type="${s.type}" data-frame-rate="${s.framerate}">`)
                 options.frameRates[s.src] = s.framerate;
+                options.ratios[s.src] = s.ratio;
             });
 
             return recordSources.join(' ');

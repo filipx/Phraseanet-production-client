@@ -14,7 +14,12 @@ class RangeCollection extends Component {
         startPosition: -1,
         endPosition: -1,
         title: '',
-        handlePositions: []
+        handlePositions: [],
+        image: {
+            src: '',
+            width: '',
+            height: ''
+        }
     };
     rangeCollection = [];
     rangeItemComponentCollection = [];
