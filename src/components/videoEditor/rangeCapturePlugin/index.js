@@ -224,6 +224,24 @@ const plugin = function (options) {
                     return (e.which === 39);
                 },
                 handler: (player, options) => {
+                    player.rangeControlBar.setNextFrame()
+                }
+            },
+            rewindFrameKey: {
+                key: function (e) {
+                    // Backward Arrow Key
+                    return (e.ctrlKey && e.which === 37);
+                },
+                handler: (player, options) => {
+                    player.rangeControlBar.setPreviousFrame()
+                }
+            },
+            forwardFrameKey: {
+                key: function (e) {
+                    // forward Arrow Key
+                    return (e.ctrlKey && e.which === 39);
+                },
+                handler: (player, options) => {
                     player.rangeControlBar.setNextFrame(parseInt(settings.seekForwardStep, 10) / 1000)
                 }
             },

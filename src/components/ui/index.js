@@ -17,7 +17,7 @@ import Alerts from '../utils/alert';
 import uploader from '../uploader';
 
 const ui = (services) => {
-    const { configService, localeService, appEvents } = services;
+    const {configService, localeService, appEvents} = services;
     let activeZone = false;
     let searchSelection = {asArray: [], serialized: ''};
     let workzoneSelection = {asArray: [], serialized: ''};
@@ -42,8 +42,8 @@ const ui = (services) => {
 
         let previewIsOpen = false;
         previewRecord.getPreviewStream().subscribe(function (previewOptions) {
-                previewIsOpen = previewOptions.open;
-            });
+            previewIsOpen = previewOptions.open;
+        });
         previewRecord.initialize();
 
 

@@ -16,11 +16,11 @@ const rangeCapture = (services, datas, activeTab = false) => {
             muteToggle: false
         }
     };
+    let videoPlayer;
     const initialize = (params, userOptions) => {
         //{$container} = params;
         $container = params.$container;
         initData = params.data;
-
         options = _.extend(defaultOptions, userOptions, {$container: $container});
         dispose();
         render(initData);
@@ -52,7 +52,7 @@ const rangeCapture = (services, datas, activeTab = false) => {
 
         // window.videojs = videojs;
         videojs.addLanguage(localeService.getLocale(), localeService.getTranslations());
-        let videoPlayer = videojs('embed-video', options, () => {
+        videoPlayer = videojs('embed-video', options, () => {
         });
         videoPlayer.rangeCapturePlugin(options);
         videoPlayer.ready(() => {
@@ -76,9 +76,13 @@ const rangeCapture = (services, datas, activeTab = false) => {
             }
         } catch (e) {
         }
-    }
+    };
 
-    return {initialize}
+    const getPlayer = () => {
+        return videoPlayer;
+    };
+
+    return {initialize, getPlayer}
 }
 
 export default rangeCapture;

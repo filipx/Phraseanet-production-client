@@ -320,7 +320,7 @@ const recordEditorService = (services) => {
         presetsModule(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
         // init plugins
         searchReplace(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
-        preview(recordEditorServices).initialize({$container: $editorContainer, parentOptions: options});
+        preview(recordEditorServices).initialize({$container: $('#TH_Opreview .PNB10'), parentOptions: options});
 
 
         geonameDatasource(recordEditorServices).initialize({
@@ -345,6 +345,10 @@ const recordEditorService = (services) => {
             parentOptions: options,
             $editTextArea,
             $editMultiValTextArea
+        });
+
+        recordEditorEvents.emit('recordSelection.changed', {
+            selection: getRecordSelection()
         });
 
 
@@ -982,7 +986,6 @@ const recordEditorService = (services) => {
             }
         }
 
-        $('#TH_Opreview .PNB10').empty();
         let selection = [];
         let selected = $('#EDIT_FILM2 .diapo.selected');
         if (selected.length === 1) {
@@ -997,13 +1000,23 @@ const recordEditorService = (services) => {
                 let $record = $(selected[pos]);
                 selection.push($record.attr('id').split('_').pop());
             }
+            recordEditorEvents.emit('recordSelection.changed', {
+                selection: getRecordSelection()
+            });
         }
 
         options.lastClickId = recordIndex;
-        recordEditorEvents.emit('recordSelection.changed', {
-            selection: loadSelectedRecords()
-        });
         refreshFields(event);
+    }
+
+    function getRecordSelection() {
+        let selection = [];
+        let selected = $('#EDIT_FILM2 .diapo.selected');
+        for (let pos = 0; pos < selected.length; pos++) {
+            let $record = $(selected[pos]);
+            selection.push($record.attr('id').split('_').pop());
+        }
+        return selection;
     }
 
     // ----------------------------------------------------------------------------------

@@ -417,9 +417,9 @@ class RangeControlBar extends Component {
         }
         if (this.$displayCurrent.length > 0) {
             if (this.$displayCurrent.data('mode') === 'remaining') {
-                this.$displayCurrent.html(formatTime(this.player_.remainingTime(), '', this.frameRate))
+                this.$displayCurrent.html('R. ' + formatTime(this.player_.remainingTime(), '', this.frameRate))
             } else {
-                this.$displayCurrent.html(formatTime(this.player_.currentTime(), '', this.frameRate))
+                this.$displayCurrent.html('E. ' + formatTime(this.player_.currentTime(), '', this.frameRate))
             }
         }
     }

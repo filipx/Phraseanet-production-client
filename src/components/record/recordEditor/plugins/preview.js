@@ -1,26 +1,27 @@
 import $ from 'jquery';
-require('jquery-ui');
+import pym from 'pym.js';
+import videoEditor from './videoEditor';
+//require('jquery-ui');
 
 const preview = (services) => {
     const {configService, localeService, recordEditorEvents} = services;
     let $container = null;
     let parentOptions = {};
+    let activeThumbnailFrame = false;
+    let lastRecordIndex = false;
 
     recordEditorEvents.listenAll({
         // @TODO debounce
-        'recordEditor.uiResize': _setPreviewEdit,
-        'recordEditor.onSelectRecord': _previewEdit
+        'recordEditor.uiResize': onResize,
+        'recordSelection.changed': onSelectionChange,
+        'recordEditor.onSelectRecord': renderPreview
     })
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
     };
 
-    function _setPreviewEdit() {
-        if (!$('#TH_Opreview').is(':visible')) {
-            return false;
-        }
-
+    function onResize() {
         var selected = $('#EDIT_FILM2 .diapo.selected');
 
         if (selected.length !== 1) {
@@ -29,76 +30,140 @@ const preview = (services) => {
 
         var id = selected.attr('id').split('_').pop();
 
-        var container = $('#TH_Opreview');
-        var zoomable = $('img.record.zoomable', container);
+        var zoomable = $('img.record.zoomable', $container.parent());
 
         if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
             return false;
         }
 
-        var h = parseInt($('input[name=height]', container).val(), 10);
-        var w = parseInt($('input[name=width]', container).val(), 10);
+        var h = parseInt($('input[name=height]', $container.parent()).val(), 10);
+        var w = parseInt($('input[name=width]', $container.parent()).val(), 10);
 
         var t = 0;
         var de = 0;
 
-        var margX = 0;
-        var margY = 0;
+        var margX = 20;
+        var margY = 20;
 
-        if ($('img.record.record_audio', container).length > 0) {
+        if ($('img.record.record_audio', $container).length > 0) {
             margY = 100;
             de = 60;
         }
-
-        var display_box = $('#TH_Opreview .PNB10');
-        var dwidth = display_box.width();
-        var dheight = display_box.height();
-
+        let containerWidth = $container.parent().width();
+        let containerHeight = $container.parent().height();
 
         //  if(datas.doctype != 'flash')
         //  {
         var ratioP = w / h;
-        var ratioD = dwidth / dheight;
+        var ratioD = containerWidth / containerHeight;
 
         if (ratioD > ratioP) {
             // je regle la hauteur d'abord
-            if ((parseInt(h, 10) + margY) > dheight) {
-                h = Math.round(dheight - margY);
+            if ((parseInt(h, 10) + margY) > containerHeight) {
+                h = Math.round(containerHeight - margY);
                 w = Math.round(h * ratioP);
             }
         } else {
-            if ((parseInt(w, 10) + margX) > dwidth) {
-                w = Math.round(dwidth - margX);
+            if ((parseInt(w, 10) + margX) > containerWidth) {
+                w = Math.round(containerWidth - margX);
                 h = Math.round(w / ratioP);
             }
         }
-        //  }
-        //  else
-        //  {
-        //
-        //    h = Math.round(dheight - margY);
-        //    w = Math.round(dwidth - margX);
-        //  }
-        t = Math.round((dheight - h - de) / 2);
-        var l = Math.round((dwidth - w) / 2);
-        $('.record', container).css({
+        t = Math.round((containerHeight - h - de) / 2);
+        var l = Math.round((containerWidth - w) / 2);
+        $('.record', $container.parent()).css({
             width: w,
             height: h,
             top: t,
-            left: l
+            left: l,
+            margin: '0 auto',
+            display: 'block'
         }).attr('width', w).attr('height', h);
+
 
     }
 
-    function _previewEdit(params) {
+    function renderPreview(params) {
         let {recordIndex} = params;
+
+        if (lastRecordIndex === recordIndex) {
+            return;
+        }
+        lastRecordIndex = recordIndex;
+
         let currentRecord = parentOptions.recordCollection.getRecordByIndex(recordIndex);
-        $('#TH_Opreview .PNB10').empty().append(currentRecord.preview);
+
+        $container.empty();
+
+        switch (currentRecord.type) {
+            case 'video':
+                // checkif video editor is enabled
+                let hasVideoEditor = false;
+                if (parentOptions.recordConfig.videoEditorConfig !== null) {
+                    hasVideoEditor = true;
+                }
+                if (hasVideoEditor) {
+                    // get records information for videoEditor
+                    let videoRecords = [];
+                    for (let recordIndex in parentOptions.recordConfig.records) {
+                        if (parentOptions.recordConfig.records[recordIndex].id === currentRecord.rid) {
+                            videoRecords.push(parentOptions.recordConfig.records[recordIndex])
+                        }
+                    }
+
+                    videoEditor(services).initialize({
+                        $container, parentOptions,
+                        data: {
+                            videoEditorConfig: parentOptions.recordConfig.videoEditorConfig,
+                            records: videoRecords
+                        }
+                    });
+                }
+                else {
+                    // transform default embed ID in order to avoid conflicts:
+                    let customId = 'phraseanet-embed-editor-frame';
+                    let $template = $(currentRecord.template);
+                    $template.attr('id', customId);
+
+                    $container.append($template.get(0));
+                    activeThumbnailFrame = new pym.Parent(customId, currentRecord.data.preview.url);
+                    activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
+                }
+                break;
+            case 'audio':
+            case 'document':
+                let customId = 'phraseanet-embed-editor-frame';
+                let $template = $(currentRecord.template);
+                $template.attr('id', customId);
+
+                $container.append($template.get(0));
+                activeThumbnailFrame = new pym.Parent(customId, currentRecord.data.preview.url);
+                activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
+                break;
+            case 'image':
+            default:
+                $container.append(currentRecord.template);
+                onResize()
+
+        }
+
 
         if ($('img.PREVIEW_PIC.zoomable').length > 0) {
             $('img.PREVIEW_PIC.zoomable').draggable();
         }
-        _setPreviewEdit();
+    }
+
+    /**
+     * refresh preview if only one record is selected
+     * @param params
+     */
+    function onSelectionChange(params) {
+        let {selection} = params;
+        if (selection.length === 1) {
+            renderPreview({
+                recordIndex: selection[0]
+            });
+        }
     }
 
     return {initialize};

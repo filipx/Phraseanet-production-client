@@ -274,9 +274,16 @@ const previewRecordService = (services) => {
                 }
                 posAsk = data.pos - 1;
 
-                $('#PREVIEWIMGCONT').empty().append(data.html_preview);
-                if ($('#phraseanet-embed-frame').length > 0) {
-                    activeThumbnailFrame = new pym.Parent('phraseanet-embed-frame', data.record.preview.url);
+                
+                // transform default embed ID in order to avoid conflicts:
+                let customId = 'phraseanet-embed-preview-frame';
+                let $template = $(data.html_preview);
+                $template.find('#phraseanet-embed-frame').attr('id', customId)
+
+
+                $('#PREVIEWIMGCONT').empty().append($template.get(0));
+                if ($(`#${customId}`).length > 0) {
+                    activeThumbnailFrame = new pym.Parent(customId, data.record.preview.url);
                     activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
                     /*
                      // warning - if listening events/sendings events,
