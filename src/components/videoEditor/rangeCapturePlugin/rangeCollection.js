@@ -15,6 +15,7 @@ class RangeCollection extends Component {
         endPosition: -1,
         title: '',
         handlePositions: [],
+        selected: false,
         image: {
             src: '',
             width: '',
@@ -225,15 +226,63 @@ ${this.rangeCollection[i].title}
     }
 
     getSelection = () => {
-        return this.player_.activeRange;
+        let selectedRanges = [];
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            if (this.rangeCollection[i].selected === true) {
+                selectedRanges.push(this.rangeCollection[i]);
+            }
+        }
+        return selectedRanges;
     }
 
     resetSelection = () => {
-        // can't reset selection...
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            this.rangeCollection[i].selected = false;
+        }
+    }
+
+    addToSelection = (model) => {
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            if (this.rangeCollection[i].id === model.id) {
+                this.rangeCollection[i].selected = true;
+            }
+        }
+    }
+
+    removeFromSelection = (model) => {
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            if (this.rangeCollection[i].id === model.id) {
+                this.rangeCollection[i].selected = false;
+            }
+        }
+    }
+
+    getFirstSelected = () => {
+        let firstModel = false;
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            if (this.rangeCollection[i].selected === true && firstModel === false) {
+                firstModel = this.rangeCollection[i];
+            }
+        }
+        return firstModel;
+    }
+
+    getLastSelected = () => {
+        let lastModel = false;
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            if (this.rangeCollection[i].selected === true) {
+                lastModel = this.rangeCollection[i];
+            }
+        }
+        return lastModel;
     }
 
     reset = (collection) => {
         this.rangeCollection = collection;
+        // refresh internal indexes:
+        for (let i = 0; i < this.rangeCollection.length; i++) {
+            this.rangeCollection[i].index = i;
+        }
         this.refreshRangeCollection();
     }
 
@@ -251,8 +300,9 @@ ${this.rangeCollection[i].title}
         }
 
         for (let i = 0; i < this.rangeCollection.length; i++) {
+            let model = _.extend({}, this.rangeCollection[i], {index: i});
             let item = new RangeItem(this.player_, {
-                model: _.extend({}, this.rangeCollection[i], {index: i}),
+                model: model,
                 collection: this,
                 isActive: this.rangeCollection[i].id === activeId ? true : false
             }, this.settings);

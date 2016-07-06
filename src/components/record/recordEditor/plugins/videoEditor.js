@@ -31,10 +31,20 @@ const videoEditor = (services) => {
         if (data.videoEditorConfig !== null) {
             options.seekBackwardStep = data.videoEditorConfig.seekBackwardStep;
             options.seekForwardStep = data.videoEditorConfig.seekForwardStep;
+            options.vttFieldValue = false;
+            options.vttFieldName = data.videoEditorConfig.vttFieldName === undefined ? false : data.videoEditorConfig.vttFieldName;
         }
 
         options.techOrder = ['html5', 'flash'];
         $container.addClass('video-range-editor-container');
+
+        // get default videoTextTrack value
+        if (options.vttFieldName !== false) {
+            let vttField = parentOptions.fieldCollection.getFieldByName(options.vttFieldName);
+            if (vttField !== false) {
+                options.vttFieldValue = vttField._value
+            }
+        }
 
         require.ensure([], () => {
             // load videoJs lib
@@ -45,20 +55,27 @@ const videoEditor = (services) => {
             rangeCaptureInstance.getPlayer().rangeStream.subscribe((params) => {
                 switch (params.action) {
                     case 'export-vtt-ranges':
-                        parentOptions.fieldCollection.getActiveField();
+                        if (options.vttFieldName !== false) {
 
-                        let presets = {
-                            fields: {
-                                YABLAVideoTextTrack: [params.data]
-                            }
-                        };
-                        recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, mode: 'emptyOnly'});
+                            let presets = {
+                                fields: {}
+                            };
+                            presets.fields[options.vttFieldName] = [params.data];
+                            recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {
+                                data: presets,
+                                mode: 'emptyOnly'
+                            });
+                        }
                         break;
                     default:
                 }
             });
         });
     };
+
+    /*recordEditorEvents.listenAll({
+     'recordEditor.userInputValue': searchValue
+     });*/
 
     return {initialize};
 };

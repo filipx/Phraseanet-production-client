@@ -111,13 +111,14 @@ class SortableComponent {
                 // get last selected offset
                 // get current
                 this.clearSelection();
+                let models = collection.get()
                 if (firstIndex < currentIndex) {
                     for (let i = firstIndex; i < currentIndex; i++) {
-                        this.addSelection(collection[i]);
+                        this.addSelection(models[i]);
                     }
                 } else {
                     for (let i = lastIndex; i > currentIndex; i--) {
-                        this.addSelection(collection[i]);
+                        this.addSelection(models[i]);
                     }
                 }
             }
@@ -194,13 +195,14 @@ class SortableComponent {
         let collection = this.options.collection.get();
         let toIndex = this.$el.index();
 
-        selectedModels.push(this.options.collection.getSelection());
-
+        selectedModels = this.options.collection.getSelection();
+        
         for (let i = selectedModels.length; i--;) {
             let fromIndex = this.options.collection.getIndex(this.options.collection.get(selectedModels[i]));
+
             collection.splice(toIndex, 0, this.options.collection.splice(fromIndex, 1)[0]);
         }
-
+        
         this.options.collection.reset(collection);
     }
 
@@ -212,15 +214,15 @@ class SortableComponent {
     }
 
     clearSelection() {
-        //this.options.collection.resetSelection();
+        this.options.collection.resetSelection();
     }
 
     addSelection(model) {
-        //this.options.collection.addToSelection(model);
+        this.options.collection.addToSelection(model);
     }
 
     removeSelection(model) {
-        //this.options.collection.removeFromSelection(model);
+        this.options.collection.removeFromSelection(model);
     }
 
     selectionChange() {

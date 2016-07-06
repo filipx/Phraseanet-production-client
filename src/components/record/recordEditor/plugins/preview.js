@@ -118,8 +118,7 @@ const preview = (services) => {
                             records: videoRecords
                         }
                     });
-                }
-                else {
+                } else {
                     // transform default embed ID in order to avoid conflicts:
                     let customId = 'phraseanet-embed-editor-frame';
                     let $template = $(currentRecord.template);

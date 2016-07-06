@@ -148,10 +148,8 @@ const plugin = function (options) {
                 }, 900);
                 break;
             case 'export-ranges':
-
                 break;
             case 'export-vtt-ranges':
-                console.log('vtt generated', params.data)
                 break;
             default:
         }
@@ -212,7 +210,7 @@ const plugin = function (options) {
             rewindKey: {
                 key: function (e) {
                     // Backward Arrow Key
-                    return (e.which === 37);
+                    return (!e.ctrlKey && e.which === 37);
                 },
                 handler: (player, options) => {
                     player.rangeControlBar.setPreviousFrame(parseInt(settings.seekBackwardStep, 10) / 1000)
@@ -221,10 +219,10 @@ const plugin = function (options) {
             forwardKey: {
                 key: function (e) {
                     // forward Arrow Key
-                    return (e.which === 39);
+                    return (!e.ctrlKey && e.which === 39);
                 },
                 handler: (player, options) => {
-                    player.rangeControlBar.setNextFrame()
+                    player.rangeControlBar.setNextFrame(parseInt(settings.seekForwardStep, 10) / 1000)
                 }
             },
             rewindFrameKey: {
@@ -242,7 +240,7 @@ const plugin = function (options) {
                     return (e.ctrlKey && e.which === 39);
                 },
                 handler: (player, options) => {
-                    player.rangeControlBar.setNextFrame(parseInt(settings.seekForwardStep, 10) / 1000)
+                    player.rangeControlBar.setNextFrame()
                 }
             },
             playOnlyKey: {
@@ -342,6 +340,21 @@ const plugin = function (options) {
                     player.rangeControlBar.toggleLoop();
                 }
             },
+            addRange: {
+                key: function (e) {
+                    // ctrl + N or  shift + "+"
+                    return (e.ctrlKey && e.which === 78 || e.shiftKey && e.which === 107);
+                },
+                handler: (player, options) => {
+                    player.rangeControlBar.setNextFrame(parseInt(settings.seekForwardStep, 10) / 1000)
+                    let newRange = player.rangeCollection.addRange({});
+                    player.rangeStream.onNext({
+                        action: 'create',
+                        range: newRange
+                    })
+
+                }
+            },
             deleteRange: {
                 key: function (e) {
                     // MAJ+SUPPR Key
@@ -349,8 +362,7 @@ const plugin = function (options) {
                 },
                 handler: function (player, options) {
                     player.rangeStream.onNext({
-                        action: 'update',
-                        range: player.rangeControlBar.removeRange()
+                        action: 'remove'
                     });
                 }
             }

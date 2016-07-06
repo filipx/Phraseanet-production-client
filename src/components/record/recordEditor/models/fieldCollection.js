@@ -56,6 +56,16 @@ class FieldCollection {
         return false;
     }
 
+    getFieldByName(fieldName) {
+        let foundField = false;
+        for (let field in this.fields) {
+            if (this.fields[field].name === fieldName) {
+                foundField = this.fields[field];
+            }
+        }
+        return foundField;
+    }
+
     getFieldStatus(id = false) {
 
     }

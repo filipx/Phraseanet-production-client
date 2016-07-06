@@ -25,6 +25,7 @@ class HotkeyModal extends ModalDialog {
             <dt>${this.player_.localize('Add an end point')}</dt><dd><span class="shortcut-label">O</span></dd>
             <dt>${this.player_.localize('Navigate to entry point')}</dt><dd><span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">I</span></dd>
             <dt>${this.player_.localize('Navigate to end point')}</dt><dd><span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">O</span></dd>
+            <dt>${this.player_.localize('Add new range')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">N</span> ${this.player_.localize('or')}  <span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">+</span></dd>
             <dt>${this.player_.localize('Delete current')}</dt><dd><span class="shortcut-label">${this.player_.localize('Shift')}</span> + <span class="shortcut-label">${this.player_.localize('Suppr')}</span></dd>
             <dt>${this.player_.localize('Toggle loop')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">L</span></dd>
             <dt>${this.player_.localize('Go 1 frame backward')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">&larr;</span></dd>
