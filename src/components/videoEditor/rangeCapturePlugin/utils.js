@@ -39,7 +39,7 @@ const formatTime = (currentTime, format, frameRate) => {
     switch (format) {
         // standard vtt format
         case 'hh:mm:ss.mmm':
-            return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + ':' + ('00' + milliseconds).slice(-3) + '';
+            return ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + '.' + ('00' + milliseconds).slice(-3) + '';
         case 'hms':
             let formatedOutput = [];
             if (hours > 0) {

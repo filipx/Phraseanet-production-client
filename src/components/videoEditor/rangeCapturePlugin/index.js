@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 require('./style/main.scss');
 import $ from 'jquery';
 import * as Rx from 'rx';
@@ -7,6 +8,7 @@ import HotkeysModalButton from './hotkeysModalButton';
 import RangeBarCollection from './rangeBarCollection';
 import RangeCollection from './rangeCollection';
 import RangeControlBar from './rangeControlBar';
+import {WebVTT} from 'videojs-vtt.js';
 // import rangeControls from './oldControlBar';
 
 const icons = `
@@ -75,6 +77,7 @@ const Component = videojs.getComponent('Component');
 
 const plugin = function (options) {
     const settings = videojs.mergeOptions(defaults, options);
+    console.log('---------settings', settings)
     this.looping = false;
     this.loopData = [];
     this.activeRange = {};
@@ -96,7 +99,6 @@ const plugin = function (options) {
             options.$container.height(editorHeight + 'px');
         }
     }
-
     // range actions:
     this.rangeStream.subscribe((params) => {
         params.handle = params.handle || false;
@@ -107,6 +109,7 @@ const plugin = function (options) {
             case 'change':
             // flow through update:
             case 'update':
+                console.log('this>>>>', this)
                 params.range = this.takeSnapshot(params.range);
                 this.activeRange = this.rangeCollection.update(params.range);
 
@@ -158,7 +161,6 @@ const plugin = function (options) {
 
     });
 
-
     this.takeSnapshot = (range) => {
         if (Math.round(range.startPosition) !== Math.round(this.currentTime())) {
             return range;
@@ -184,8 +186,53 @@ const plugin = function (options) {
         return range;
     }
 
+    this.setVTT = () => {
+        if (settings.vttFieldValue !== false) {
+            // reset existing collection
+            this.rangeCollection.reset([])
+
+            // prefill chapters with vtt data
+            let parser = new WebVTT.Parser(window,
+                window.vttjs,
+                WebVTT.StringDecoder());
+
+            let errors = [];
+
+            parser.oncue = (cue) => {
+                let newRange = this.rangeCollection.addRange({
+                    startPosition: cue.startTime,
+                    endPosition: cue.endTime,
+                    title: cue.text
+                });
+                this.rangeStream.onNext({
+                    action: 'create',
+                    range: newRange
+                })
+
+            };
+
+            parser.onparsingerror = function (error) {
+                errors.push(error);
+            };
+
+            parser.parse(settings.vttFieldValue);
+            if (errors.length > 0) {
+                if (console.groupCollapsed) {
+                    console.groupCollapsed(`Text Track parsing errors`);
+                }
+                errors.forEach((error) => console.error(error));
+                if (console.groupEnd) {
+                    console.groupEnd();
+                }
+            }
+
+            parser.flush();
+        }
+    }
+
     this.ready(() => {
         this.setEditorHeight()
+        this.setVTT();
     });
 
     // ensure control bar is always visible by simulating user activity:

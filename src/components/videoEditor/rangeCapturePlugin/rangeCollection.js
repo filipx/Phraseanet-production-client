@@ -193,15 +193,15 @@ class RangeCollection extends Component {
         return exportedRanges;
     }
     exportVttRanges = () => {
-        let exportedRanges = ['WEBVTT'];
+        let exportedRanges = [`WEBVTT
+`];
         for (let i = 0; i < this.rangeCollection.length; i++) {
-            exportedRanges.push(`
-${i + 1}
+            exportedRanges.push(`${i + 1}
 ${formatTime(this.rangeCollection[i].startPosition, 'hh:mm:ss.mmm')} --> ${formatTime(this.rangeCollection[i].endPosition, 'hh:mm:ss.mmm')}
 ${this.rangeCollection[i].title}
 `)
         }
-        return exportedRanges.join('');
+        return exportedRanges.join('\n');
     }
 
     get = (model) => {

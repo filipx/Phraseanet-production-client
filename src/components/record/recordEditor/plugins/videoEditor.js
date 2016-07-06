@@ -63,7 +63,7 @@ const videoEditor = (services) => {
                             presets.fields[options.vttFieldName] = [params.data];
                             recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {
                                 data: presets,
-                                mode: 'emptyOnly'
+                                // mode: 'emptyOnly'
                             });
                         }
                         break;
