@@ -79,6 +79,7 @@ class RangeControlBar extends Component {
         this.currentRange = false;
         this.player_.activeRangeStream.subscribe((params) => {
             this.currentRange = params.activeRange;
+            this.onRefreshDisplayTime();
         })
     }
 
@@ -105,7 +106,7 @@ class RangeControlBar extends Component {
 <button class="control-button" id="forward-frame"  videotip="${this.player_.localize('Go 1 frame forward')}"><svg class="icon icon-next-frame"><use xlink:href="#icon-next-frame"></use></svg><span class="icon-label"> next frame</span></button>
 <button class="control-button" id="next-forward-frame"  videotip="${this.player_.localize('Go to end point')}"><svg class="icon icon-next-forward-frame"><use xlink:href="#icon-next-forward-frame"></use></svg><span class="icon-label"> next forward frame</span></button>
 
-<span id="display-current" class="display-time" videotip="${this.player_.localize('Elapsed time')}">00:00:00s 00f</span>
+<span id="display-current" class="display-time" videotip="${this.player_.localize('Elapsed time')}" data-mode="elapsed">E. 00:00:00s 00f</span>
 </div>`;
     }
 
@@ -172,14 +173,44 @@ class RangeControlBar extends Component {
             .on('click', '#display-current', (event) => {
                 let $el = $(event.currentTarget);
                 let mode = $el.data('mode');
-                // toggle mode
-                if ($el.data('mode') === 'remaining') {
-                    $el.data('mode', 'current');
-                    $el.attr('videotip', this.player_.localize('Elapsed time'))
-                } else {
-                    $el.data('mode', 'remaining');
-                    $el.attr('videotip', this.player_.localize('Remaining time'))
+
+                console.log('mode:', $el.data('mode'))
+                switch (mode) {
+                    case 'remaining':
+                        $el.data('mode', 'elapsed');
+                        $el.attr('videotip', this.player_.localize('Elapsed time'))
+                        break;
+                    case 'elapsed':
+                        if (this.currentRange === false) {
+                            $el.data('mode', 'remaining');
+                            $el.attr('videotip', this.player_.localize('Remaining time'))
+                        } else {
+                            $el.data('mode', 'duration');
+                            $el.attr('videotip', this.player_.localize('Range duration'))
+                        }
+                        break;
+                    case 'duration':
+                        $el.data('mode', 'remaining');
+                        $el.attr('videotip', this.player_.localize('Remaining time'))
+                        break;
+                    default:
+                        if (this.currentRange === false) {
+                            $el.data('mode', 'remaining');
+                            $el.attr('videotip', this.player_.localize('Remaining time'))
+                        } else {
+                            $el.data('mode', 'duration');
+                            $el.attr('videotip', this.player_.localize('Range duration'))
+                        }
                 }
+                this.onRefreshDisplayTime();
+                /*// toggle mode
+                 if ($el.data('mode') === 'remaining') {
+                 $el.data('mode', 'current');
+                 $el.attr('videotip', this.player_.localize('Elapsed time'))
+                 } else {
+                 $el.data('mode', 'remaining');
+                 $el.attr('videotip', this.player_.localize('Remaining time'))
+                 }*/
             })
             .on('keyup', '.range-input', (event) => {
                 if (event.keyCode === 13) {
@@ -416,10 +447,17 @@ class RangeControlBar extends Component {
             this.$displayCurrent = $('#display-current');
         }
         if (this.$displayCurrent.length > 0) {
-            if (this.$displayCurrent.data('mode') === 'remaining') {
-                this.$displayCurrent.html('R. ' + formatTime(this.player_.remainingTime(), '', this.frameRate))
-            } else {
-                this.$displayCurrent.html('E. ' + formatTime(this.player_.currentTime(), '', this.frameRate))
+            switch (this.$displayCurrent.data('mode')) {
+                case 'remaining':
+                    this.$displayCurrent.html('R. ' + formatTime(this.player_.remainingTime(), '', this.frameRate))
+                    break;
+                case 'elapsed':
+                    this.$displayCurrent.html('E. ' + formatTime(this.player_.currentTime(), '', this.frameRate))
+                    break;
+                case 'duration':
+                    this.$displayCurrent.html('D. ' + formatTime(this.currentRange.endPosition - this.currentRange.startPosition, '', this.frameRate))
+                    break;
+                default:
             }
         }
     }
