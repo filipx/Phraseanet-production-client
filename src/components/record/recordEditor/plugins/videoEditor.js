@@ -47,10 +47,19 @@ const videoEditor = (services) => {
         }
 
         require.ensure([], () => {
+
             // load videoJs lib
             rangeCapture = require('../../../videoEditor/rangeCapture').default;
             rangeCaptureInstance = rangeCapture(services);
             rangeCaptureInstance.initialize(params, options);
+
+            // proxy resize event to rangeStream
+            recordEditorEvents.listenAll({
+                'recordEditor.uiResize': () => {
+                    rangeCaptureInstance.getPlayer().rangeStream.onNext({action: 'resize'})
+                }
+            })
+
 
             rangeCaptureInstance.getPlayer().rangeStream.subscribe((params) => {
                 switch (params.action) {
@@ -62,8 +71,7 @@ const videoEditor = (services) => {
                             };
                             presets.fields[options.vttFieldName] = [params.data];
                             recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {
-                                data: presets,
-                                // mode: 'emptyOnly'
+                                data: presets
                             });
                         }
                         break;
@@ -72,10 +80,6 @@ const videoEditor = (services) => {
             });
         });
     };
-
-    /*recordEditorEvents.listenAll({
-     'recordEditor.userInputValue': searchValue
-     });*/
 
     return {initialize};
 };

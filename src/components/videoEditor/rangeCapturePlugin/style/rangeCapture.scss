@@ -301,6 +301,37 @@
     bottom: 4em;
   }
 }
+.vjs-mini-screen {
+  .range-control-bar {
+    .control-button {
+      width: 26px;
+      height: 30px;
+      margin: auto;
+
+
+    }
+    .display-time {
+      padding: 0 3px;
+      font-size: 11px;
+    }
+  }
+  .range-collection-container {
+    .range-collection-item {
+      .range-item-screenshot {
+        padding-right: 3px;
+      }
+      .range-item-time-data, .range-item-index, .range-item-title {
+        padding: 10px 3px;
+      }
+    }
+  }
+  input.range-input {
+    width: 17px;
+    padding: 0;
+    font-size: 11px;
+  }
+
+}
 
 
 .vjs-modal-dialog-content {

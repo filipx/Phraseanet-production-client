@@ -203,7 +203,7 @@ class RangeCollection extends Component {
             };
 
             if (this.rangeCollection[i].image.src !== '') {
-                exportableData['image'] = this.rangeCollection[i].image.src;
+                exportableData.image = this.rangeCollection[i].image.src;
             }
 
             exportedRanges.push(`${i + 1}

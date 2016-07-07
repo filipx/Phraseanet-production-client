@@ -90,6 +90,16 @@ const plugin = function (options) {
 
     $(this.el()).prepend(icons);
 
+    this.setEditorWidth = () => {
+        let editorWidth = this.currentWidth();
+
+        if (editorWidth < 672) {
+            $(this.el()).addClass('vjs-mini-screen');
+        } else {
+            $(this.el()).removeClass('vjs-mini-screen');
+        }
+    }
+
     this.setEditorHeight = () => {
         // gather components sizes
         let editorHeight = this.currentHeight() + $(this.rangeControlBar.el()).height() + $(this.rangeCollection.el()).height();
@@ -154,6 +164,9 @@ const plugin = function (options) {
             case 'export-ranges':
                 break;
             case 'export-vtt-ranges':
+                break;
+            case 'resize':
+                this.setEditorWidth();
                 break;
             default:
         }
@@ -252,7 +265,7 @@ const plugin = function (options) {
     }
 
     this.ready(() => {
-        this.setEditorHeight()
+
         this.setVTT();
         // if we have to load existing chapters, let's trigger loadedmetadata:
         if (settings.vttFieldValue !== false) {
@@ -266,6 +279,8 @@ const plugin = function (options) {
     });
 
     this.one('loadedmetadata', () => {
+        this.setEditorHeight();
+        this.setEditorWidth();
         if (settings.vttFieldValue !== false) {
             //this.currentTime(0);
         }
