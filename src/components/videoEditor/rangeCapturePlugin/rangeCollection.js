@@ -17,9 +17,9 @@ class RangeCollection extends Component {
         handlePositions: [],
         selected: false,
         image: {
-            src: '',
-            width: '',
-            height: ''
+            src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFkAAAAyCAYAAAA3OHc2AAAAuElEQVR4Xu3UwQkAIAwEwdh/0Qr2kH2NBWRhODwzc8dbFTiQV33/ccj7xpADY8iQC4Gg4U+GHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgEiQftoTIBhrHr1wAAAABJRU5ErkJggg==',
+            width: 89,
+            height: 50
         }
     };
     rangeCollection = [];
@@ -165,10 +165,12 @@ class RangeCollection extends Component {
 
     setHandlePositions(range) {
         let videoDuration = this.player_.duration();
-        let left = ((range.startPosition / videoDuration) * 100);
-        let right = ((range.endPosition / videoDuration) * 100);
+        if (videoDuration > 0) {
+            let left = ((range.startPosition / videoDuration) * 100);
+            let right = ((range.endPosition / videoDuration) * 100);
 
-        range.handlePositions = {left, right};
+            range.handlePositions = {left, right};
+        }
         return range;
     }
 
@@ -196,9 +198,17 @@ class RangeCollection extends Component {
         let exportedRanges = [`WEBVTT
 `];
         for (let i = 0; i < this.rangeCollection.length; i++) {
+            let exportableData = {
+                title: this.rangeCollection[i].title
+            };
+
+            if (this.rangeCollection[i].image.src !== '') {
+                exportableData['image'] = this.rangeCollection[i].image.src;
+            }
+
             exportedRanges.push(`${i + 1}
 ${formatTime(this.rangeCollection[i].startPosition, 'hh:mm:ss.mmm')} --> ${formatTime(this.rangeCollection[i].endPosition, 'hh:mm:ss.mmm')}
-${this.rangeCollection[i].title}
+${JSON.stringify(exportableData)}
 `)
         }
         return exportedRanges.join('\n');

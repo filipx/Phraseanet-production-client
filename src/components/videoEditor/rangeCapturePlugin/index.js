@@ -77,7 +77,6 @@ const Component = videojs.getComponent('Component');
 
 const plugin = function (options) {
     const settings = videojs.mergeOptions(defaults, options);
-    console.log('---------settings', settings)
     this.looping = false;
     this.loopData = [];
     this.activeRange = {};
@@ -104,12 +103,14 @@ const plugin = function (options) {
         params.handle = params.handle || false;
         console.log('RANGE EVENT ===========', params.action, '========>>>')
         switch (params.action) {
+            case 'initialize':
+                this.rangeCollection.update(params.range);
+                break;
             case 'select':
             case 'create':
             case 'change':
             // flow through update:
             case 'update':
-                console.log('this>>>>', this)
                 params.range = this.takeSnapshot(params.range);
                 this.activeRange = this.rangeCollection.update(params.range);
 
@@ -199,13 +200,33 @@ const plugin = function (options) {
             let errors = [];
 
             parser.oncue = (cue) => {
+
+                // try to parse text:
+                let parsedCue = false;
+                try {
+                    parsedCue = JSON.parse(cue.text || '{}');
+
+                } catch (e) {
+                    console.error('failed to parse cue text', e)
+                }
+                if (parsedCue === false) {
+                    parsedCue = {
+                        title: cue.text
+                    }
+                }
+
                 let newRange = this.rangeCollection.addRange({
                     startPosition: cue.startTime,
                     endPosition: cue.endTime,
-                    title: cue.text
+                    title: parsedCue.title,
+                    image: {
+                        src: parsedCue.image || ''
+                    }
+
                 });
+
                 this.rangeStream.onNext({
-                    action: 'create',
+                    action: 'initialize',
                     range: newRange
                 })
 
@@ -233,6 +254,21 @@ const plugin = function (options) {
     this.ready(() => {
         this.setEditorHeight()
         this.setVTT();
+        // if we have to load existing chapters, let's trigger loadedmetadata:
+        if (settings.vttFieldValue !== false) {
+            if (this.paused()) {
+                this.play();
+            }
+            if (!this.paused()) {
+                this.pause();
+            }
+        }
+    });
+
+    this.one('loadedmetadata', () => {
+        if (settings.vttFieldValue !== false) {
+            //this.currentTime(0);
+        }
     });
 
     // ensure control bar is always visible by simulating user activity:

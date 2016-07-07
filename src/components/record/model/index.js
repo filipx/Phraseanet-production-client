@@ -184,13 +184,13 @@ recordField.prototype = {
 
         merge = !!merge;
 
-        if (this.databoxField.isReadonly()) {
+/*        if (this.databoxField.isReadonly()) {
             if (window.console) {
                 console.error('Unable to set a value to a readonly field');
             }
 
             return this;
-        }
+        }*/
 
         if (window.console) {
             console.log('adding value ', value, ' vocId : ', VocabularyId, '  ; merge is ', merge);
