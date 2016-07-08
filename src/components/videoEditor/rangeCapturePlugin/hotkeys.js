@@ -98,6 +98,24 @@ const hotkeys = (settings) => {
                 player.rangeControlBar.setNextFrame()
             }
         },
+        moveDownRange: {
+            key: function (e) {
+                // K Key
+                return (e.which === 40);
+            },
+            handler: (player, options) => {
+                player.rangeCollection.moveRange('down');
+            }
+        },
+        moveUpRange: {
+            key: function (e) {
+                // K Key
+                return (e.which === 38);
+            },
+            handler: (player, options) => {
+                player.rangeCollection.moveRange('up');
+            }
+        },
         entryCuePoint: {
             key: function (e) {
                 // I Key

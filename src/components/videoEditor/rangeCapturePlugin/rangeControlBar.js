@@ -255,8 +255,14 @@ class RangeControlBar extends Component {
 
                 var current_time = this.player_.currentTime();
 
-                if (current_time < start || end > 0 && current_time > end) {
+                if (current_time < start || end > 0 && current_time >= end) {
                     this.player_.currentTime(start);
+                    setTimeout(() => {
+                        // Resume play if the element is paused.
+                        if (this.player_.paused()) {
+                            this.player_.play();
+                        }
+                    }, 150);
                 }
 
             }
@@ -351,9 +357,12 @@ class RangeControlBar extends Component {
         // @deprecated
         this.loopData = [start, end];
 
-        if (this.player_.paused()) {
-            this.player_.play();
-        }
+        setTimeout(() => {
+            // Resume play if the element is paused.
+            if (this.player_.paused()) {
+                this.player_.play();
+            }
+        }, 150);
     }
 
     setStartPositon() {

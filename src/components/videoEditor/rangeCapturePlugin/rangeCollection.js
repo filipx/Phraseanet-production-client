@@ -296,6 +296,28 @@ ${JSON.stringify(exportableData)}
         this.refreshRangeCollection();
     }
 
+    moveRange = (direction) => {
+        if (this.currentRange === false) {
+            return;
+        }
+        let collection = this.get();
+        let toIndex = this.currentRange.index - 1;
+
+        if (direction === 'down') {
+            toIndex = this.currentRange.index + 1;
+        }
+        this.addToSelection(this.currentRange);
+        let selectedModels = this.getSelection();
+
+        for (let i = selectedModels.length; i--;) {
+            let fromIndex = this.getIndex(this.get(selectedModels[i]));
+
+            collection.splice(toIndex, 0, this.splice(fromIndex, 1)[0]);
+        }
+
+        this.reset(collection);
+    }
+
     refreshRangeCollection = () => {
         // remove any existing items
         for (let i = 0; i < this.rangeItemComponentCollection.length; i++) {

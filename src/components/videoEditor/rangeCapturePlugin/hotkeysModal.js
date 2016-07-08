@@ -30,6 +30,8 @@ class HotkeyModal extends ModalDialog {
             <dt>${this.player_.localize('Toggle loop')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">L</span></dd>
             <dt>${this.player_.localize('Go 1 frame backward')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">&larr;</span></dd>
             <dt>${this.player_.localize('Go 1 frame forward')}</dt><dd><span class="shortcut-label">${this.player_.localize('Ctrl')}</span> + <span class="shortcut-label">&rarr;</span></dd>
+            <dt>${this.player_.localize('Move up range')}</dt><dd><span class="shortcut-label">&uarr;</span></dd>
+            <dt>${this.player_.localize('Move down range')}</dt><dd><span class="shortcut-label">&darr;</span></dd>
             </dl>
             </div>`;
     }
