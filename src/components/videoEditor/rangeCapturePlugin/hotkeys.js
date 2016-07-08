@@ -140,7 +140,7 @@ const hotkeys = (player, settings) => {
                 return (e.which === 40);
             },
             handler: (player, options) => {
-                player.rangeCollection.moveRange('down');
+                player.rangeCollection.setActiveRange('down');
             }
         },
         moveUpRange: {
@@ -149,7 +149,7 @@ const hotkeys = (player, settings) => {
                 return (e.which === 38);
             },
             handler: (player, options) => {
-                player.rangeCollection.moveRange('up');
+                player.rangeCollection.setActiveRange('up');
             }
         },
         entryCuePoint: {

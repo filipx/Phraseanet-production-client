@@ -296,6 +296,25 @@ ${JSON.stringify(exportableData)}
         this.refreshRangeCollection();
     }
 
+    setActiveRange = (direction) => {
+        if (this.currentRange === false) {
+            return;
+        }
+        let toIndex = this.currentRange.index - 1;
+
+        if (direction === 'down') {
+            toIndex = this.currentRange.index + 1;
+        }
+
+        if (this.rangeCollection[toIndex] !== undefined) {
+
+            this.player_.rangeStream.onNext({
+                action: 'change',
+                range: this.rangeCollection[toIndex]
+            });
+        }
+    }
+
     moveRange = (direction) => {
         if (this.currentRange === false) {
             return;
