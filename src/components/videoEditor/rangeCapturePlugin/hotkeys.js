@@ -1,3 +1,5 @@
+import * as Rx from 'rx';
+
 const overrideHotkeys = (settings) => {
     // override existing keys
     return {
@@ -18,10 +20,44 @@ const overrideHotkeys = (settings) => {
             return false;
         },
     }
-}
-const hotkeys = (settings) => {
+};
 
-    return {
+const tapSequenceHotKey = (keyStream, eventKey) => {
+
+    return keyStream
+        .filter(function (e) {
+            if (e.which === eventKey) {
+                return true;
+            }
+            return false;
+        })
+        .buffer(function () {
+            return keyStream.debounce(250);
+        })
+        .map(function (list) {
+            return list.length;
+        })
+        .filter(function (x) {
+            return x >= 1;
+        });
+
+}
+
+const hotkeys = (player, settings) => {
+
+    let keyStream = Rx.Observable.fromEvent(settings.$container.get(0), 'keyup');
+    let rates = settings.playbackRates;
+
+    // L key speed 1x 2x 3x ...
+    tapSequenceHotKey(keyStream, 76)
+        .subscribe(function (numclicks) {
+            let rate = rates[numclicks - 1];
+            if (rate !== undefined) {
+                player.playbackRate(rate);
+            }
+        });
+
+    let hotkeys = {
         rewindKey: {
             key: function (e) {
                 // Backward Arrow Key
@@ -200,6 +236,8 @@ const hotkeys = (settings) => {
             }
         }
     }
+
+    return hotkeys;
 }
 
 export {overrideHotkeys, hotkeys};

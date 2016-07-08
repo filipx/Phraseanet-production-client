@@ -13,24 +13,11 @@ const videoEditor = (services) => {
     };
     const initialize = (params) => {
         let initWith = {$container, parentOptions, data} = params;
-        let aspectRatio = configService.get('resource.aspectRatio');
-
-
-        if (configService.get('resource.aspectRatio') !== null) {
-            options.aspectRatio = configService.get('resource.aspectRatio');
-        }
-
-        if (configService.get('resource.autoplay') !== null) {
-            options.autoplay = configService.get('resource.autoplay');
-        }
-
-        if (configService.get('resource.playbackRates') !== null) {
-            options.playbackRates = configService.get('resource.playbackRates');
-        }
 
         if (data.videoEditorConfig !== null) {
             options.seekBackwardStep = data.videoEditorConfig.seekBackwardStep;
             options.seekForwardStep = data.videoEditorConfig.seekForwardStep;
+            options.playbackRates = data.videoEditorConfig.playbackRates === undefined ? [1, 2, 3] : data.videoEditorConfig.playbackRates;
             options.vttFieldValue = false;
             options.vttFieldName = data.videoEditorConfig.vttFieldName === undefined ? false : data.videoEditorConfig.vttFieldName;
         }

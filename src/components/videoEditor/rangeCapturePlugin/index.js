@@ -295,7 +295,7 @@ const plugin = function (options) {
     this.getRangeCaptureOverridedHotkeys = () => overrideHotkeys(settings);
 
     // set new hotkeys
-    this.getRangeCaptureHotkeys = () => hotkeys(settings);
+    this.getRangeCaptureHotkeys = () => hotkeys(this, settings);
 
     // init a default range once every components are ready:
     this.rangeCollection.initDefaultRange();
