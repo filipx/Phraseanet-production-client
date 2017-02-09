@@ -265,44 +265,43 @@ class Bootstrap {
 
         this.appSearch.initialize();
 
-        $("#EDIT_query").autocomplete({
+        $('#EDIT_query').autocomplete({
             delay: 200,
             minLength: 2,
             source: function (request, response) {
-                var inp = document.getElementById("EDIT_query");
-                var data={
-                    '_selectionStart': inp.selectionStart,
-                    '_selectionEnd':   inp.selectionEnd
+                var inp = document.getElementById('EDIT_query');
+                var data = {
+                    _selectionStart: inp.selectionStart,
+                    _selectionEnd: inp.selectionEnd
                 };
-                var a = $("#searchForm").serializeArray();
-                for(var i=0; i<a.length; i++) {
+                var a = $('#searchForm').serializeArray();
+                for (var i = 0; i < a.length; i++) {
                     var k = a[i].name;
                     var v = a[i].value;
-                    if(k.substring(k.length-2) == "[]") {
-                        if(data[k] == undefined) {
+                    if (k.substring(k.length - 2) === '[]') {
+                        if (data[k] === undefined) {
                             data[k] = [];
                         }
                         data[k].push(v);
-                    }
-                    else {
+                    } else {
                         data[k] = v;
                     }
                 }
                 $.ajax({
                     url: '/prod/query/completion/',
-                    dataType: "json",
-                    method: "post",
+                    dataType: 'json',
+                    method: 'post',
                     data: data,
                     success: function (data) {
                         response(data);
                     }
                 });
             },
-            focus: function(event, ui) {
+            focus: function (event, ui) {
                 event.preventDefault();
             },
             select: function (event, ui) {
-                $("#EDIT_query").val(ui.item.value.completed);
+                $('#EDIT_query').val(ui.item.value.completed);
 
                 return false;
             }
