@@ -19,7 +19,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 var extractCSS = new ExtractTextPlugin({
   filename: '[name].css',
   allChunks: true
-})
+});
 
 module.exports = {
     // entry points
@@ -37,7 +37,7 @@ module.exports = {
     },
     cache: true,
     watch: true,
-    devtool: 'eval',
+    devtool: 'inline-source-map',
     output: {
         path: config.distDir,
         filename: '[name].js',
@@ -107,6 +107,7 @@ module.exports = {
               // exclude: /src\/(?!skins)/,
               // include: [path.join(__dirname, '../../src'), path.join(__dirname, '../../stylesheets')],
               use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
                 use: [
                   'css-loader',
                   'resolve-url-loader',
