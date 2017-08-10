@@ -3,8 +3,8 @@ import pym from 'pym.js';
 import videoEditor from './videoEditor';
 //require('jquery-ui');
 
-const preview = (services) => {
-    const {configService, localeService, recordEditorEvents} = services;
+const preview = services => {
+    const { configService, localeService, recordEditorEvents } = services;
     let $container = null;
     let parentOptions = {};
     let activeThumbnailFrame = false;
@@ -14,11 +14,12 @@ const preview = (services) => {
         // @TODO debounce
         'recordEditor.uiResize': onResize,
         'recordSelection.changed': onSelectionChange,
-        'recordEditor.onSelectRecord': renderPreview
-    })
+        'recordEditor.onSelectRecord': renderPreview,
+        'recordEditor.tabChange': tabChanged
+    });
 
-    const initialize = (options) => {
-        let initWith = {$container, parentOptions} = options;
+    const initialize = options => {
+        let initWith = ({ $container, parentOptions } = options);
     };
 
     function onResize() {
@@ -36,7 +37,10 @@ const preview = (services) => {
             return false;
         }
 
-        var h = parseInt($('input[name=height]', $container.parent()).val(), 10);
+        var h = parseInt(
+            $('input[name=height]', $container.parent()).val(),
+            10
+        );
         var w = parseInt($('input[name=width]', $container.parent()).val(), 10);
 
         var t = 0;
@@ -59,39 +63,53 @@ const preview = (services) => {
 
         if (ratioD > ratioP) {
             // je regle la hauteur d'abord
-            if ((parseInt(h, 10) + margY) > containerHeight) {
+            if (parseInt(h, 10) + margY > containerHeight) {
                 h = Math.round(containerHeight - margY);
                 w = Math.round(h * ratioP);
             }
         } else {
-            if ((parseInt(w, 10) + margX) > containerWidth) {
+            if (parseInt(w, 10) + margX > containerWidth) {
                 w = Math.round(containerWidth - margX);
                 h = Math.round(w / ratioP);
             }
         }
         t = Math.round((containerHeight - h - de) / 2);
         var l = Math.round((containerWidth - w) / 2);
-        $('.record', $container.parent()).css({
-            width: w,
-            height: h,
-            top: t,
-            left: l,
-            margin: '0 auto',
-            display: 'block'
-        }).attr('width', w).attr('height', h);
+        $('.record', $container.parent())
+            .css({
+                width: w,
+                height: h,
+                top: t,
+                left: l,
+                margin: '0 auto',
+                display: 'block'
+            })
+            .attr('width', w)
+            .attr('height', h);
+    }
 
-
+    function tabChanged(params) {
+        if (params.tab === '#TH_Opreview') {
+            //redraw preview
+            var selected = $('#EDIT_FILM2 .diapo.selected');
+            if (selected.length !== 1) {
+                return false;
+            }
+            var id = selected.attr('id').split('_').pop();
+            renderPreview({
+                recordIndex: id
+            });
+        }
     }
 
     function renderPreview(params) {
-        let {recordIndex} = params;
+        let { recordIndex } = params;
 
-        if (lastRecordIndex === recordIndex) {
-            return;
-        }
         lastRecordIndex = recordIndex;
 
-        let currentRecord = parentOptions.recordCollection.getRecordByIndex(recordIndex);
+        let currentRecord = parentOptions.recordCollection.getRecordByIndex(
+            recordIndex
+        );
 
         $container.empty();
 
@@ -105,16 +123,24 @@ const preview = (services) => {
                 if (hasVideoEditor) {
                     // get records information for videoEditor
                     let videoRecords = [];
-                    for (let recordIndex in parentOptions.recordConfig.records) {
-                        if (parentOptions.recordConfig.records[recordIndex].id === currentRecord.rid) {
-                            videoRecords.push(parentOptions.recordConfig.records[recordIndex])
+                    for (let recordIndex in parentOptions.recordConfig
+                        .records) {
+                        if (
+                            parentOptions.recordConfig.records[recordIndex]
+                                .id === currentRecord.rid
+                        ) {
+                            videoRecords.push(
+                                parentOptions.recordConfig.records[recordIndex]
+                            );
                         }
                     }
 
                     videoEditor(services).initialize({
-                        $container, parentOptions,
+                        $container,
+                        parentOptions,
                         data: {
-                            videoEditorConfig: parentOptions.recordConfig.videoEditorConfig,
+                            videoEditorConfig:
+                                parentOptions.recordConfig.videoEditorConfig,
                             records: videoRecords
                         }
                     });
@@ -125,8 +151,14 @@ const preview = (services) => {
                     $template.attr('id', customId);
 
                     $container.append($template.get(0));
-                    activeThumbnailFrame = new pym.Parent(customId, currentRecord.data.preview.url);
-                    activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
+                    activeThumbnailFrame = new pym.Parent(
+                        customId,
+                        currentRecord.data.preview.url
+                    );
+                    activeThumbnailFrame.iframe.setAttribute(
+                        'allowfullscreen',
+                        ''
+                    );
                 }
                 break;
             case 'audio':
@@ -136,16 +168,17 @@ const preview = (services) => {
                 $template.attr('id', customId);
 
                 $container.append($template.get(0));
-                activeThumbnailFrame = new pym.Parent(customId, currentRecord.data.preview.url);
+                activeThumbnailFrame = new pym.Parent(
+                    customId,
+                    currentRecord.data.preview.url
+                );
                 activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
                 break;
             case 'image':
             default:
                 $container.append(currentRecord.template);
-                onResize()
-
+                onResize();
         }
-
 
         if ($('img.PREVIEW_PIC.zoomable').length > 0) {
             $('img.PREVIEW_PIC.zoomable').draggable();
@@ -157,7 +190,7 @@ const preview = (services) => {
      * @param params
      */
     function onSelectionChange(params) {
-        let {selection} = params;
+        let { selection } = params;
         if (selection.length === 1) {
             renderPreview({
                 recordIndex: selection[0]
@@ -165,6 +198,6 @@ const preview = (services) => {
         }
     }
 
-    return {initialize};
+    return { initialize };
 };
 export default preview;

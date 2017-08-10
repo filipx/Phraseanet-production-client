@@ -2,6 +2,7 @@ import $ from 'jquery';
 require('jquery-ui');
 import utils from 'phraseanet-common/src/components/utils';
 import download from './download';
+import pym from 'pym.js';
 
 const lightbox = (services) => {
     const {configService, localeService, appEvents} = services;
@@ -12,6 +13,7 @@ const lightbox = (services) => {
         y: 0
     };
     let $mainContainer = null;
+    let activeThumbnailFrame = false;
 
     const initialize = () => {
         $mainContainer = $('#mainContainer');
@@ -30,6 +32,22 @@ const lightbox = (services) => {
         });
 
         _display_basket();
+        
+        //load iframe if type is document
+        let $embedFrame = $('.lightbox_container', $('#record_main')).find('#phraseanet-embed-frame');
+        let customId = 'phraseanet-embed-lightbox-frame';
+        $embedFrame.attr('id', customId);
+        let src = $embedFrame.attr('data-src');
+        if($embedFrame.hasClass('documentTips')) {
+            activeThumbnailFrame = new pym.Parent(
+                customId,
+                src
+            );
+            activeThumbnailFrame.iframe.setAttribute(
+                'allowfullscreen',
+                ''
+            );
+        }
 
         $(window).bind('mousedown', function () {
             $(this).focus();
@@ -264,53 +282,74 @@ const lightbox = (services) => {
             request.abort();
         }
 
-        request = $.ajax({
-            type: 'GET',
-            url: $(el).attr('href'), //'/lightbox/ajax/LOAD_BASKET_ELEMENT/'+sselcont_id+'/',
-            dataType: 'json',
-            success: function (datas) {
-                var container = false;
-                var data = datas;
-
-                if (compare) {
-                    container = $('#record_compare');
-                } else {
-                    container = $('#record_main');
-
-                    $('#record_infos .lightbox_container')
-                        .empty()
-                        .append(data.caption);
-
-                    $('#basket_infos')
-                        .empty()
-                        .append(data.agreement_html);
-                }
-
-                $('.display_id', container)
-                    .empty()
-                    .append(data.number);
-
-                $('.title', container)
-                    .empty()
-                    .append(data.title)
-                    .attr('title', data.title);
-
-                var options_container = $('.options', container);
-                options_container
-                    .empty()
-                    .append(data.options_html);
-
-                $('.lightbox_container', container).empty()
-                    .append(data.preview + data.selector_html + data.note_html);
-
-
-                _display_basket_element(compare, sselcont_id);
-
-
-                return;
-            }
-        });
+        request = _loadBasketElement($(el).attr('href'));
         container.data('request', request);
+    }
+    
+    function _loadBasketElement(url, compare, sselcont_id) {
+      $.ajax({
+          type: 'GET',
+          url: url, //'/lightbox/ajax/LOAD_BASKET_ELEMENT/'+sselcont_id+'/',
+          dataType: 'json',
+          success: function (datas) {
+              var container = false;
+              var data = datas;
+
+              if (compare) {
+                  container = $('#record_compare');
+              } else {
+                  container = $('#record_main');
+
+                  $('#record_infos .lightbox_container')
+                      .empty()
+                      .append(data.caption);
+
+                  $('#basket_infos')
+                      .empty()
+                      .append(data.agreement_html);
+              }
+
+              $('.display_id', container)
+                  .empty()
+                  .append(data.number);
+
+              $('.title', container)
+                  .empty()
+                  .append(data.title)
+                  .attr('title', data.title);
+
+              var options_container = $('.options', container);
+              options_container
+                  .empty()
+                  .append(data.options_html);
+                  
+              let customId = 'phraseanet-embed-lightbox-frame';
+              let $template = $(data.preview);
+              $template.attr('id', customId);
+              let src = $template.attr('data-src');
+              
+              $('.lightbox_container', container).empty().append($template.get(0));
+              
+              if ($template.hasClass('documentTips')) {
+                  activeThumbnailFrame = new pym.Parent(
+                      customId,
+                      src
+                  );
+                  activeThumbnailFrame.iframe.setAttribute(
+                      'allowfullscreen',
+                      ''
+                  );
+              }
+
+              // $('.lightbox_container', container).empty()
+              //     .append(data.preview + data.selector_html + data.note_html);
+
+              _display_basket_element(compare, sselcont_id);
+
+
+              return;
+          }
+      });
     }
 
     function _display_basket_element(compare, sselcont_id) {
