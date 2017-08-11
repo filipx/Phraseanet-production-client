@@ -633,19 +633,19 @@ const lightbox = services => {
         var compare_record = $('.lightbox_container .record', compare_box);
 
         var main_record_width = parseInt(
-            $('input[name=width]', main_box).val(),
+            main_record.attr('data-original-width'),
             10
         );
         var main_record_height = parseInt(
-            $('input[name=height]', main_box).val(),
+            main_record.attr('data-original-height'),
             10
         );
         var compare_record_width = parseInt(
-            $('input[name=width]', compare_box).val(),
+            compare_record.attr('data-original-width'),
             10
         );
         var compare_record_height = parseInt(
-            $('input[name=height]', compare_box).val(),
+            compare_record.attr('data-original-height'),
             10
         );
 
