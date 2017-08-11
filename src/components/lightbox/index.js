@@ -4,8 +4,8 @@ import utils from 'phraseanet-common/src/components/utils';
 import download from './download';
 import pym from 'pym.js';
 
-const lightbox = (services) => {
-    const {configService, localeService, appEvents} = services;
+const lightbox = services => {
+    const { configService, localeService, appEvents } = services;
     const downloadService = download(services);
     var _releasable = false;
     var _bodySize = {
@@ -32,96 +32,106 @@ const lightbox = (services) => {
         });
 
         _display_basket();
-        
+
         //load iframe if type is document
-        let $embedFrame = $('.lightbox_container', $('#record_main')).find('#phraseanet-embed-frame');
+        let $embedFrame = $('.lightbox_container', $('#record_main')).find(
+            '#phraseanet-embed-frame'
+        );
         let customId = 'phraseanet-embed-lightbox-frame';
         $embedFrame.attr('id', customId);
         let src = $embedFrame.attr('data-src');
-        if($embedFrame.hasClass('documentTips')) {
-            activeThumbnailFrame = new pym.Parent(
-                customId,
-                src
-            );
-            activeThumbnailFrame.iframe.setAttribute(
-                'allowfullscreen',
-                ''
-            );
+        if ($embedFrame.hasClass('documentTips')) {
+            activeThumbnailFrame = new pym.Parent(customId, src);
+            activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
         }
 
-        $(window).bind('mousedown', function () {
-            $(this).focus();
-        }).trigger('mousedown');
+        $(window)
+            .bind('mousedown', function () {
+                $(this).focus();
+            })
+            .trigger('mousedown');
 
-        $('.basket_wrapper').hover(
-            function () {
-                $(this).addClass('hover');
-            },
-            function () {
-                $(this).removeClass('hover');
-            }
-        ).bind('click', function () {
-            var id = $('input[name=ssel_id]', this).val();
-            document.location = '/lightbox/validate/' + id + '/';
-            return;
-        });
+        $('.basket_wrapper')
+            .hover(
+                function () {
+                    $(this).addClass('hover');
+                },
+                function () {
+                    $(this).removeClass('hover');
+                }
+            )
+            .bind('click', function () {
+                var id = $('input[name=ssel_id]', this).val();
+                document.location = '/lightbox/validate/' + id + '/';
+                return;
+            });
 
         downloadService.initialize({
             $container: $mainContainer
         });
 
         if ($('.right_column_wrapper_user').length > 0) {
-            $('.right_column_title, #right_column_validation_toggle').bind('click', function () {
-                if (!$('.right_column_wrapper_caption').is(':visible')) {
-                    $('.right_column_wrapper_user').height($('.right_column_wrapper_user').height()).css('top', 'auto').animate({
-                        height: 0
-                    });
-                    $('.right_column_wrapper_caption').slideDown();
-                    $('#right_column_validation_toggle').show();
-                } else {
-                    $('.right_column_wrapper_user').height('auto').animate({
-                        top: $('.right_column_title').height()
-                    });
-                    $('.right_column_wrapper_caption').slideUp();
-                    $('#right_column_validation_toggle').hide();
-                }
-                var title = $('.right_column_title');
-                title.hasClass('expanded') ? title.removeClass('expanded') : title.addClass('expanded');
-            }).addClass('clickable');
+            $('.right_column_title, #right_column_validation_toggle')
+                .bind('click', function () {
+                    if (!$('.right_column_wrapper_caption').is(':visible')) {
+                        $('.right_column_wrapper_user')
+                            .height($('.right_column_wrapper_user').height())
+                            .css('top', 'auto')
+                            .animate({
+                                height: 0
+                            });
+                        $('.right_column_wrapper_caption').slideDown();
+                        $('#right_column_validation_toggle').show();
+                    } else {
+                        $('.right_column_wrapper_user').height('auto').animate({
+                            top: $('.right_column_title').height()
+                        });
+                        $('.right_column_wrapper_caption').slideUp();
+                        $('#right_column_validation_toggle').hide();
+                    }
+                    var title = $('.right_column_title');
+                    title.hasClass('expanded')
+                        ? title.removeClass('expanded')
+                        : title.addClass('expanded');
+                })
+                .addClass('clickable');
         }
         var sselcont = $('#sc_container .basket_element:first');
         if (sselcont.length > 0) {
-            _display_basket_element(false, sselcont.attr('id').split('_').pop());
+            _display_basket_element(
+                false,
+                sselcont.attr('id').split('_').pop()
+            );
         }
 
+        _setSizeable(
+            $(
+                '#record_main .lightbox_container, #record_compare .lightbox_container'
+            )
+        );
 
-        _setSizeable($('#record_main .lightbox_container, #record_compare .lightbox_container'));
-
-        $('#navigation')
-            .bind('change',
-                function () {
-                    window.location.replace(window.location.protocol + '//' + window.location.host + '/lightbox/validate/' + $(this).val() + '/');
-                }
+        $('#navigation').bind('change', function () {
+            window.location.replace(
+                window.location.protocol +
+                    '//' +
+                    window.location.host +
+                    '/lightbox/validate/' +
+                    $(this).val() +
+                    '/'
             );
+        });
 
-        $('#left_scroller')
-            .bind('click',
-                function () {
-                    _scrollElements(false);
-                }
-            );
+        $('#left_scroller').bind('click', function () {
+            _scrollElements(false);
+        });
 
-        $('#right_scroller')
-            .bind('click', function () {
-                    _scrollElements(true);
-                }
-            );
+        $('#right_scroller').bind('click', function () {
+            _scrollElements(true);
+        });
 
-        $(window)
-            .bind('resize', function () {
-                    _resizeLightbox();
-                }
-            );
+        $(window).bind('resize', function () {
+            _resizeLightbox();
+        });
         _bind_keyboard();
     };
 
@@ -135,10 +145,12 @@ const lightbox = (services) => {
         var sc_wrapper = $('#sc_wrapper');
         var basket_options = $('#basket_options');
 
-        $('.report').on('click', function () {
-            _loadReport();
-            return false;
-        }).addClass('clickable');
+        $('.report')
+            .on('click', function () {
+                _loadReport();
+                return false;
+            })
+            .addClass('clickable');
         //	$('#basket_infos .report').button({
         //					icons: {
         //						primary: 'ui-icon-document'
@@ -146,33 +158,39 @@ const lightbox = (services) => {
         //				}).bind('click',function(){
         //					$(this).blur();
         //				});
-        $('.confirm_report', basket_options).button()
-            .bind('click', function () {
-                _setRelease($(this));
-            });
+        $('.confirm_report', basket_options).button().bind('click', function () {
+            _setRelease($(this));
+        });
 
-        $('.basket_element', sc_wrapper).parent()
+        $('.basket_element', sc_wrapper)
+            .parent()
             .bind('click', function (event) {
                 _scid_click(event, this);
                 return false;
             });
 
-        $('.agree_button, .disagree_button', sc_wrapper).bind('click', function (event) {
+        $('.agree_button, .disagree_button', sc_wrapper)
+            .bind('click', function (event) {
+                var sselcont_id = $(this)
+                    .closest('.basket_element')
+                    .attr('id')
+                    .split('_')
+                    .pop();
 
-            var sselcont_id = $(this).closest('.basket_element').attr('id').split('_').pop();
+                var agreement = $(this).hasClass('agree_button') ? 1 : -1;
 
-            var agreement = $(this).hasClass('agree_button') ? 1 : -1;
-
-            _setAgreement(event, $(this), sselcont_id, agreement);
-            return false;
-        }).addClass('clickable');
+                _setAgreement(event, $(this), sselcont_id, agreement);
+                return false;
+            })
+            .addClass('clickable');
 
         let n = $('.basket_element', sc_wrapper).length;
-        $('#sc_container').width(n * $('.basket_element_wrapper:first', sc_wrapper).outerWidth() + 1);
+        $('#sc_container').width(
+            n * $('.basket_element_wrapper:first', sc_wrapper).outerWidth() + 1
+        );
 
         $('.previewTips').tooltip();
     }
-
 
     function setReleasable(val) {
         _releasable = val;
@@ -180,7 +198,6 @@ const lightbox = (services) => {
 
     function _bind_keyboard() {
         $(document).bind('keydown', function (event) {
-
             var stop = false;
             $('.notes_wrapper').each(function (i, n) {
                 if (parseInt($(n).css('top'), 10) >= 0) {
@@ -231,7 +248,7 @@ const lightbox = (services) => {
                 if (event.stopPropagation) {
                     event.stopPropagation();
                 }
-                return (false);
+                return false;
             }
             return true;
         });
@@ -259,7 +276,6 @@ const lightbox = (services) => {
         });
     }
 
-
     function _scid_click(event, el) {
         var compare = utils.is_ctrl_key(event);
 
@@ -285,71 +301,63 @@ const lightbox = (services) => {
         request = _loadBasketElement($(el).attr('href'));
         container.data('request', request);
     }
-    
+
     function _loadBasketElement(url, compare, sselcont_id) {
-      $.ajax({
-          type: 'GET',
-          url: url, //'/lightbox/ajax/LOAD_BASKET_ELEMENT/'+sselcont_id+'/',
-          dataType: 'json',
-          success: function (datas) {
-              var container = false;
-              var data = datas;
+        $.ajax({
+            type: 'GET',
+            url: url, //'/lightbox/ajax/LOAD_BASKET_ELEMENT/'+sselcont_id+'/',
+            dataType: 'json',
+            success: function (datas) {
+                var container = false;
+                var data = datas;
 
-              if (compare) {
-                  container = $('#record_compare');
-              } else {
-                  container = $('#record_main');
+                if (compare) {
+                    container = $('#record_compare');
+                } else {
+                    container = $('#record_main');
 
-                  $('#record_infos .lightbox_container')
-                      .empty()
-                      .append(data.caption);
+                    $('#record_infos .lightbox_container')
+                        .empty()
+                        .append(data.caption);
 
-                  $('#basket_infos')
-                      .empty()
-                      .append(data.agreement_html);
-              }
+                    $('#basket_infos').empty().append(data.agreement_html);
+                }
 
-              $('.display_id', container)
-                  .empty()
-                  .append(data.number);
+                $('.display_id', container).empty().append(data.number);
 
-              $('.title', container)
-                  .empty()
-                  .append(data.title)
-                  .attr('title', data.title);
+                $('.title', container)
+                    .empty()
+                    .append(data.title)
+                    .attr('title', data.title);
 
-              var options_container = $('.options', container);
-              options_container
-                  .empty()
-                  .append(data.options_html);
-                  
-              let customId = 'phraseanet-embed-lightbox-frame';
-              let $template = $(data.preview);
-              $template.attr('id', customId);
-              let src = $template.attr('data-src');
-              
-              $('.lightbox_container', container).empty().append($template.get(0));
-              
-              if ($template.hasClass('documentTips')) {
-                  activeThumbnailFrame = new pym.Parent(
-                      customId,
-                      src
-                  );
-                  activeThumbnailFrame.iframe.setAttribute(
-                      'allowfullscreen',
-                      ''
-                  );
-              }
+                var options_container = $('.options', container);
+                options_container.empty().append(data.options_html);
 
-              // $('.lightbox_container', container).empty()
-              //     .append(data.preview + data.selector_html + data.note_html);
+                let customId = 'phraseanet-embed-lightbox-frame';
+                let $template = $(data.preview);
+                $template.attr('id', customId);
+                let src = $template.attr('data-src');
 
-              _display_basket_element(compare, sselcont_id);
+                $('.lightbox_container', container)
+                    .empty()
+                    .append($template.get(0));
 
+                if ($template.hasClass('documentTips')) {
+                    activeThumbnailFrame = new pym.Parent(customId, src);
+                    activeThumbnailFrame.iframe.setAttribute(
+                        'allowfullscreen',
+                        ''
+                    );
+                }
 
-              return;
-          }
-      });
+                // $('.lightbox_container', container).empty()
+                //     .append(data.preview + data.selector_html + data.note_html);
+
+                _display_basket_element(compare, sselcont_id);
+
+                return;
+            }
+        });
     }
 
     function _display_basket_element(compare, sselcont_id) {
@@ -366,19 +374,20 @@ const lightbox = (services) => {
 
         $('.download_button', options_container).bind('click', function () {
             //		$(this).blur();
-            downloadService.openModal($(this).next('form[name=download_form]').find('input').val())
+            downloadService.openModal(
+                $(this).next('form[name=download_form]').find('input').val()
+            );
             // _download($(this).next('form[name=download_form]').find('input').val());
         });
 
         $('.comment_button', options_container).bind('click', function () {
-                //				$(this).blur();
-                if ($('.lightbox_container', container).hasClass('note_editing')) {
-                    _hideNotes(container);
-                } else {
-                    _showNotes(container);
-                }
+            //				$(this).blur();
+            if ($('.lightbox_container', container).hasClass('note_editing')) {
+                _hideNotes(container);
+            } else {
+                _showNotes(container);
             }
-        );
+        });
         _activateNotes(container);
 
         $('.previous_button', options_container).bind('click', function () {
@@ -397,9 +406,23 @@ const lightbox = (services) => {
         });
 
         if ($(document).data('slideshow')) {
-            $('.play_button, .next_button.play, .previous_button.play', options_container).hide();
+            $(
+                '.play_button, .next_button.play, .previous_button.play',
+                options_container
+            ).hide();
+            $(
+                '.pause_button, .next_button.pause, .previous_button.pause',
+                options_container
+            ).show();
         } else {
-            $('.pause_button, .next_button.pause, .previous_button.pause', options_container).hide();
+            $(
+                '.play_button, .next_button.play, .previous_button.play',
+                options_container
+            ).show();
+            $(
+                '.pause_button, .next_button.pause, .previous_button.pause',
+                options_container
+            ).hide();
         }
 
         $('.next_button', options_container).bind('click', function () {
@@ -408,26 +431,20 @@ const lightbox = (services) => {
             _getNext();
         });
 
-
         $('.lightbox_container', container).bind('dblclick', function (event) {
             _displayRecord();
         });
 
-
         $('#record_wrapper .agree_' + sselcont_id + ', .big_box.agree')
-            .bind('click',
-                function (event) {
-                    _setAgreement(event, $(this), sselcont_id, 1);
-                }
-            )
+            .bind('click', function (event) {
+                _setAgreement(event, $(this), sselcont_id, 1);
+            })
             .addClass('clickable');
 
         $('#record_wrapper .disagree_' + sselcont_id + ', .big_box.disagree')
-            .bind('click',
-                function (event) {
-                    _setAgreement(event, $(this), sselcont_id, -1);
-                }
-            )
+            .bind('click', function (event) {
+                _setAgreement(event, $(this), sselcont_id, -1);
+            })
             .addClass('clickable');
 
         if (compare === $('#record_wrapper').hasClass('single')) {
@@ -448,15 +465,15 @@ const lightbox = (services) => {
                 $('#right_column').show();
                 $('#record_compare .lightbox_container').empty();
             }
-
         } else {
             _displayRecord(compare);
         }
-
     }
 
     function _getPrev() {
-        var current_wrapper = $('#sc_container .basket_element.selected').parent().parent();
+        var current_wrapper = $('#sc_container .basket_element.selected')
+            .parent()
+            .parent();
 
         if (current_wrapper.length === 0) {
             return;
@@ -475,7 +492,9 @@ const lightbox = (services) => {
     }
 
     function _getNext() {
-        var current_wrapper = $('#sc_container .basket_element.selected').parent().parent();
+        var current_wrapper = $('#sc_container .basket_element.selected')
+            .parent()
+            .parent();
 
         if (current_wrapper.length === 0) {
             return;
@@ -511,12 +530,24 @@ const lightbox = (services) => {
         var headers = $('#record_wrapper .header');
 
         if (boolean_value) {
-            $('.play_button, .next_button.play, .previous_button.play', headers).hide();
-            $('.pause_button, .next_button.pause, .previous_button.pause', headers).show();
+            $(
+                '.play_button, .next_button.play, .previous_button.play',
+                headers
+            ).hide();
+            $(
+                '.pause_button, .next_button.pause, .previous_button.pause',
+                headers
+            ).show();
             _getNext();
         } else {
-            $('.pause_button, .next_button.pause, .previous_button.pause', headers).hide();
-            $('.play_button, .next_button.play, .previous_button.play', headers).show();
+            $(
+                '.pause_button, .next_button.pause, .previous_button.pause',
+                headers
+            ).hide();
+            $(
+                '.play_button, .next_button.play, .previous_button.play',
+                headers
+            ).show();
         }
     }
 
@@ -528,13 +559,15 @@ const lightbox = (services) => {
         var sc_wrapper = $('#sc_wrapper');
         var el_parent = $(el).parent();
 
-        var sc_left = el_parent.position().left + el_parent.outerWidth() / 2 - sc_wrapper.width() / 2;
+        var sc_left =
+            el_parent.position().left +
+            el_parent.outerWidth() / 2 -
+            sc_wrapper.width() / 2;
 
         sc_wrapper.stop().animate({
             scrollLeft: sc_left
         });
     }
-
 
     function _setAgreement(event, el, sselcont_id, agreeValue) {
         if (event.stopPropagation) {
@@ -542,38 +575,48 @@ const lightbox = (services) => {
         }
         event.cancelBubble = true;
 
-        var id =
-
-            $.ajax({
-                type: 'POST',
-                url: '/lightbox/ajax/SET_ELEMENT_AGREEMENT/' + sselcont_id + '/',
-                dataType: 'json',
-                data: {
-                    agreement: agreeValue
-                },
-                success: function (datas) {
-                    if (!datas.error) {
-                        if (agreeValue === 1) {
-                            $('.agree_' + sselcont_id + '').removeClass('not_decided');
-                            $('.disagree_' + sselcont_id + '').addClass('not_decided');
-                            $('.userchoice.me').addClass('agree').removeClass('disagree');
-                        } else {
-                            $('.agree_' + sselcont_id + '').addClass('not_decided');
-                            $('.disagree_' + sselcont_id + '').removeClass('not_decided');
-                            $('.userchoice.me').addClass('disagree').removeClass('agree');
-                        }
-                        _releasable = datas.releasable;
-                        if (datas.releasable !== false) {
-                            if (confirm(datas.releasable)) {
-                                $('#basket_options .confirm_report').trigger('click');
-                            }
-                        }
+        var id = $.ajax({
+            type: 'POST',
+            url: '/lightbox/ajax/SET_ELEMENT_AGREEMENT/' + sselcont_id + '/',
+            dataType: 'json',
+            data: {
+                agreement: agreeValue
+            },
+            success: function (datas) {
+                if (!datas.error) {
+                    if (agreeValue === 1) {
+                        $('.agree_' + sselcont_id + '').removeClass(
+                            'not_decided'
+                        );
+                        $('.disagree_' + sselcont_id + '').addClass(
+                            'not_decided'
+                        );
+                        $('.userchoice.me')
+                            .addClass('agree')
+                            .removeClass('disagree');
                     } else {
-                        alert(datas.datas);
+                        $('.agree_' + sselcont_id + '').addClass('not_decided');
+                        $('.disagree_' + sselcont_id + '').removeClass(
+                            'not_decided'
+                        );
+                        $('.userchoice.me')
+                            .addClass('disagree')
+                            .removeClass('agree');
                     }
-                    return;
+                    _releasable = datas.releasable;
+                    if (datas.releasable !== false) {
+                        if (confirm(datas.releasable)) {
+                            $('#basket_options .confirm_report').trigger(
+                                'click'
+                            );
+                        }
+                    }
+                } else {
+                    alert(datas.datas);
                 }
-            });
+                return;
+            }
+        });
     }
 
     function _displayRecord(compare) {
@@ -589,10 +632,22 @@ const lightbox = (services) => {
         var main_record = $('.lightbox_container .record', main_box);
         var compare_record = $('.lightbox_container .record', compare_box);
 
-        var main_record_width = parseInt($('input[name=width]', main_box).val(), 10);
-        var main_record_height = parseInt($('input[name=height]', main_box).val(), 10);
-        var compare_record_width = parseInt($('input[name=width]', compare_box).val(), 10);
-        var compare_record_height = parseInt($('input[name=height]', compare_box).val(), 10);
+        var main_record_width = parseInt(
+            $('input[name=width]', main_box).val(),
+            10
+        );
+        var main_record_height = parseInt(
+            $('input[name=height]', main_box).val(),
+            10
+        );
+        var compare_record_width = parseInt(
+            $('input[name=width]', compare_box).val(),
+            10
+        );
+        var compare_record_height = parseInt(
+            $('input[name=height]', compare_box).val(),
+            10
+        );
 
         var main_container_width = main_container.width();
         var main_container_innerwidth = main_container.innerWidth();
@@ -604,36 +659,55 @@ const lightbox = (services) => {
             main_container.addClass('comparison');
 
             var double_portrait_width = main_container_innerwidth / 2;
-            var double_portrait_height = main_container_innerheight - $('.header', main_box).outerHeight();
+            var double_portrait_height =
+                main_container_innerheight -
+                $('.header', main_box).outerHeight();
 
             var double_paysage_width = main_container_innerwidth;
-            var double_paysage_height = main_container_innerheight / 2 - $('.header', main_box).outerHeight();
+            var double_paysage_height =
+                main_container_innerheight / 2 -
+                $('.header', main_box).outerHeight();
 
             var main_display_portrait = _calculateDisplay(
-                double_portrait_width, double_portrait_height,
-                main_record_width, main_record_height
+                double_portrait_width,
+                double_portrait_height,
+                main_record_width,
+                main_record_height
             );
             var main_display_paysage = _calculateDisplay(
-                double_paysage_width, double_paysage_height,
-                main_record_width, main_record_height
+                double_paysage_width,
+                double_paysage_height,
+                main_record_width,
+                main_record_height
             );
 
             var compare_display_portrait = _calculateDisplay(
-                double_portrait_width, double_portrait_height,
-                compare_record_width, compare_record_height
+                double_portrait_width,
+                double_portrait_height,
+                compare_record_width,
+                compare_record_height
             );
             var compare_display_paysage = _calculateDisplay(
-                double_paysage_width, double_paysage_height,
-                compare_record_width, compare_record_height
+                double_paysage_width,
+                double_paysage_height,
+                compare_record_width,
+                compare_record_height
             );
 
-            var surface_main_portrait = main_display_portrait.width * main_display_portrait.height;
-            var surface_main_paysage = main_display_paysage.width * main_display_paysage.height;
-            var surface_compare_portrait = compare_display_portrait.width * compare_display_portrait.height;
-            var surface_compare_paysage = compare_display_paysage.width * compare_display_paysage.height;
+            var surface_main_portrait =
+                main_display_portrait.width * main_display_portrait.height;
+            var surface_main_paysage =
+                main_display_paysage.width * main_display_paysage.height;
+            var surface_compare_portrait =
+                compare_display_portrait.width *
+                compare_display_portrait.height;
+            var surface_compare_paysage =
+                compare_display_paysage.width * compare_display_paysage.height;
 
-            var double_portrait_surface = (surface_main_portrait + surface_compare_portrait) / 2;
-            var double_paysage_surface = (surface_main_paysage + surface_compare_paysage) / 2;
+            var double_portrait_surface =
+                (surface_main_portrait + surface_compare_portrait) / 2;
+            var double_paysage_surface =
+                (surface_main_paysage + surface_compare_paysage) / 2;
 
             var m_width_image;
             var m_height_image;
@@ -645,27 +719,18 @@ const lightbox = (services) => {
                 if (!main_container.hasClass('portrait')) {
                     smooth_image = true;
 
-                    _smoothTransform(
-                        main_box,
-                        '50%',
-                        '100%',
-                        function () {
-                            _setContainerStatus('portrait');
-                        }
-                    );
+                    _smoothTransform(main_box, '50%', '100%', function () {
+                        _setContainerStatus('portrait');
+                    });
 
                     compare_box.css('visibility', 'hidden');
 
-                    _smoothTransform(
-                        compare_box,
-                        '50%',
-                        '100%',
-                        function () {
-                            compare_box.css('display', 'none')
-                                .css('visibility', 'visible')
-                                .fadeIn();
-                        }
-                    );
+                    _smoothTransform(compare_box, '50%', '100%', function () {
+                        compare_box
+                            .css('display', 'none')
+                            .css('visibility', 'visible')
+                            .fadeIn();
+                    });
                 }
                 m_width_image = main_display_portrait.width;
                 m_height_image = main_display_portrait.height;
@@ -679,27 +744,18 @@ const lightbox = (services) => {
                 if (!main_container.hasClass('paysage')) {
                     smooth_image = true;
 
-                    _smoothTransform(
-                        main_box,
-                        '100%',
-                        '50%',
-                        function () {
-                            _setContainerStatus('paysage');
-                        }
-                    );
+                    _smoothTransform(main_box, '100%', '50%', function () {
+                        _setContainerStatus('paysage');
+                    });
 
                     compare_box.css('visibility', 'hidden');
 
-                    _smoothTransform(
-                        compare_box,
-                        '100%',
-                        '50%',
-                        function () {
-                            compare_box.css('display', 'none')
-                                .css('visibility', 'visible')
-                                .fadeIn();
-                        }
-                    );
+                    _smoothTransform(compare_box, '100%', '50%', function () {
+                        compare_box
+                            .css('display', 'none')
+                            .css('visibility', 'visible')
+                            .fadeIn();
+                    });
                 }
                 m_width_image = main_display_paysage.width;
                 m_height_image = main_display_paysage.height;
@@ -711,36 +767,68 @@ const lightbox = (services) => {
                 };
             }
 
-            var image_callback = _setImagePosition(false, compare_record, c_width_image, c_height_image, dim_container, function () {
-            });
-            _setImagePosition(smooth_image, main_record, m_width_image, m_height_image, dim_container, image_callback);
+            var image_callback = _setImagePosition(
+                false,
+                compare_record,
+                c_width_image,
+                c_height_image,
+                dim_container,
+                function () {}
+            );
+            _setImagePosition(
+                smooth_image,
+                main_record,
+                m_width_image,
+                m_height_image,
+                dim_container,
+                image_callback
+            );
         } else {
             $('.agreement_selector').hide();
             main_container.removeClass('comparison');
 
             if (compare_box.is(':visible')) {
-                compare_box.hide().css('visibility', 'hidden').css('display', 'block');
+                compare_box
+                    .hide()
+                    .css('visibility', 'hidden')
+                    .css('display', 'block');
             }
 
             var main_display = _calculateDisplay(
-                main_container_innerwidth, (main_container_innerheight - $('.header', main_box).outerHeight()),
-                main_record_width, main_record_height
+                main_container_innerwidth,
+                main_container_innerheight -
+                    $('.header', main_box).outerHeight(),
+                main_record_width,
+                main_record_height
             );
 
             if (!main_container.hasClass('single')) {
-                main_box.width('100%')
-                    .height('100%');
+                main_box.width('100%').height('100%');
 
                 _setContainerStatus('single');
             }
-            _setImagePosition(smooth_image, main_record, main_display.width, main_display.height, {
-                width: main_container_width,
-                height: (main_container_height - $('.header', main_box).outerHeight())
-            });
+            _setImagePosition(
+                smooth_image,
+                main_record,
+                main_display.width,
+                main_display.height,
+                {
+                    width: main_container_width,
+                    height:
+                        main_container_height -
+                        $('.header', main_box).outerHeight()
+                }
+            );
         }
     }
 
-    function _calculateDisplay(display_width, display_height, width, height, margin) {
+    function _calculateDisplay(
+        display_width,
+        display_height,
+        width,
+        height,
+        margin
+    ) {
         if (typeof margin === 'undefined') {
             margin = 10;
         }
@@ -749,7 +837,7 @@ const lightbox = (services) => {
         var ratio = width / height;
         var w;
         var h;
-// landscape
+        // landscape
         if (ratio > display_ratio) {
             w = display_width - 2 * margin;
             if (w > width) {
@@ -770,11 +858,8 @@ const lightbox = (services) => {
         };
     }
 
-
     function _setSizeable(container) {
-
         $(container).bind('mousewheel', function (event, delta) {
-
             if ($(this).hasClass('note_editing')) {
                 return;
             }
@@ -811,18 +896,30 @@ const lightbox = (services) => {
                 height = Math.round(o_height / 1.05);
             }
 
-            var top = Math.round((height / o_height) * (o_top - $(this).height() / 2) + $(this).height() / 2);
-            var left = Math.round((width / o_width) * (o_left - $(this).width() / 2) + $(this).width() / 2);
+            var top = Math.round(
+                height / o_height * (o_top - $(this).height() / 2) +
+                    $(this).height() / 2
+            );
+            var left = Math.round(
+                width / o_width * (o_left - $(this).width() / 2) +
+                    $(this).width() / 2
+            );
 
             record.width(width).height(height).css({
                 top: top,
                 left: left
             });
         });
-
     }
 
-    function _setImagePosition(smooth, image, width, height, container, callback) {
+    function _setImagePosition(
+        smooth,
+        image,
+        width,
+        height,
+        container,
+        callback
+    ) {
         var dimensions = {};
 
         if (typeof container !== 'undefined') {
@@ -833,8 +930,7 @@ const lightbox = (services) => {
             dimensions.left = parseInt((c_width - width) / 2, 10);
         }
         if (typeof callback === 'undefined') {
-            callback = function () {
-            };
+            callback = function () {};
         }
 
         dimensions.width = width;
@@ -865,23 +961,23 @@ const lightbox = (services) => {
 
     function _smoothTransform(box, width, height, callback) {
         if (typeof callback === 'undefined') {
-            callback = function () {
-            };
+            callback = function () {};
         }
 
-        $(box).stop()
-            .animate(
-                {
-                    width: width,
-                    height: height
-                },
-                500,
-                callback
-            );
+        $(box).stop().animate(
+            {
+                width: width,
+                height: height
+            },
+            500,
+            callback
+        );
     }
 
     function _setContainerStatus(status) {
-        $('#record_wrapper').removeClass('paysage portrait single').addClass(status);
+        $('#record_wrapper')
+            .removeClass('paysage portrait single')
+            .addClass(status);
     }
 
     function _isViewable(el) {
@@ -922,29 +1018,29 @@ const lightbox = (services) => {
                 return;
             }
         });
-
     }
 
     function _activateNotes(container) {
-        $('.note_closer', container).button({
-            text: true
-        }).bind('click', function () {
+        $('.note_closer', container)
+            .button({
+                text: true
+            })
+            .bind('click', function () {
                 $(this).blur();
                 _hideNotes(container);
                 return false;
-            }
-        );
+            });
 
-        $('.note_saver', container).button({
-            text: true
-        }).bind('click', function () {
+        $('.note_saver', container)
+            .button({
+                text: true
+            })
+            .bind('click', function () {
                 $(this).blur();
                 _saveNote(container, this);
                 return false;
-            }
-        );
+            });
     }
-
 
     function _showNotes(container) {
         $('.notes_wrapper', container).animate({
@@ -997,7 +1093,7 @@ const lightbox = (services) => {
     return {
         initialize,
         setReleasable
-    }
+    };
 };
 
 export default lightbox;
