@@ -38,10 +38,13 @@ const preview = services => {
         }
 
         var h = parseInt(
-            $('input[name=height]', $container.parent()).val(),
+            $($container.children()).attr('data-original-height'),
             10
         );
-        var w = parseInt($('input[name=width]', $container.parent()).val(), 10);
+        var w = parseInt(
+            $($container.children()).attr('data-original-width'),
+            10
+        );
 
         var t = 0;
         var de = 0;

@@ -349,11 +349,15 @@ const previewRecordService = services => {
 
                 options.current = {};
                 options.current.width = parseInt(
-                    $('#PREVIEWIMGCONT input[name=width]').val(),
+                    $('#PREVIEWIMGCONT .thumb_wrapper')
+                        .children()
+                        .attr('data-original-width'),
                     10
                 );
                 options.current.height = parseInt(
-                    $('#PREVIEWIMGCONT input[name=height]').val(),
+                    $('#PREVIEWIMGCONT .thumb_wrapper')
+                        .children()
+                        .attr('data-original-height'),
                     10
                 );
                 options.current.tot = data.tot;
