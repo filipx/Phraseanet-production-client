@@ -98,9 +98,7 @@ const order = services => {
                 $('#filter-text').text(dateSelectionText);
                 $('.reset-btn').show();
             } else {
-                $('#filter-text').text(
-                    "{{ 'order-manager::order-list: no-filter' | trans }}"
-                );
+                $('#filter-text').text(window.orderData.noFilterText);
                 info.limit = null;
             }
             info.todo = tabSelection;
@@ -239,7 +237,8 @@ const order = services => {
     };
 
     return {
-        initialize
+        initialize,
+        orderModal
     };
 };
 

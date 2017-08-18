@@ -344,7 +344,7 @@ span.ww_winTitle {
     margin: 10px;
 }
 
-#order_manager .order_list li {
+#order_manager .order_list .table-order li {
     display: inline-block;
     border-radius: $defaultBorderRadius;
     border: 1px solid #ffffff;
@@ -361,7 +361,12 @@ span.ww_winTitle {
     border: 1px solid #4990e2;
 }
 
-#order_manager .order_list .selectable {
+#order_manager .order_list .clicked {
+    background-color: $btnBackgroundHighlight;
+    border: 1px solid #4990e2;
+}
+
+#order_manager .order_list .order_row {
     cursor: pointer;
 }
 
