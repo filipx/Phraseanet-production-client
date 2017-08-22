@@ -9,8 +9,8 @@ require('phraseanet-common/src/components/vendors/contextMenu');
 
 import searchForm from './searchForm';
 
-const search = (services) => {
-    const {configService, localeService, appEvents} = services;
+const search = services => {
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     let searchPromise = {};
     let searchResult = {
@@ -27,8 +27,10 @@ const search = (services) => {
     let $searchResult = null;
     let answAjaxrunning = false;
     let resultInfoView;
-    const initialize = () => {
+    let filterFacet = false;
+    let facets = null;
 
+    const initialize = () => {
         $searchForm = $('#searchForm');
         searchForm(services).initialize({
             $container: $searchForm
@@ -53,24 +55,30 @@ const search = (services) => {
             callbackSelection: function (element) {
                 var elements = $(element).attr('id').split('_');
 
-                return elements.slice(elements.length - 2, elements.length).join('_');
+                return elements
+                    .slice(elements.length - 2, elements.length)
+                    .join('_');
             }
         });
         // map events to result selection:
         appEvents.listenAll({
-            'search.selection.selectAll': () => searchResult.selection.selectAll(),
-            'search.selection.unselectAll': () => searchResult.selection.empty(),
-            'search.selection.selectByType': (dataType) => searchResult.selection.select(dataType.type),
-            'search.selection.remove': (data) => searchResult.selection.remove(data.records)
+            'search.selection.selectAll': () =>
+                searchResult.selection.selectAll(),
+            'search.selection.unselectAll': () =>
+                searchResult.selection.empty(),
+            'search.selection.selectByType': dataType =>
+                searchResult.selection.select(dataType.type),
+            'search.selection.remove': data =>
+                searchResult.selection.remove(data.records)
         });
 
         $searchResult
-            .on('click', '.search-navigate-action', (event) => {
+            .on('click', '.search-navigate-action', event => {
                 event.preventDefault();
                 let $el = $(event.currentTarget);
                 navigate($el.data('page'));
             })
-            .on('keypress', '.search-navigate-input-action', (event) => {
+            .on('keypress', '.search-navigate-input-action', event => {
                 // event.preventDefault();
                 let $el = $(event.currentTarget);
                 let inputPage = $el.val();
@@ -95,8 +103,7 @@ const search = (services) => {
     const getResultNavigationStream = () => resultNavigationStream; //Rx.Observable.ofObjectChanges(searchResult.navigation);
     //const getResultNavigationStream = () => Rx.Observable.ofObjectChanges(searchResult.navigation);
 
-    const newSearch = (query) => {
-
+    const newSearch = query => {
         searchResult.selection.empty();
 
         clearAnswers();
@@ -141,17 +148,28 @@ const search = (services) => {
                 $('#answers').removeClass('loading');
             },
             success: function (datas) {
-
-                $searchResult.empty().append(datas.results).removeClass('loading');
+                $searchResult
+                    .empty()
+                    .append(datas.results)
+                    .removeClass('loading');
 
                 $('img.lazyload', $searchResult).lazyload({
                     container: $('#answers')
                 });
-                appEvents.emit('facets.doLoadFacets', datas.facets);
+                appEvents.emit('facets.doLoadFacets', {
+                    facets: datas.facets,
+                    filterFacet: filterFacet
+                });
+                facets = datas.facets;
 
-                $searchResult.append('<div id="paginate"><div class="navigation"><div id="tool_navigate"></div></div></div>');
+                $searchResult.append(
+                    '<div id="paginate"><div class="navigation"><div id="tool_navigate"></div></div></div>'
+                );
 
-                resultInfoView.render(datas.infos, searchResult.selection.length())
+                resultInfoView.render(
+                    datas.infos,
+                    searchResult.selection.length()
+                );
 
                 $('#tool_navigate').empty().append(datas.navigationTpl);
 
@@ -160,11 +178,15 @@ const search = (services) => {
                     $('#IMGT_' + el).addClass('selected');
                 });
 
-                searchResult.navigation = merge(searchResult.navigation, datas.navigation, {
-                    tot: datas.total_answers,
-                    tot_options: datas.form,
-                    tot_query: datas.query
-                });
+                searchResult.navigation = merge(
+                    searchResult.navigation,
+                    datas.navigation,
+                    {
+                        tot: datas.total_answers,
+                        tot_options: datas.form,
+                        tot_query: datas.query
+                    }
+                );
                 resultNavigationStream.onNext(searchResult.navigation);
 
                 if (datas.next_page) {
@@ -208,8 +230,12 @@ const search = (services) => {
         }
 
         $.each($('.contextMenuTrigger', $searchResult), function () {
-
-            var id = $(this).closest('.IMGT').attr('id').split('_').slice(1, 3).join('_');
+            var id = $(this)
+                .closest('.IMGT')
+                .attr('id')
+                .split('_')
+                .slice(1, 3)
+                .join('_');
 
             $(this).contextMenu('#IMGT_' + id + ' .answercontextmenu', {
                 appendTo: '#answercontextwrap',
@@ -248,7 +274,11 @@ const search = (services) => {
         );
         $('div.IMGT', $searchResult).draggable({
             helper: function () {
-                $('body').append('<div id="dragDropCursor" style="position:absolute;z-index:9999;background:red;-moz-border-radius:8px;-webkit-border-radius:8px;"><div style="padding:2px 5px;font-weight:bold;">' + searchResult.selection.length() + '</div></div>');
+                $('body').append(
+                    '<div id="dragDropCursor" style="position:absolute;z-index:9999;background:red;-moz-border-radius:8px;-webkit-border-radius:8px;"><div style="padding:2px 5px;font-weight:bold;">' +
+                        searchResult.selection.length() +
+                        '</div></div>'
+                );
                 return $('#dragDropCursor');
             },
             scope: 'objects',
@@ -273,10 +303,16 @@ const search = (services) => {
         $($searchResult, '#dyn_tool').empty();
     };
 
-    const navigate = (page) => {
-        $('#searchForm input[name="sel"]').val(searchResult.selection.serialize());
+    const navigate = page => {
+        $('#searchForm input[name="sel"]').val(
+            searchResult.selection.serialize()
+        );
         $('#formAnswerPage').val(page);
         onRefreshSearchState();
+    };
+
+    const setFilterFacet = isEnabled => {
+        filterFacet = isEnabled;
     };
 
     appEvents.listenAll({
@@ -284,10 +320,11 @@ const search = (services) => {
         'search.doNewSearch': newSearch,
         'search.doAfterSearch': afterSearch,
         'search.doClearSearch': clearAnswers,
-        'search.doNavigate': navigate
+        'search.doNavigate': navigate,
+        'search.setFilterFacet': setFilterFacet
     });
 
-    return {initialize, getResultSelectionStream, getResultNavigationStream};
+    return { initialize, getResultSelectionStream, getResultNavigationStream };
 };
 
 export default search;
