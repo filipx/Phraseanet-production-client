@@ -4,7 +4,7 @@ import $ from 'jquery';
 require('jquery-ui');
 require('jquery.fancytree/src/jquery.fancytree');
 import * as _ from 'underscore';
-const workzoneFacets = (services) => {
+const workzoneFacets = services => {
     const { configService, localeService, appEvents } = services;
     let selectedFacetValues = [];
 
@@ -38,11 +38,17 @@ const workzoneFacets = (services) => {
             };
         });
 
-        treeSource.sort(_sortFacets('title', true, function (a) {
-            return a.toUpperCase();
-        }));
+        treeSource.sort(
+            _sortFacets('title', true, function (a) {
+                return a.toUpperCase();
+            })
+        );
 
-        treeSource = _sortByPredefinedFacets(treeSource, 'name', ['Base_Name', 'Collection_Name', 'Type_Name']);
+        treeSource = _sortByPredefinedFacets(treeSource, 'name', [
+            'Base_Name',
+            'Collection_Name',
+            'Type_Name'
+        ]);
 
         return _getFacetsTree().reload(treeSource);
     };
@@ -57,7 +63,7 @@ const workzoneFacets = (services) => {
         return function (a, b) {
             let A = key(a);
             let B = key(b);
-            return ((A < B) ? -1 : ((A > B) ? 1 : 0)) * [-1, 1][+!!reverse];
+            return (A < B ? -1 : A > B ? 1 : 0) * [-1, 1][+!!reverse];
         };
     }
 
@@ -92,7 +98,7 @@ const workzoneFacets = (services) => {
             $facetsTree.fancytree({
                 // activate and expand
                 clickFolderMode: 3,
-                icon: false,
+                icons: false,
                 source: [],
                 activate: function (event, data) {
                     var query = data.node.data.query;
@@ -104,8 +110,12 @@ const workzoneFacets = (services) => {
                 },
                 renderNode: function (event, data) {
                     var facetFilter = '';
-                    if (data.node.folder && !_.isUndefined(selectedFacetValues[data.node.title])) {
-                        facetFilter = selectedFacetValues[data.node.title].label;
+                    if (
+                        data.node.folder &&
+                        !_.isUndefined(selectedFacetValues[data.node.title])
+                    ) {
+                        facetFilter =
+                            selectedFacetValues[data.node.title].label;
 
                         var s_label = document.createElement('SPAN');
                         s_label.setAttribute('class', 'facetFilter-label');
@@ -114,16 +124,24 @@ const workzoneFacets = (services) => {
                         var length = 15;
                         var facetFilterString = facetFilter;
                         if (facetFilterString.length > length) {
-                            facetFilterString = facetFilterString.substring(0, length) + '…';
+                            facetFilterString =
+                                facetFilterString.substring(0, length) + '…';
                         }
-                        s_label.appendChild(document.createTextNode(facetFilterString));
+                        s_label.appendChild(
+                            document.createTextNode(facetFilterString)
+                        );
 
                         var s_closer = document.createElement('A');
                         s_closer.setAttribute('class', 'facetFilter-closer');
 
                         var s_gradient = document.createElement('SPAN');
-                        s_gradient.setAttribute('class', 'facetFilter-gradient');
-                        s_gradient.appendChild(document.createTextNode('\u00A0'));
+                        s_gradient.setAttribute(
+                            'class',
+                            'facetFilter-gradient'
+                        );
+                        s_gradient.appendChild(
+                            document.createTextNode('\u00A0')
+                        );
 
                         s_label.appendChild(s_gradient);
 
@@ -133,23 +151,18 @@ const workzoneFacets = (services) => {
                         s_closer = $(s_facet.appendChild(s_closer));
                         s_closer.data('facetTitle', data.node.title);
 
-                        s_closer.click(
-                            function (event) {
-                                event.stopPropagation();
-                                var facetTitle = $(this).data('facetTitle');
-                                delete selectedFacetValues[facetTitle];
-                                _facetCombinedSearch();
-                                return false;
-                            }
-                        );
+                        s_closer.click(function (event) {
+                            event.stopPropagation();
+                            var facetTitle = $(this).data('facetTitle');
+                            delete selectedFacetValues[facetTitle];
+                            _facetCombinedSearch();
+                            return false;
+                        });
 
-                        $('.fancytree-folder', data.node.li).append(
-                            $(s_facet)
-                        );
+                        $('.fancytree-folder', data.node.li).append($(s_facet));
                     }
                 }
             });
-
         }
         return $facetsTree.fancytree('getTree');
     }
@@ -181,7 +194,6 @@ const workzoneFacets = (services) => {
         loadFacets,
         resetSelectedFacets
     };
-
 };
 
 export default workzoneFacets;

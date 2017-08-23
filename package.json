@@ -132,7 +132,7 @@
         "jquery-lazyload": "^1.9.7",
         "jquery-treeview": "https://github.com/alchemy-fr/jquery-treeview.git",
         "jquery-ui": "~1.10",
-        "jquery.fancytree": "^2.23.0",
+        "jquery.fancytree": "~2.7",
         "leaflet": "^1.1.0",
         "leaflet-contextmenu": "^1.4.0",
         "leaflet-draw": "^0.4.10",
