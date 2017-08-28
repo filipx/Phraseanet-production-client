@@ -531,6 +531,11 @@ button.order_launcher.btn {
     border: 1px solid #4990e2;
 }
 
+.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
+
 .order_list {
     width: 40%;
     float: left;

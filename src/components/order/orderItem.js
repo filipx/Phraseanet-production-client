@@ -5,10 +5,10 @@ import order from './index';
 import _ from 'underscore';
 import pym from 'pym.js';
 
-const orderItem = (services) => {
+const orderItem = services => {
     const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
-    const openModal = (orderId) => {
+    const openModal = orderId => {
         let $dialog = dialog.create(services, {
             size: 'Full'
         });
@@ -25,125 +25,137 @@ const orderItem = (services) => {
         return true;
     };
 
-    const _onOrderItemReady = ($dialog) => {
-       let userInfoIsVisible = false;
-       let itemCount = 0;
-       let elementsForValidation = [];
-       let readyForValidation = false;
+    const _onOrderItemReady = $dialog => {
+        let userInfoIsVisible = false;
+        let itemCount = 0;
+        let elementsForValidation = [];
+        let readyForValidation = false;
 
-       const ELEMENT_TYPE = {
-           VALIDATED: 'validated',
-           DENIED: 'denied',
-           SELECTABLE: 'selectable',
-           SELECTED: 'selected',
-           WAITINGFORVALIDATION: 'waitingForValidation'
-       }
-       
-       let trs = $('.order_list .order_row', $dialog.getDomElement());
-       let lastSelectedRow;
-       ;
-       
+        const ELEMENT_TYPE = {
+            VALIDATED: 'validated',
+            DENIED: 'denied',
+            SELECTABLE: 'selectable',
+            SELECTED: 'selected',
+            WAITINGFORVALIDATION: 'waitingForValidation'
+        };
+
+        let trs = $('.order_list .order_row', $dialog.getDomElement());
+        let lastSelectedRow;
         if ($('#notification_box').is(':visible')) {
             $('#notification_trigger').trigger('mousedown');
         }
-        
-        $('.order_launcher', $dialog.getDomElement()).bind('click',function(){
-            if(readyForValidation) {
-                if(confirm(window.orderItemData.translatedText.message)) {
+
+        $('.order_launcher', $dialog.getDomElement()).bind('click', function () {
+            if (readyForValidation) {
+                if (confirm(window.orderItemData.translatedText.message)) {
                     order(services).orderModal(event);
                 }
-            }else {
+            } else {
                 order(services).orderModal(event);
             }
-
         });
-        
-        $('#email-btn', $dialog.getDomElement()).bind('click', function() {
-          let email = window.orderItemData.userEmail;
-          let subject = window.orderItemData.subject;
-          let body = window.orderItemData.body;
-          if(email != null) {
-              let link = "mailto:" + email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-              window.location.href = link;
 
-          }
+        $('#email-btn', $dialog.getDomElement()).bind('click', function () {
+            let email = window.orderItemData.userEmail;
+            let subject = window.orderItemData.subject;
+            let body = window.orderItemData.body;
+            if (email !== null) {
+                let link =
+                    'mailto:' +
+                    email +
+                    '?subject=' +
+                    encodeURIComponent(subject) +
+                    '&body=' +
+                    encodeURIComponent(body);
+                window.location.href = link;
+            }
         });
-        
-        $('input[name="select-all"]', $dialog.getDomElement()).bind('click', function() {
-          let checkboxElement = this;
-          itemCount = 0;
-          let selectable =[];
-          $('.table-order .order_row').each(function(){
-              let el = $(this);
-              if(checkboxElement.checked && el.hasClass(ELEMENT_TYPE.SELECTABLE)){
-                  el.addClass(ELEMENT_TYPE.SELECTED);
-                  itemCount++;
-                  selectable.push(el);
-              }else {
-                  el.removeClass(ELEMENT_TYPE.SELECTED);
-              }
-          });
-          //load preview for single item selected
-          if(selectable.length == 1) {
-              loadPreviewAndCaption(selectable[0]);
-          }
-          renderOrderDetailView(itemCount);
-        });
-        
-        $('.order_list .order_row', $dialog.getDomElement()).bind('click',function(event){
 
+        $(
+            'input[name="select-all"]',
+            $dialog.getDomElement()
+        ).bind('click', function () {
+            let checkboxElement = this;
+            itemCount = 0;
+            let selectable = [];
+            $('.table-order .order_row').each(function () {
+                let el = $(this);
+                if (
+                    checkboxElement.checked &&
+                    el.hasClass(ELEMENT_TYPE.SELECTABLE)
+                ) {
+                    el.addClass(ELEMENT_TYPE.SELECTED);
+                    itemCount++;
+                    selectable.push(el);
+                } else {
+                    el.removeClass(ELEMENT_TYPE.SELECTED);
+                }
+            });
+            //load preview for single item selected
+            if (selectable.length === 1) {
+                loadPreviewAndCaption(selectable[0]);
+            }
+            renderOrderDetailView(itemCount);
+        });
+
+        $(
+            '.order_list .order_row',
+            $dialog.getDomElement()
+        ).bind('click', function (event) {
             let $this = $(this);
 
             //disable select all checkbox if selected
-            if($('input[name="select-all"]').is(':checked')){
+            if ($('input[name="select-all"]').is(':checked')) {
                 $('input[name="select-all"]').prop('checked', false);
             }
 
-            if(appCommons.utilsModule.is_ctrl_key(event))
-            {
-                if(!$this.hasClass(ELEMENT_TYPE.SELECTABLE)) {
+            if (appCommons.utilsModule.is_ctrl_key(event)) {
+                if (!$this.hasClass(ELEMENT_TYPE.SELECTABLE)) {
                     return;
                 }
-                if($this.hasClass(ELEMENT_TYPE.SELECTED)) {
+                if ($this.hasClass(ELEMENT_TYPE.SELECTED)) {
                     $this.removeClass(ELEMENT_TYPE.SELECTED);
                     itemCount--;
                 } else {
                     $this.addClass(ELEMENT_TYPE.SELECTED);
                     itemCount++;
                 }
-
-            }
-            else if(appCommons.utilsModule.is_shift_key(event))
-            {
-                if(!$this.hasClass(ELEMENT_TYPE.SELECTABLE)) {
+            } else if (appCommons.utilsModule.is_shift_key(event)) {
+                if (!$this.hasClass(ELEMENT_TYPE.SELECTABLE)) {
                     return;
                 }
                 let currentIndex = $this.index('.order_list .order_row');
                 let prevIndex = lastSelectedRow.index('.order_list .order_row');
-                $('.order_list .selectable.selected', $dialog.getDomElement()).removeClass(ELEMENT_TYPE.SELECTED);
+                $(
+                    '.order_list .selectable.selected',
+                    $dialog.getDomElement()
+                ).removeClass(ELEMENT_TYPE.SELECTED);
                 itemCount = 0;
-                selectRowsBetweenIndexes([prevIndex, currentIndex])
-            }
-            else
-            {
-                $('.order_list .selectable.selected', $dialog.getDomElement()).removeClass(ELEMENT_TYPE.SELECTED);
-                if($this.hasClass(ELEMENT_TYPE.SELECTABLE)) {
+                selectRowsBetweenIndexes([prevIndex, currentIndex]);
+            } else {
+                $(
+                    '.order_list .selectable.selected',
+                    $dialog.getDomElement()
+                ).removeClass(ELEMENT_TYPE.SELECTED);
+                if ($this.hasClass(ELEMENT_TYPE.SELECTABLE)) {
                     $this.addClass(ELEMENT_TYPE.SELECTED);
                     lastSelectedRow = $this;
                 }
                 itemCount = 1;
             }
 
-            if(itemCount == 1) {
-                let selected = $('.order_list .selected', $dialog.getDomElement());
+            if (itemCount === 1) {
+                let selected = $(
+                    '.order_list .selected',
+                    $dialog.getDomElement()
+                );
                 loadPreviewAndCaption(selected);
             }
             renderOrderDetailView(itemCount);
         });
-        
-        
+
         function selectRowsBetweenIndexes(indexes) {
-            indexes.sort(function(a, b) {
+            indexes.sort(function (a, b) {
                 return a - b;
             });
             for (let i = indexes[0]; i <= indexes[1]; i++) {
@@ -154,57 +166,67 @@ const orderItem = (services) => {
             }
         }
 
-        $('.captionTips, .captionRolloverTips, .infoTips', $dialog.getDomElement()).tooltip({
-            delay:0
+        $(
+            '.captionTips, .captionRolloverTips, .infoTips',
+            $dialog.getDomElement()
+        ).tooltip({
+            delay: 0
         });
         $('.previewTips', $dialog.getDomElement()).tooltip({
-            fixable:true
+            fixable: true
         });
 
-        $('button.send', $dialog.getDomElement()).bind('click',function(){
+        $('button.send', $dialog.getDomElement()).bind('click', function () {
             updateValidation(ELEMENT_TYPE.VALIDATED);
             //send_documents(order_id);
         });
 
-        $('button.deny', $dialog.getDomElement()).bind('click',function(){
+        $('button.deny', $dialog.getDomElement()).bind('click', function () {
             updateValidation(ELEMENT_TYPE.DENIED);
             //deny_documents(order_id);
         });
 
-        $('.force_sender', $dialog.getDomElement()).bind('click',function(){
-            if(confirm(localeService.t('forceSendDocument')))
-            {
+        $('.force_sender', $dialog.getDomElement()).bind('click', function () {
+            if (confirm(localeService.t('forceSendDocument'))) {
                 //updateValidation('validated');
                 let element_id = [];
-                element_id.push($(this).closest('.order_row').find('input[name=order_element_id]').val());
+                element_id.push(
+                    $(this)
+                        .closest('.order_row')
+                        .find('input[name=order_element_id]')
+                        .val()
+                );
                 let order_id = $('input[name=order_id]').val();
                 do_send_documents(order_id, element_id, true);
             }
         });
-        
-        $('#userInfo').hover(function() {
-            let offset = $('#userInfo').position();
-            $('#userInfoPreview').css({
-                'left': (offset.left - $('#userInfoPreview').width()) + 48,
-                'top': (offset.top+$('#userInfo').height()) + 8
-            });
-            $('#userInfoPreview').show();
-        }, function() {
-            if(!userInfoIsVisible) {
-                $('#userInfoPreview').hide();
-            }
-        });
 
-        $('#userInfo').click(function() {
-            let offset = $('#userInfo').position();
-            if(!userInfoIsVisible) {
-                userInfoIsVisible = true;
+        $('#userInfo').hover(
+            function () {
+                let offset = $('#userInfo').position();
                 $('#userInfoPreview').css({
-                    'left': (offset.left - $('#userInfoPreview').width()) + 48,
-                    'top': (offset.top+$('#userInfo').height()) + 8
+                    left: offset.left - $('#userInfoPreview').width() + 48,
+                    top: offset.top + $('#userInfo').height() + 8
                 });
                 $('#userInfoPreview').show();
-            }else {
+            },
+            function () {
+                if (!userInfoIsVisible) {
+                    $('#userInfoPreview').hide();
+                }
+            }
+        );
+
+        $('#userInfo').click(function () {
+            let offset = $('#userInfo').position();
+            if (!userInfoIsVisible) {
+                userInfoIsVisible = true;
+                $('#userInfoPreview').css({
+                    left: offset.left - $('#userInfoPreview').width() + 48,
+                    top: offset.top + $('#userInfo').height() + 8
+                });
+                $('#userInfoPreview').show();
+            } else {
                 userInfoIsVisible = false;
                 $('#userInfoPreview').hide();
             }
@@ -212,65 +234,89 @@ const orderItem = (services) => {
 
         let minimized_elements = $('.minimize');
 
-        $('.minimize').each(function() {
+        $('.minimize').each(function () {
             let t = $(this).text();
             if (t.length < 60) return;
 
             $(this).html(
-                t.slice(0, 60) + '<span>... </span><a href="#" class="more">' + window.orderItemData.translatedText.moreText + '</a>' +
-                '<span style="display:none;">' + t.slice(60, t.length) + ' <a href="#" class="less">' + window.orderItemData.translatedText.lessText + '</a></span>'
+                t.slice(0, 60) +
+                    '<span>... </span><a href="#" class="more">' +
+                    window.orderItemData.translatedText.moreText +
+                    '</a>' +
+                    '<span style="display:none;">' +
+                    t.slice(60, t.length) +
+                    ' <a href="#" class="less">' +
+                    window.orderItemData.translatedText.lessText +
+                    '</a></span>'
             );
-
         });
 
-
-        $('a.more', minimized_elements).click(function(event){
+        $('a.more', minimized_elements).click(function (event) {
             event.preventDefault();
             $(this).hide().prev().hide();
             $(this).next().show();
         });
 
-        $('a.less', minimized_elements).click(function(event) {
+        $('a.less', minimized_elements).click(function (event) {
             event.preventDefault();
             $(this).parent().hide().prev().show().prev().show();
         });
 
-        $('button.validate', $dialog.getDomElement()).bind('click',function(event){
-            openValidationDialog(this,event);
+        $('button.validate', $dialog.getDomElement()).bind('click', function (
+            event
+        ) {
+            openValidationDialog(this, event);
             return false;
         });
 
-        $('.basket-btn').click(function(event) {
+        $('.basket-btn').click(function (event) {
+            let titleCreate = window.orderItemData.translatedText.createTitle;
             let type = $(this).attr('type');
-            let $innerDialog = $("#basket-window").dialog({
-                open: function (event, ui) {
-                    $('.ui-dialog').css('z-index', 100000);
-                    $(".ui-widget-overlay").css('z-index', 100000);
-                },
-                closeOnEscape: true,
-                width: 450,
-                height: 300,
-                modal: true,
-                draggable: false,
-                stack: false,
-                title: window.orderItemData.translatedText.dialogTitle,
-                overlay: {
-                    backgroundColor: '#000',
-                    opacity: 0.7
-                },
-                buttons: {
-                    'create': function () {
-                        //create basket
-                        createBasket($innerDialog);
-                        $(this).dialog('close');
-                    }
-                }
-            }).dialog('open');
+            var dialog_buttons = {};
+            dialog_buttons[titleCreate] = function () {
+                createBasket($innerDialog);
+                $(this).dialog('close');
+            };
+            let $innerDialog = $('#basket-window')
+                .dialog({
+                    open: function (event, ui) {
+                        $('.ui-dialog').css('z-index', 100000);
+                        $('.ui-widget-overlay').css('z-index', 100000);
+                    },
+                    closeOnEscape: true,
+                    width: 450,
+                    height: 300,
+                    modal: true,
+                    draggable: false,
+                    stack: false,
+                    title: window.orderItemData.translatedText.dialogTitle,
+                    overlay: {
+                        backgroundColor: '#000',
+                        opacity: 0.7
+                    },
+                    buttons: dialog_buttons
+                })
+                .dialog('open');
             populateBasketDialog($innerDialog, type);
             return false;
         });
-        
-        
+
+        $('#myDropdown').on('click', function () {
+            if ($('#myDropdown').hasClass('open')) {
+                return;
+            }
+            if (
+                $('.order_list .selected', $dialog.getDomElement()).length > 0
+            ) {
+                $('li[type="selected"]').removeClass('disabled');
+            } else {
+                //no selected item
+                if (!$('li[type="selected"]').hasClass('disabled')) {
+                    $('li[type="selected"]').addClass('disabled');
+                }
+            }
+        });
+
         function createBasket($innerDialog) {
             let $form = $('form', $innerDialog);
             let dialog = $innerDialog.closest('.ui-dialog');
@@ -281,19 +327,29 @@ const orderItem = (services) => {
                 url: $form.attr('action'),
                 data: $form.serializeArray(),
                 dataType: 'json',
-                beforeSend:function(){
-                    $(":button:contains('" + language.create + "')", buttonPanel)
-                        .attr("disabled", true).addClass("ui-state-disabled");
+                beforeSend: function () {
+                    $(
+                        ":button:contains('" + localeService.t('create') + "')",
+                        buttonPanel
+                    )
+                        .attr('disabled', true)
+                        .addClass('ui-state-disabled');
                 },
-                success: function(data){
+                success: function (data) {
                     let order_id = $('input[name=order_id]').val();
                     let success = '0';
-                    if(data.success)
-                    {
+                    if (data.success) {
                         success = '1';
                     }
-                    
-                    var url = '../prod/order/' + order_id + '/?success=' + success + '&action=basket' + '&message=' + encodeURIComponent(data.message);
+
+                    var url =
+                        '../prod/order/' +
+                        order_id +
+                        '/?success=' +
+                        success +
+                        '&action=basket' +
+                        '&message=' +
+                        encodeURIComponent(data.message);
                     reloadDialog(url);
                     appEvents.emit('workzone.refresh');
                 }
@@ -305,29 +361,35 @@ const orderItem = (services) => {
             let orderDialog = $innerDialog;
             //set checkbox to true and disable it
             $('input[name="lst"]', orderDialog).prop('checked', true);
-            $('.checkbox', orderDialog).css("visibility","hidden");
+            $('.checkbox', orderDialog).css('visibility', 'hidden');
             //set default name
             let name = window.orderItemData.translatedText.defaultBasketTitle;
             $('input[name="name"]', orderDialog).val(name);
-            let description = '';
+            let description = window.orderItemData.description;
             let elements_ids = [];
-            switch (type){
+            switch (type) {
                 case 'denied':
-                    description = window.orderItemData.translatedText.rejected;
-                    $('.order_list .order_row.' + type, $dialog.getDomElement()).each(function(i,n) {
+                    $(
+                        '.order_list .order_row.' + type,
+                        $dialog.getDomElement()
+                    ).each(function (i, n) {
                         elements_ids.push($(n).attr('elementids'));
                     });
                     break;
                 case 'validated':
-                    description = window.orderItemData.translatedText.accepted;
-                    $('.order_list .order_row.' + type, $dialog.getDomElement()).each(function(i,n) {
+                    $(
+                        '.order_list .order_row.' + type,
+                        $dialog.getDomElement()
+                    ).each(function (i, n) {
                         elements_ids.push($(n).attr('elementids'));
                     });
                     break;
-                default :
+                default:
                     //selected elements;
-                    description = window.orderItemData.translatedText.selected;
-                    $('.order_list .order_row.' + type, $dialog.getDomElement()).each(function(i,n) {
+                    $(
+                        '.order_list .order_row.' + type,
+                        $dialog.getDomElement()
+                    ).each(function (i, n) {
                         elements_ids.push($(n).attr('elementids'));
                     });
             }
@@ -336,116 +398,168 @@ const orderItem = (services) => {
         }
 
         function openValidationDialog(el, event) {
-            $("#validation-window").dialog({
-                open: function (event, ui) {
-                    $('.ui-dialog').css('z-index', 100000);
-                    $(".ui-widget-overlay").css('z-index', 100000);
-                },
-                closeOnEscape: true,
-                resizable: false,
-                width: 450,
-                height: 500,
-                modal: true,
-                draggable: false,
-                stack: false,
-                title: window.orderItemData.translatedText.validation,
-                buttons: {
-                    'submit': function() {
-                        //submit documents
-                        submitDocuments($(this));
-                    },
-                    'reset': function() {
-                        if(confirm(window.orderItemData.translatedText.message)) {
-                            resetValidation();
-                            toggleValidationButton();
-                            $(this).dialog("close");
-                        }
-                    }
-                },
-                overlay: {
-                    backgroundColor: '#000',
-                    opacity: 0.7
+            let submitTitle = window.orderItemData.translatedText.submit;
+            let resetTitle = window.orderItemData.translatedText.reset;
+            var dialog_buttons = {};
+            dialog_buttons[submitTitle] = function () {
+                //submit documents
+                submitDocuments($(this));
+            };
+            dialog_buttons[resetTitle] = function () {
+                if (confirm(window.orderItemData.translatedText.message)) {
+                    resetValidation();
+                    toggleValidationButton();
+                    $(this).dialog('close');
                 }
-            }).dialog('open');
+            };
+            $('#validation-window')
+                .dialog({
+                    open: function (event, ui) {
+                        $('.ui-dialog').css('z-index', 100000);
+                        $('.ui-widget-overlay').css('z-index', 100000);
+                    },
+                    closeOnEscape: true,
+                    resizable: false,
+                    width: 450,
+                    height: 500,
+                    modal: true,
+                    draggable: false,
+                    stack: false,
+                    title: window.orderItemData.translatedText.validation,
+                    buttons: dialog_buttons,
+                    overlay: {
+                        backgroundColor: '#000',
+                        opacity: 0.7
+                    }
+                })
+                .dialog('open');
             createValidationTable();
         }
 
         function submitDocuments(dialogElem) {
             let order_id = $('input[name=order_id]').val();
-            let validatedArrayNoForceIds = _.filter(elementsForValidation, function(elem) {
-                return elem.newState === ELEMENT_TYPE.VALIDATED && elem.oldState !== ELEMENT_TYPE.DENIED;
-            }).map(function(elem) {
+            let validatedArrayNoForceIds = _.filter(
+                elementsForValidation,
+                function (elem) {
+                    return (
+                        elem.newState === ELEMENT_TYPE.VALIDATED &&
+                        elem.oldState !== ELEMENT_TYPE.DENIED
+                    );
+                }
+            ).map(function (elem) {
                 return elem.elementId;
             });
 
-            let validatedArrayWithForceIds = _.filter(elementsForValidation, function(elem) {
-                return elem.newState === ELEMENT_TYPE.VALIDATED && elem.oldState === ELEMENT_TYPE.DENIED;
-            }).map(function(elem) {
+            let validatedArrayWithForceIds = _.filter(
+                elementsForValidation,
+                function (elem) {
+                    return (
+                        elem.newState === ELEMENT_TYPE.VALIDATED &&
+                        elem.oldState === ELEMENT_TYPE.DENIED
+                    );
+                }
+            ).map(function (elem) {
                 return elem.elementId;
             });
 
-            let deniedArrayIds = _.filter(elementsForValidation, function(elem) {
+            let deniedArrayIds = _.filter(elementsForValidation, function (
+                elem
+            ) {
                 return elem.newState === ELEMENT_TYPE.DENIED;
-            }).map(function(elem) {
+            }).map(function (elem) {
                 return elem.elementId;
             });
 
-            if(validatedArrayNoForceIds.length > 0) {
+            if (validatedArrayNoForceIds.length > 0) {
                 do_send_documents(order_id, validatedArrayNoForceIds, false);
             }
-            if(validatedArrayWithForceIds.length > 0) {
+            if (validatedArrayWithForceIds.length > 0) {
                 do_send_documents(order_id, validatedArrayWithForceIds, true);
             }
-            if(deniedArrayIds.length > 0) {
+            if (deniedArrayIds.length > 0) {
                 do_deny_documents(order_id, deniedArrayIds);
             }
-            dialogElem.dialog("close");
+            dialogElem.dialog('close');
         }
 
         function createValidationTable() {
             $('.validation-content').empty();
-            let validatedArray = _.filter(elementsForValidation, function(elem) {
+            let validatedArray = _.filter(elementsForValidation, function (
+                elem
+            ) {
                 return elem.newState === ELEMENT_TYPE.VALIDATED;
             });
-            let deniedArray = _.filter(elementsForValidation, function(elem) {
+            let deniedArray = _.filter(elementsForValidation, function (elem) {
                 return elem.newState === ELEMENT_TYPE.DENIED;
             });
 
-            if(validatedArray.length > 0) {
+            if (validatedArray.length > 0) {
                 let html = '';
-                html += '<h5>' + window.orderItemData.translatedText.youHaveValidated + " " + validatedArray.length + " " + window.orderItemData.translatedText.item + (validatedArray.length == 1 ? "" : "s") + '</h5>';
+                html +=
+                    '<h5>' +
+                    window.orderItemData.translatedText.youHaveValidated +
+                    ' ' +
+                    validatedArray.length +
+                    ' ' +
+                    window.orderItemData.translatedText.item +
+                    (validatedArray.length === 1 ? '' : 's') +
+                    '</h5>';
                 html += '<table class="validation-table">';
-                _.each(validatedArray, function(elem) {
+                _.each(validatedArray, function (elem) {
                     html += '<tr>';
-                    html += '<td width="25%" align="center">' + elem.elementPreview[0].outerHTML + '</td>';
-                    html += '<td width="75%">' + elem.elementTitle[0].outerHTML + '</td>';
+                    html +=
+                        '<td width="25%" align="center">' +
+                        elem.elementPreview[0].outerHTML +
+                        '</td>';
+                    html +=
+                        '<td width="75%">' +
+                        elem.elementTitle[0].outerHTML +
+                        '</td>';
                     html += '</tr>';
                 });
                 html += '</table>';
                 $('.validation-content').append(html);
             }
 
-            if(deniedArray.length > 0) {
+            if (deniedArray.length > 0) {
                 let html = '';
-                html += '<h5>' + window.orderItemData.translatedText.youHaveDenied + " " + deniedArray.length + " " + window.orderItemData.translatedText.item + (deniedArray.length == 1 ? ""  : "s") + '</h5>';
+                html +=
+                    '<h5>' +
+                    window.orderItemData.translatedText.youHaveDenied +
+                    ' ' +
+                    deniedArray.length +
+                    ' ' +
+                    window.orderItemData.translatedText.item +
+                    (deniedArray.length === 1 ? '' : 's') +
+                    '</h5>';
                 html += '<table class="validation-table">';
-                _.each(deniedArray, function(elem) {
+                _.each(deniedArray, function (elem) {
                     html += '<tr>';
-                    html += '<td width="25%" align="center">' + elem.elementPreview[0].outerHTML + '</td>';
-                    html += '<td width="75%">' + elem.elementTitle[0].outerHTML + '</td>';
+                    html +=
+                        '<td width="25%" align="center">' +
+                        elem.elementPreview[0].outerHTML +
+                        '</td>';
+                    html +=
+                        '<td width="75%">' +
+                        elem.elementTitle[0].outerHTML +
+                        '</td>';
                     html += '</tr>';
                 });
                 html += '</table>';
                 $('.validation-content').append(html);
             }
-
         }
 
         function resetValidation() {
-            $('.order_list .order_row', $dialog.getDomElement()).each(function(i,n){
+            $('.order_list .order_row', $dialog.getDomElement()).each(function (
+                i,
+                n
+            ) {
                 let elementId = $(n).find('input[name=order_element_id]').val();
-                let found = _.where(elementsForValidation, {elementId: elementId});
-                if(found.length > 0) {
+                let found = _.where(elementsForValidation, {
+                    elementId: elementId
+                });
+                if (found.length > 0) {
                     $(n).removeClass(ELEMENT_TYPE.WAITINGFORVALIDATION);
                     //replace content or row with original content
                     $(n)[0].innerHTML = found[0].element[0].innerHTML;
@@ -459,15 +573,32 @@ const orderItem = (services) => {
 
         function updateValidation(newState) {
             let count = 0;
-            $('.order_list .order_row', $dialog.getDomElement()).each(function(i,n){
-                if($(n).hasClass(ELEMENT_TYPE.SELECTED) && !$(n).hasClass(ELEMENT_TYPE.VALIDATED) && !$(n).hasClass(ELEMENT_TYPE.DENIED)
-                    && !$(n).hasClass(ELEMENT_TYPE.WAITINGFORVALIDATION)){
-                    createItemForValidation($(n), ELEMENT_TYPE.SELECTABLE, newState);
+            $('.order_list .order_row', $dialog.getDomElement()).each(function (
+                i,
+                n
+            ) {
+                if (
+                    $(n).hasClass(ELEMENT_TYPE.SELECTED) &&
+                    !$(n).hasClass(ELEMENT_TYPE.VALIDATED) &&
+                    !$(n).hasClass(ELEMENT_TYPE.DENIED) &&
+                    !$(n).hasClass(ELEMENT_TYPE.WAITINGFORVALIDATION)
+                ) {
+                    createItemForValidation(
+                        $(n),
+                        ELEMENT_TYPE.SELECTABLE,
+                        newState
+                    );
                     count++;
-                }
-                else if($(n).hasClass(ELEMENT_TYPE.SELECTED) && !$(n).hasClass(ELEMENT_TYPE.VALIDATED)
-                    && !$(n).hasClass(ELEMENT_TYPE.WAITINGFORVALIDATION)){
-                    createItemForValidation($(n), ELEMENT_TYPE.DENIED, newState);
+                } else if (
+                    $(n).hasClass(ELEMENT_TYPE.SELECTED) &&
+                    !$(n).hasClass(ELEMENT_TYPE.VALIDATED) &&
+                    !$(n).hasClass(ELEMENT_TYPE.WAITINGFORVALIDATION)
+                ) {
+                    createItemForValidation(
+                        $(n),
+                        ELEMENT_TYPE.DENIED,
+                        newState
+                    );
                     count++;
                 }
                 $(n).removeClass(ELEMENT_TYPE.SELECTED);
@@ -476,12 +607,12 @@ const orderItem = (services) => {
             readyForValidation = true;
             toggleValidationButton();
             //disable select all checkbox if selected
-            if($('input[name="select-all"]').is(':checked')){
+            if ($('input[name="select-all"]').is(':checked')) {
                 $('input[name="select-all"]').prop('checked', false);
             }
 
             //multiple items selected
-            if(count > 1) {
+            if (count > 1) {
                 $('#wrapper-padding').hide();
                 $('.external-order-action').hide();
                 $('#wrapper-multiple').hide();
@@ -492,56 +623,63 @@ const orderItem = (services) => {
             let order = {};
             order.elementTitle = element.find('span');
             order.elementPreview = element.find('.order_wrapper');
-            order.elementId = element.find('input[name=order_element_id]').val();
-            order.element = element.clone( true );
+            order.elementId = element
+                .find('input[name=order_element_id]')
+                .val();
+            order.element = element.clone(true);
             order.oldState = oldState;
             order.newState = newState;
             elementsForValidation.push(order);
             element.toggleClass(ELEMENT_TYPE.WAITINGFORVALIDATION);
             element.find('td:first-child').empty();
-            element.find('td:first-child').append('<i style="font-size: 20px;" class="icon-ok-circle">');
+            element
+                .find('td:first-child')
+                .append('<i style="font-size: 20px;" class="icon-ok-circle">');
             updateButtonStatus(element.attr('class').split(/\s+/));
         }
 
         function toggleValidationButton() {
-            if(readyForValidation) {
+            if (readyForValidation) {
                 $('button.validate').show();
-            }else {
+            } else {
                 $('button.validate').hide();
             }
         }
 
-        function do_send_documents(order_id, elements_ids, force)
-        {
+        function do_send_documents(order_id, elements_ids, force) {
             let cont = $dialog.getDomElement();
 
             $('button.deny, button.send', cont).prop('disabled', true);
             $('.activity_indicator', cont).show();
 
             $.ajax({
-                type: "POST",
-                url: "../prod/order/"+order_id+"/send/",
-                dataType:'json',
+                type: 'POST',
+                url: '../prod/order/' + order_id + '/send/',
+                dataType: 'json',
                 data: {
-                    'elements[]':elements_ids,
-                    force:(force?1:0)
+                    'elements[]': elements_ids,
+                    force: force ? 1 : 0
                 },
-                success: function(data){
+                success: function (data) {
                     let success = '0';
 
-                    if(data.success)
-                    {
+                    if (data.success) {
                         success = '1';
                     }
 
-                    var url = '../prod/order/' + order_id + '/?success=' + success + '&action=send';
+                    var url =
+                        '../prod/order/' +
+                        order_id +
+                        '/?success=' +
+                        success +
+                        '&action=send';
                     reloadDialog(url);
                 },
-                error: function(){
+                error: function () {
                     $('button.deny, button.send', cont).prop('disabled', false);
                     $('.activity_indicator', cont).hide();
                 },
-                timeout: function(){
+                timeout: function () {
                     $('button.deny, button.send', cont).prop('disabled', false);
                     $('.activity_indicator', cont).hide();
                 }
@@ -554,28 +692,32 @@ const orderItem = (services) => {
             $('.activity_indicator', cont).show();
 
             $.ajax({
-                type: "POST",
-                url: "../prod/order/"+ order_id +"/deny/",
-                dataType:'json',
+                type: 'POST',
+                url: '../prod/order/' + order_id + '/deny/',
+                dataType: 'json',
                 data: {
-                    'elements[]':elements_ids
+                    'elements[]': elements_ids
                 },
-                success: function(data){
+                success: function (data) {
                     let success = '0';
 
-                    if(data.success)
-                    {
+                    if (data.success) {
                         success = '1';
                     }
 
-                    var url = '../prod/order/' + order_id + '/?success=' + success + '&action=deny';
+                    var url =
+                        '../prod/order/' +
+                        order_id +
+                        '/?success=' +
+                        success +
+                        '&action=deny';
                     reloadDialog(url);
                 },
-                error: function(){
+                error: function () {
                     $('button.deny, button.send', cont).prop('disabled', false);
                     $('.activity_indicator', cont).hide();
                 },
-                timeout: function(){
+                timeout: function () {
                     $('button.deny, button.send', cont).prop('disabled', false);
                     $('.activity_indicator', cont).hide();
                 }
@@ -583,22 +725,25 @@ const orderItem = (services) => {
         }
 
         function renderOrderDetailView(countSelected) {
-            if(countSelected > 1) {
+            if (countSelected > 1) {
                 $('#wrapper-padding').hide();
                 $('.external-order-action').hide();
                 $('#wrapper-multiple').show();
                 let elementArrayType = [];
-                $('.order_list .selectable.selected', $dialog.getDomElement()).each(function(i,n){
+                $(
+                    '.order_list .selectable.selected',
+                    $dialog.getDomElement()
+                ).each(function (i, n) {
                     //elementArrayType = _.union(elementArrayType, $(n).attr('class').split(/\s+/));
                     elementArrayType.push($(n).attr('class').split(/\s+/));
                 });
                 updateButtonStatusMultiple(elementArrayType);
                 //updateButtonStatus(elementArrayType);
-            }else if(countSelected == 1) {
+            } else if (countSelected === 1) {
                 $('#wrapper-padding').show();
                 $('.external-order-action').show();
                 $('#wrapper-multiple').hide();
-            }else {
+            } else {
                 $('#wrapper-padding').hide();
                 $('.external-order-action').hide();
                 $('#wrapper-multiple').hide();
@@ -608,31 +753,53 @@ const orderItem = (services) => {
 
         function updateButtonStatusMultiple(elementArrayType) {
             $('#order-action button.deny, #order-action button.send').hide();
-            let countObj = elementArrayType.reduce(function(m,v){
-                for (let k in m) {
-                    if (~v.indexOf(k)) m[k]++;
-                }
-                return m;
-            },{validated:0, selectable: 0, waitingForValidation: 0});
+            let countObj = elementArrayType.reduce(
+                function (m, v) {
+                    for (let k in m) {
+                        if (~v.indexOf(k)) m[k]++;
+                    }
+                    return m;
+                },
+                { validated: 0, selectable: 0, waitingForValidation: 0 }
+            );
 
-            let html = "";
-            if(countObj.validated > 0) {
-                html += '<p>' + window.orderItemData.translatedText.itemsAlreadySent + ': '
-                    + countObj.validated + '</p>';
+            let html = '';
+            if (countObj.validated > 0) {
+                html +=
+                    '<p>' +
+                    window.orderItemData.translatedText.itemsAlreadySent +
+                    ': ' +
+                    countObj.validated +
+                    '</p>';
             }
 
-            if(countObj.waitingForValidation > 0) {
-                html += '<p>' + window.orderItemData.translatedText.itemsWaitingValidation + ': '
-                    + countObj.waitingForValidation + '</p>';
+            if (countObj.waitingForValidation > 0) {
+                html +=
+                    '<p>' +
+                    window.orderItemData.translatedText.itemsWaitingValidation +
+                    ': ' +
+                    countObj.waitingForValidation +
+                    '</p>';
             }
 
             //for the remaining items
-            let remaining = countObj.selectable - (countObj.validated + countObj.waitingForValidation);
-            if(remaining > 0) {
-                html += '<p>' +  window.orderItemData.translatedText.nonSentItems + ': '
-                    + remaining + '</p>';
-                $('#order-action button.deny, #order-action button.send').prop('disabled', false);
-                $('#order-action button.deny, #order-action button.send').show();
+            let remaining =
+                countObj.selectable -
+                (countObj.validated + countObj.waitingForValidation);
+            if (remaining > 0) {
+                html +=
+                    '<p>' +
+                    window.orderItemData.translatedText.nonSentItems +
+                    ': ' +
+                    remaining +
+                    '</p>';
+                $('#order-action button.deny, #order-action button.send').prop(
+                    'disabled',
+                    false
+                );
+                $(
+                    '#order-action button.deny, #order-action button.send'
+                ).show();
             }
 
             $('#wrapper-multiple #text-content').empty();
@@ -644,26 +811,43 @@ const orderItem = (services) => {
          * params - array of type for each button selected
          */
         function updateButtonStatus(elementArrayType) {
-            if(_.contains(elementArrayType, ELEMENT_TYPE.VALIDATED)) {
-                $('#order-action button.deny, #order-action button.send').hide();
-                $('#order-action span.action-text').html(window.orderItemData.translatedText.alreadyValidated + '<i class="icon-ok"></i>');
+            if (_.contains(elementArrayType, ELEMENT_TYPE.VALIDATED)) {
+                $(
+                    '#order-action button.deny, #order-action button.send'
+                ).hide();
+                $('#order-action span.action-text').html(
+                    window.orderItemData.translatedText.alreadyValidated +
+                        '<i class="icon-ok"></i>'
+                );
                 $('#order-action span.action-text').show();
-            }else if (_.contains(elementArrayType, ELEMENT_TYPE.WAITINGFORVALIDATION)) {
-                $('#order-action button.deny, #order-action span.action-text').hide();
+            } else if (
+                _.contains(elementArrayType, ELEMENT_TYPE.WAITINGFORVALIDATION)
+            ) {
+                $(
+                    '#order-action button.deny, #order-action span.action-text'
+                ).hide();
                 $('#order-action button.send').show();
                 $('#order-action button.send').prop('disabled', true);
-            }else if (_.contains(elementArrayType, ELEMENT_TYPE.DENIED)) {
+            } else if (_.contains(elementArrayType, ELEMENT_TYPE.DENIED)) {
                 $('#order-action button.deny').hide();
-                $('#order-action span.action-text').html(window.orderItemData.translatedText.refusedPreviously);
+                $('#order-action span.action-text').html(
+                    window.orderItemData.translatedText.refusedPreviously
+                );
                 $('#order-action button.send').prop('disabled', false);
-                $('#order-action button.send, #order-action span.action-text').show();
-            }else {
-                $('#order-action button.send, #order-action button.deny').prop('disabled', false);
-                $('#order-action button.send, #order-action button.deny').show();
+                $(
+                    '#order-action button.send, #order-action span.action-text'
+                ).show();
+            } else {
+                $('#order-action button.send, #order-action button.deny').prop(
+                    'disabled',
+                    false
+                );
+                $(
+                    '#order-action button.send, #order-action button.deny'
+                ).show();
                 $('#order-action span.action-text').hide();
             }
         }
-
 
         function loadPreviewAndCaption(elem) {
             $('#preview-layout').empty();
@@ -673,100 +857,122 @@ const orderItem = (services) => {
             let sbasId = elementids[0];
             let recordId = elementids[1];
             let prevAjax = $.ajax({
-                type: "GET",
-                url: "../prod/records/record/"+sbasId+'/'+recordId+'/',
+                type: 'GET',
+                url: '../prod/records/record/' + sbasId + '/' + recordId + '/',
                 dataType: 'json',
                 success: function (data) {
                     if (data.error) {
                         return;
                     }
-                    
+
                     let customId = 'phraseanet-embed-preview-frame';
                     let $template = $(data.html_preview);
-                    let src = $template.find('#phraseanet-embed-frame').attr('data-src');
-                    $template.find('#phraseanet-embed-frame').attr('id', customId)
-
+                    let src = $template
+                        .find('#phraseanet-embed-frame')
+                        .attr('data-src');
+                    $template
+                        .find('#phraseanet-embed-frame')
+                        .attr('id', customId);
 
                     $('#preview-layout').empty().append($template.get(0));
                     if ($(`#${customId}`).length > 0) {
-                        let activeThumbnailFrame = new pym.Parent(customId, src);
-                        activeThumbnailFrame.iframe.setAttribute('allowfullscreen', '');
+                        let activeThumbnailFrame = new pym.Parent(
+                            customId,
+                            src
+                        );
+                        activeThumbnailFrame.iframe.setAttribute(
+                            'allowfullscreen',
+                            ''
+                        );
                     }
 
-
                     $('#preview-layout .thumb_wrapper')
-                        .width('100%').height('100%').image_enhance({zoomable: true});
+                        .width('100%')
+                        .height('100%')
+                        .image_enhance({ zoomable: true });
                     $('#caption-layout').append(data.desc);
-                    
+
                     resizePreview();
                 }
             });
         }
-        
-        
+
         function resizePreview() {
-          let containerHeight = $('#preview-layout').height();
-          let containerWidth = $('#preview-layout').width();
-          var zoomable = $('img.record.zoomable');
-          // if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
-          //     return;
-          // }
-          
-          //parseInt($('#preview-layout input[name=width]').val(), 10);
+            let containerHeight = $('#preview-layout').height();
+            let containerWidth = $('#preview-layout').width();
+            var zoomable = $('img.record.zoomable');
+            // if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
+            //     return;
+            // }
 
-          var h = parseInt($('#preview-layout .thumb_wrapper').children().attr('data-original-height'), 10);
-          var w = parseInt($('#preview-layout .thumb_wrapper').children().attr('data-original-width'), 10);
-          var t = 20;
-          var de = 0;
+            //parseInt($('#preview-layout input[name=width]').val(), 10);
 
-          var margX = 0;
-          var margY = 0;
+            var h = parseInt(
+                $('#preview-layout .thumb_wrapper')
+                    .children()
+                    .attr('data-original-height'),
+                10
+            );
+            var w = parseInt(
+                $('#preview-layout .thumb_wrapper')
+                    .children()
+                    .attr('data-original-width'),
+                10
+            );
+            var t = 20;
+            var de = 0;
 
-          if ($('#preview-layout .record_audio').length > 0) {
-              margY = 100;
-              de = 60;
-          }
+            var margX = 0;
+            var margY = 0;
 
-          var ratioP = w / h;
-          var ratioD = parseInt(containerWidth, 10) / parseInt(containerHeight, 10);
+            if ($('#preview-layout .record_audio').length > 0) {
+                margY = 100;
+                de = 60;
+            }
 
-          if (ratioD > ratioP) {
-              //je regle la hauteur d'abord
-              if ((parseInt(h, 10) + margY) > parseInt(containerHeight, 10)) {
-                  h = Math.round(parseInt(containerHeight, 10) - margY);
-                  w = Math.round(h * ratioP);
-              }
-          } else {
-              if ((parseInt(w, 10) + margX) > parseInt(containerWidth, 10)) {
-                  w = Math.round(parseInt(containerWidth, 10) - margX);
-                  h = Math.round(w / ratioP);
-              }
-          }
+            var ratioP = w / h;
+            var ratioD =
+                parseInt(containerWidth, 10) / parseInt(containerHeight, 10);
 
-          t = Math.round((parseInt(containerHeight, 10) - h - de) / 2);
-          var l = Math.round((parseInt(containerWidth, 10) - w) / 2);
-          $('#preview-layout .record').css({
-              width: w,
-              height: h,
-              top: t,
-              left: l
-          }).attr('width', w).attr('height', h);
+            if (ratioD > ratioP) {
+                //je regle la hauteur d'abord
+                if (parseInt(h, 10) + margY > parseInt(containerHeight, 10)) {
+                    h = Math.round(parseInt(containerHeight, 10) - margY);
+                    w = Math.round(h * ratioP);
+                }
+            } else {
+                if (parseInt(w, 10) + margX > parseInt(containerWidth, 10)) {
+                    w = Math.round(parseInt(containerWidth, 10) - margX);
+                    h = Math.round(w / ratioP);
+                }
+            }
+
+            t = Math.round((parseInt(containerHeight, 10) - h - de) / 2);
+            var l = Math.round((parseInt(containerWidth, 10) - w) / 2);
+            $('#preview-layout .record')
+                .css({
+                    width: w,
+                    height: h,
+                    top: t,
+                    left: l
+                })
+                .attr('width', w)
+                .attr('height', h);
         }
-        
-        
+
         function reloadDialog(url) {
-          const baseUrl = configService.get('baseUrl');
-          $.ajax({
-              type: "GET",
-              url: `${baseUrl}${url}`,
-              success: function (data) {
-                  if (data.error) {
-                      return;
-                  }
-                  $dialog.setContent(data);
-                  _onOrderItemReady($dialog);
-              }
-          });
+            const baseUrl = configService.get('baseUrl');
+            $.ajax({
+                type: 'GET',
+                url: `${baseUrl}${url}`,
+                success: function (data) {
+                    if (data.error) {
+                        return;
+                    }
+                    $dialog.setContent(data);
+                    _onOrderItemReady($dialog);
+                }
+            });
         }
     };
 
