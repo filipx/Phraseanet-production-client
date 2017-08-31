@@ -12,7 +12,7 @@ const webpackConfig = require('./webpack.production.config')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 var extractCSS = new ExtractTextPlugin({
-  filename: '[name].css',
+  filename: '[name].min.css',
   allChunks: true
 });
 
