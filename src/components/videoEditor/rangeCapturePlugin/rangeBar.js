@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import videojs from 'video.js';
-import noUiSlider from 'noUiSlider';
+import noUiSlider from 'nouislider';
 /**
  * VideoJs Range bar
  */
