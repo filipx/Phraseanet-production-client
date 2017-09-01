@@ -31,7 +31,8 @@
         "asset-server": "node config/webpack/webpack.hot.assets.config",
         "publish-patch": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version patch && npm publish",
         "publish-minor": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version minor && npm publish",
-        "postpublish": "git push origin master --follow-tags"
+        "postpublish": "git push origin master --follow-tags",
+        "postinstall": "./node_modules/.bin/bower install"
     },
     "pre-commit": ["test"],
     "repository": {
@@ -39,7 +40,7 @@
         "url": "git+https://github.com/alchemy-fr/Phraseanet-production-client.git"
     },
     "keywords": ["phraseanet"],
-    "files": ["dist", "src"],
+    "files": ["dist", "src", "bower.json"],
     "devDependencies": {
         "babel-cli": "^6.24.1",
         "babel-core": "^6.25.0",
