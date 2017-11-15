@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
 const WebpackNotifierPlugin = require('webpack-notifier');
-const PKG_LOCATION = path.join(__dirname, '../../package.json');
+const PKG_LOCATION = require(path.join(__dirname, '../../package.json'));
 const config = require('../config');
 const webpackConfig = require('./webpack.development.config');
 // add loader for external stylesheets:
@@ -28,7 +28,7 @@ module.exports = Object.assign({}, webpackConfig, {
               loader: 'babel-loader',
               options: { presets: ['es2015', 'stage-0'] },
             }],
-          }, 
+          },
           {
               test: /\.(ttf|eot|woff|svg|png|jpg|gif)$/,
               use: [
@@ -41,7 +41,7 @@ module.exports = Object.assign({}, webpackConfig, {
                 }
               ],
               exclude: /node_modules/
-          }, 
+          },
           {
               test: /\.(ttf|eot|woff|svg|png|jpg|jpeg|gif)$/,
               use: [
@@ -111,7 +111,7 @@ module.exports = Object.assign({}, webpackConfig, {
             alwaysNotify: true
         }),
         // optimizations
-        new webpack.NoErrorsPlugin(),
+        new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
             '__DEV__': false,
             'process.env.NODE_ENV': JSON.stringify('production'),
