@@ -14,29 +14,28 @@ $highlightDarkerColor: #0c4554;
 $highlightBackgroundColor: #076882;
 $highlightBackgroundAltColor: #0c4554;
 $highlightBorderColor: #0c4554;
-$highlightTextColor: #FFFFFF;
+$highlightTextColor: #ffffff;
 
-
-$darkerBackgroundColor: #D9D9D9; // #F1F1F1 <- to try
-$darkerBorderColor: darken(#D9D9D9, 10);
+$darkerBackgroundColor: #d9d9d9; // #F1F1F1 <- to try
+$darkerBorderColor: darken(#d9d9d9, 10);
 $darkerTextColor: #333333;
 $darkerTextHoverColor: #000000;
 
 $darkBackgroundColor: #9c9c9c; //B1B1B1;
 $darkBorderColor: darken($darkBackgroundColor, 10);
-$darkTextColor: #FFFFFF;
+$darkTextColor: #ffffff;
 
 $mediumBackgroundColor: #a6a6a6; // B2B2B2 <- to try
 $mediumBorderColor: darken($mediumBackgroundColor, 10);
 $mediumBorderHighlightColor: #666666;
 $mediumTextColor: $textPrimaryColor;
-$mediumTextHoverColor: #EAEAEA;
-$mediumTextActiveColor: #EAEAEA;
+$mediumTextHoverColor: #eaeaea;
+$mediumTextActiveColor: #eaeaea;
 
-$lightBackgroundColor: #B1B1B1;
+$lightBackgroundColor: #b1b1b1;
 $lightBackgroundSelectedColor: darken($lightBackgroundColor, 10);
 $lightBackgroundActiveColor: darken($lightBackgroundColor, 10);
-$lightBorderColor: #B1B1B1;
+$lightBorderColor: #b1b1b1;
 $lightBorderSelectedColor: darken($lightBorderColor, 10);
 $lightBorderActiveColor: darken($lightBorderColor, 10);
 $lightTextColor: #3b3b3b;
@@ -44,7 +43,7 @@ $lightTextColor: #3b3b3b;
 // inverse
 $textInverseColor: #000;
 $textInverseHoverColor: #000;
-$bgInverseHoverColor: #FFF;
+$bgInverseHoverColor: #fff;
 
 /******* GLOBAL PROD **********************************************************/
 
@@ -54,38 +53,33 @@ $paginateBorderColor: #999999;
 $paginateTextColor: #999999;
 // $paginateBorder2Color: #999999;
 // $paginateTextColor: #FFFFFF;
-$paginateBg1: #D9D9D9;
+$paginateBg1: #d9d9d9;
 
-$uploadBg1: #FFFFFF;
+$uploadBg1: #ffffff;
 $uploadBg2: transparent;
 $uploadLoaderImg: 'loader-black.gif';
 
-$bridgeDropdownToggleBg: #E6E6E6;
-$bridgeDropdownMenuBg: #A4A4A4;
+$bridgeDropdownToggleBg: #e6e6e6;
+$bridgeDropdownMenuBg: #a4a4a4;
 $bridgeDropdownMenuBorder: #666666;
-$bridgeDropdownMenuColor: #EAEAEA;
+$bridgeDropdownMenuColor: #eaeaea;
 $bridgeDropdownMenuHoverBg: #666666;
-$bridgeDropdownMenuHoverColor: #FFFFFF;
+$bridgeDropdownMenuHoverColor: #ffffff;
 
 $thesaurusInputBackground: #d4d4d4;
 
-
-$thesaurusContextMenuColor: #FFFFFF;
-
+$thesaurusContextMenuColor: #ffffff;
 
 $basketsTextColor: #777777;
 
 $guiSplitterImg: 'vsplitter2-959595.png';
 
-
-
-
 $answersToolsBtnSeparatorBorder: #999;
-$answersToolsBtnBg: #A4A4A4;
+$answersToolsBtnBg: #a4a4a4;
 $answersToolsBtnBorder: #666666;
-$answersToolsBtnColor: #EAEAEA;
+$answersToolsBtnColor: #eaeaea;
 $answersToolsBtnHoverBg: #666666;
-$answersToolsBtnHoverColor: #FFFFFF;
+$answersToolsBtnHoverColor: #ffffff;
 
 $answersToolsBtnSettingsColor: lighten($answersToolsBtnColor, 10);
 $answersToolsBtnSettingsHoverBg: #393939;
@@ -94,7 +88,7 @@ $answersToolsBtnSettingsBorder: #999;
 
 // $diapoBorderColor: $darkerBorderColor;
 
-$editTextMultiValueBg: #FFFFFF;
+$editTextMultiValueBg: #ffffff;
 $editTextMultiValueBorder: #999999;
 $editTextMultiValueHighlightBg: #d0d0d0;
 
@@ -104,16 +98,16 @@ $activeStateIcon: 'ui-icons_ffffff_256x240.png';
 $accordionLoaderImg: 'loader-black.gif';
 $accordionBgHeaderHover: #999;
 
-$inputButtonHoverColor: #FEFEFE;
+$inputButtonHoverColor: #fefefe;
 $inputFallbackBorderColor: #b1b1b1;
 
 $dropdownDividerBg: $darkerBorderColor;
 $dropdownDividerBorder: $darkerBorderColor;
 
-$overlayBg: #B1B1B1;
+$overlayBg: #b1b1b1;
 
 $tabsNavBg: #999999;
-$tabsNavBgActive: #B2B2B2; //#D9D9D9;
+$tabsNavBgActive: #b2b2b2; //#D9D9D9;
 $contentLoaderImg: 'loading.svg';
 
 /*$btnBackground: #444444; //#B9B9B9;
@@ -122,16 +116,14 @@ $btnColor: #AAAAAA;
 $btnTextShadow: 0 -1px 0 rgba(0,0,0,.25);*/
 
 $btnBackground: #f2f2f2;
-$btnBackgroundHighlight: #D6D6D6;
+$btnBackgroundHighlight: #d6d6d6;
 $btnColor: #737373;
-$btnTextShadow: 0 -1px 0 rgba(0,0,0,0);
+$btnTextShadow: 0 -1px 0 rgba(0, 0, 0, 0);
 
-
-
-$btnInverseBackground: #B9B9B9;
-$btnInverseBackgroundHighlight: #A4A4A4;
-$btnInverseColor: #EAEAEA;
-$btnInverseTextShadow: 0 -1px 0 rgba(0,0,0,.25);
+$btnInverseBackground: #b9b9b9;
+$btnInverseBackgroundHighlight: #a4a4a4;
+$btnInverseColor: #eaeaea;
+$btnInverseTextShadow: 0 -1px 0 rgba(0, 0, 0, .25);
 $btnGrpSeparatorColor: $defaultBorderColor;
 
 $widgetContentColor: $textPrimaryInverseColor;
@@ -146,6 +138,7 @@ $uiLinkColor: $darkTextColor;
 $uiLinkFocusColor: $darkTextColor;
 $uiLinkActiveColor: $darkTextColor;
 
+$pushboxBadgeColor: #666666;
 
 /******** MAIN MENU CONFIG ********/
 // $mainMenuRightListBorderLeft: #999;
@@ -153,7 +146,7 @@ $mainMenuBottomBorder: none;
 $mainMenuBackgroundColor: $mediumBackgroundColor; //BFBFBF;
 $mainMenuBottomBorder: none;
 $mainMenuMarginBottom: 0;
-$mainMenuLinkColor: #FFF;
+$mainMenuLinkColor: #fff;
 $mainMenuLinkBackgroundHoverColor: transparent; //$bgInverseHoverColor;
 $mainMenuLinkHoverColor: $textPrimaryHoverColor;
 @import '../../../../stylesheets/shared/variables';
@@ -167,13 +160,13 @@ $workzoneTabTopBorder: 1px solid #999;
 $workzoneTabBorderBottom: transparent;
 $workzoneBasketAlertDataBg: #fff190;
 $workzoneBasketAlertDataColor: #1a1a1a;
-$workzoneToolsLabelColor: #FFFFFF;
+$workzoneToolsLabelColor: #ffffff;
 
 /******** PROPOSALS CONFIG ********/
-$proposalsTitleColor: #FFFFFF;
+$proposalsTitleColor: #ffffff;
 $proposalsTitleBorder: #666666;
 $proposalsTitleHoverColor: lighten($proposalsTitleColor, 10);
-$proposalsFacetHoverColor: #FFF;
+$proposalsFacetHoverColor: #fff;
 
 @import '../../../../stylesheets/shared/jquery-ui/ui-lightness';
 @import '../skin-shared';

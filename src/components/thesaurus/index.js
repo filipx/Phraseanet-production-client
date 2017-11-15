@@ -1,19 +1,19 @@
 import $ from 'jquery';
 import _ from 'underscore';
-import {sprintf} from 'sprintf-js';
+import { sprintf } from 'sprintf-js';
 import * as AppCommons from 'phraseanet-common';
 import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 require('phraseanet-common/src/components/vendors/contextMenu');
 
-const thesaurusService = (services) => {
-    const {configService, localeService, appEvents} = services;
+const thesaurusService = services => {
+    const { configService, localeService, appEvents } = services;
     let options = {};
     let config = {};
     let sbas;
     let bas2sbas;
     let trees; // @TODO remove global
-    const initialize = (params) => {
-        let {$container} = params;
+    const initialize = params => {
+        let { $container } = params;
 
         config = configService.get('thesaurusConfig');
         // set up thlist:
@@ -22,7 +22,9 @@ const thesaurusService = (services) => {
         for (let db in config.availableDatabases) {
             if (config.availableDatabases.hasOwnProperty(db)) {
                 let curDb = config.availableDatabases[db];
-                options.thlist['s' + curDb.id] = new ThesauThesaurusSeeker(curDb.id);
+                options.thlist['s' + curDb.id] = new ThesauThesaurusSeeker(
+                    curDb.id
+                );
             }
         }
 
@@ -52,8 +54,7 @@ const thesaurusService = (services) => {
          })*/
 
         $container
-
-            .on('click', '.thesaurus-branch-action', (event) => {
+            .on('click', '.thesaurus-branch-action', event => {
                 let $el = $(event.currentTarget);
                 event.preventDefault();
                 cclicks++;
@@ -63,7 +64,6 @@ const thesaurusService = (services) => {
                         Xclick(event);
                         cclicks = 0;
                     }, cDelay);
-
                 } else {
                     clearTimeout(cTimer);
 
@@ -75,27 +75,26 @@ const thesaurusService = (services) => {
                     cclicks = 0;
                 }
             })
-            .on('dblclick', '.thesaurus-branch-action', (event) => {
+            .on('dblclick', '.thesaurus-branch-action', event => {
                 // dbl is handled by click event
                 event.preventDefault();
             })
-            .on('click', '.thesaurus-cancel-wizard-action', (event) => {
+            .on('click', '.thesaurus-cancel-wizard-action', event => {
                 // dbl is handled by click event
                 event.preventDefault();
                 thesauCancelWizard();
             })
-            .on('keyup', '.thesaurus-filter-suggest-action', (event) => {
+            .on('keyup', '.thesaurus-filter-suggest-action', event => {
                 event.preventDefault();
                 searchValue($(event.currentTarget).val());
             })
-            .on('submit', '.thesaurus-filter-submit-action', (event) => {
+            .on('submit', '.thesaurus-filter-submit-action', event => {
                 event.preventDefault();
                 T_Gfilter(event.currentTarget);
             });
 
         searchValue = _.debounce(searchValue, 300);
     };
-
 
     function show() {
         // first show of thesaurus
@@ -109,15 +108,25 @@ const thesaurusService = (services) => {
     }
 
     function thesauShowWizard(wizard, refreshFilter) {
+        var offsetTabHeight = $('#THPD_tabs .ui-tabs-nav')[0].offsetHeight;
         if (wizard !== options.currentWizard) {
             $('#THPD_WIZARDS DIV.wizard', options.tabs).hide();
             $('#THPD_WIZARDS .' + wizard, options.tabs).show();
-            $('#THPD_T_treeBox', options.tabs).css('top', $('#THPD_WIZARDS', options.tabs).height());
+            $('#THPD_T', options.tabs).css(
+                'top',
+                $('#THPD_WIZARDS', options.tabs).height() + offsetTabHeight
+            );
+            $('#THPD_C', options.tabs).css(
+                'top',
+                $('#THPD_WIZARDS', options.tabs).height() + offsetTabHeight
+            );
 
             options.currentWizard = wizard;
 
             if (refreshFilter) {
-                searchValue($('#THPD_WIZARDS .gform', options.tabs).eq(0).val());
+                searchValue(
+                    $('#THPD_WIZARDS .gform', options.tabs).eq(0).val()
+                );
             }
             // browse
             if (wizard === 'wiz_0') {
@@ -136,9 +145,8 @@ const thesaurusService = (services) => {
         }
     }
 
-
-// here when the 'filter' forms is submited with key <enter> or button <ok>
-// force immediate search
+    // here when the 'filter' forms is submited with key <enter> or button <ok>
+    // force immediate search
     function T_Gfilter(o) {
         var f;
         if (o.nodeName === 'FORM') {
@@ -150,11 +158,11 @@ const thesaurusService = (services) => {
         searchValue(f);
 
         switch (options.currentWizard) {
-            case 'wiz_0':	// browse
+            case 'wiz_0': // browse
                 break;
-            case 'wiz_1':	// accept
+            case 'wiz_1': // accept
                 break;
-            case 'wiz_2':	// replace
+            case 'wiz_2': // replace
                 T_replaceBy2(f);
                 break;
             default:
@@ -162,23 +170,22 @@ const thesaurusService = (services) => {
         }
     }
 
-// here when a key is pressed in the 'filter' form
-    let searchValue = (f) => {
+    // here when a key is pressed in the 'filter' form
+    let searchValue = f => {
         switch (options.currentWizard) {
-            case 'wiz_0':	// browse
+            case 'wiz_0': // browse
                 searchValueByMode(f, 'ALL');
                 break;
-            case 'wiz_1':	// accept
+            case 'wiz_1': // accept
                 searchValueByMode(f, 'CANDIDATE');
                 break;
-            case 'wiz_2':	// replace
+            case 'wiz_2': // replace
                 searchValueByMode(f, 'CANDIDATE');
                 break;
             default:
                 break;
         }
-    }
-
+    };
 
     function T_replaceBy2(f) {
         if (trees.C._selInfos.n !== 1) {
@@ -190,9 +197,9 @@ const thesaurusService = (services) => {
         let sbas = cid.shift();
         cid = cid.join('.');
 
-        trees.C._toReplace = {sbas: sbas, cid: cid, replaceby: f};
+        trees.C._toReplace = { sbas: sbas, cid: cid, replaceby: f };
 
-        let msg = sprintf(config.replaceMessage, {from: term, to: f});
+        let msg = sprintf(config.replaceMessage, { from: term, to: f });
 
         let confirmBox = dialog.create(services, {
             size: 'Alert',
@@ -209,13 +216,35 @@ const thesaurusService = (services) => {
     }
 
     function searchValueByMode(f, mode) {
-
         if (mode === 'ALL') {
+            let type;
+            let id;
+            let z = '';
+            if (
+                $('.ui-tabs-nav li.ui-state-active a', options.tabs).attr(
+                    'href'
+                ) === '#THPD_T'
+            ) {
+                //thesaurus
+                type = 'TH';
+                id = 'T';
+            } else {
+                //candidate
+                type = 'CT';
+                id = 'C';
+            }
             // search in every base, everywhere
             for (let i in sbas) {
-                let zurl = '/xmlhttp/search_th_term_prod.j.php'
-                    + '?sbid=' + sbas[i].sbid
-                    + '&t=' + encodeURIComponent(f);
+                let zurl =
+                    '/xmlhttp/search_term_prod.j.php' +
+                    '?sbid=' +
+                    sbas[i].sbid +
+                    '&typ=' +
+                    type +
+                    '&id=' +
+                    id +
+                    '&t=' +
+                    encodeURIComponent(f);
                 $('#THPD_T_treeBox').addClass('loading');
                 sbas[i].seeker = $.ajax({
                     url: zurl,
@@ -224,6 +253,11 @@ const thesaurusService = (services) => {
                     dataType: 'json',
                     success: function (j) {
                         var z = '#TX_P\\.' + j.parm.sbid + '\\.T';
+                        if (type === 'TH') {
+                            z = '#TX_P\\.' + j.parm.sbid + '\\.' + id;
+                        } else {
+                            z = '#CX_P\\.' + j.parm.sbid + '\\.' + id;
+                        }
 
                         var o = $(z);
                         var isLast = o.hasClass('last');
@@ -233,7 +267,8 @@ const thesaurusService = (services) => {
                         if (isLast) {
                             $(z).addClass('last');
                         }
-                    }, complete: function () {
+                    },
+                    complete: function () {
                         $('#THPD_T_treeBox').removeClass('loading');
                     }
                 });
@@ -241,11 +276,19 @@ const thesaurusService = (services) => {
         } else if (mode === 'CANDIDATE') {
             // search only on the good base and the good branch(es)
             for (let i in sbas) {
-                var zurl = '/xmlhttp/search_th_term_prod.j.php?sbid=' + sbas[i].sbid;
+                var zurl =
+                    '/xmlhttp/search_term_prod.j.php?sbid=' +
+                    sbas[i].sbid +
+                    '&typ=TH' +
+                    '&id=T';
+
                 $('#THPD_T_treeBox').addClass('loading');
                 if (sbas[i].sbid === trees.C._selInfos.sbas) {
-                    zurl += '&t=' + encodeURIComponent(f)
-                        + '&field=' + encodeURIComponent(trees.C._selInfos.field);
+                    zurl +=
+                        '&t=' +
+                        encodeURIComponent(f) +
+                        '&field=' +
+                        encodeURIComponent(trees.C._selInfos.field);
                 }
                 sbas[i].seeker = $.ajax({
                     url: zurl,
@@ -263,21 +306,18 @@ const thesaurusService = (services) => {
                         if (isLast) {
                             $(z).addClass('last');
                         }
-                    }, complete: function () {
+                    },
+                    complete: function () {
                         $('#THPD_T_treeBox').removeClass('loading');
                     }
                 });
-
             }
         }
     }
 
-
-// ======================================================================================================
+    // ======================================================================================================
 
     function T_replaceCandidates_OK() {
-
-
         var replacingBox = dialog.create(services, {
             size: 'Alert'
         });
@@ -293,7 +333,7 @@ const thesaurusService = (services) => {
             async: false,
             cache: false,
             dataType: 'json',
-            timeout: 10 * 60 * 1000,	// 10 minutes !
+            timeout: 10 * 60 * 1000, // 10 minutes !
             success: function (result, textStatus) {
                 trees.C._toReplace = null;
                 thesauShowWizard('wiz_0', false);
@@ -310,17 +350,20 @@ const thesaurusService = (services) => {
                 }
 
                 for (let i in result.ctermsDeleted) {
-                    var cid = '#CX_P\\.' + result.ctermsDeleted[i].replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
+                    var cid =
+                        '#CX_P\\.' +
+                        result.ctermsDeleted[i].replace(
+                            new RegExp('\\.', 'g'),
+                            '\\.'
+                        ); // escape les '.' pour jquery
                     $(cid).remove();
                 }
-
             },
-            _ret: null	// private alchemy
+            _ret: null // private alchemy
         };
 
         $.ajax(parms);
     }
-
 
     function T_acceptCandidates_OK() {
         let same_sbas = true;
@@ -335,16 +378,14 @@ const thesaurusService = (services) => {
         let sbid = dst.shift();
         dst = dst.join('.');
         // obviously the candidates and the target already complies (same sbas, good tbranch)
-        trees.C._selInfos.sel.each(
-            function () {
-                var x = this.getAttribute('id').split('.');
-                x.shift();
-                if (x.shift() !== sbid) {
-                    same_sbas = false;
-                }
-                t_ids.push(x.join('.'));
+        trees.C._selInfos.sel.each(function () {
+            var x = this.getAttribute('id').split('.');
+            x.shift();
+            if (x.shift() !== sbid) {
+                same_sbas = false;
             }
-        );
+            t_ids.push(x.join('.'));
+        });
 
         if (!same_sbas) {
             return;
@@ -365,25 +406,35 @@ const thesaurusService = (services) => {
             dataType: 'json',
             success: function (result, textStatus) {
                 for (let i in result.refresh) {
-                    var zurl = '/xmlhttp/openbranch_prod.j.php'
-                        + '?type=' + result.refresh[i].type
-                        + '&sbid=' + result.refresh[i].sbid
-                        + '&id=' + encodeURIComponent(result.refresh[i].id);
-                    if (result.refresh[i].type === 'T') {
-                        zurl += '&sortsy=1';
-                    }
+                    var zurl =
+                        '/xmlhttp/openbranch_prod.j.php' +
+                        '?type=' +
+                        result.refresh[i].type +
+                        '&sbid=' +
+                        result.refresh[i].sbid +
+                        '&sortsy=1' +
+                        '&id=' +
+                        encodeURIComponent(result.refresh[i].id);
 
-                    $.get(zurl,
+                    $.get(
+                        zurl,
                         [],
                         function (j) {
-                            var z = '#' + j.parm.type
-                                + 'X_P\\.'
-                                + j.parm.sbid + '\\.'
-                                + j.parm.id.replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
+                            var z =
+                                '#' +
+                                j.parm.type +
+                                'X_P\\.' +
+                                j.parm.sbid +
+                                '\\.' +
+                                j.parm.id.replace(
+                                    new RegExp('\\.', 'g'),
+                                    '\\.'
+                                ); // escape les '.' pour jquery
 
                             $(z).children('ul').eq(0).replaceWith(j.html);
                         },
-                        'json');
+                        'json'
+                    );
                 }
                 trees.C._toAccept = null;
                 thesauShowWizard('wiz_0', false);
@@ -395,12 +446,11 @@ const thesaurusService = (services) => {
             timeout: function () {
                 acceptingBox.close();
             },
-            _ret: null	// private alchemy
+            _ret: null // private alchemy
         };
 
         $.ajax(parms);
     }
-
 
     function C_deleteCandidates_OK() {
         var deletingBox = dialog.create(services, {
@@ -410,20 +460,18 @@ const thesaurusService = (services) => {
 
         var t_ids = [];
         var lisel = trees.C.tree.find('LI .selected');
-        trees.C.tree.find('LI .selected').each(
-            function () {
-                var x = this.getAttribute('id').split('.');
-                x.shift();
-                t_ids.push(x.join('.'));
-            }
-        );
+        trees.C.tree.find('LI .selected').each(function () {
+            var x = this.getAttribute('id').split('.');
+            x.shift();
+            t_ids.push(x.join('.'));
+        });
         var parms = {
             url: '/xmlhttp/replacecandidate.j.php',
-            data: {'id[]': t_ids},
+            data: { 'id[]': t_ids },
             async: false,
             cache: false,
             dataType: 'json',
-            timeout: 10 * 60 * 1000,	// 10 minutes !
+            timeout: 10 * 60 * 1000, // 10 minutes !
             success: function (result, textStatus) {
                 deletingBox.close();
 
@@ -437,7 +485,12 @@ const thesaurusService = (services) => {
                 }
 
                 for (let i in result.ctermsDeleted) {
-                    var cid = '#CX_P\\.' + result.ctermsDeleted[i].replace(new RegExp('\\.', 'g'), '\\.');	// escape les '.' pour jquery
+                    var cid =
+                        '#CX_P\\.' +
+                        result.ctermsDeleted[i].replace(
+                            new RegExp('\\.', 'g'),
+                            '\\.'
+                        ); // escape les '.' pour jquery
                     $(cid).remove();
                 }
             },
@@ -447,8 +500,7 @@ const thesaurusService = (services) => {
         $.ajax(parms);
     }
 
-
-// menu option T:accept as...
+    // menu option T:accept as...
     function T_acceptCandidates(menuItem, menu, type) {
         var lidst = trees.T.tree.find('LI .selected');
         if (lidst.length !== 1) {
@@ -484,11 +536,9 @@ const thesaurusService = (services) => {
             }
         });
         confirmBox.setContent(msg);
-
     }
 
-
-// menu option T:search
+    // menu option T:search
     function T_search(menuItem, menu, cmenu, e, label) {
         if (!menu._li) {
             return;
@@ -501,28 +551,32 @@ const thesaurusService = (services) => {
         doThesSearch('T', sbid, term, null);
     }
 
-
     function C_MenuOption(menuItem, menu, option, parm) {
         // nothing selected in candidates ?
         if (!trees.C._selInfos) {
             return;
         }
 
-        trees.C._toAccept = null;	// cancel previous 'accept' action anyway
-        trees.C._toReplace = null;	// cancel previous 'replace' action anyway
+        trees.C._toAccept = null; // cancel previous 'accept' action anyway
+        trees.C._toReplace = null; // cancel previous 'replace' action anyway
         // display helpful message into the thesaurus box...
         let msg;
         let term;
         switch (option) {
             case 'ACCEPT':
                 // glue selection to the tree
-                trees.C._toAccept = {lng: parm.lng};
-
+                trees.C._toAccept = { lng: parm.lng };
 
                 if (trees.C._selInfos.n === 1) {
-                    msg = sprintf(config.acceptCandidateUniqueMsg, menu._srcElement.find('span').html());
+                    msg = sprintf(
+                        config.acceptCandidateUniqueMsg,
+                        menu._srcElement.find('span').html()
+                    );
                 } else {
-                    msg = sprintf(config.acceptCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(
+                        config.acceptCandidateManyMsg,
+                        trees.C._selInfos.n
+                    );
                 }
 
                 // set the content of the wizard
@@ -538,7 +592,10 @@ const thesaurusService = (services) => {
                     term = trees.C._selInfos.sel.eq(0).find('span span').html();
                     msg = sprintf(config.replaceCandidateUniqueMsg, term);
                 } else {
-                    msg = sprintf(config.replaceCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(
+                        config.replaceCandidateManyMsg,
+                        trees.C._selInfos.n
+                    );
                 }
 
                 options.tabs.tabs('option', 'active', 0);
@@ -557,7 +614,10 @@ const thesaurusService = (services) => {
                     term = trees.C._selInfos.sel.eq(0).find('span span').html();
                     msg = sprintf(config.deleteCandidateUniqueMsg, term);
                 } else {
-                    msg = sprintf(config.deleteCandidateManyMsg, trees.C._selInfos.n);
+                    msg = sprintf(
+                        config.deleteCandidateManyMsg,
+                        trees.C._selInfos.n
+                    );
                 }
 
                 let confirmBox = dialog.create(services, {
@@ -578,21 +638,26 @@ const thesaurusService = (services) => {
         }
     }
 
-
     function Xclick(e) {
         let x = e.srcElement ? e.srcElement : e.target;
         let li = $(x).closest('li');
         let tids = li.attr('id').split('.');
         let type;
         switch (x.nodeName) {
-            case 'DIV':		// +/-
+            case 'DIV': // +/-
                 var tid = tids.shift();
                 var sbid = tids.shift();
                 type = tid.substr(0, 1);
                 // TX_P ou CX_P
-                if ((type === 'T' || type === 'C') && tid.substr(1, 4) === 'X_P') {
+                if (
+                    (type === 'T' || type === 'C') &&
+                    tid.substr(1, 4) === 'X_P'
+                ) {
                     var ul = li.children('ul').eq(0);
-                    if (ul.css('display') === 'none' || AppCommons.utilsModule.is_ctrl_key(e)) {
+                    if (
+                        ul.css('display') === 'none' ||
+                        AppCommons.utilsModule.is_ctrl_key(e)
+                    ) {
                         if (AppCommons.utilsModule.is_ctrl_key(e)) {
                             ul.text(config.loadingMsg);
                             li.removeAttr('loaded');
@@ -601,18 +666,27 @@ const thesaurusService = (services) => {
                         ul.show();
 
                         if (!li.attr('loaded')) {
-                            var zurl = '/xmlhttp/openbranch_prod.j.php?type=' + type + '&sbid=' + sbid + '&id=' + encodeURIComponent(tids.join('.'));
+                            var zurl =
+                                '/xmlhttp/openbranch_prod.j.php?type=' +
+                                type +
+                                '&sbid=' +
+                                sbid +
+                                '&id=' +
+                                encodeURIComponent(tids.join('.'));
                             if (li.hasClass('last')) {
                                 zurl += '&last=1';
                             }
-                            if (type === 'T') {
-                                zurl += '&sortsy=1';
-                            }
-                            $.get(zurl, [], function (j) {
+                            zurl += '&sortsy=1';
+
+                            $.get(
+                                zurl,
+                                [],
+                                function (j) {
                                     ul.replaceWith(j.html);
                                     li.attr('loaded', '1');
-                                }
-                                , 'json');
+                                },
+                                'json'
+                            );
                         }
                     } else {
                         ul.hide();
@@ -624,28 +698,45 @@ const thesaurusService = (services) => {
                 if ((type === 'T' && tids.length > 2) || tids.length === 4) {
                     tids.pop();
                     var tid3 = tids.join('.');
-                    if (!AppCommons.utilsModule.is_ctrl_key(e) && !AppCommons.utilsModule.is_shift_key(e)) {
+                    if (
+                        !AppCommons.utilsModule.is_ctrl_key(e) &&
+                        !AppCommons.utilsModule.is_shift_key(e)
+                    ) {
                         $('LI', trees[type].tree).removeClass('selected');
                         options.lastClickedCandidate = null;
                     } else {
                         // if($("#THPD_C_treeBox")._lastClicked)
                         if (options.lastClickedCandidate !== null) {
                             if (options.lastClickedCandidate.tid3 !== tid3) {
-                                $('LI', trees[type].tree).removeClass('selected');
+                                $('LI', trees[type].tree).removeClass(
+                                    'selected'
+                                );
                                 options.lastClickedCandidate = null;
                             } else {
                                 if (e.shiftKey) {
                                     var lip = li.parent().children('li');
-                                    var idx0 = lip.index(options.lastClickedCandidate.item);
+                                    var idx0 = lip.index(
+                                        options.lastClickedCandidate.item
+                                    );
                                     var idx1 = lip.index(li);
                                     if (idx0 < idx1) {
-                                        lip.filter(function (index) {
-                                            return (index >= idx0 && index < idx1);
-                                        }).addClass('selected');
+                                        lip
+                                            .filter(function (index) {
+                                                return (
+                                                    index >= idx0 &&
+                                                    index < idx1
+                                                );
+                                            })
+                                            .addClass('selected');
                                     } else {
-                                        lip.filter(function (index) {
-                                            return (index > idx1 && index <= idx0);
-                                        }).addClass('selected');
+                                        lip
+                                            .filter(function (index) {
+                                                return (
+                                                    index > idx1 &&
+                                                    index <= idx0
+                                                );
+                                            })
+                                            .addClass('selected');
                                     }
                                 }
                             }
@@ -653,7 +744,7 @@ const thesaurusService = (services) => {
                     }
                     li.toggleClass('selected');
                     if (type === 'C') {
-                        options.lastClickedCandidate = {item: li, tid3: tid3};
+                        options.lastClickedCandidate = { item: li, tid3: tid3 };
                     }
                 }
                 break;
@@ -667,19 +758,21 @@ const thesaurusService = (services) => {
         let tid = $(x).closest('li').attr('id');
         let term;
         switch (x.nodeName) {
-            case 'SPAN':		// term
+            case 'SPAN': // term
                 switch (options.currentWizard) {
-                    case 'wiz_0':				// simply browse
+                    case 'wiz_0': // simply browse
                         if (tid.substr(0, 5) === 'TX_P.') {
                             var tids = tid.split('.');
                             if (tids.length > 3) {
                                 var sbid = tids[1];
-                                term = $(x).hasClass('separator') ? $(x).prev().text() : $(x).text();
+                                term = $(x).hasClass('separator')
+                                    ? $(x).prev().text()
+                                    : $(x).text();
                                 doThesSearch('T', sbid, term, null);
                             }
                         }
                         break;
-                    case 'wiz_2':				// replace by
+                    case 'wiz_2': // replace by
                         if (tid.substr(0, 5) === 'TX_P.') {
                             term = $(x).text();
                             $('#THPD_WIZARDS .wiz_2 :text').val(term);
@@ -697,7 +790,7 @@ const thesaurusService = (services) => {
     function CXdblClick(e) {
         var x = e.srcElement ? e.srcElement : e.target;
         switch (x.nodeName) {
-            case 'SPAN':		// term
+            case 'SPAN': // term
                 var li = $(x).closest('li');
                 var field = li.closest('[field]').attr('field');
                 if (typeof field !== 'undefined') {
@@ -715,7 +808,7 @@ const thesaurusService = (services) => {
     }
 
     function doThesSearch(type, sbid, term, field) {
-        appEvents.emit('search.activateDatabase', {databases: [sbid]});
+        appEvents.emit('search.activateDatabase', { databases: [sbid] });
 
         let queryString = '';
         if (type === 'T') {
@@ -939,18 +1032,23 @@ const thesaurusService = (services) => {
         this.sbas_id = sbas_id;
         this._ctimer = null;
         this._xmlhttp = null;
-        this.tObj = {TH_searching: null, TH_P: null, TH_K: null};
+        this.tObj = { TH_searching: null, TH_P: null, TH_K: null };
         this.search = function (txt) {
             if (this._ctimer) {
                 clearTimeout(this._ctimer);
             }
             this._ctimer = setTimeout(() => {
-                return options.thlist['s' + this.sbas_id].search_delayed('"' + txt.replace("'", "\\'") + '"');
+                return options.thlist['s' + this.sbas_id].search_delayed(
+                    '"' + txt.replace("'", "\\'") + '"'
+                );
             }, 100);
         };
         this.search_delayed = function (txt) {
             var me = this;
-            if (this._xmlttp.abort && typeof this._xmlttp.abort === 'function') {
+            if (
+                this._xmlttp.abort &&
+                typeof this._xmlttp.abort === 'function'
+            ) {
                 this._xmlhttp.abort();
             }
             var url = '/xmlhttp/openbranches_prod.x.php';
@@ -967,19 +1065,18 @@ const thesaurusService = (services) => {
                 success: function (ret) {
                     me.xmlhttpstatechanged(ret);
                 },
-                error: function () {
-
-                },
-                timeout: function () {
-
-                }
+                error: function () {},
+                timeout: function () {}
             });
 
             this._ctimer = null;
         };
         this.openBranch = function (id, thid) {
             var me = this;
-            if (this._xmlttp.abort && typeof this._xmlttp.abort === 'function') {
+            if (
+                this._xmlttp.abort &&
+                typeof this._xmlttp.abort === 'function'
+            ) {
                 this._xmlhttp.abort();
             }
             var url = '/xmlhttp/getterm_prod.x.php';
@@ -997,33 +1094,35 @@ const thesaurusService = (services) => {
                 success: function (ret) {
                     me.xmlhttpstatechanged(ret, id);
                 },
-                error: function () {
-
-                },
-                timeout: function () {
-
-                }
+                error: function () {},
+                timeout: function () {}
             });
-
         };
         this.xmlhttpstatechanged = function (ret, id) {
             try {
                 if (!this.tObj.TH_searching) {
-                    this.tObj.TH_searching = document.getElementById('TH_searching');
+                    this.tObj.TH_searching = document.getElementById(
+                        'TH_searching'
+                    );
                 }
-                this.tObj.TH_searching.src = '/assets/common/images/icons/ftp-loader-blank.gif';
+                this.tObj.TH_searching.src =
+                    '/assets/common/images/icons/ftp-loader-blank.gif';
                 // && (typeof(ret.parsed)=="undefined" || ret.parsed))
                 if (ret) {
                     let htmlnodes = ret.getElementsByTagName('html');
                     let htmlnode = htmlnodes.item(0).firstChild;
                     if (htmlnodes && htmlnodes.length === 1 && htmlnode) {
-                        if (typeof (id) === 'undefined') {
+                        if (typeof id === 'undefined') {
                             // called from search or 'auto' : full thesaurus search
                             if (!this.tObj.TH_P) {
-                                this.tObj.TH_P = document.getElementById('TH_P.' + this.sbas_id + '.T');
+                                this.tObj.TH_P = document.getElementById(
+                                    'TH_P.' + this.sbas_id + '.T'
+                                );
                             }
                             if (!this.tObj.TH_K) {
-                                this.tObj.TH_K = document.getElementById('TH_K.' + this.sbas_id + '.T');
+                                this.tObj.TH_K = document.getElementById(
+                                    'TH_K.' + this.sbas_id + '.T'
+                                );
                             }
                             this.tObj.TH_P.innerHTML = '...';
                             this.tObj.TH_K.className = 'h';
@@ -1032,18 +1131,16 @@ const thesaurusService = (services) => {
                             // called from 'openBranch'
                             //			var js = "document.getElementById('TH_K."+thid+"').innerHTML = \""+htmlnode.nodeValue+"\"";
                             //			self.setTimeout(js, 10);
-                            document.getElementById('TH_K.' + id).innerHTML = htmlnode.nodeValue;
+                            document.getElementById('TH_K.' + id).innerHTML =
+                                htmlnode.nodeValue;
                         }
                     }
                 }
-            } catch (err) {
-            }
+            } catch (err) {}
         };
     }
 
-
     function startThesaurus() {
-
         options.thlist = config.thlist;
         options.currentWizard = '???';
 
@@ -1091,8 +1188,7 @@ const thesaurusService = (services) => {
                         T_acceptCandidates(menuItem, menu, 'SY');
                     }
                 }
-            ]
-            ,
+            ],
             {
                 className: 'THPD_TMenu',
                 beforeShow: function () {
@@ -1100,11 +1196,18 @@ const thesaurusService = (services) => {
                     menuOptions.eq(1).addClass('context-menu-item-disabled');
                     menuOptions.eq(2).addClass('context-menu-item-disabled');
 
-                    var x = this._showEvent.srcElement ? this._showEvent.srcElement : this._showEvent.target;
+                    var x = this._showEvent.srcElement
+                        ? this._showEvent.srcElement
+                        : this._showEvent.target;
                     var li = $(x).closest('li');
                     this._li = null;
                     var tcids = li.attr('id').split('.');
-                    if (tcids.length > 2 && tcids[0] === 'TX_P' && tcids[2] !== 'T' && x.nodeName !== 'LI') {
+                    if (
+                        tcids.length > 2 &&
+                        tcids[0] === 'TX_P' &&
+                        tcids[2] !== 'T' &&
+                        x.nodeName !== 'LI'
+                    ) {
                         this._li = li;
                         tcids.shift();
                         var sbas = tcids.shift();
@@ -1118,14 +1221,23 @@ const thesaurusService = (services) => {
                             li.addClass('selected');
                         }
 
-                        if (trees.C._selInfos && trees.C._selInfos.sbas === sbas) {
+                        if (
+                            trees.C._selInfos &&
+                            trees.C._selInfos.sbas === sbas
+                        ) {
                             // whe check if the candidates can be validated here
                             // aka does the tbranch of the field (of candidates) reaches the paste location ?
                             var parms = {
-                                url: '/xmlhttp/checkcandidatetarget.j.php'
-                                + '?sbid=' + sbas
-                                + '&acf=' + encodeURIComponent(trees.C._selInfos.field)
-                                + '&id=' + encodeURIComponent(tcids.join('.')),
+                                url:
+                                    '/xmlhttp/checkcandidatetarget.j.php' +
+                                    '?sbid=' +
+                                    sbas +
+                                    '&acf=' +
+                                    encodeURIComponent(
+                                        trees.C._selInfos.field
+                                    ) +
+                                    '&id=' +
+                                    encodeURIComponent(tcids.join('.')),
                                 data: [],
                                 async: false,
                                 cache: false,
@@ -1134,18 +1246,25 @@ const thesaurusService = (services) => {
                                 success: function (result, textStatus) {
                                     this._ret = result;
                                     if (result.acceptable) {
-                                        menuOptions.eq(1).removeClass('context-menu-item-disabled');
-                                        menuOptions.eq(2).removeClass('context-menu-item-disabled');
+                                        menuOptions
+                                            .eq(1)
+                                            .removeClass(
+                                                'context-menu-item-disabled'
+                                            );
+                                        menuOptions
+                                            .eq(2)
+                                            .removeClass(
+                                                'context-menu-item-disabled'
+                                            );
                                     }
                                 },
-                                _ret: null	// private alchemy
+                                _ret: null // private alchemy
                             };
 
                             $.ajax(parms);
-
                         }
                     }
-                    return (true);
+                    return true;
                 }
             }
         );
@@ -1156,14 +1275,16 @@ const thesaurusService = (services) => {
             contextMenu.push({
                 label: langPlist.label,
                 onclick: function (menuItem, menu) {
-                    C_MenuOption(menuItem, menu, 'ACCEPT', {lng: langPlist.lngCode});
+                    C_MenuOption(menuItem, menu, 'ACCEPT', {
+                        lng: langPlist.lngCode
+                    });
                 }
             });
         }
 
         contextMenu.push({
             label: config.replaceWithMsg,
-//      disabled:true,
+            //      disabled:true,
             onclick: function (menuItem, menu) {
                 C_MenuOption(menuItem, menu, 'REPLACE', null);
             }
@@ -1171,68 +1292,79 @@ const thesaurusService = (services) => {
 
         contextMenu.push({
             label: config.removeActionMsg,
-//      disabled:true,
+            //      disabled:true,
             onclick: function (menuItem, menu) {
                 C_MenuOption(menuItem, menu, 'DELETE', null);
             }
         });
 
-        trees.C.tree.contextMenu(
-            contextMenu,
-            {
-                beforeShow: function () {
-                    var ret = false;
+        trees.C.tree.contextMenu(contextMenu, {
+            beforeShow: function () {
+                var ret = false;
 
-                    var x = this._showEvent.srcElement ? this._showEvent.srcElement : this._showEvent.target;
-                    var li = $(x).closest('li');
+                var x = this._showEvent.srcElement
+                    ? this._showEvent.srcElement
+                    : this._showEvent.target;
+                var li = $(x).closest('li');
 
-                    if (!li.hasClass('selected')) {
-                        // rclick OUTSIDE the selection : unselect all
-                        // lisel.removeClass('selected');
-                        trees.C.tree.find('LI').removeClass('selected');
-                        options.lastClickedCandidate = null;
-                    }
-                    var tcids = li.attr('id').split('.');
-                    if (tcids.length === 4 && tcids[0] === 'CX_P' && x.nodeName !== 'LI') {
-                        // candidate context menu only clicking on final term
-                        if (!li.hasClass('selected')) {
-                            li.addClass('selected');
-                        }
-                        //				this._cutInfos = { sbid:tcids[1], field:li.parent().attr('field') };	// private alchemy
-                        this._srcElement = li;						// private alchemy
-
-                        // as selection changes, compute usefull info (field, sbas)
-                        var lisel = trees.C.tree.find('LI .selected');
-                        if (lisel.length > 0) {
-                            // lisel are all from the same candidate field, so check the first li
-                            var li0 = lisel.eq(0);
-                            var field = li0.parent().attr('field');
-                            var sbas = li0.attr('id').split('.')[1];
-
-                            // glue selection info to the tree
-                            trees.C._selInfos = {sel: lisel, field: field, sbas: sbas, n: lisel.length};
-
-                            if (lisel.length === 1) {
-
-                                $(this.menu).find('.context-menu-item').eq(config.languagesCount).removeClass('context-menu-item-disabled');
-                            } else {
-                                $(this.menu).find('.context-menu-item').eq(config.languagesCount).addClass('context-menu-item-disabled');
-                            }
-                        } else {
-                            trees.C._selInfos = null;
-                        }
-
-                        ret = true;
-                    }
-                    return (ret);
+                if (!li.hasClass('selected')) {
+                    // rclick OUTSIDE the selection : unselect all
+                    // lisel.removeClass('selected');
+                    trees.C.tree.find('LI').removeClass('selected');
+                    options.lastClickedCandidate = null;
                 }
-            }
-        );
+                var tcids = li.attr('id').split('.');
+                if (
+                    tcids.length === 4 &&
+                    tcids[0] === 'CX_P' &&
+                    x.nodeName !== 'LI'
+                ) {
+                    // candidate context menu only clicking on final term
+                    if (!li.hasClass('selected')) {
+                        li.addClass('selected');
+                    }
+                    //				this._cutInfos = { sbid:tcids[1], field:li.parent().attr('field') };	// private alchemy
+                    this._srcElement = li; // private alchemy
 
+                    // as selection changes, compute usefull info (field, sbas)
+                    var lisel = trees.C.tree.find('LI .selected');
+                    if (lisel.length > 0) {
+                        // lisel are all from the same candidate field, so check the first li
+                        var li0 = lisel.eq(0);
+                        var field = li0.parent().attr('field');
+                        var sbas = li0.attr('id').split('.')[1];
+
+                        // glue selection info to the tree
+                        trees.C._selInfos = {
+                            sel: lisel,
+                            field: field,
+                            sbas: sbas,
+                            n: lisel.length
+                        };
+
+                        if (lisel.length === 1) {
+                            $(this.menu)
+                                .find('.context-menu-item')
+                                .eq(config.languagesCount)
+                                .removeClass('context-menu-item-disabled');
+                        } else {
+                            $(this.menu)
+                                .find('.context-menu-item')
+                                .eq(config.languagesCount)
+                                .addClass('context-menu-item-disabled');
+                        }
+                    } else {
+                        trees.C._selInfos = null;
+                    }
+
+                    ret = true;
+                }
+                return ret;
+            }
+        });
     }
 
-
-    return {initialize, show};
+    return { initialize, show };
 };
 
 export default thesaurusService;
