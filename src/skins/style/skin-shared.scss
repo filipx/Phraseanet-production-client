@@ -11,7 +11,7 @@ $pluginsColor: #fff;
 }
 
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
     border-radius: 0;
 }
 
@@ -156,6 +156,9 @@ EM {
 
 div#PREVIEWTITLEWRAPPER {
     top: 10px;
+    span {
+        line-height: 45px;
+    }
 }
 
 .PNB10 {
@@ -236,24 +239,64 @@ span.ww_winTitle {
 #keyboard-dialog ul li {
 }
 
-.cont_infos {
+.wrapper_diaspo {
     position: absolute;
-    bottom: 10px;
-    height: 60px;
-    top: auto;
-    text-align: center;
-    width: 70px;
-    right: 60px;
-    div {
-        line-height: 20px;
-        font-size: $smallFontSize;
-        font-weight: bold;
-    }
-    span {
-        cursor: pointer;
-        font-size: $smallFontSize;
+    bottom: 0px;
+    top: 0px;
+    width: 130px;
+    right: 0px;
+    .cont_infos {
+        text-align: center;
+        width: 100%;
+        div {
+            line-height: 20px;
+            font-size: $smallFontSize;
+            font-weight: bold;
+        }
+        span {
+            cursor: pointer;
+            font-size: $smallFontSize;
+            padding: 4px;
+        }
+        img {
+            width: 20px;
+        }
+        button {
+            background: transparent;
+            border: 0;
+            font-size: 50px;
+            color: #474747;
+            display: inline-block;
+            margin: 0px 16px;
+            padding: 0px;
+            border: none !important;
+            outline: none !important;
+        }
     }
 }
+
+.edit_button img {
+    width: 20px;
+}
+
+// .cont_infos {
+//   position: absolute;
+//   bottom: 10px;
+//   height: 60px;
+//   top: auto;
+//   text-align: center;
+//   width: 70px;
+//   right: 60px;
+//   div {
+//     line-height: 20px;
+//     font-size: $smallFontSize;
+//     font-weight: bold;
+//   }
+//   span {
+//     cursor: pointer;
+//     font-size: $smallFontSize;
+//   }
+// }
 
 #SPANTITLE img {
     height: 16px;
@@ -294,6 +337,37 @@ span.ww_winTitle {
 .ui-selectable-helper {
     border: 1px dotted #cccccc;
     z-index: 10000;
+}
+
+.invisible-btn {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    height: 320px;
+    width: 150px;
+    margin-top: -160px;
+    i {
+        display: none;
+        font-size: 120px;
+        color: #4d4d4d;
+        text-shadow: -1px -1px 1px #888, 1px -1px 1px #888, -1px 1px 1px #888,
+            1px 1px 1px #888;
+        opacity: .8;
+    }
+}
+
+#right-btn {
+    right: 10px;
+}
+
+#left-btn {
+    left: 10px;
 }
 
 /******* DIALOGS **************************************************************/
