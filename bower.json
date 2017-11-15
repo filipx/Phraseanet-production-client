@@ -1,18 +1,26 @@
 {
-    "name": "phraseanet-production-client",
-    "description": "Phraseanet frontend dependencies",
-    "main": "",
-    "authors": [
-        {
-            "name": "Mike Ng",
-            "email": "mike.esokia@gmail.com"
-        }
-    ],
-    "license": "MIT",
-    "keywords": ["phraseanet", "phraseanet-production-client"],
-    "homepage": "https://github.com/mike-esokia/Phraseanet-production-client",
-    "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
-    "dependencies": {
-        "jquery-ui": "^1.12.1"
+  "name": "phraseanet-production-client",
+  "description": "Phraseanet frontend dependencies",
+  "main": "",
+  "authors": [
+    {
+      "name": "Mike Ng",
+      "email": "mike.esokia@gmail.com"
     }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "phraseanet", "phraseanet-production-client"
+  ],
+  "homepage": "https://github.com/mike-esokia/Phraseanet-production-client",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery-ui": "^1.12.1"
+  }
 }
