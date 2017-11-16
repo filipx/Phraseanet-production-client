@@ -2,112 +2,174 @@ import $ from 'jquery';
 import * as appCommons from 'phraseanet-common';
 let highlight = require('imports-loader?$=jquery!../utils/jquery-plugins/highlight');
 let colorpicker = require('imports-loader?$=jquery!../utils/jquery-plugins/colorpicker/colorpicker');
-const preferences = (services) => {
-    const {configService, localeService, appEvents} = services;
+const preferences = services => {
+    const { configService, localeService, appEvents } = services;
     const initialize = (options = {}) => {
-        const {$container} = options;
+        const { $container } = options;
 
         render();
 
-        $container.on('click', '.open-preferences', (event) => {
+        $container.on('change', '#ADVSRCH_FILTER_FACET', event => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref('facet', $el.prop('checked'));
+            appEvents.emit('search.setFilterFacet', $el.prop('checked'));
+            appEvents.emit('search.doRefreshState');
+        });
+
+        $container.on('click', '.open-preferences', event => {
             event.preventDefault();
             openModal(event);
         });
 
-        $container.on('click', '.preferences-options-submit', (event) => {
+        $container.on('click', '.preferences-options-submit', event => {
             event.preventDefault();
             submitState();
         });
 
-        $container.on('change', '.preferences-options-start-page', (event) => {
+        $container.on('change', '.preferences-options-start-page', event => {
             event.preventDefault();
             setInitialStateOptions();
         });
 
-        $container.on('change', '.preferences-options-search-reload', (event) => {
+        $container.on('change', '.preferences-options-search-reload', event => {
             let $el = $(event.currentTarget);
             event.preventDefault();
-            appCommons.userModule.setPref('advanced_search_reload', $el.prop('checked') ? '1' : '0');
+            appCommons.userModule.setPref(
+                'advanced_search_reload',
+                $el.prop('checked') ? '1' : '0'
+            );
         });
 
-        $container.on('change', '.preferences-options-presentation-thumbnail', (event) => {
+        $container.on(
+            'change',
+            '.preferences-options-presentation-thumbnail',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('view', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+
+        $container.on(
+            'change',
+            '.preferences-options-presentation-list',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('view', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+
+        $container.on(
+            'change',
+            '.preferences-options-rollover-caption',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('rollover_thumbnail', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+
+        $container.on(
+            'change',
+            '.preferences-options-rollover-preview',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('rollover_thumbnail', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+
+        $container.on(
+            'change',
+            '.preferences-options-technical-display',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('technical_display', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+        $container.on(
+            'change',
+            '.preferences-options-rollover-preview',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('technical_display', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+        $container.on(
+            'change',
+            '.preferences-options-rollover-preview',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref('technical_display', $el.val());
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+
+        $container.on(
+            'change',
+            '.preferences-options-doctype-display',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref(
+                    'doctype_display',
+                    $el.prop('checked') ? '1' : '0'
+                );
+                appEvents.emit('search.doRefreshState');
+            }
+        );
+
+        $container.on('change', '.preferences-options-basket-status', event => {
             let $el = $(event.currentTarget);
             event.preventDefault();
-            appCommons.userModule.setPref('view', $el.val());
-            appEvents.emit('search.doRefreshState');
+            appCommons.userModule.setPref(
+                'basket_status_display',
+                $el.prop('checked') ? '1' : '0'
+            );
         });
 
-        $container.on('change', '.preferences-options-presentation-list', (event) => {
+        $container.on(
+            'change',
+            '.preferences-options-basket-caption',
+            event => {
+                let $el = $(event.currentTarget);
+                event.preventDefault();
+                appCommons.userModule.setPref(
+                    'basket_caption_display',
+                    $el.prop('checked') ? '1' : '0'
+                );
+            }
+        );
+
+        $container.on('change', '.preferences-options-basket-title', event => {
             let $el = $(event.currentTarget);
             event.preventDefault();
-            appCommons.userModule.setPref('view', $el.val());
-            appEvents.emit('search.doRefreshState');
+            appCommons.userModule.setPref(
+                'basket_title_display',
+                $el.prop('checked') ? '1' : '0'
+            );
         });
 
-        $container.on('change', '.preferences-options-rollover-caption', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('rollover_thumbnail', $el.val());
-            appEvents.emit('search.doRefreshState');
-        });
-
-        $container.on('change', '.preferences-options-rollover-preview', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('rollover_thumbnail', $el.val());
-            appEvents.emit('search.doRefreshState');
-        });
-
-        $container.on('change', '.preferences-options-technical-display', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('technical_display', $el.val());
-            appEvents.emit('search.doRefreshState');
-        });
-        $container.on('change', '.preferences-options-rollover-preview', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('technical_display', $el.val());
-            appEvents.emit('search.doRefreshState');
-        });
-        $container.on('change', '.preferences-options-rollover-preview', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('technical_display', $el.val());
-            appEvents.emit('search.doRefreshState');
-        });
-
-        $container.on('change', '.preferences-options-doctype-display', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('doctype_display', $el.prop('checked') ? '1' : '0');
-            appEvents.emit('search.doRefreshState');
-        });
-
-        $container.on('change', '.preferences-options-basket-status', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('basket_status_display', $el.prop('checked') ? '1' : '0');
-        });
-
-        $container.on('change', '.preferences-options-basket-caption', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('basket_caption_display', $el.prop('checked') ? '1' : '0');
-        });
-
-        $container.on('change', '.preferences-options-basket-title', (event) => {
-            let $el = $(event.currentTarget);
-            event.preventDefault();
-            appCommons.userModule.setPref('basket_title_display', $el.prop('checked') ? '1' : '0');
-        });
-
-        $container.on('click', '.preference-change-theme-action', (event) => {
+        $container.on('click', '.preference-change-theme-action', event => {
             let $el = $(event.currentTarget);
             let color = $el.data('theme');
             let minified = configService.get('debug') ? '' : '.min';
             // setCss()
-            $('#skinCss').attr('href', `/assets/production/skin-${color}${minified}.css`);
+            $('#skinCss').attr(
+                'href',
+                `/assets/production/skin-${color}${minified}.css`
+            );
             $.post(`${configService.get('baseUrl')}/user/preferences/`, {
                 prop: 'css',
                 value: color,
@@ -124,7 +186,10 @@ const preferences = (services) => {
                 $('#nperpage_value').val(ui.value);
             },
             stop: function (event, ui) {
-                appCommons.userModule.setPref('images_per_page', $('#nperpage_value').val());
+                appCommons.userModule.setPref(
+                    'images_per_page',
+                    $('#nperpage_value').val()
+                );
             }
         });
         $('#sizeAns_slider').slider({
@@ -136,7 +201,10 @@ const preferences = (services) => {
                 $('#sizeAns_value').val(ui.value);
             },
             stop: function (event, ui) {
-                appCommons.userModule.setPref('images_size', $('#sizeAns_value').val());
+                appCommons.userModule.setPref(
+                    'images_size',
+                    $('#sizeAns_value').val()
+                );
             }
         });
         $('#backcolorpickerHolder').ColorPicker({
@@ -161,26 +229,45 @@ const preferences = (services) => {
 
                 sim_b = 0.1 * hsb.b;
 
-                var sim_rgb = appCommons.utilsModule.hsl2rgb(hsb.h, hsb.s, sim_b);
-                var sim_hex = appCommons.utilsModule.RGBtoHex(sim_rgb.r, sim_rgb.g, sim_rgb.b);
+                var sim_rgb = appCommons.utilsModule.hsl2rgb(
+                    hsb.h,
+                    hsb.s,
+                    sim_b
+                );
+                var sim_hex = appCommons.utilsModule.RGBtoHex(
+                    sim_rgb.r,
+                    sim_rgb.g,
+                    sim_rgb.b
+                );
 
                 appCommons.userModule.setPref('background-selection', hex);
-                appCommons.userModule.setPref('background-selection-disabled', sim_hex);
+                appCommons.userModule.setPref(
+                    'background-selection-disabled',
+                    sim_hex
+                );
                 appCommons.userModule.setPref('fontcolor-selection', back_hex);
 
                 $('style[title=color_selection]').empty();
 
-                var datas = '.diapo.selected,#reorder_box .diapo.selected, #EDIT_ALL .diapo.selected, .list.selected, .list.selected .diapo' +
+                var datas =
+                    '.diapo.selected,#reorder_box .diapo.selected, #EDIT_ALL .diapo.selected, .list.selected, .list.selected .diapo' +
                     '{' +
-                    '    COLOR: #' + back_hex + ';' +
-                    '    BACKGROUND-COLOR: #' + hex + ';' +
+                    '    COLOR: #' +
+                    back_hex +
+                    ';' +
+                    '    BACKGROUND-COLOR: #' +
+                    hex +
+                    ';' +
                     '}';
                 $('style[title=color_selection]').empty().text(datas);
             }
         });
-        $('#backcolorpickerHolder').find('.colorpicker_submit').append($('#backcolorpickerHolder .submiter')).bind('click', function () {
-            $(this).highlight('#CCCCCC');
-        });
+        $('#backcolorpickerHolder')
+            .find('.colorpicker_submit')
+            .append($('#backcolorpickerHolder .submiter'))
+            .bind('click', function () {
+                $(this).highlight('#CCCCCC');
+            });
         $('#look_box .tabs').tabs();
     };
 
@@ -194,9 +281,9 @@ const preferences = (services) => {
         }
         // generates themes
         $('#theme-container').empty().append(themeTpl);
-    }
+    };
 
-// look_box
+    // look_box
     function setInitialStateOptions() {
         var el = $('#look_box_settings select[name=start_page]');
 
@@ -217,31 +304,32 @@ const preferences = (services) => {
         var el = $('#look_box_settings select[name=start_page]');
         var val = el.val();
 
-
-        var start_page_query = $('#look_box_settings input[name=start_page_value]').val();
+        var start_page_query = $(
+            '#look_box_settings input[name=start_page_value]'
+        ).val();
 
         if (val === 'QUERY') {
             appCommons.userModule.setPref('start_page_query', start_page_query);
         }
 
         appCommons.userModule.setPref('start_page', val);
-
     }
 
-
     function openModal(event) {
-        $('#look_box').dialog({
-            closeOnEscape: true,
-            resizable: false,
-            width: 450,
-            height: 500,
-            modal: true,
-            draggable: false,
-            overlay: {
-                backgroundColor: '#000',
-                opacity: 0.7
-            }
-        }).dialog('open');
+        $('#look_box')
+            .dialog({
+                closeOnEscape: true,
+                resizable: false,
+                width: 450,
+                height: 500,
+                modal: true,
+                draggable: false,
+                overlay: {
+                    backgroundColor: '#000',
+                    opacity: 0.7
+                }
+            })
+            .dialog('open');
     }
 
     return {
