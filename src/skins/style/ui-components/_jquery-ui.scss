@@ -213,6 +213,7 @@ $tabDisabledTextColor: $mediumTextActiveColor !default;
 .ui-dialog.ui-widget-content {
     border: $modalBorder;
     background: $modalBackground;
+    z-index: 5000;
 }
 
 .ui-dialog-titlebar {
@@ -244,7 +245,7 @@ $tabDisabledTextColor: $mediumTextActiveColor !default;
 .ui-autocomplete.ui-widget-content .ui-state-focus,
 .ui-autocomplete.ui-widget-header .ui-state-focus {
     background-image: none;
-    background-color: $btnBackgroundHighlight;
+    background-color: #515151;
     border: none;
     margin: 0;
     border-radius: 0;
