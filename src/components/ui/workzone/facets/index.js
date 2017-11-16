@@ -16,9 +16,9 @@ const workzoneFacets = services => {
         selectedFacetValues = [];
         return selectedFacetValues;
     };
-    var loadFacets = function (facets) {
+    var loadFacets = function (data) {
         // Convert facets data to fancytree source format
-        var treeSource = _.map(facets, function (facet) {
+        var treeSource = _.map(data.facets, function (facet) {
             // Values
             var values = _.map(facet.values, function (value) {
                 return {
@@ -50,6 +50,8 @@ const workzoneFacets = services => {
             'Type_Name'
         ]);
 
+        treeSource = _shouldFilterSingleContent(treeSource, data.filterFacet);
+
         return _getFacetsTree().reload(treeSource);
     };
 
@@ -65,6 +67,28 @@ const workzoneFacets = services => {
             let B = key(b);
             return (A < B ? -1 : A > B ? 1 : 0) * [-1, 1][+!!reverse];
         };
+    }
+
+    function _shouldFilterSingleContent(source, shouldFilter) {
+        var filteredSource = [];
+        if (shouldFilter === true) {
+            _.forEach(source, function (facet) {
+                //close expansion for facet containing selected values
+                if (!_.isUndefined(selectedFacetValues[facet.title])) {
+                    facet.expanded = false;
+                }
+                if (
+                    !_.isUndefined(facet.children) &&
+                    (facet.children.length > 1 ||
+                        !_.isUndefined(selectedFacetValues[facet.title]))
+                ) {
+                    filteredSource.push(facet);
+                }
+            });
+            source = filteredSource;
+        }
+
+        return source;
     }
 
     function _sortByPredefinedFacets(source, field, predefinedFieldOrder) {
