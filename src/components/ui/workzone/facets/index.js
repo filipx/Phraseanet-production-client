@@ -122,7 +122,7 @@ const workzoneFacets = services => {
             $facetsTree.fancytree({
                 // activate and expand
                 clickFolderMode: 3,
-                icon: false,
+                icons: false,
                 source: [],
                 activate: function (event, data) {
                     var query = data.node.data.query;
