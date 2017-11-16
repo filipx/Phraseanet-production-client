@@ -61,8 +61,8 @@ const basketCreate = (services) => {
         $('form', $dialogBox).bind('submit', function (event) {
 
             var $form = $(this);
-            var dialog = $dialogBox.closest('.ui-dialog');
-            var buttonPanel = dialog.find('.ui-dialog-buttonpane');
+            var $dialog = $dialogBox.closest('.ui-dialog');
+            var buttonPanel = $dialog.find('.ui-dialog-buttonpane');
 
             // @TODO should be in a service:
             $.ajax({

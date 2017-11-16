@@ -1,6 +1,6 @@
 {
     "name": "phraseanet-production-client",
-    "version": "0.19.25",
+    "version": "0.32.2",
     "description": "Phraseanet frontend dependencies",
     "scripts": {
         "clean": "rimraf dist",
@@ -31,7 +31,8 @@
         "asset-server": "node config/webpack/webpack.hot.assets.config",
         "publish-patch": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version patch && npm publish",
         "publish-minor": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version minor && npm publish",
-        "postpublish": "git push origin master --follow-tags"
+        "postpublish": "git push origin master --follow-tags",
+        "postinstall": "./node_modules/.bin/bower install"
     },
     "pre-commit": ["test"],
     "repository": {
@@ -39,7 +40,7 @@
         "url": "git+https://github.com/alchemy-fr/Phraseanet-production-client.git"
     },
     "keywords": ["phraseanet"],
-    "files": ["dist", "src"],
+    "files": ["dist", "src", "bower.json"],
     "devDependencies": {
         "babel-cli": "^6.24.1",
         "babel-core": "^6.25.0",
@@ -49,6 +50,7 @@
         "babel-polyfill": "^6.23.0",
         "babel-preset-es2015": "^6.24.1",
         "babel-preset-stage-0": "^6.24.1",
+        "bower": "^1.8.0",
         "chai": "^3.5.0",
         "chai-as-promised": "^7.1.1",
         "coveralls": "^2.13.1",
@@ -132,7 +134,7 @@
         "jquery-lazyload": "^1.9.7",
         "jquery-treeview": "https://github.com/alchemy-fr/jquery-treeview.git",
         "jquery-ui": "~1.10",
-        "jquery.fancytree": "^2.23.0",
+        "jquery.fancytree": "~2.24.0",
         "leaflet": "^1.1.0",
         "leaflet-contextmenu": "^1.4.0",
         "leaflet-draw": "^0.4.10",
