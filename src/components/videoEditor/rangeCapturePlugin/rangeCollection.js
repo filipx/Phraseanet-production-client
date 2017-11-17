@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import videojs from 'video.js';
-import RangeItem from './RangeItem';
+import RangeItem from './rangeItem';
 import {formatTime} from './utils';
 /**
  * VideoJs Range Collection

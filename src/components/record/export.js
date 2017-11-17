@@ -2,8 +2,8 @@ import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
 const humane = require('humane-js');
 
-const exportRecord = (services) => {
-    const {configService, localeService, appEvents} = services;
+const exportRecord = services => {
+    const { configService, localeService, appEvents } = services;
     const url = configService.get('baseUrl');
     let $container = null;
     const initialize = () => {
@@ -29,7 +29,7 @@ const exportRecord = (services) => {
         });
     };
 
-    const openModal = (datas) => doExport(datas);
+    const openModal = datas => doExport(datas);
 
     function doExport(datas) {
         var $dialog = dialog.create(services, {
@@ -45,12 +45,15 @@ const exportRecord = (services) => {
                 $dialog.setContent(data);
                 if (window.exportConfig.isGuest) {
                     dialog.get(1).close();
-                    let guestModal = dialog.create({
-                        size: '500x100',
-                        closeOnEscape: true,
-                        closeButton: false,
-                        title: window.exportConfig.msg.modalTile
-                    }, 2);
+                    let guestModal = dialog.create(
+                        {
+                            size: '500x100',
+                            closeOnEscape: true,
+                            closeButton: false,
+                            title: window.exportConfig.msg.modalTile
+                        },
+                        2
+                    );
                     guestModal.setContent(window.exportConfig.msg.modalContent);
                 } else {
                     _onExportReady($dialog, window.exportConfig);
@@ -70,19 +73,22 @@ const exportRecord = (services) => {
 
         var tabs = $('.tabs', $dialog.getDomElement());
 
-
         if (dataConfig.haveFtp === true) {
-            $('#ftp_form_selector').bind('change', function () {
-                $('#ftp .ftp_form').hide();
-                $('#ftp .ftp_form_' + $(this).val()).show();
-                $('.ftp_folder_check', dialog.get(1).getDomElement()).unbind('change').bind('change', function () {
-                    if ($(this).prop('checked')) {
-                        $(this).next().prop('disabled', false);
-                    } else {
-                        $(this).next().prop('disabled', true);
-                    }
-                });
-            }).trigger('change');
+            $('#ftp_form_selector')
+                .bind('change', function () {
+                    $('#ftp .ftp_form').hide();
+                    $('#ftp .ftp_form_' + $(this).val()).show();
+                    $('.ftp_folder_check', dialog.get(1).getDomElement())
+                        .unbind('change')
+                        .bind('change', function () {
+                            if ($(this).prop('checked')) {
+                                $(this).next().prop('disabled', false);
+                            } else {
+                                $(this).next().prop('disabled', true);
+                            }
+                        });
+                })
+                .trigger('change');
         }
 
         $('a.TOUview').bind('click', function (event) {
@@ -118,8 +124,12 @@ const exportRecord = (services) => {
             var count = 0;
 
             $('input[name="obj[]"]', $('#download')).each(function () {
-                var total_el = $('#download input[name=download_' + $(this).val() + ']');
-                var count_el = $('#download input[name=count_' + $(this).val() + ']');
+                var total_el = $(
+                    '#download input[name=download_' + $(this).val() + ']'
+                );
+                var count_el = $(
+                    '#download input[name=count_' + $(this).val() + ']'
+                );
                 if ($(this).prop('checked')) {
                     total += parseInt($(total_el).val(), 10);
                     count += parseInt($(count_el).val(), 10);
@@ -127,11 +137,25 @@ const exportRecord = (services) => {
             });
 
             if (count > 1 && total / 1024 / 1024 > dataConfig.maxDownload) {
-                if (confirm(`${dataConfig.msg.fileTooLarge} \n ${dataConfig.msg.fileTooLargeAlt} \n ${dataConfig.msg.fileTooLargeEmail}`)) {
-                    $('input[name="obj[]"]:checked', $('#download')).each(function (i, n) {
-                        $('input[name="obj[]"][value="' + $(n).val() + '"]', $('#sendmail')).prop('checked', true);
+                if (
+                    confirm(
+                        `${dataConfig.msg.fileTooLarge} \n ${dataConfig.msg
+                            .fileTooLargeAlt} \n ${dataConfig.msg
+                            .fileTooLargeEmail}`
+                    )
+                ) {
+                    $(
+                        'input[name="obj[]"]:checked',
+                        $('#download')
+                    ).each(function (i, n) {
+                        $(
+                            'input[name="obj[]"][value="' + $(n).val() + '"]',
+                            $('#sendmail')
+                        ).prop('checked', true);
                     });
-                    $('input[name="destmail"]', $('#sendmail')).val(dataConfig.user.email);
+                    $('input[name="destmail"]', $('#sendmail')).val(
+                        dataConfig.user.email
+                    );
 
                     var tabs = $('.tabs', $dialog.getDomElement());
                     tabs.tabs('option', 'active', 1);
@@ -155,10 +179,16 @@ const exportRecord = (services) => {
 
             var $this = $(this);
             $this.prop('disabled', true).addClass('disabled');
-            $.post(`${url}prod/order/`, options, function (data) {
+            $.post(
+                `${url}prod/order/`,
+                options,
+                function (data) {
                     $this.prop('disabled', false).removeClass('disabled');
 
-                    $('#order .order_button_loader').css('visibility', 'hidden');
+                    $('#order .order_button_loader').css(
+                        'visibility',
+                        'hidden'
+                    );
 
                     if (!data.error) {
                         title = dataConfig.msg.success;
@@ -182,7 +212,8 @@ const exportRecord = (services) => {
                     }
 
                     return;
-                }, 'json'
+                },
+                'json'
             );
         });
 
@@ -205,7 +236,8 @@ const exportRecord = (services) => {
             var options_join = $('#ftp_joined').serialize();
 
             $this.prop('disabled', true);
-            $.post(`${url}prod/export/ftp/`,
+            $.post(
+                `${url}prod/export/ftp/`,
                 options_addr + '&' + options_join,
                 function (data) {
                     $this.prop('disabled', false);
@@ -215,12 +247,16 @@ const exportRecord = (services) => {
                         humane.info(data.message);
                         $dialog.close();
                     } else {
-                        var alert = dialog.create(services, {
-                            size: 'Alert',
-                            closeOnEscape: true,
-                            closeButton: true,
-                            title: dataConfig.msg.warning
-                        }, 2);
+                        var alert = dialog.create(
+                            services,
+                            {
+                                size: 'Alert',
+                                closeOnEscape: true,
+                                closeButton: true,
+                                title: dataConfig.msg.warning
+                            },
+                            2
+                        );
 
                         alert.setContent(data.message);
                     }
@@ -233,10 +269,11 @@ const exportRecord = (services) => {
         $('#ftp .tryftp_button').bind('click', function () {
             $('#ftp .tryftp_button_loader').css('visibility', 'visible');
             var $this = $(this);
-            $this.prop('disabled', true)
+            $this.prop('disabled', true);
             var options_addr = $('#ftp_form_stock form:visible').serialize();
 
-            $.post(`${url}prod/export/ftp/test/`,
+            $.post(
+                `${url}prod/export/ftp/test/`,
                 // no need to include 'ftp_joined' checkboxes to test ftp
                 options_addr,
                 function (data) {
@@ -245,10 +282,14 @@ const exportRecord = (services) => {
                     var options = {
                         size: 'Alert',
                         closeButton: true,
-                        title: data.success ? dataConfig.msg.success : dataConfig.msg.warning
+                        title: data.success
+                            ? dataConfig.msg.success
+                            : dataConfig.msg.warning
                     };
 
-                    dialog.create(services, options, 3).setContent(data.message);
+                    dialog
+                        .create(services, options, 3)
+                        .setContent(data.message);
 
                     $this.prop('disabled', false);
 
@@ -267,7 +308,9 @@ const exportRecord = (services) => {
             }
 
             if ($('iframe[name=""]').length === 0) {
-                $('body').append('<iframe style="display:none;" name="sendmail_target"></iframe>');
+                $('body').append(
+                    '<iframe style="display:none;" name="sendmail_target"></iframe>'
+                );
             }
 
             $('#sendmail form').submit();
@@ -280,13 +323,18 @@ const exportRecord = (services) => {
             dateFormat: 'yy-mm-dd'
         });
 
-        $('a.undisposable_link', $dialog.getDomElement()).bind('click', function () {
+        $(
+            'a.undisposable_link',
+            $dialog.getDomElement()
+        ).bind('click', function () {
             $(this).parent().parent().find('.undisposable').slideToggle();
             return false;
         });
 
-        $('input[name="obj[]"]', $('#download, #sendmail, #ftp')).bind('change', function () {
-
+        $(
+            'input[name="obj[]"]',
+            $('#download, #sendmail, #ftp')
+        ).bind('change', function () {
             var $form = $(this).closest('form');
 
             if ($('input.caption[name="obj[]"]:checked', $form).length > 0) {
@@ -295,19 +343,23 @@ const exportRecord = (services) => {
                 $('div.businessfields', $form).hide();
             }
         });
-    }
+    };
 
     function check_TOU(container, dataConfig) {
         let checkbox = $('input[name="TOU_accept"]', $(container));
         let go = checkbox.length === 0 || checkbox.prop('checked');
         let alert;
         if (!go) {
-            alert = dialog.create(services, {
-                size: 'Small',
-                closeOnEscape: true,
-                closeButton: true,
-                title: dataConfig.msg.warning
-            }, 2);
+            alert = dialog.create(
+                services,
+                {
+                    size: 'Small',
+                    closeOnEscape: true,
+                    closeButton: true,
+                    title: dataConfig.msg.warning
+                },
+                2
+            );
 
             alert.setContent(dataConfig.msg.termOfUseAgree);
 
@@ -337,24 +389,32 @@ const exportRecord = (services) => {
         });
 
         if (required) {
-            alert = dialog.create(services, {
-                size: 'Alert',
-                closeOnEscape: true,
-                closeButton: true,
-                title: dataConfig.msg.warning
-            }, 2);
+            alert = dialog.create(
+                services,
+                {
+                    size: 'Alert',
+                    closeOnEscape: true,
+                    closeButton: true,
+                    title: dataConfig.msg.warning
+                },
+                2
+            );
 
             alert.setContent(dataConfig.msg.requiredFields);
 
             return false;
         }
         if (!go) {
-            alert = dialog.create(services, {
-                size: 'Alert',
-                closeOnEscape: true,
-                closeButton: true,
-                title: dataConfig.msg.warning
-            }, 2);
+            alert = dialog.create(
+                services,
+                {
+                    size: 'Alert',
+                    closeOnEscape: true,
+                    closeButton: true,
+                    title: dataConfig.msg.warning
+                },
+                2
+            );
 
             alert.setContent(dataConfig.msg.missingSubdef);
 
@@ -364,7 +424,7 @@ const exportRecord = (services) => {
         return true;
     }
 
-    return {initialize, openModal};
+    return { initialize, openModal };
 };
 
 export default exportRecord;

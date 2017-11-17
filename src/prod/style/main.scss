@@ -6,6 +6,11 @@
 // @import '../../vendors/colorpicker/styles/colorpicker';
 @import '../../../stylesheets/shared/main';
 
+#ADVSRCH_SORT_ZONE {
+    margin-bottom: 10px;
+    margin-top: 15px;
+}
+
 #idFrameC {
     top: 10px;
     bottom: 10px;
@@ -148,6 +153,21 @@
     background-image: url('#{$iconsPath}push16.png');
 }
 
+.history-add {
+    background-image: url('#{$iconsPath}add.png');
+}
+
+.history-collection,
+.history-status,
+.history-print,
+.history-substit,
+.history-publish,
+.history-download,
+.history-mail,
+.history-ftp,
+.history-edit,
+.history-validate,
+.history-push,
 .history-add {
     background-image: url('#{$iconsPath}add.png');
 }
