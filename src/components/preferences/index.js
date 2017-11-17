@@ -41,6 +41,15 @@ const preferences = services => {
             );
         });
 
+        $container.on('change', '.preferences-options-use-truncation', event => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'use_truncation',
+                $el.prop('checked') ? '1' : '0'
+            );
+        });
+
         $container.on(
             'change',
             '.preferences-options-presentation-thumbnail',
