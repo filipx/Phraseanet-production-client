@@ -16,14 +16,14 @@ import previewRecordService from '../record/recordPreview';
 import Alerts from '../utils/alert';
 import uploader from '../uploader';
 
-const ui = (services) => {
-    const {configService, localeService, appEvents} = services;
+const ui = services => {
+    const { configService, localeService, appEvents } = services;
     let activeZone = false;
-    let searchSelection = {asArray: [], serialized: ''};
-    let workzoneSelection = {asArray: [], serialized: ''};
+    let searchSelection = { asArray: [], serialized: '' };
+    let workzoneSelection = { asArray: [], serialized: '' };
 
-    const initialize = (options) => {
-        let {$container} = options;
+    const initialize = options => {
+        let { $container } = options;
         // init state navigation
         // records and baskets actions in global interface:
         exportRecord(services).initialize();
@@ -46,20 +46,18 @@ const ui = (services) => {
         });
         previewRecord.initialize();
 
-
         // add interface components:
         toolbar(services).initialize();
         mainMenu(services).initialize();
         keyboard(services).initialize();
         uploader(services).initialize();
 
-
         // main menu > help context menu
         $('.shortcuts-trigger').bind('click', function () {
             keyboard(services).openModal();
         });
 
-        $container.on('keydown', (event) => {
+        $container.on('keydown', event => {
             let specialKeyState = {
                 isCancelKey: false,
                 isShortcutKey: false
@@ -81,7 +79,10 @@ const ui = (services) => {
                     // access to editor instead of edit modal
                     // specialKeyState = editRecord.onGlobalKeydown(event, specialKeyState);
                 } else if (previewIsOpen) {
-                    specialKeyState = previewRecord.onGlobalKeydown(event, specialKeyState);
+                    specialKeyState = previewRecord.onGlobalKeydown(
+                        event,
+                        specialKeyState
+                    );
                 } else if ($('#EDIT_query').hasClass('focused')) {
                     // if return true - nothing to do
                 } else if ($('.overlay').is(':visible')) {
@@ -91,10 +92,16 @@ const ui = (services) => {
                 } else {
                     switch (getActiveZone()) {
                         case 'rightFrame':
-                            specialKeyState = _searchResultKeyDownEvent(event, specialKeyState);
+                            specialKeyState = _searchResultKeyDownEvent(
+                                event,
+                                specialKeyState
+                            );
                             break;
                         case 'idFrameC':
-                            specialKeyState = _workzoneKeyDownEvent(event, specialKeyState);
+                            specialKeyState = _workzoneKeyDownEvent(
+                                event,
+                                specialKeyState
+                            );
                             break;
                         case 'mainMenu':
                             break;
@@ -107,8 +114,10 @@ const ui = (services) => {
             }
 
             if (!$('#EDIT_query').hasClass('focused') && event.keyCode !== 17) {
-
-                if ($('#keyboard-dialog.auto').length > 0 && specialKeyState.isShortcutKey) {
+                if (
+                    $('#keyboard-dialog.auto').length > 0 &&
+                    specialKeyState.isShortcutKey
+                ) {
                     keyboard(services).openModal();
                 }
             }
@@ -118,16 +127,16 @@ const ui = (services) => {
                 if (event.stopPropagation) {
                     event.stopPropagation();
                 }
-                return (false);
+                return false;
             }
-            return (true);
+            return true;
         });
     };
 
     // @TODO to be moved
     const _searchResultKeyDownEvent = (event, specialKeyState) => {
         switch (event.keyCode) {
-            case 65:	// a
+            case 65: // a
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
                     appEvents.emit('search.selection.selectAll');
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
@@ -137,13 +146,16 @@ const ui = (services) => {
                     }
                 }
                 break;
-            case 80:// P
+            case 80: // P
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
-                    appEvents.emit('record.doPrint', 'lst=' + searchSelection.serialized);
+                    appEvents.emit(
+                        'record.doPrint',
+                        'lst=' + searchSelection.serialized
+                    );
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
-            case 69:// e
+            case 69: // e
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
                     // eq to: editRecord.doEdit()
                     appEvents.emit('record.doEdit', {
@@ -153,24 +165,28 @@ const ui = (services) => {
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
-            case 40:	// down arrow
+            case 40: // down arrow
                 $('#answers').scrollTop($('#answers').scrollTop() + 30);
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
-            case 38:	// down arrow
+            case 38: // down arrow
                 $('#answers').scrollTop($('#answers').scrollTop() - 30);
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
-            case 37:// previous page
+            case 37: // previous page
                 $('#PREV_PAGE').trigger('click');
                 specialKeyState.isShortcutKey = true;
                 break;
-            case 39:// previous page
+            case 39: // previous page
                 $('#NEXT_PAGE').trigger('click');
                 specialKeyState.isShortcutKey = true;
                 break;
-            case 9:// tab
-                if (!appCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+            case 9: // tab
+                if (
+                    !appCommons.utilsModule.is_ctrl_key(event) &&
+                    !$('.ui-widget-overlay').is(':visible') &&
+                    !$('.overlay_box').is(':visible')
+                ) {
                     document.getElementById('EDIT_query').focus();
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
@@ -183,20 +199,23 @@ const ui = (services) => {
     // @TODO to be moved
     const _workzoneKeyDownEvent = (event, specialKeyState) => {
         switch (event.keyCode) {
-            case 65:	// a
+            case 65: // a
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
                     appEvents.emit('workzone.selection.selectAll');
                     // p4.WorkZone.Selection.selectAll();
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
-            case 80:// P
+            case 80: // P
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
-                    appEvents.emit('record.doPrint', 'lst=' + workzoneSelection.serialized);
+                    appEvents.emit(
+                        'record.doPrint',
+                        'lst=' + workzoneSelection.serialized
+                    );
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
                 break;
-            case 69:// e
+            case 69: // e
                 if (appCommons.utilsModule.is_ctrl_key(event)) {
                     // eq to: editRecord.doEdit()
                     appEvents.emit('record.doEdit', {
@@ -210,12 +229,16 @@ const ui = (services) => {
             // 								_deleteRecords(searchSelection.serialized);
             // 								specialKeyState.isCancelKey = true;
             // 							break;
-            case 40:	// down arrow
-                $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() + 30);
+            case 40: // down arrow
+                $('#baskets div.bloc').scrollTop(
+                    $('#baskets div.bloc').scrollTop() + 30
+                );
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
-            case 38:	// down arrow
-                $('#baskets div.bloc').scrollTop($('#baskets div.bloc').scrollTop() - 30);
+            case 38: // down arrow
+                $('#baskets div.bloc').scrollTop(
+                    $('#baskets div.bloc').scrollTop() - 30
+                );
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
             // 								case 37:// previous page
@@ -224,8 +247,12 @@ const ui = (services) => {
             // 								case 39:// previous page
             // 									$('#NEXT_PAGE').trigger('click');
             // 									break;
-            case 9:// tab
-                if (!appCommons.utilsModule.is_ctrl_key(event) && !$('.ui-widget-overlay').is(':visible') && !$('.overlay_box').is(':visible')) {
+            case 9: // tab
+                if (
+                    !appCommons.utilsModule.is_ctrl_key(event) &&
+                    !$('.ui-widget-overlay').is(':visible') &&
+                    !$('.overlay_box').is(':visible')
+                ) {
                     document.getElementById('EDIT_query').focus();
                     specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 }
@@ -235,16 +262,15 @@ const ui = (services) => {
         return specialKeyState;
     };
 
-    const hideOverlay = (n) => {
+    const hideOverlay = n => {
         var div = 'OVERLAY';
-        if (typeof (n) !== 'undefined') {
+        if (typeof n !== 'undefined') {
             div += n;
         }
         $('#' + div).hide().remove();
     };
 
     const showModal = (cas, options) => {
-
         var content = '';
         var callback = null;
         var button = {
@@ -255,8 +281,7 @@ const ui = (services) => {
             }
         };
         var escape = true;
-        var onClose = function () {
-        };
+        var onClose = function () {};
 
         switch (cas) {
             case 'timeout':
@@ -276,7 +301,7 @@ const ui = (services) => {
                 break;
         }
 
-        if (typeof (Alerts) === 'undefined') {
+        if (typeof Alerts === 'undefined') {
             alert(localeService.t('serverDisconnected'));
             self.location.replace(self.location.href);
         } else {
@@ -288,7 +313,7 @@ const ui = (services) => {
     const getActiveZone = () => {
         return activeZone;
     };
-    const setActiveZone = (zoneId) => {
+    const setActiveZone = zoneId => {
         activeZone = zoneId;
         return activeZone;
     };
@@ -297,9 +322,12 @@ const ui = (services) => {
         $('#idFrameC, #rightFrame').bind('mousedown', function (event) {
             var old_zone = getActiveZone();
             setActiveZone($(this).attr('id'));
-            if (getActiveZone() !== old_zone && getActiveZone() !== 'headBlock') {
+            if (
+                getActiveZone() !== old_zone &&
+                getActiveZone() !== 'headBlock'
+            ) {
                 $('.effectiveZone.activeZone').removeClass('activeZone');
-                $('.effectiveZone', this).addClass('activeZone');// .flash('#555555');
+                $('.effectiveZone', this).addClass('activeZone'); // .flash('#555555');
             }
             $('#EDIT_query').blur();
         });
@@ -319,14 +347,12 @@ const ui = (services) => {
         appEvents.emit('preview.doResize');
 
         if ($('#idFrameC').data('ui-resizable')) {
-            $('#idFrameC').resizable('option', 'maxWidth', (480));
+            $('#idFrameC').resizable('option', 'maxWidth', 480);
             $('#idFrameC').resizable('option', 'minWidth', 300);
         }
 
         answerSizer();
         linearizeUi();
-
-
     };
     const answerSizer = () => {
         var el = $('#idFrameC').outerWidth();
@@ -336,7 +362,6 @@ const ui = (services) => {
         var widthA = Math.round(window.bodySize.x - el - 10);
         $('#rightFrame').width(widthA);
         $('#rightFrame').css('left', $('#idFrameC').width());
-
     };
     const linearizeUi = () => {
         const list = $('#answers .list');
@@ -347,33 +372,30 @@ const ui = (services) => {
 
             var stdWidth = 460;
             var diff = 28;
-            n = Math.round(fllWidth / (stdWidth));
+            n = Math.round(fllWidth / stdWidth);
             var w = Math.floor(fllWidth / n) - diff;
-            if (w < 360 && n > 1) {
+            if (w < 460 && n > 1) {
                 w = Math.floor(fllWidth / (n - 1)) - diff;
             }
             $('#answers .list').width(w);
         } else {
-
             var minMargin = 5;
             var el = $('#answers .diapo:first');
-            var diapoWidth = el.outerWidth() + (minMargin * 2);
+            var diapoWidth = el.outerWidth() + minMargin * 2;
             fllWidth -= 26;
 
-            n = Math.floor(fllWidth / (diapoWidth));
+            n = Math.floor(fllWidth / diapoWidth);
 
-            let margin = Math.floor((fllWidth % diapoWidth) / (2 * n));
+            let margin = Math.floor(fllWidth % diapoWidth / (2 * n));
             margin = margin + minMargin;
 
-            $('#answers .diapo').css('margin', '5px ' + (margin) + 'px');
+            $('#answers .diapo').css('margin', '5px ' + margin + 'px');
         }
-
     };
 
     const saveWindow = () => {
         var key = '';
         var value = '';
-
 
         if ($('#idFrameE').is(':visible') && $('#EDITWINDOW').is(':visible')) {
             key = 'edit_window';
@@ -383,13 +405,13 @@ const ui = (services) => {
             value = $('#idFrameC').outerWidth() / window.bodySize.x;
         }
         appCommons.userModule.setPref(key, value);
-    }
+    };
 
     appEvents.listenAll({
-        'broadcast.searchResultSelection': (selection) => {
+        'broadcast.searchResultSelection': selection => {
             searchSelection = selection;
         },
-        'broadcast.workzoneResultSelection': (selection) => {
+        'broadcast.workzoneResultSelection': selection => {
             workzoneSelection = selection;
         },
         'ui.resizeAll': resizeAll,
@@ -398,8 +420,7 @@ const ui = (services) => {
         'ui.saveWindow': saveWindow
     });
 
-
-    return {initialize, showModal, activeZoning, getActiveZone, resizeAll};
+    return { initialize, showModal, activeZoning, getActiveZone, resizeAll };
 };
 
 export default ui;
