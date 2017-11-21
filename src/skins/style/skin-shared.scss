@@ -406,6 +406,13 @@ span.ww_winTitle {
 
 #order_manager tr.order_row {
     height: 28px;
+    img {
+        width: 16px;
+        display: block;
+        margin-bottom: 2px;
+        margin-top: 2px;
+        border: none;
+    }
 }
 
 #order_manager .order_row.odd {
@@ -503,6 +510,7 @@ button.order_launcher.btn {
 #order_manager .table {
     height: 20%;
     color: #737373;
+    margin-bottom: 15px;
 }
 
 #order_manager .table td h4 {
@@ -512,7 +520,6 @@ button.order_launcher.btn {
 }
 
 #order_manager .well {
-    height: 90%;
     position: relative;
 }
 
@@ -582,6 +589,11 @@ button.order_launcher.btn {
     margin: 0 10px 0 4px;
 }
 
+.scrollable-table {
+    max-height:410px;
+    overflow-y: auto;
+}
+
 .order-list-container .table-order {
     border-collapse: collapse;
     border: 1px inset;
@@ -594,8 +606,8 @@ button.order_launcher.btn {
 }
 
 .order-list-container {
-    overflow: auto;
-    height: 75%;
+    max-height: 450px;
+    overflow: hidden;
 }
 
 .order-list-container .table-order tr {
@@ -614,19 +626,32 @@ button.order_launcher.btn {
 .order_list {
     width: 40%;
     float: left;
-    overflow: auto;
-    height: 100%;
+    overflow: hidden;
+    max-height:450px;
 }
 
 #wrapper-padding {
     display: none;
     margin-left: 30px;
-    overflow-y: auto;
 }
 
 #wrapper-multiple {
     display: none;
     text-align: center;
+}
+
+#wrapper-no-item {
+    height: 450px;
+    position: relative;
+    img {
+        width: 150px;
+        height: 150px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -75px;
+        margin-left: -75px;
+    }
 }
 
 #preview-layout-multiple {
@@ -654,6 +679,7 @@ button.order_launcher.btn {
     width: 60%;
     float: left;
     overflow: auto;
+    max-height:450px;
 }
 
 #order_detail .thumb_wrapper {
@@ -792,6 +818,7 @@ span.action-text {
     max-width: 600px;
     display: block;
     margin: auto;
+    text-align: center;
 }
 
 #preview-layout .thumb_wrapper img {
@@ -867,7 +894,7 @@ span.action-text {
 button.btn.validate {
     margin-bottom: 10px;
     font-size: 14px;
-    border: 2px solid #f00;
+    //border: 2px solid #f00;
     i {
         margin-right: 0.6em;
         font-size: 14px;

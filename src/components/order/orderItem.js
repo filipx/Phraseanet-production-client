@@ -30,6 +30,7 @@ const orderItem = services => {
         let itemCount = 0;
         let elementsForValidation = [];
         let readyForValidation = false;
+        let lastItemChosen = null;
 
         const ELEMENT_TYPE = {
             VALIDATED: 'validated',
@@ -103,6 +104,7 @@ const orderItem = services => {
             $dialog.getDomElement()
         ).bind('click', function (event) {
             let $this = $(this);
+            lastItemChosen = $this;
 
             //disable select all checkbox if selected
             if ($('input[name="select-all"]').is(':checked')) {
@@ -184,6 +186,19 @@ const orderItem = services => {
         $('button.deny', $dialog.getDomElement()).bind('click', function () {
             updateValidation(ELEMENT_TYPE.DENIED);
             //deny_documents(order_id);
+        });
+
+        $('button.reset', $dialog.getDomElement()).bind('click',function(){
+            var itemsToBeReset = [];
+            $('.order_list .order_row.selected.waitingForValidation', $dialog.getDomElement()).each(function(i,n){
+                itemsToBeReset.push($(n));
+            });
+            //if item is not selected, delete item being previewed
+            if(itemsToBeReset.length == 0 && lastItemChosen) {
+                itemsToBeReset.push(lastItemChosen);
+            }
+            resetItemForValidation(itemsToBeReset);
+            toggleValidationButton();
         });
 
         $('.force_sender', $dialog.getDomElement()).bind('click', function () {
@@ -407,7 +422,7 @@ const orderItem = services => {
             };
             dialog_buttons[resetTitle] = function () {
                 if (confirm(window.orderItemData.translatedText.message)) {
-                    resetValidation();
+                    resetAllItemForValidation();
                     toggleValidationButton();
                     $(this).dialog('close');
                 }
@@ -550,24 +565,41 @@ const orderItem = services => {
             }
         }
 
-        function resetValidation() {
-            $('.order_list .order_row', $dialog.getDomElement()).each(function (
-                i,
-                n
-            ) {
-                let elementId = $(n).find('input[name=order_element_id]').val();
-                let found = _.where(elementsForValidation, {
-                    elementId: elementId
-                });
-                if (found.length > 0) {
-                    $(n).removeClass(ELEMENT_TYPE.WAITINGFORVALIDATION);
-                    //replace content or row with original content
-                    $(n)[0].innerHTML = found[0].element[0].innerHTML;
-                }
+        function removeItemFromArray(item) {
+            var elementId = item.find('input[name=order_element_id]').val();
+            var found = _.where(elementsForValidation, {elementId: elementId});
+            if(found.length > 0) {
+                item.removeClass(ELEMENT_TYPE.WAITINGFORVALIDATION);
+                //replace content or row with original content
+                item[0].innerHTML = found[0].element[0].innerHTML;
+                //remove from array
+                elementsForValidation = _.without(elementsForValidation, found[0]);
+            }
+        }
+        function resetItemForValidation(itemsToBeReset) {
+            var elementArrayType = [];
+            itemsToBeReset.forEach(function(item){
+                removeItemFromArray(item);
+                updateButtonStatus(item.attr('class').split(/\s+/));
+                elementArrayType.push(item.attr('class').split(/\s+/));
+            });
+            if(elementsForValidation.length == 0) {
+                readyForValidation = false;
+            }
+            updateButtonStatusMultiple(elementArrayType);
+            toggleValidationButton();
+            //disable select all checkbox if selected
+            if($('input[name="select-all"]').is(':checked')){
+                $('input[name="select-all"]').prop('checked', false);
+            }
+        }
+        function resetAllItemForValidation() {
+            //var dialog = p4.Dialog.get(1);
+            $('.order_list .order_row', $dialog.getDomElement()).each(function(i,n){
+                removeItemFromArray($(n));
                 updateButtonStatus($(n).attr('class').split(/\s+/));
             });
             readyForValidation = false;
-            elementsForValidation = [];
             renderOrderDetailView(0);
         }
 
@@ -604,6 +636,12 @@ const orderItem = services => {
                 $(n).removeClass(ELEMENT_TYPE.SELECTED);
             });
 
+            //if item is not selected, delete item being previewed
+            if(count == 0 && lastItemChosen) {
+                createItemForValidation(lastItemChosen, ELEMENT_TYPE.SELECTABLE, newState);
+                count++;
+            }
+
             readyForValidation = true;
             toggleValidationButton();
             //disable select all checkbox if selected
@@ -616,6 +654,7 @@ const orderItem = services => {
                 $('#wrapper-padding').hide();
                 $('.external-order-action').hide();
                 $('#wrapper-multiple').hide();
+                $('#wrapper-no-item').show();
             }
         }
 
@@ -640,9 +679,11 @@ const orderItem = services => {
 
         function toggleValidationButton() {
             if (readyForValidation) {
-                $('button.validate').show();
+                $('button.validate').prop('disabled', false);
+                $('button.validate').css('color', '#7CD21C');
             } else {
-                $('button.validate').hide();
+                $('button.validate').prop('disabled', true);
+                $('button.validate').css('color', '#737373');
             }
         }
 
@@ -729,6 +770,7 @@ const orderItem = services => {
                 $('#wrapper-padding').hide();
                 $('.external-order-action').hide();
                 $('#wrapper-multiple').show();
+                $('#wrapper-no-item').hide();
                 let elementArrayType = [];
                 $(
                     '.order_list .selectable.selected',
@@ -743,10 +785,12 @@ const orderItem = services => {
                 $('#wrapper-padding').show();
                 $('.external-order-action').show();
                 $('#wrapper-multiple').hide();
+                $('#wrapper-no-item').hide();
             } else {
                 $('#wrapper-padding').hide();
                 $('.external-order-action').hide();
                 $('#wrapper-multiple').hide();
+                $('#wrapper-no-item').show();
             }
             $('#preview-layout-multiple .title').html(countSelected);
         }
@@ -812,9 +856,7 @@ const orderItem = services => {
          */
         function updateButtonStatus(elementArrayType) {
             if (_.contains(elementArrayType, ELEMENT_TYPE.VALIDATED)) {
-                $(
-                    '#order-action button.deny, #order-action button.send'
-                ).hide();
+                $('#order-action button.deny, #order-action button.send, #order-action button.reset').hide();
                 $('#order-action span.action-text').html(
                     window.orderItemData.translatedText.alreadyValidated +
                         '<i class="icon-ok"></i>'
@@ -823,29 +865,19 @@ const orderItem = services => {
             } else if (
                 _.contains(elementArrayType, ELEMENT_TYPE.WAITINGFORVALIDATION)
             ) {
-                $(
-                    '#order-action button.deny, #order-action span.action-text'
-                ).hide();
-                $('#order-action button.send').show();
-                $('#order-action button.send').prop('disabled', true);
+                $('#order-action button.deny, #order-action button.send, #order-action span.action-text').hide();
+                $('#order-action button.reset').show();
+                //$('#order-action button.send').show();
+                //$('#order-action button.send').prop('disabled', true);
             } else if (_.contains(elementArrayType, ELEMENT_TYPE.DENIED)) {
-                $('#order-action button.deny').hide();
-                $('#order-action span.action-text').html(
-                    window.orderItemData.translatedText.refusedPreviously
-                );
-                $('#order-action button.send').prop('disabled', false);
-                $(
-                    '#order-action button.send, #order-action span.action-text'
-                ).show();
+                $('#order-action button.deny, #order-action button.reset').hide();
+                $('#order-action span.action-text').html('window.orderItemData.translatedText.refusedPreviously');
+                //$('#order-action button.send').prop('disabled', false);
+                $('#order-action button.send, #order-action span.action-text').show();
             } else {
-                $('#order-action button.send, #order-action button.deny').prop(
-                    'disabled',
-                    false
-                );
-                $(
-                    '#order-action button.send, #order-action button.deny'
-                ).show();
-                $('#order-action span.action-text').hide();
+                // $('#order-action button.send, #order-action button.deny').prop('disabled', false);
+                $('#order-action button.send, #order-action button.deny').show();
+                $('#order-action span.action-text, #order-action button.reset').hide();
             }
         }
 
@@ -865,99 +897,11 @@ const orderItem = services => {
                         return;
                     }
 
-                    let customId = 'phraseanet-embed-preview-frame';
-                    let $template = $(data.html_preview);
-                    let src = $template
-                        .find('#phraseanet-embed-frame')
-                        .attr('data-src');
-                    $template
-                        .find('#phraseanet-embed-frame')
-                        .attr('id', customId);
-
-                    $('#preview-layout').empty().append($template.get(0));
-                    if ($(`#${customId}`).length > 0) {
-                        let activeThumbnailFrame = new pym.Parent(
-                            customId,
-                            src
-                        );
-                        activeThumbnailFrame.iframe.setAttribute(
-                            'allowfullscreen',
-                            ''
-                        );
-                    }
-
-                    $('#preview-layout .thumb_wrapper')
-                        .width('100%')
-                        .height('100%')
-                        .image_enhance({ zoomable: true });
+                    $('#preview-layout').append(data.html_preview);
                     $('#caption-layout').append(data.desc);
 
-                    resizePreview();
                 }
             });
-        }
-
-        function resizePreview() {
-            let containerHeight = $('#preview-layout').height();
-            let containerWidth = $('#preview-layout').width();
-            var zoomable = $('img.record.zoomable');
-            // if (zoomable.length > 0 && zoomable.hasClass('zoomed')) {
-            //     return;
-            // }
-
-            //parseInt($('#preview-layout input[name=width]').val(), 10);
-
-            var h = parseInt(
-                $('#preview-layout .thumb_wrapper')
-                    .children()
-                    .attr('data-original-height'),
-                10
-            );
-            var w = parseInt(
-                $('#preview-layout .thumb_wrapper')
-                    .children()
-                    .attr('data-original-width'),
-                10
-            );
-            var t = 20;
-            var de = 0;
-
-            var margX = 0;
-            var margY = 0;
-
-            if ($('#preview-layout .record_audio').length > 0) {
-                margY = 100;
-                de = 60;
-            }
-
-            var ratioP = w / h;
-            var ratioD =
-                parseInt(containerWidth, 10) / parseInt(containerHeight, 10);
-
-            if (ratioD > ratioP) {
-                //je regle la hauteur d'abord
-                if (parseInt(h, 10) + margY > parseInt(containerHeight, 10)) {
-                    h = Math.round(parseInt(containerHeight, 10) - margY);
-                    w = Math.round(h * ratioP);
-                }
-            } else {
-                if (parseInt(w, 10) + margX > parseInt(containerWidth, 10)) {
-                    w = Math.round(parseInt(containerWidth, 10) - margX);
-                    h = Math.round(w / ratioP);
-                }
-            }
-
-            t = Math.round((parseInt(containerHeight, 10) - h - de) / 2);
-            var l = Math.round((parseInt(containerWidth, 10) - w) / 2);
-            $('#preview-layout .record')
-                .css({
-                    width: w,
-                    height: h,
-                    top: t,
-                    left: l
-                })
-                .attr('width', w)
-                .attr('height', h);
         }
 
         function reloadDialog(url) {
