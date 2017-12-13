@@ -177,6 +177,15 @@ const preferences = services => {
             });
         });
 
+        $container.on('change', '.preferences-options-collection-order', event => {
+            let el = $('#look_box_settings select[name=orderByName]');
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'order_collection_by',
+                el.val()
+            );
+        });
+
         $('#nperpage_slider').slider({
             value: parseInt($('#nperpage_value').val(), 10),
             min: 10,
