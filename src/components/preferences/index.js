@@ -186,6 +186,15 @@ const preferences = services => {
             );
         });
 
+        $container.on('change', '.upload-options-collection', event => {
+            let el = $('.settings-box select[name=base_id]');
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'upload_last_used_collection',
+                el.val()
+            );
+        });
+
         $('#nperpage_slider').slider({
             value: parseInt($('#nperpage_value').val(), 10),
             min: 10,
