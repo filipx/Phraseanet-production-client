@@ -29,6 +29,7 @@ const search = services => {
     let resultInfoView;
     let filterFacet = false;
     let facets = null;
+    var lastFilterResults = [];
 
     const initialize = () => {
         $searchForm = $('#searchForm');
@@ -156,10 +157,21 @@ const search = services => {
                 $('img.lazyload', $searchResult).lazyload({
                     container: $('#answers')
                 });
-                appEvents.emit('facets.doLoadFacets', {
-                    facets: datas.facets,
-                    filterFacet: filterFacet
-                });
+
+                //load last result collected or [] if length == 0
+                if (datas.facets.length == 0) {
+                    appEvents.emit('facets.doLoadFacets', {
+                        facets: lastFilterResults,
+                        filterFacet: filterFacet
+                    });
+                } else {
+                    lastFilterResults = datas.facets;
+                    appEvents.emit('facets.doLoadFacets', {
+                        facets: datas.facets,
+                        filterFacet: filterFacet
+                    });
+                }
+
                 facets = datas.facets;
 
                 $searchResult.append(
@@ -313,6 +325,10 @@ const search = services => {
 
     const setFilterFacet = isEnabled => {
         filterFacet = isEnabled;
+        appEvents.emit('facets.doLoadFacets', {
+            facets: facets,
+            filterFacet: filterFacet
+        });
     };
 
     appEvents.listenAll({
