@@ -94,6 +94,7 @@ const uploader = (services) => {
 
         if (iev >= 10) {
             $('#UPLOAD_FLASH_LINK').hide();
+            $('#upload_type option[value="flash"]').remove();
         }
         // Upload management
         var uploaderInstance = new UploaderManager({
@@ -109,6 +110,14 @@ const uploader = (services) => {
         uploaderInstance.Preview.setOptions({
             maxWidth: 130,
             maxHeight: 120
+        });
+
+        $('#upload_type').on('change', function () {
+            if ($(this).val() === 'html') {
+                $("#UPLOAD_HTML5_LINK").trigger("click");
+            }else if  ($(this).val() === 'flash') {
+                $("#UPLOAD_FLASH_LINK").trigger("click");
+            }
         });
 
         // Init jquery tabs
