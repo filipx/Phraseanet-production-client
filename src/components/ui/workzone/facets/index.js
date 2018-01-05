@@ -133,20 +133,22 @@ const workzoneFacets = services => {
                         _facetCombinedSearch();
                     }
                 },
-                collapse: function (event, data) { 
-                    var dict = {}; 
-                    dict[data.node.data.name] = "collapse"; 
-                    if (_.some(facetStatus, function(o) { return _.has(o, data.node.data.name); })) { 
-                        facetStatus = _.without(facetStatus, _.findWhere(facetStatus, data.node.data.name)); 
-                    } 
-                    facetStatus.push(dict); 
-                    sessionStorage.setItem('facetStatus', JSON.stringify(facetStatus));  
+                collapse: function (event, data) {
+                    var dict = {};
+                    dict[data.node.data.name] = "collapse";
+                    if(_.findWhere(facetStatus, dict) !== undefined ) {
+                        facetStatus = _.without(facetStatus, _.findWhere(facetStatus, dict))
+                    }
+                    facetStatus.push(dict);
+                    sessionStorage.setItem('facetStatus', JSON.stringify(facetStatus));
                 },
-                 expand: function (event, data) { 
-                    if (_.some(facetStatus, function(o) { return _.has(o, data.node.data.name); })) { 
-                        facetStatus = _.without(facetStatus, _.findWhere(facetStatus, data.node.data.name)); 
-                    } 
-                    sessionStorage.setItem('facetStatus', JSON.stringify(facetStatus)); 
+                expand: function (event, data) {
+                    var dict = {};
+                    dict[data.node.data.name] = "collapse";
+                    if (_.findWhere(facetStatus, dict) !== undefined) {
+                        facetStatus = _.without(facetStatus, _.findWhere(facetStatus, dict))
+                    }
+                    sessionStorage.setItem('facetStatus', JSON.stringify(facetStatus));
                 },
                 renderNode: function (event, data) {
                     var facetFilter = '';
