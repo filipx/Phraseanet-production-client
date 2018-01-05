@@ -126,6 +126,11 @@ const workzoneFacets = services => {
                 source: [],
                 activate: function (event, data) {
                     var query = data.node.data.query;
+                    var eventType = event.originalEvent;
+                    //if user did not click, then no need to perform any query
+                    if(eventType == null) {
+                        return;
+                    }
                     if (query) {
                         var facet = data.node.parent;
                         selectedFacetValues[facet.title] = data.node.data;

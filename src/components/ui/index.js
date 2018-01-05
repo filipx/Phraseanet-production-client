@@ -241,12 +241,12 @@ const ui = services => {
                 );
                 specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                 break;
-            // 								case 37:// previous page
-            // 									$('#PREV_PAGE').trigger('click');
-            // 									break;
-            // 								case 39:// previous page
-            // 									$('#NEXT_PAGE').trigger('click');
-            // 									break;
+            case 37:// previous page
+            	$('#PREV_PAGE').trigger('click');
+            	break;
+            case 39:// previous page
+            	$('#NEXT_PAGE').trigger('click');
+            	break;
             case 9: // tab
                 if (
                     !appCommons.utilsModule.is_ctrl_key(event) &&
