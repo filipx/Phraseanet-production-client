@@ -218,7 +218,7 @@ const exportRecord = services => {
         });
 
         $('#ftp .ftp_button').bind('click', function () {
-            if (!check_subdefs($('#ftp'), check_subdefs)) {
+            if (!check_subdefs($('#ftp'), dataConfig)) {
                 return false;
             }
 
@@ -299,7 +299,11 @@ const exportRecord = services => {
         });
 
         $('#sendmail .sendmail_button').bind('click', function () {
-            if (!check_subdefs($('#sendmail'), check_subdefs)) {
+            if(!validEmail($('input[name="destmail"]', $('#sendmail')).val(), dataConfig)) {
+                return false;
+            }
+
+            if (!check_subdefs($('#sendmail'), dataConfig)) {
                 return false;
             }
 
@@ -344,6 +348,37 @@ const exportRecord = services => {
             }
         });
     };
+
+    function validateEmail(email) {
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
+
+    function validEmail(emailList, dataConfig) {
+        //split emailList by ; , or whitespace and filter empty element
+        let emails = emailList.split(/[ ,;]+/).filter(Boolean);
+        let alert;
+        for(let i=0; i < emails.length; i++) {
+            if (!validateEmail(emails[i])) {
+
+                alert = dialog.create(
+                    services,
+                    {
+                        size: 'Alert',
+                        closeOnEscape: true,
+                        closeButton: true,
+                        title: dataConfig.msg.warning
+                    },
+                    2
+                );
+
+                alert.setContent(dataConfig.msg.invalidEmail);
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     function check_TOU(container, dataConfig) {
         let checkbox = $('input[name="TOU_accept"]', $(container));
