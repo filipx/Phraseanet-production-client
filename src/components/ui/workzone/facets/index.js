@@ -17,6 +17,7 @@ const workzoneFacets = services => {
      */
 
     let selectedFacetValues = [];
+    let facetStatus = $.parseJSON(sessionStorage.getItem('facetStatus')) || [];
 
     /*var getSelectedFacets = function() {
      return selectedFacetValues;
@@ -44,7 +45,7 @@ const workzoneFacets = services => {
                 title: facet.label,
                 folder: true,
                 children: values,
-                expanded: true
+                expanded: !_.some(facetStatus, function(o) { return _.has(o, facet.name)})
             };
         });
 
@@ -154,6 +155,23 @@ const workzoneFacets = services => {
                         selectedFacetValues[facet.title].push(facetData);
                         _facetCombinedSearch();
                     }
+                },
+                collapse: function (event, data) {
+                    var dict = {};
+                    dict[data.node.data.name] = "collapse";
+                    if(_.findWhere(facetStatus, dict) !== undefined ) {
+                        facetStatus = _.without(facetStatus, _.findWhere(facetStatus, dict))
+                    }
+                    facetStatus.push(dict);
+                    sessionStorage.setItem('facetStatus', JSON.stringify(facetStatus));
+                },
+                expand: function (event, data) {
+                    var dict = {};
+                    dict[data.node.data.name] = "collapse";
+                    if (_.findWhere(facetStatus, dict) !== undefined) {
+                        facetStatus = _.without(facetStatus, _.findWhere(facetStatus, dict))
+                    }
+                    sessionStorage.setItem('facetStatus', JSON.stringify(facetStatus));
                 },
                 renderNode: function (event, data) {
                     var facetFilter = "";
