@@ -1,4 +1,6 @@
 $proposalColor: #4c5d84;
+$proposalColor_AND: #4c5d84;
+$proposalColor_EXCEPT: #8a3747;
 $thesaurusColor: #884c92;
 $basketsColor: #076882;
 $pluginsColor: #fff;
@@ -341,7 +343,7 @@ span.ww_winTitle {
 
 .invisible-btn {
     position: absolute;
-    top: 50%;
+    top: 21%;
     z-index: 1;
     background-color: transparent;
     background-repeat: no-repeat;
@@ -349,9 +351,8 @@ span.ww_winTitle {
     cursor: pointer;
     overflow: hidden;
     outline: none;
-    height: 320px;
-    width: 150px;
-    margin-top: -160px;
+    height: 50%;
+    width: 25%;
     i {
         display: none;
         font-size: 120px;
@@ -1055,6 +1056,21 @@ h4 {
 .videoTips {
     width: 100%;
     height: 100%;
+}
+
+/********* record **************/
+#advance-share {
+    font-style: italic;
+    line-height: 30px;
+}
+
+#shared-def {
+    display: none;
+    margin-left: 10px;
+    #resource_type_sel {
+        width: 170px;
+        margin-left: 10px;
+    }
 }
 
 @import 'ui-components/jquery-ui';
