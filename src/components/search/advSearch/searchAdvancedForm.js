@@ -209,7 +209,7 @@ const searchAdvancedForm = (services) => {
                     // nb: unselect the "all" field, so it acts as a button
                     optAllSelected = $(opt).is(':selected');
                 }
-                if (idx === 0 || optAllSelected || $(opt).is(':disabled') || !$(opt).is(':visible')) {
+                if (idx === 0 || optAllSelected || $(opt).is(':disabled') || $(opt).css('display') === 'none') {
                     $(opt).prop('selected', false);
                 }
             }

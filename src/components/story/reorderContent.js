@@ -68,31 +68,53 @@ const storyReorderContent = (services) => {
                 diapos.push({
                     title: $('input[name=title]', n).val(),
                     order: parseInt($('input[name=default]', n).val(), 10),
-                    id: $('input[name=id]', n).val()
+                    id: $('input[name=id]', n).val(),
+                    date_created: new Date($('input[name=date_created]', n).val()),
+                    date_updated: new Date($('input[name=date_updated]', n).val()),
                 });
             });
 
+            var elements = [];
             var sorterCallback;
 
             if (val === 'default') {
                 sorterCallback = function (diapo) {
                     return diapo.order;
                 };
-            } else {
-                sorterCallback = function (diapo) {
-                    return diapo.title;
+                elements = sorting(sorterCallback, diapos, false);
+            } else if(val === 'date_updated' || val === 'date_created'){
+                sorterCallback = function(diapo) {
+                    if(val === 'date_created') {
+                        return diapo.date_created;
+                    }
+                    return diapo.date_updated;
                 };
+                elements = sorting(sorterCallback, diapos, true);
+            } else {
+                sorterCallback = function(diapo) {return diapo.title.toLowerCase();};
+                elements = sorting(sorterCallback, diapos, false);
             }
 
-            var elements = [];
-
-            _.chain(diapos)
-                .sortBy(sorterCallback)
-                .each(function (diapo) {
-                    elements.push($('#ORDER_' + diapo.id));
-                });
-
             $('#reorder_box .elements').append(elements);
+        }
+
+        function sorting(sorterCallback, diapos, reverse) {
+            var elements = [];
+            if(reverse == true) {
+                _.chain(diapos)
+                    .sortBy(sorterCallback)
+                    .reverse()
+                    .each(function(diapo) {
+                        elements.push($('#ORDER_'+ diapo.id));
+                    });
+            }else {
+                _.chain(diapos)
+                    .sortBy(sorterCallback)
+                    .each(function(diapo) {
+                        elements.push($('#ORDER_'+ diapo.id));
+                    });
+            }
+            return elements;
         }
 
         function reverse_order() {
@@ -101,6 +123,11 @@ const storyReorderContent = (services) => {
                 $(this).prependTo($container);
             });
         }
+
+        ('.elements div', container).bind('click', function(){
+            $(this).addClass("selected").siblings().removeClass("selected");
+            return false;
+        });
 
         $('.elements', container).sortable({
             appendTo: container,

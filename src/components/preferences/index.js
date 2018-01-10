@@ -41,6 +41,15 @@ const preferences = services => {
             );
         });
 
+        $container.on('change', '.preferences-options-use-truncation', event => {
+            let $el = $(event.currentTarget);
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'use_truncation',
+                $el.prop('checked') ? '1' : '0'
+            );
+        });
+
         $container.on(
             'change',
             '.preferences-options-presentation-thumbnail',
@@ -175,6 +184,24 @@ const preferences = services => {
                 value: color,
                 t: Math.random()
             });
+        });
+
+        $container.on('change', '.preferences-options-collection-order', event => {
+            let el = $('#look_box_settings select[name=orderByName]');
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'order_collection_by',
+                el.val()
+            );
+        });
+
+        $container.on('change', '.upload-options-collection', event => {
+            let el = $('.settings-box select[name=base_id]');
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'upload_last_used_collection',
+                el.val()
+            );
         });
 
         $('#nperpage_slider').slider({
