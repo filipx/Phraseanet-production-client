@@ -38,9 +38,9 @@ class HotkeysModalButton extends Button {
 
 }
 
-HotkeysModalButton.prototype.controlText_ = `<span class="icon-stack">
-                              <i class="icon-circle icon-stack-base"></i>
-                              <i class="icon-info icon-light"></i>
+HotkeysModalButton.prototype.controlText_ = `<span class="fa-stack">
+                              <i class="fa fa-circle fa-stack-2x"></i>
+                              <i class="fa fa-info fa-inverse"></i>
                             </span>`;
 
 Component.registerComponent('HotkeysModalButton', HotkeysModalButton);

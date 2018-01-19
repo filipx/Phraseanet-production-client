@@ -673,7 +673,7 @@ const orderItem = services => {
             element.find('td:first-child').empty();
             element
                 .find('td:first-child')
-                .append('<i style="font-size: 20px;" class="icon-ok-circle">');
+                .append('<i style="font-size: 20px;" class="fa fa check-circle-o">');
             updateButtonStatus(element.attr('class').split(/\s+/));
         }
 
@@ -859,7 +859,7 @@ const orderItem = services => {
                 $('#order-action button.deny, #order-action button.send, #order-action button.reset').hide();
                 $('#order-action span.action-text').html(
                     window.orderItemData.translatedText.alreadyValidated +
-                        '<i class="icon-ok"></i>'
+                        '<i class="fa fa-check" aria-hidden="true"></i>'
                 );
                 $('#order-action span.action-text').show();
             } else if (

@@ -130,16 +130,16 @@
     margin-right: 10px;
     position: relative;
 
-    .icon-stack {
+    .fa-stack {
       font-size: 11px;
       cursor: pointer;
       width: 19px;
-      height: 15px;
-      line-height: 14px;
-      .icon-stack-base {
+      //height: 15px;
+      //line-height: 14px;
+      .fa-stack-2x {
         color: #777777; //darken($darkerBackgroundColor, 10);
       }
-      .icon-light {
+      .fa-inverse {
         color: $darkerBackgroundColor; //$darkerTextColor;
       }
     }

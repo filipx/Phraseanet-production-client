@@ -66,6 +66,7 @@ $workzoneTabDisabledTextColor: $mediumTextActiveColor !default;
       height: $subTabHeight;
       border-bottom: 1px solid $workzoneTabBorderBottom;
       box-sizing: border-box;
+      display: initial;
       li {
         width: auto;
         height: $tabHeight;
@@ -137,10 +138,10 @@ $workzoneTabDisabledTextColor: $mediumTextActiveColor !default;
     }
 
   }
-  ul.icon-menu {
+  ul.prod-icon-menu {
     width: 100%;
   }
-  .icon-menu {
+  .prod-icon-menu {
     .WZtabs, .WZplugins {
       display: block;
       width: 70px;
@@ -159,7 +160,7 @@ $workzoneTabDisabledTextColor: $mediumTextActiveColor !default;
     }
   }
   .closed {
-    .icon-menu li {
+    .prod-icon-menu li {
       clear: left;
     }
   }

@@ -89,7 +89,7 @@ const workzone = (services) => {
         $('#idFrameC #retractableButton').bind('click', function (event) {
 
             if ($container.attr('data-status') !== 'closed') {
-                $(this).find('i').removeClass('icon-double-angle-left').addClass('icon-double-angle-right');
+                $(this).find('i').removeClass('fa-angle-double-left').addClass('fa-angle-double-right');
                 $container.width(80);
                 $('#rightFrame').css('left', 80);
                 $('#rightFrame').width($(window).width() - 80);
@@ -98,9 +98,9 @@ const workzone = (services) => {
                 $('#idFrameC .ui-tabs-nav li').removeClass('ui-state-active');
                 $('.WZbasketTab').css('background-position', '15px 16px');
                 $container.addClass('closed');
-                previousTab = $('#idFrameC .icon-menu').find('li.ui-tabs-active');
+                previousTab = $('#idFrameC .prod-icon-menu').find('li.ui-tabs-active');
             } else {
-                $(this).find('i').removeClass('icon-double-angle-right').addClass('icon-double-angle-left');
+                $(this).find('i').removeClass('fa-angle-double-right').addClass('fa-angle-double-left');
                 $container.width(300);
                 $('#rightFrame').css('left', 300);
                 $('#rightFrame').width($(window).width() - 300);
@@ -108,8 +108,8 @@ const workzone = (services) => {
                 $('.ui-resizable-handle, #basket_menu_trigger').show();
                 $('.WZbasketTab').css('background-position', '9px 16px');
                 $container.removeClass('closed');
-                $('#idFrameC .icon-menu li').last().find('a').trigger('click');
-                $('#idFrameC .icon-menu li').first().find('a').trigger('click');
+                $('#idFrameC .prod-icon-menu li').last().find('a').trigger('click');
+                $('#idFrameC .prod-icon-menu li').first().find('a').trigger('click');
                 $(previousTab).find('a').trigger('click');
             }
 

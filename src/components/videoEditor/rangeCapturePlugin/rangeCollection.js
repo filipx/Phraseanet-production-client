@@ -87,9 +87,9 @@ class RangeCollection extends Component {
     renderElContent() {
         $(this.el()).append(`
 <div class="btn-container">
-    <button class="button button-primary add-range" type="button"><i class="icon-plus"></i> ${this.player_.localize('Add new range')}</button>
-    <button class="button button-primary export-vtt-ranges" type="button"><i class="icon-save"></i> ${this.player_.localize('Save as VTT')}</button>
-    <button class="button button-primary export-ranges" type="button"><i class="icon-cloud-download"></i> ${this.player_.localize('Export video ranges')}</button>
+    <button class="button button-primary add-range" type="button"><i class="fa fa-plus" aria-hidden="true"></i> ${this.player_.localize('Add new range')}</button>
+    <button class="button button-primary export-vtt-ranges" type="button"><i class="fa fa-floppy-o" aria-hidden="true"></i> ${this.player_.localize('Save as VTT')}</button>
+    <button class="button button-primary export-ranges" type="button"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> ${this.player_.localize('Export video ranges')}</button>
 </div>`);
         return $(this.el());
     }
