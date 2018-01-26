@@ -1,6 +1,6 @@
 {
   "name": "phraseanet-production-client",
-  "version": "0.32.3",
+  "version": "0.33.0",
   "description": "Phraseanet frontend dependencies",
   "scripts": {
     "clean": "rimraf dist",
@@ -143,6 +143,7 @@
     "jquery-ui": "~1.10",
     "jquery-ui-datepicker-with-i18n": "^1.10.4",
     "jquery.fancytree": "~2.7",
+    "jquery.tree": "0.0.5",
     "leaflet": "^1.1.0",
     "leaflet-contextmenu": "^1.4.0",
     "leaflet-draw": "^0.4.10",
