@@ -797,10 +797,14 @@ span.action-text {
     font-size: 14px;
     color: #737373;
     margin-right: 10px;
-    i.icon-ok {
+    i.fa-check {
         color: #7cd21c;
         margin-left: 0.6em;
     }
+}
+
+.fa-white {
+    color: #FFFFFF;
 }
 
 #order_detail iframe {
