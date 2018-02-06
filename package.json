@@ -1,6 +1,6 @@
 {
   "name": "phraseanet-production-client",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "description": "Phraseanet frontend dependencies",
   "scripts": {
     "clean": "rimraf dist",
@@ -150,7 +150,7 @@
     "lodash.merge": "^4.6.0",
     "mapbox.js": "^3.1.1",
     "nouislider": "^9.2.0",
-    "phraseanet-common": "^0.4.0",
+    "phraseanet-common": "^0.4.1",
     "pym.js": "^1.3.1",
     "rx": "^4.1.0",
     "sprintf-js": "^1.1.1",
