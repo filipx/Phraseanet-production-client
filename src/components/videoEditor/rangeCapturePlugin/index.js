@@ -269,11 +269,18 @@ const plugin = function (options) {
         this.setVTT();
         // if we have to load existing chapters, let's trigger loadedmetadata:
         if (settings.vttFieldValue !== false) {
+            var playPromise = null;
             if (this.paused()) {
-                this.play();
+                playPromise = this.play();
             }
             if (!this.paused()) {
-                this.pause();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        this.pause();
+                    })
+                    .catch(error => {
+                     });
+                }
             }
         }
     });

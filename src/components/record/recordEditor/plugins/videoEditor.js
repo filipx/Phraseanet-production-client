@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import Flash from 'videojs-flash';
 
 const videoEditor = (services) => {
     const {configService, localeService, recordEditorEvents} = services;
