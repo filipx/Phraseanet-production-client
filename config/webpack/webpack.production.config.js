@@ -60,6 +60,10 @@ module.exports = Object.assign({}, webpackConfig, {
                 "css-loader"
               ]
           },
+          {
+              test: /videojs-flash\.js$/,
+              loader: 'script-loader'
+          },
           // exclude skins as inline-css in dev env
           // {
           //     test: /\.scss$/,

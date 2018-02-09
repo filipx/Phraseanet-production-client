@@ -1,6 +1,6 @@
 {
   "name": "phraseanet-production-client",
-  "version": "0.33.1",
+  "version": "0.33.2",
   "description": "Phraseanet frontend dependencies",
   "scripts": {
     "clean": "rimraf dist",
@@ -156,6 +156,7 @@
     "sprintf-js": "^1.1.1",
     "underscore": "^1.8.3",
     "video.js": "^6.2.4",
+    "videojs-flash": "^2.1.0",
     "videojs-hotkeys": "^0.2.20",
     "zxcvbn": "^4.4.2"
   }

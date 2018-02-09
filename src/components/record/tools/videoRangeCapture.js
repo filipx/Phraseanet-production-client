@@ -1,3 +1,5 @@
+import Flash from 'videojs-flash';
+
 const videoRangeCapture = (services, datas, activeTab = false) => {
     const {configService, localeService, appEvents} = services;
     let $container = null;
