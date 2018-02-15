@@ -55,11 +55,7 @@ const workzoneFacets = services => {
             })
         );
 
-        treeSource = _sortByPredefinedFacets(treeSource, 'name', [
-            'Base_Name',
-            'Collection_Name',
-            'Type_Name'
-        ]);
+        treeSource = _sortByPredefinedFacets(treeSource, 'name', ['base_aggregate', 'collection_aggregate', 'doctype_aggregate']);
 
         treeSource = _shouldFilterSingleContent(treeSource, data.filterFacet);
 
