@@ -166,6 +166,7 @@ const lightbox = services => {
             .parent()
             .bind('click', function (event) {
                 _scid_click(event, this);
+                _adjust_visibility(this);
                 return false;
             });
 
@@ -488,7 +489,7 @@ const lightbox = services => {
 
         $('.basket_element', current_wrapper).parent().trigger('click');
 
-        _adjust_visibility($('.basket_element', current_wrapper));
+        _adjust_visibility($('.basket_element', current_wrapper).parent());
     }
 
     function _getNext() {
@@ -507,7 +508,7 @@ const lightbox = services => {
 
         $('.basket_element', current_wrapper).parent().trigger('click');
 
-        _adjust_visibility($('.basket_element', current_wrapper));
+        _adjust_visibility($('.basket_element', current_wrapper).parent());
 
         if ($(document).data('slideshow')) {
             var timer = setTimeout(() => _getNext(), 3500);
@@ -561,7 +562,7 @@ const lightbox = services => {
 
         var sc_left =
             el_parent.position().left +
-            el_parent.outerWidth() / 2 -
+            el_parent.outerWidth() -
             sc_wrapper.width() / 2;
 
         sc_wrapper.stop().animate({
@@ -984,16 +985,16 @@ const lightbox = services => {
         var sc_wrapper = $('#sc_wrapper');
         var sc_container = $('#sc_container');
 
-        var el_width = $(el).parent().outerWidth();
-        var el_position = $(el).parent().position();
+        var el_width = $(el).parent().width();
+        var el_position = $(el).parent().offset();
         var sc_scroll_left = sc_wrapper.scrollLeft();
 
-        var boundup = sc_wrapper.width();
-        var bounddown = 0;
-        var placeup = el_position.left + el_width - sc_scroll_left;
-        var placedown = el_position.left - sc_scroll_left;
+        var boundRight = sc_wrapper.width();
+        var boundLeft = 0;
+        var placeRight = el_position.left + el_width + sc_scroll_left;
+        var placeLeft = el_position.left - sc_scroll_left;
 
-        if (placeup <= boundup && placedown >= bounddown) {
+        if (placeRight <= boundRight && placeLeft >= boundLeft) {
             return true;
         }
         return false;
