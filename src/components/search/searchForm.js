@@ -31,6 +31,7 @@ const searchForm = (services) => {
         });
 
         toggleSearchState();
+        appEvents.emit('search.doCheckFilters');
 
         $container.on('click', '.geo-search-action-btn', (event) => {
             event.preventDefault();
