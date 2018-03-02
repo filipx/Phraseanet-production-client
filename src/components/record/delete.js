@@ -9,8 +9,8 @@ const deleteRecord = (services) => {
 
     const openModal = (datas) => {
         var $dialog = dialog.create(services, {
-            size: 'Small',
-            title: localeService.t('deleteRecords')
+            size: '287x153',
+            title: localeService.t('warning')
         });
 
         $.ajax({
@@ -19,7 +19,13 @@ const deleteRecord = (services) => {
             dataType: 'html',
             data: datas,
             success: function (data) {
-                $dialog.setContent(data);
+                var response = JSON.parse(data);
+                $dialog.setOption('height', 'auto');
+
+                $dialog.setContent(response.renderView);
+
+                //reset top position of dialog
+                $dialog.getDomElement().offsetParent().css('top', ($(window).height() - $dialog.getDomElement()[0].clientHeight)/2);
                 _onDialogReady();
             }
         });
@@ -31,6 +37,8 @@ const deleteRecord = (services) => {
         var $dialogBox = $dialog.getDomElement();
         var $closeButton = $('button.ui-dialog-titlebar-close', $dialogBox.parent());
         var $cancelButton = $('button.cancel', $dialogBox);
+        var titleBox = $(".ui-dialog-title", $dialogBox.parent());
+        titleBox.prepend('<i class="fa fa-exclamation-triangle" style="margin-right: 10px"></i>');
 
         $cancelButton.bind('click', function () {
             $dialog.close();
