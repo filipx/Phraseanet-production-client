@@ -1,4 +1,5 @@
 import Flash from 'videojs-flash';
+import FieldCollection from './../recordEditor/models/fieldCollection';
 
 const videoRangeCapture = (services, datas, activeTab = false) => {
     const {configService, localeService, appEvents} = services;
@@ -31,9 +32,21 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
         if (initData.videoEditorConfig !== null) {
             options.seekBackwardStep = initData.videoEditorConfig.seekBackwardStep;
             options.seekForwardStep = initData.videoEditorConfig.seekForwardStep;
+            options.playbackRates = initData.videoEditorConfig.playbackRates === undefined ? [1, 2, 3] : initData.videoEditorConfig.playbackRates;
+            options.vttFieldValue = false;
+            options.vttFieldName = initData.videoEditorConfig.vttFieldName === undefined ? false : initData.videoEditorConfig.vttFieldName;
         }
 
         options.techOrder = ['html5', 'flash'];
+
+        // get default videoTextTrack value
+        if (options.vttFieldName !== false) {
+            var fieldCollection = new FieldCollection(initData.T_fields);
+            let vttField = fieldCollection.getFieldByName(options.vttFieldName);
+            if (vttField !== false || vttField._value.length > 0) {
+                options.vttFieldValue = vttField._value.VideoTextTrackChapters[0];
+            }
+        }
 
         require.ensure([], () => {
             // load videoJs lib
