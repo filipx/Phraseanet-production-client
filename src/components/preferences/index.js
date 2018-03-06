@@ -13,7 +13,7 @@ const preferences = services => {
             let $el = $(event.currentTarget);
             event.preventDefault();
             appCommons.userModule.setPref('facet', $el.prop('checked'));
-            appEvents.emit('search.setFilterFacet', $el.prop('checked'));
+            appEvents.emit('search.updateFacetData');
             appEvents.emit('search.doRefreshState');
         });
 
@@ -193,6 +193,16 @@ const preferences = services => {
                 'order_collection_by',
                 el.val()
             );
+        });
+
+        $container.on('change', '.preferences-facet-order', event => {
+            let el = $('#look_box_settings select[name=orderFacet]');
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'order_facet',
+                el.val()
+            );
+            appEvents.emit('search.updateFacetData');
         });
 
         $container.on('change', '.upload-options-collection', event => {

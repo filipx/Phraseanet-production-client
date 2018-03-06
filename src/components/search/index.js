@@ -27,7 +27,6 @@ const search = services => {
     let $searchResult = null;
     let answAjaxrunning = false;
     let resultInfoView;
-    let filterFacet = false;
     let facets = null;
     var lastFilterResults = [];
 
@@ -162,13 +161,15 @@ const search = services => {
                 if (datas.facets.length == 0) {
                     appEvents.emit('facets.doLoadFacets', {
                         facets: lastFilterResults,
-                        filterFacet: filterFacet
+                        filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
+                        facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
                     });
                 } else {
                     lastFilterResults = datas.facets;
                     appEvents.emit('facets.doLoadFacets', {
                         facets: datas.facets,
-                        filterFacet: filterFacet
+                        filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
+                        facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
                     });
                 }
 
@@ -323,13 +324,13 @@ const search = services => {
         onRefreshSearchState();
     };
 
-    const setFilterFacet = isEnabled => {
-        filterFacet = isEnabled;
+    const updateFacetData = () => {
         appEvents.emit('facets.doLoadFacets', {
             facets: facets,
-            filterFacet: filterFacet
+            filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
+            facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
         });
-    };
+    }
 
     appEvents.listenAll({
         'search.doRefreshState': onRefreshSearchState,
@@ -337,7 +338,7 @@ const search = services => {
         'search.doAfterSearch': afterSearch,
         'search.doClearSearch': clearAnswers,
         'search.doNavigate': navigate,
-        'search.setFilterFacet': setFilterFacet
+        'search.updateFacetData': updateFacetData,
     });
 
     return { initialize, getResultSelectionStream, getResultNavigationStream };

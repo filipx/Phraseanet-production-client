@@ -16,6 +16,7 @@ const workzoneFacets = services => {
      }
      */
 
+    const ORDER_BY_BCT = "ORDER_BY_BCT";
     let selectedFacetValues = [];
     let facetStatus = $.parseJSON(sessionStorage.getItem('facetStatus')) || [];
 
@@ -55,9 +56,13 @@ const workzoneFacets = services => {
             })
         );
 
-        treeSource = _sortByPredefinedFacets(treeSource, 'name', ['base_aggregate', 'collection_aggregate', 'doctype_aggregate']);
+        if(data.facetOrder == ORDER_BY_BCT) {
+            treeSource = _sortByPredefinedFacets(treeSource, 'name', ['base_aggregate', 'collection_aggregate', 'doctype_aggregate']);
+        }
 
-        treeSource = _shouldFilterSingleContent(treeSource, data.filterFacet);
+        if(data.filterFacet == true) {
+            treeSource = _shouldFilterSingleContent(treeSource);
+        }
 
         return _getFacetsTree().reload(treeSource)
             .done(function () {
@@ -81,26 +86,22 @@ const workzoneFacets = services => {
         };
     }
 
-    function _shouldFilterSingleContent(source, shouldFilter) {
+    function _shouldFilterSingleContent(source) {
         var filteredSource = [];
-        if (shouldFilter === true) {
-            _.forEach(source, function (facet) {
-                //close expansion for facet containing selected values
-                // if (!_.isUndefined(selectedFacetValues[facet.title])) {
-                //     facet.expanded = false;
-                // }
-                if (
-                    !_.isUndefined(facet.children) &&
-                    (facet.children.length > 1 ||
-                        !_.isUndefined(selectedFacetValues[facet.title]))
-                ) {
-                    filteredSource.push(facet);
-                }
-            });
-            source = filteredSource;
-        }
-
-        return source;
+        _.forEach(source, function (facet) {
+            //close expansion for facet containing selected values
+            // if (!_.isUndefined(selectedFacetValues[facet.title])) {
+            //     facet.expanded = false;
+            // }
+            if (
+                !_.isUndefined(facet.children) &&
+                (facet.children.length > 1 ||
+                !_.isUndefined(selectedFacetValues[facet.title]))
+            ) {
+                filteredSource.push(facet);
+            }
+        });
+        return filteredSource;
     }
 
     function _sortByPredefinedFacets(source, field, predefinedFieldOrder) {
