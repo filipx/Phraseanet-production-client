@@ -163,6 +163,7 @@ const search = services => {
                         facets: lastFilterResults,
                         filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
                         facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
+                        facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val()
                     });
                 } else {
                     lastFilterResults = datas.facets;
@@ -170,6 +171,7 @@ const search = services => {
                         facets: datas.facets,
                         filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
                         facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
+                        facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val()
                     });
                 }
 
@@ -329,6 +331,7 @@ const search = services => {
             facets: facets,
             filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
             facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
+            facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val()
         });
     }
 

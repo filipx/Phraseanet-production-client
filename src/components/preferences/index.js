@@ -205,6 +205,16 @@ const preferences = services => {
             appEvents.emit('search.updateFacetData');
         });
 
+        $container.on('change', '.preferences-facet-values-order', event => {
+            let el = $('#look_box_settings select[name=facetValuesOrder]');
+            event.preventDefault();
+            appCommons.userModule.setPref(
+                'facet_values_order',
+                el.val()
+            );
+            appEvents.emit('search.updateFacetData');
+        });
+
         $container.on('change', '.upload-options-collection', event => {
             let el = $('.settings-box select[name=base_id]');
             event.preventDefault();
