@@ -38,7 +38,7 @@ const workzoneFacets = services => {
         function sortIteration(i) {
             switch(data.facetValueOrder) {
                 case ORDER_ALPHA_ASC:
-                    return i.value.toLowerCase();
+                    return i.value.toString().toLowerCase();
                     break;
                 case ORDER_BY_HITS:
                     return i.count*-1;

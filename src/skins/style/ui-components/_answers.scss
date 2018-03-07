@@ -90,7 +90,7 @@ $answersInfoLabelColor: #949494 !default;
         font-size: 11px;
         color: $answersInfoDialogColor;
         height: 60px;
-        .infoDialog {
+        .infoDialog, .search-display-info {
             float: left;
             background: $answersInfoDialogBg;
             color: $answersInfoDialogColor;
