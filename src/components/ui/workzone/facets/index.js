@@ -17,6 +17,9 @@ const workzoneFacets = services => {
      */
 
     const ORDER_BY_BCT = "ORDER_BY_BCT";
+    const ORDER_ALPHA_ASC = "ORDER_ALPHA_ASC";
+    const ORDER_BY_HITS = "ORDER_BY_HITS";
+
     let selectedFacetValues = [];
     let facetStatus = $.parseJSON(sessionStorage.getItem('facetStatus')) || [];
 
@@ -28,11 +31,25 @@ const workzoneFacets = services => {
         selectedFacetValues = [];
         return selectedFacetValues;
     };
+
+
     var loadFacets = function (data) {
+
+        function sortIteration(i) {
+            switch(data.facetValueOrder) {
+                case ORDER_ALPHA_ASC:
+                    return i.value.toLowerCase();
+                    break;
+                case ORDER_BY_HITS:
+                    return i.count*-1;
+                    break;
+            }
+        }
+
         // Convert facets data to fancytree source format
         var treeSource = _.map(data.facets, function (facet) {
             // Values
-            var values = _.map(facet.values, function (value) {
+            var values = _.map(_.sortBy(facet.values, sortIteration), function (value) {
                 return {
                     title: value.value + ' (' + value.count + ')',
                     query: value.query,
