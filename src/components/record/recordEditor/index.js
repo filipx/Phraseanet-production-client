@@ -82,15 +82,16 @@ const recordEditorService = services => {
             'recordEditor.activateToolTab': activateToolTab
         });
 
+        // set grouping (regroupement) image
+        $editorContainer.parent().on('click', '.set-grouping-image-action', event => {
+            let $el = $(event.currentTarget);
+            setRegDefault($el.data('index'), $el.data('record-id'));
+        })
+
         $editorContainer
             .on('click', '.select-record-action', event => {
                 let $el = $(event.currentTarget);
                 _onSelectRecord(event, $el.data('index'));
-            })
-            // set grouping (regroupement) image
-            .on('click', '.set-grouping-image-action', event => {
-                let $el = $(event.currentTarget);
-                setRegDefault($el.data('index'), $el.data('record-id'));
             })
             // status field edition
             .on('click', '.edit-status-action', event => {
