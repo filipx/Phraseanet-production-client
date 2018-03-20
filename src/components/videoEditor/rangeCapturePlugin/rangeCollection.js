@@ -3,6 +3,10 @@ import _ from 'underscore';
 import videojs from 'video.js';
 import RangeItem from './rangeItem';
 import {formatTime} from './utils';
+import Alerts from '../../utils/alert';
+
+const humane = require('humane-js');
+
 /**
  * VideoJs Range Collection
  */
@@ -51,15 +55,20 @@ class RangeCollection extends Component {
                 action: 'export-ranges',
                 ranges: this.exportRanges()
             })
-        })
+        });
 
-        this.$el.on('click', '.export-vtt-ranges', (event) => {
-            event.preventDefault();
-            this.player_.rangeStream.onNext({
-                action: 'export-vtt-ranges',
-                data: this.exportVttRanges()
-            })
-        })
+        if(this.settings.vttFieldValue == false) {
+           this.$el.find('.export-vtt-ranges').prop('disabled', true);
+        }else {
+            this.$el.on('click', '.export-vtt-ranges', (event) => {
+                event.preventDefault();
+                this.player_.rangeStream.onNext({
+                    action: 'export-vtt-ranges',
+                    data: this.exportVttRanges()
+                })
+            });
+        }
+
     }
 
     initDefaultRange() {
@@ -364,6 +373,30 @@ ${JSON.stringify(exportableData)}
 
         }
     }
+
+    exportRangesData = (rangeData) => {
+        var title = this.settings.translations.alertTitle;
+        var message = this.settings.translations.updateTitle;
+        var dialogElement = this.settings.dialog.$dialog;
+        $.ajax({
+            type: 'POST',
+            url: `${this.settings.baseUrl}prod/tools/metadata/save/`,
+            data: {
+                databox_id: this.settings.databoxId,
+                record_id: this.settings.recordId,
+                meta_struct_id: this.settings.meta_struct_id,
+                value: rangeData
+            },
+            success: function (data) {
+                if (!data.success) {
+                    humane.error(data.message);
+                } else {
+                    dialogElement.dialog('close');
+                    Alerts(title, message, null);
+                }
+            }
+        });
+};
 }
 
 videojs.registerComponent('RangeCollection', RangeCollection);
