@@ -39,12 +39,18 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
 
         options.techOrder = ['html5', 'flash'];
 
+        options.recordId = initData.recordId;
+        options.databoxId = initData.databoxId;
+        options.translations = initData.translations;
+        options.dialog = params.$dialog;
+
         // get default videoTextTrack value
         if (options.vttFieldName !== false) {
             var fieldCollection = new FieldCollection(initData.T_fields);
             let vttField = fieldCollection.getFieldByName(options.vttFieldName);
             if (vttField !== false && vttField._value.VideoTextTrackChapters != undefined) {
                 options.vttFieldValue = vttField._value.VideoTextTrackChapters[0];
+                options.meta_struct_id = vttField.id;
             }
         }
 

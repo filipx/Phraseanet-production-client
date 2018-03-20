@@ -14,7 +14,8 @@ const rangeCapture = (services, datas, activeTab = false) => {
         fluid: true,
         controlBar: {
             muteToggle: false
-        }
+        },
+        baseUrl: configService.get('baseUrl')
     };
     let videoPlayer;
     const initialize = (params, userOptions) => {

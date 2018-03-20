@@ -105,7 +105,7 @@ const recordToolsModal = (services, datas, activeTab = false) => {
             });
 
             videoScreenCapture(services).initialize({$container: $scope, data});
-            videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data});
+            videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data, $dialog});
         }
     };
 

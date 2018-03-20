@@ -165,6 +165,7 @@ const plugin = function (options) {
             case 'export-ranges':
                 break;
             case 'export-vtt-ranges':
+                this.rangeCollection.exportRangesData(params.data);
                 break;
             case 'resize':
                 this.setEditorWidth();
