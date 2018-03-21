@@ -42,7 +42,7 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
         options.recordId = initData.recordId;
         options.databoxId = initData.databoxId;
         options.translations = initData.translations;
-        options.dialog = params.$dialog;
+        options.services = params.services;
 
         // get default videoTextTrack value
         if (options.vttFieldName !== false) {

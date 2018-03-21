@@ -53,7 +53,7 @@ const recordVideoEditorModal = (services, datas, activeTab = false) => {
         // available if only 1 record is selected:
         if (data.selectionLength === 1 && data.isVideo === "true") {
             videoScreenCapture(services).initialize({$container: $scope, data});
-            videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data, $dialog});
+            videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data, services});
         }else {
             let confirmationDialog = dialog.create(services, {
                 size: 'Alert',

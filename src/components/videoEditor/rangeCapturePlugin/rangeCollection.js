@@ -378,7 +378,7 @@ ${JSON.stringify(exportableData)}
     exportRangesData = (rangeData) => {
         var title = this.settings.translations.alertTitle;
         var message = this.settings.translations.updateTitle;
-        var dialogElement = this.settings.dialog.$dialog;
+        var services = this.settings.services;
         $.ajax({
             type: 'POST',
             url: `${this.settings.baseUrl}prod/tools/metadata/save/`,

@@ -1,8 +1,5 @@
-require('./style/main.scss');
 import $ from 'jquery';
 import dialog from 'phraseanet-common/src/components/dialog';
-import videoScreenCapture from './videoScreenCapture';
-import videoRangeCapture from './videoRangeCapture';
 import sharingManager from './sharingManager';
 import * as Rx from 'rx';
 
@@ -103,9 +100,6 @@ const recordToolsModal = (services, datas, activeTab = false) => {
                 $container: $dialog, data, tabs,
                 dialogParams: $dialog.getOption('contextArgs')
             });
-
-            videoScreenCapture(services).initialize({$container: $scope, data});
-            videoRangeCapture(services).initialize({$container: $('.video-range-editor-container'), data, $dialog});
         }
     };
 
