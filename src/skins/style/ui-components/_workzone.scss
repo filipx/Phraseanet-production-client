@@ -66,7 +66,6 @@ $workzoneTabDisabledTextColor: $mediumTextActiveColor !default;
       height: $subTabHeight;
       border-bottom: 1px solid $workzoneTabBorderBottom;
       box-sizing: border-box;
-      display: initial;
       li {
         width: auto;
         height: $tabHeight;
@@ -140,6 +139,7 @@ $workzoneTabDisabledTextColor: $mediumTextActiveColor !default;
   }
   ul.prod-icon-menu {
     width: 100%;
+    display: initial;
   }
   .prod-icon-menu {
     .WZtabs, .WZplugins {
