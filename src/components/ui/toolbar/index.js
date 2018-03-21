@@ -10,6 +10,7 @@ import recordToolsModal from '../../record/tools/index';
 import printRecord from '../../record/print';
 import recordFeedbackModal from '../../record/feedback';
 import bridgeRecord from '../../record/bridge';
+import videoToolsModal from '../../record/videoEditor/index';
 import merge from 'lodash.merge';
 
 const toolbar = (services) => {
@@ -154,6 +155,13 @@ const toolbar = (services) => {
                 default:
             }
             $el.data('action-state', !state);
+        });
+
+        /**
+         * tools > Edit > VideoEditor
+         */
+        $container.on('click', '.TOOL_videoeditor_btn', function (event) {
+            _triggerModal(event, videoToolsModal(services).openModal);
         });
 
         /**

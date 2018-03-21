@@ -4,6 +4,7 @@ import videojs from 'video.js';
 import RangeItem from './rangeItem';
 import {formatTime} from './utils';
 import Alerts from '../../utils/alert';
+import dialog from 'phraseanet-common/src/components/dialog';
 
 const humane = require('humane-js');
 
@@ -377,7 +378,7 @@ ${JSON.stringify(exportableData)}
     exportRangesData = (rangeData) => {
         var title = this.settings.translations.alertTitle;
         var message = this.settings.translations.updateTitle;
-        var dialogElement = this.settings.dialog.$dialog;
+        var services = this.settings.services;
         $.ajax({
             type: 'POST',
             url: `${this.settings.baseUrl}prod/tools/metadata/save/`,
@@ -391,8 +392,18 @@ ${JSON.stringify(exportableData)}
                 if (!data.success) {
                     humane.error(data.message);
                 } else {
-                    dialogElement.dialog('close');
-                    Alerts(title, message, null);
+                    let confirmationDialog = dialog.create(services, {
+                        size: 'Alert',
+                        title: title,
+                        closeOnEscape: true
+                    }, 3);
+
+                    let content = $('<div />').css({
+                        'text-align': 'center',
+                        width: '100%',
+                        'font-size': '14px'
+                    }).append(message);
+                    confirmationDialog.setContent(content);
                 }
             }
         });
