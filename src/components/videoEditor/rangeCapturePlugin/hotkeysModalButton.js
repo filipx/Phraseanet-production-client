@@ -21,6 +21,12 @@ class HotkeysModalButton extends Button {
         return 'vjs-hotkeys-modal-button vjs-button';
     }
 
+    createEl(tag = 'button', props = {}, attributes = {}) {
+        let el = super.createEl(tag, props, attributes);
+        el.innerHTML = '<span class="fa-stack"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-info fa-stack-1x fa-inverse"></i></span>';
+        return el;
+    }
+
     /**
      * Handles click for keyboard shortcuts modal
      *
@@ -38,10 +44,10 @@ class HotkeysModalButton extends Button {
 
 }
 
-HotkeysModalButton.prototype.controlText_ = `<span class="fa-stack">
-                              <i class="fa fa-circle fa-stack-2x"></i>
-                              <i class="fa fa-info fa-inverse"></i>
-                            </span>`;
+// HotkeysModalButton.prototype.controlText_ = `<span class="fa-stack">
+//                               <i class="fa fa-circle fa-stack-2x"></i>
+//                               <i class="fa fa-info fa-stack-1x fa-inverse"></i>
+//                             </span>`;
 
 Component.registerComponent('HotkeysModalButton', HotkeysModalButton);
 export default HotkeysModalButton;

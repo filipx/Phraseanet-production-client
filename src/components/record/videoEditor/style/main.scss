@@ -7,6 +7,11 @@
   }
 }
 .video-range-editor-container {
-  padding: 10px;
-  min-height: 530px;
+    padding: 10px;
+    min-height: 530px;
+    overflow: hidden;
+}
+
+.fa-info {
+    color: #000;
 }
