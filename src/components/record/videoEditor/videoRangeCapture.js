@@ -48,8 +48,10 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
         if (options.vttFieldName !== false) {
             var fieldCollection = new FieldCollection(initData.T_fields);
             let vttField = fieldCollection.getFieldByName(options.vttFieldName);
-            if (vttField !== false && vttField._value.VideoTextTrackChapters != undefined) {
-                options.vttFieldValue = vttField._value.VideoTextTrackChapters[0];
+            if (vttField !== false) {
+                if(vttField._value.VideoTextTrackChapters != undefined) {
+                    options.vttFieldValue = vttField._value.VideoTextTrackChapters[0];
+                }
                 options.meta_struct_id = vttField.id;
             }
         }

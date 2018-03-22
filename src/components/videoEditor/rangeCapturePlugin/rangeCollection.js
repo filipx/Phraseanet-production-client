@@ -58,7 +58,8 @@ class RangeCollection extends Component {
             })
         });
 
-        if(this.settings.vttFieldValue == false) {
+        if(this.settings.vttFieldName == false
+            || this.settings.meta_struct_id == undefined) {
            this.$el.find('.export-vtt-ranges').prop('disabled', true);
         }else {
             this.$el.on('click', '.export-vtt-ranges', (event) => {
