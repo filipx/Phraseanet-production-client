@@ -305,16 +305,18 @@ const leafletMap = (services) => {
     const refreshMarkers = (pois) => {
 
         return buildGeoJson(pois).then((geoJsonPoiCollection) => {
-            addMarkersLayers();
+            if(map != null) {
+                addMarkersLayers();
 
-            let markerColl = markerCollection(services);
-            markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
+                let markerColl = markerCollection(services);
+                markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
 
-            if (featureLayer.getLayers().length > 0) {
-                map.fitBounds(featureLayer.getBounds(), {maxZoom: activeProvider.markerDefaultZoom});
-            } else {
-                // set default position
-                map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                if (featureLayer.getLayers().length > 0) {
+                    map.fitBounds(featureLayer.getBounds(), {maxZoom: activeProvider.markerDefaultZoom});
+                } else {
+                    // set default position
+                    map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                }
             }
         })
 
