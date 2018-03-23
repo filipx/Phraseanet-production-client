@@ -14,6 +14,7 @@ const geonames = {
 
             // On search request add loading-state
             geocompleter.geocompleter('autocompleter', 'on', 'autocompletesearch', function (event, ui) {
+                $(this).attr('autocomplete', 'false');
                 $(this).addClass('input-loading');
                 $(this).removeClass('input-error');
             });
