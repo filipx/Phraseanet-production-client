@@ -57,7 +57,7 @@ const recordEditorService = services => {
 
         $toolsTabs.tabs({
             activate: function (event, ui) {
-                recordEditorEvents.emit('recordEditor.tabChange', {
+                recordEditorEvents.emit('tabChange', {
                     tab: ui.newPanel.selector
                 });
             }
