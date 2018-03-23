@@ -98,7 +98,7 @@ const leafletMap = (services) => {
             // select geocoding provider:
             mapbox = require('mapbox.js');
             leafletDraw = require('leaflet-draw');
-            //require('leaflet-contextmenu');
+            require('leaflet-contextmenu');
 
             $container.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
