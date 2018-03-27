@@ -307,10 +307,10 @@ const previewRecordService = services => {
                         ''
                     );
                     //set height of iframe to 100%
-                    activeThumbnailFrame.iframe.setAttribute(
-                        'height',
-                        '100%'
-                    );
+                    // activeThumbnailFrame.iframe.setAttribute(
+                    //     'height',
+                    //     '100%'
+                    // );
                     /*
                      // warning - if listening events/sendings events,
                      // pym instances should be destroyed when preview is closed

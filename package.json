@@ -1,6 +1,6 @@
 {
   "name": "phraseanet-production-client",
-  "version": "0.33.8",
+  "version": "0.33.10",
   "description": "Phraseanet frontend dependencies",
   "scripts": {
     "clean": "rimraf dist",
@@ -29,9 +29,9 @@
     "package:prod": "./node_modules/.bin/ncu -u",
     "package:dev": "./node_modules/.bin/ncu -p -u",
     "asset-server": "node config/webpack/webpack.hot.assets.config",
-    "publish-patch": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version patch && npm publish",
-    "publish-minor": "git add -A && npm run dist && git commit && git push -u origin master && git push --tags && npm version minor && npm publish",
-    "postpublish": "git push origin master --follow-tags"
+    "publish-patch": "git add -A && npm run dist && git commit && git push -u origin 4.1 && git push --tags && npm version patch && npm publish",
+    "publish-minor": "git add -A && npm run dist && git commit && git push -u origin 4.1 && git push --tags && npm version minor && npm publish",
+    "postpublish": "git push origin 4.1 --follow-tags"
   },
   "pre-commit": [
     "test"
