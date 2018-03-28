@@ -53,8 +53,9 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
 
 
             $container.on('click', '#thumb_camera_button', function () {
-                $('#thumb_info', $container).hide();
+                //$('#thumb_info', $container).hide();
                 $('#thumb_delete_button', $container).show();
+                $('#thumb_download_button', $container).show();
 
                 var screenshot = ThumbEditor.screenshot();
                 var img = $('<img />');

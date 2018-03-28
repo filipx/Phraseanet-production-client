@@ -1,0 +1,25 @@
+/******* PROD-TOOL-BOX ******************************************************/
+
+$accentColor: #884c92;
+
+#prod-tool-box.video-edit {
+    #tool-tabs.ui-tabs {
+        .ui-tabs-nav li.ui-tabs-active {
+            background-color: transparent;
+            border-bottom: 4px solid $accentColor;
+            box-sizing: border-box;
+        }
+        .ui-tabs-nav li {
+            background-color: transparent;
+            border-bottom: 4px solid transparent;
+            box-sizing: border-box;
+        }
+        .ui-tabs-nav li a {
+            padding: 5px 8px;
+            font-weight: 500;
+            font-family: roboto;
+            color: #FFFFFF;
+            background-color: transparent;
+        }
+    }
+}

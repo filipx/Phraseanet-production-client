@@ -2,10 +2,33 @@
 
 #thumbExtractor {
   background-color: $lightBackgroundColor;
+  min-width: 1020px;
   .main_title {
     height: 15px;
     font-weight: bold;
     top: 15px;
+  }
+  #thumbExtractor-preview {
+      width: 40%;
+      min-width: 400px;
+      height: 100%;
+      padding-left: 30px;
+      padding-right: 30px;
+      float: left;
+      box-sizing: border-box;
+      border-right: 1px solid #636363;
+      margin-top: 60px;
+      margin-bottom: 60px;
+  }
+  #thumbExtractor-screenshot {
+      width: 59%;
+      height: 100%;
+      padding-left: 30px;
+      padding-right: 30px;
+      float: left;
+      display: inline-block;
+      box-sizing: border-box;
+      position: relative;
   }
   .part_title_left {
     height: 20px;
@@ -20,30 +43,44 @@
     left: 380px;
   }
   #thumb_info {
-    padding-top: 25px;
-    font-style: italic;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 30px;
+      text-align: center;
+      font-family: Roboto;
+      font-size: 13px;
+      font-weight: 500;
+      font-style: normal;
+      color: #ffffff;
   }
   .frame_video {
-    border: 1px solid $darkerBorderColor;
-    height: 210px;
-    width: 320px;
-    top: 50px;
-    left: 10px;
+      height: 210px;
+      width: 320px;
+      margin: 0 auto;
+      background-color: #333333;
   }
   #thumb_video {
     height: 100%;
     width: 100%;
   }
+  #frame {
+     overflow: auto;
+     height: 211px;
+     margin-top: 60px;
+  }
   .frame_canva {
     border: 1px solid $darkerBorderColor;
+    position: absolute;
+    margin: 60px auto 0;
+    border: 1px solid #404040;
     border-bottom: none;
     height: 210px;
-    line-height: 210px;
     width: 320px;
-    top: 50px;
-    left: 380px;
+    top: 0px;
+    left: 0;
+    right: 0;
     z-index: 2;
-    text-align: center;
   }
   #thumb_canvas {
     vertical-align: middle;
@@ -73,6 +110,22 @@
       }
     }
   }
+  #thumb_validate_button {
+      border-radius: 15px;
+      padding-left: 50px;
+      padding-right: 50px;
+      background: transparent;
+      border: 1px solid #fff;
+      color: #fff;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: 500;
+      font-style: normal;
+      margin: 0 auto;
+  }
+  #thumb_validate_button:hover {
+      border-color: #884c92;
+  }
   #thumb_reset_button {
     width: 41px;
     height: 41px;
@@ -82,14 +135,33 @@
     display: none;
     line-height: 20px;
   }
+  #thumb_download_button {
+      height: 50px;
+      width: 320px;
+        background-image: url("/assets/common/images/icons/picto-export-thumbnail.png");
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 41px;
+        height: 41px;
+        position: absolute;
+        bottom: -20px;
+        right: 20px;
+  }
+  #thumbExtractor #thumb_download_button:hover {
+        background-image: url("/assets/common/images/icons/picto-export-thumbnail-hover.png");
+  }
   #thumb_delete_button {
-    width: 41px;
-    height: 41px;
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    display: none;
-    line-height: 20px;
+      background-image: url("/assets/common/images/icons/picto-delete.png");
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 41px;
+      height: 41px;
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+  }
+  #thumb_delete_button:hover {
+      background-image: url("/assets/common/images/icons/picto-delete-hover.png");
   }
   #thumb_delete_button,
   #thumb_reset_button {
@@ -118,24 +190,64 @@
     }
   }
   #thumb_camera_button {
-    cursor: pointer;
-    height: 50px;
-    width: 320px;
-    top: 300px;
-    left: 10px;
-    text-align: center;
+      cursor: pointer;
+      height: 50px;
+      width: 320px;
+      text-align: center;
+      margin: 26px auto 40px;
+      background-image: url("/assets/common/images/icons/icon-photography.png");
+      background-position: center;
+      background-repeat: no-repeat;
+  }
+  #thumb_camera_button:hover {
+      background-image: url("/assets/common/images/icons/icon-photography-hover.png");
   }
   .thumb_submit_action {
-    cursor: pointer;
-    height: 30px;
-    width: 80px;
-    top: 385px;
-    left: 620px;
-    padding: 0;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
   }
   .action_frame .ui-slider .ui-slider-handle {
     background-color: #FFFFFF;
   }
+  .video-data-container {
+    width: 320px;
+    margin: 30px auto 10px;
+    overflow: auto;
+    max-height: 200px;
+      .dl-horizontal dt {
+          width: 100%;
+          padding-bottom: 0;
+          font-family: Roboto;
+          font-size: 12px;
+          font-weight: 500;
+          font-style: normal;
+          color: #b3b3b3;
+      }
+      .dl-horizontal dd {
+          margin: 0;
+          padding-top: 0;
+          font-family: Roboto;
+          font-size: 12px;
+          font-weight: 500;
+          font-style: normal;
+          color: #ffffff;
+      }
+  }
+}
+
+.vertical-divider {
+    height: 1px;
+    background-color: #636363;
+}
+
+.horizontal-divider {
+    width: 1%;
+    max-width: 1px;
+    height: 100%;
+    background-color: #636363;
+    float: left;
+    margin-top: 60px;
 }
 
 #thumb_confirm {
