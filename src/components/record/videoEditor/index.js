@@ -33,6 +33,7 @@ const recordVideoEditorModal = (services, datas, activeTab = false) => {
             , function (data) {
                 $dialog.setContent(data);
                 $dialog.setOption('contextArgs', datas);
+                $dialog.getDomElement().closest('.ui-dialog').addClass('videoEditor_dialog')
                 _onModalReady(data, window.toolsConfig, activeTab);
                 return;
             }

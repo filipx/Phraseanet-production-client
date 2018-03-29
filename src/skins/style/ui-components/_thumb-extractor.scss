@@ -3,6 +3,12 @@
 #thumbExtractor {
   background-color: $lightBackgroundColor;
   min-width: 1020px;
+  position: absolute;
+  overflow-y: auto;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  top: 31px;
   .main_title {
     height: 15px;
     font-weight: bold;
@@ -16,7 +22,6 @@
       padding-right: 30px;
       float: left;
       box-sizing: border-box;
-      border-right: 1px solid #636363;
       margin-top: 60px;
       margin-bottom: 60px;
   }
@@ -127,25 +132,16 @@
       border-color: #884c92;
   }
   #thumb_reset_button {
-    width: 41px;
-    height: 41px;
-    position: absolute;
     bottom: 10px;
     right: 60px;
-    display: none;
     line-height: 20px;
   }
   #thumb_download_button {
-      height: 50px;
-      width: 320px;
-        background-image: url("/assets/common/images/icons/picto-export-thumbnail.png");
-        background-position: center;
-        background-repeat: no-repeat;
-        width: 41px;
-        height: 41px;
-        position: absolute;
-        bottom: -20px;
-        right: 20px;
+    background-image: url("/assets/common/images/icons/picto-export-thumbnail.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    bottom: -20px;
+    right: 20px;
   }
   #thumbExtractor #thumb_download_button:hover {
         background-image: url("/assets/common/images/icons/picto-export-thumbnail-hover.png");
@@ -154,9 +150,6 @@
       background-image: url("/assets/common/images/icons/picto-delete.png");
       background-position: center;
       background-repeat: no-repeat;
-      width: 41px;
-      height: 41px;
-      position: absolute;
       bottom: -20px;
       right: -20px;
   }
@@ -164,8 +157,13 @@
       background-image: url("/assets/common/images/icons/picto-delete-hover.png");
   }
   #thumb_delete_button,
+  #thumb_download_button,
   #thumb_reset_button {
     cursor: pointer;
+    display: none;
+    width: 41px;
+    height: 41px;
+    position: absolute;
   }
   #thumb_slider {
     height: 95px;
@@ -251,17 +249,16 @@
 }
 
 #thumb_confirm {
-  table {
-    table-layout: fixed;
-    width: 100%;
-    td {
-      padding: 5px;
-      text-align: center;
-      vertical-align: middle;
-      img.selected {
-        width: 160px;
-        height: auto;
-      }
-    }
+  span {
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: 500;
+      color: #ffffff;
+  }
+  img.selected {
+      width: 160px;
+      height: auto;
+      display: block;
+      padding-bottom: 16px;
   }
 }

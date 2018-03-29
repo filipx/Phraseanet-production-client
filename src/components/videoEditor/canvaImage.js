@@ -20,7 +20,7 @@ Canva.prototype = {
 
             h = Math.round(w * (1 / ratio));
 
-            if (h > maxH) {
+            if (h < maxH) {
                 h = maxH;
                 w = Math.round(h * ratio);
             }

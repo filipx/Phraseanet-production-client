@@ -94,7 +94,7 @@ const ScreenShot = function (id, canva, video, altCanvas) {
     if (altCanvas.length > 0) {
         for (let i = 0; i < altCanvas.length; i++) {
             let canvaEl = altCanvas[i].el;
-            canvaEl.resize(video, altCanvas[i].width);
+            canvaEl.resize(video);
             canvaEl.copy(video);
 
             this.altScreenShots.push({
