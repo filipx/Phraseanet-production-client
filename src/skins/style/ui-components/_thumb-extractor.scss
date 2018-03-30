@@ -143,7 +143,7 @@
     bottom: -20px;
     right: 20px;
   }
-  #thumbExtractor #thumb_download_button:hover {
+  #thumb_download_button:hover {
         background-image: url("/assets/common/images/icons/picto-export-thumbnail-hover.png");
   }
   #thumb_delete_button {
@@ -165,28 +165,28 @@
     height: 41px;
     position: absolute;
   }
-  #thumb_slider {
-    height: 95px;
-    width: 320px;
-    top: 285px;
-    left: 380px;
-    padding: 0;
-    overflow: auto;
-  }
-  #thumb_wrapper {
-    white-space: nowrap;
-    margin-top: 15px;
-    img {
-      display: inline-block;
-      width: 80px;
-      height: auto;
-      margin-left: 5px;
-      margin-right: 5px;
-      &.selected {
-        border: 2px solid $bgInverseHoverColor;
-      }
-    }
-  }
+  //#thumb_slider {
+  //  height: 95px;
+  //  width: 320px;
+  //  top: 285px;
+  //  left: 380px;
+  //  padding: 0;
+  //  overflow: auto;
+  //}
+  //#thumb_wrapper {
+  //  white-space: nowrap;
+  //  margin-top: 15px;
+  //  img {
+  //    display: inline-block;
+  //    width: 80px;
+  //    height: auto;
+  //    margin-left: 5px;
+  //    margin-right: 5px;
+  //    &.selected {
+  //      border: 2px solid $bgInverseHoverColor;
+  //    }
+  //  }
+  //}
   #thumb_camera_button {
       cursor: pointer;
       height: 50px;
@@ -204,6 +204,7 @@
       cursor: pointer;
       width: 100%;
       text-align: center;
+      margin-bottom: 20px;
   }
   .action_frame .ui-slider .ui-slider-handle {
     background-color: #FFFFFF;
@@ -232,6 +233,57 @@
           color: #ffffff;
       }
   }
+  #grid {
+      padding-top: 40px;
+      overflow: hidden;
+      padding-bottom: 40px;
+      margin: 0 auto;
+      width: 510px;
+  }
+
+  .grid-item {
+      width: 105px;
+      height: 65px;
+      float: left;
+      margin: 10px;
+      position: relative;
+    }
+
+  .grid-wrapper {
+      position: absolute;
+      &.selected {
+        border: 2px solid $bgInverseHoverColor;
+      }
+      #small_thumb_download_button,
+      #small_thumb_delete_button {
+          display: block;
+          cursor: pointer;
+          width: 41px;
+          height: 41px;
+          position: absolute;
+      }
+      #small_thumb_download_button {
+          background-image: url("/assets/common/images/icons/picto-export-thumbnail.png");
+          background-position: center;
+          background-repeat: no-repeat;
+          bottom: -20px;
+          right: 20px;
+      }
+      #small_thumb_download_button:hover {
+          background-image: url("/assets/common/images/icons/picto-export-thumbnail-hover.png");
+      }
+      #small_thumb_delete_button {
+          background-image: url("/assets/common/images/icons/picto-delete.png");
+          background-position: center;
+          background-repeat: no-repeat;
+          bottom: -20px;
+          right: -20px;
+      }
+      #small_thumb_delete_button:hover {
+          background-image: url("/assets/common/images/icons/picto-delete-hover.png");
+      }
+  }
+
 }
 
 .vertical-divider {
