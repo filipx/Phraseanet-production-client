@@ -40,37 +40,6 @@ class RangeCollection extends Component {
             this.currentRange = params.activeRange;
             this.refreshRangeCollection()
         });
-
-        this.$el.on('click', '.add-range', (event) => {
-            event.preventDefault();
-            let newRange = this.addRange(this.defaultRange);
-            this.player_.rangeStream.onNext({
-                action: 'create',
-                range: newRange
-            })
-        });
-
-        this.$el.on('click', '.export-ranges', (event) => {
-            event.preventDefault();
-            this.player_.rangeStream.onNext({
-                action: 'export-ranges',
-                ranges: this.exportRanges()
-            })
-        });
-
-        if(this.settings.vttFieldName == false
-            || this.settings.meta_struct_id == undefined) {
-           this.$el.find('.export-vtt-ranges').prop('disabled', true);
-        }else {
-            this.$el.on('click', '.export-vtt-ranges', (event) => {
-                event.preventDefault();
-                this.player_.rangeStream.onNext({
-                    action: 'export-vtt-ranges',
-                    data: this.exportVttRanges()
-                })
-            });
-        }
-
     }
 
     initDefaultRange() {
@@ -80,6 +49,28 @@ class RangeCollection extends Component {
             action: 'create',
             range: newRange
         });
+    }
+
+    addRangeEvent() {
+        let newRange = this.addRange(this.defaultRange);
+        this.player_.rangeStream.onNext({
+            action: 'create',
+            range: newRange
+        })
+    }
+
+    exportRangeEvent() {
+        this.player_.rangeStream.onNext({
+            action: 'export-ranges',
+            ranges: this.exportRanges()
+        })
+    }
+
+    exportVTTRangeEvent() {
+        this.player_.rangeStream.onNext({
+            action: 'export-vtt-ranges',
+            data: this.exportVttRanges()
+        })
     }
 
     /**
@@ -96,12 +87,6 @@ class RangeCollection extends Component {
     }
 
     renderElContent() {
-        $(this.el()).append(`
-<div class="btn-container">
-    <button class="button button-primary add-range" type="button"><i class="fa fa-plus" aria-hidden="true"></i> ${this.player_.localize('Add new range')}</button>
-    <button class="button button-primary export-vtt-ranges" type="button"><i class="fa fa-floppy-o" aria-hidden="true"></i> ${this.player_.localize('Save as VTT')}</button>
-    <button class="button button-primary export-ranges" type="button"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> ${this.player_.localize('Export video ranges')}</button>
-</div>`);
         return $(this.el());
     }
 

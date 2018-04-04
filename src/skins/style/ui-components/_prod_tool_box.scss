@@ -44,6 +44,9 @@ $accentColor: #884c92;
     .ui-dialog-titlebar-close:hover {
         border: 1px solid #884c92;
     }
+    .ui-dialog-content {
+        overflow: hidden;
+    }
 }
 
 .screenCapture_validate_dialog {

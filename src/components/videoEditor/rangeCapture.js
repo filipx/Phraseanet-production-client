@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import $ from 'jquery';
 import rangeCapturePlugin from './rangeCapturePlugin/index';
 let hotkeys = require('videojs-hotkeys');
 import videojs from 'video.js';
@@ -55,7 +56,9 @@ const rangeCapture = (services, datas, activeTab = false) => {
         videojs.addLanguage(localeService.getLocale(), localeService.getTranslations());
         videoPlayer = videojs('embed-video', options, () => {
         });
+        //group video elements together
         videoPlayer.rangeCapturePlugin(options);
+        $(videoPlayer.el_).children().not('.range-item-container').wrapAll('<div class="video-player-container"></div>');
         videoPlayer.ready(() => {
             let hotkeyOptions = _.extend({
                 alwaysCaptureHotkeys: true,

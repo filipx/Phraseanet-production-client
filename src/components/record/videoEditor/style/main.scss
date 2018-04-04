@@ -1,14 +1,20 @@
 #rangeExtractor {
-  padding: 10px;
   // overflow: none;
+    position: absolute;
+    min-width: 1020px;
+    overflow-y: auto;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    top: 31px;
   .main_title {
 
     margin: 10px 15px 10px 10px;
   }
 }
 .video-range-editor-container {
-    padding: 10px;
-    min-height: 530px;
+    background: #000;
+    height: 100%;
 }
 
 .fa-info {

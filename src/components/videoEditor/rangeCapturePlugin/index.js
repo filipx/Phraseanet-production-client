@@ -10,6 +10,8 @@ import RangeCollection from './rangeCollection';
 import RangeControlBar from './rangeControlBar';
 import {WebVTT} from 'videojs-vtt.js';
 import {overrideHotkeys, hotkeys} from './hotkeys';
+import RangeItemContainer from './rangeItemContainer';
+
 // import rangeControls from './oldControlBar';
 
 const icons = `
@@ -85,7 +87,8 @@ const plugin = function (options) {
     this.rangeStream = new Rx.Subject();
     this.rangeBarCollection = this.controlBar.getChild('progressControl').getChild('seekBar').addChild('RangeBarCollection', settings);
     this.rangeControlBar = this.addChild('RangeControlBar', settings);
-    this.rangeCollection = this.addChild('RangeCollection', settings);
+    this.rangeItemContainer = this.addChild('RangeItemContainer', settings);
+    this.rangeCollection = this.rangeItemContainer.getChild('RangeCollection');
 
     this.hotkeysModalButton = this.addChild('HotkeysModalButton', settings);
 
@@ -173,7 +176,7 @@ const plugin = function (options) {
             default:
         }
         console.log('<<< =================== RANGE EVENT COMPLETE')
-        this.setEditorHeight()
+        //this.setEditorHeight()
 
     });
 
@@ -287,7 +290,7 @@ const plugin = function (options) {
     });
 
     this.one('loadedmetadata', () => {
-        this.setEditorHeight();
+        //this.setEditorHeight();
         this.setEditorWidth();
         if (settings.vttFieldValue !== false) {
             //this.currentTime(0);
