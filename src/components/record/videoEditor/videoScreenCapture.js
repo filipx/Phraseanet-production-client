@@ -13,10 +13,10 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
 
         if (ThumbEditor.isSupported()) {
 
-            var $sliderWrapper = $('#thumb_wrapper', $container);
+            var $gridContainer = $('#grid', $container);
 
-            $sliderWrapper.on('click', 'img', function () {
-                $('.selected', $sliderWrapper).removeClass('selected');
+            $gridContainer.on('click', '.grid-wrapper', function () {
+                $('.selected', $gridContainer).removeClass('selected');
                 $(this).addClass('selected');
 
                 var $self = this;
@@ -26,25 +26,12 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
                 ThumbEditor.copy(screenshots.getDataURI(), screenshots.getAltScreenShots());
             });
 
+            $container.on('click', '#thumb_download_button', function() {
+                downloadThumbnail($gridContainer.find('.selected'), $container);
+            });
 
             $container.on('click', '#thumb_delete_button', function () {
-                var img = $sliderWrapper.find('.selected');
-                var id = img.attr('id').split('_').pop();
-                var previous = img.prev();
-                var next = img.next();
-
-                if (previous.length > 0) {
-                    previous.trigger('click');
-                } else if (next.length > 0) {
-                    next.trigger('click');
-                } else {
-                    $(this).hide();
-                    $('#thumb_info', $container).show();
-                    ThumbEditor.resetCanva();
-                }
-
-                img.remove();
-                ThumbEditor.store.remove(id);
+                deleteThumbnail($gridContainer.find('.selected'), $container, ThumbEditor);
             });
 
             $container.on('click', '.close_action_frame', function () {
@@ -53,21 +40,43 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
 
 
             $container.on('click', '#thumb_camera_button', function () {
-                $('#thumb_info', $container).hide();
+                //$('#thumb_info', $container).hide();
                 $('#thumb_delete_button', $container).show();
+                $('#thumb_download_button', $container).show();
 
                 var screenshot = ThumbEditor.screenshot();
-                var img = $('<img />');
-                $('.selected', $sliderWrapper).removeClass('selected');
-                img.addClass('selected')
+
+                $container.find('.frame_canva').css('width', $container.find('#thumb_canvas').width());
+
+                $('.selected', $gridContainer).removeClass('selected');
+                var grid_wrapper = document.createElement('div');
+                $(grid_wrapper)
+                    .addClass('grid-wrapper')
+                    .addClass('selected')
                     .attr('id', 'working_' + screenshot.getId())
-                    .attr('src', screenshot.getDataURI())
+                    .append('<div id="small_thumb_download_button"/>')
+                    .append('<div id="small_thumb_delete_button"/>');
+                var img = $('<img />');
+                img.attr('src', screenshot.getDataURI())
                     .attr('alt', screenshot.getVideoTime())
-                    .appendTo($sliderWrapper);
+                    .appendTo($(grid_wrapper));
+
+                var grid_item = document.createElement('div');
+                $(grid_item).addClass('grid-item').append($(grid_wrapper)).appendTo($gridContainer);
+            });
+
+            $gridContainer.on('click', '#small_thumb_download_button', function () {
+                downloadThumbnail($(this).parent(), $container);
+                return false;
+            });
+
+            $gridContainer.on('click', '#small_thumb_delete_button', function () {
+                deleteThumbnail($(this).parent(), $container, ThumbEditor);
+                return false;
             });
 
             $('#thumb_canvas').on('tool_event', function () {
-                var thumbnail = $('.selected', $sliderWrapper);
+                var thumbnail = $('.selected', $gridContainer);
 
                 if (thumbnail.length === 0) {
                     console.error('No image selected');
@@ -79,14 +88,18 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
 
             });
             $container.on('click', '#thumb_validate_button', function () {
-                var thumbnail = $('.selected', $sliderWrapper);
+                var thumbnail = $('.selected', $gridContainer);
                 let content = '';
                 if (thumbnail.length === 0) {
                     let confirmationDialog = dialog.create(services, {
-                        size: 'Alert',
+                        size: 'Custom',
+                        customWidth: 360,
+                        customHeight: 160,
                         title: data.translations.alertTitle,
                         closeOnEscape: true
                     }, 3);
+
+                    confirmationDialog.getDomElement().closest('.ui-dialog').addClass('screenCapture_validate_dialog');
 
                     content = $('<div />').css({
                         'text-align': 'center',
@@ -117,59 +130,75 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
 
                         });
                     }
-                    buttons[localeService.t('valider')] = function () {
-                        let confirmDialog = dialog.get(2);
-                        var buttonPanel = confirmDialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane');
-                        var loadingDiv = buttonPanel.find('.info-div');
 
-                        if (loadingDiv.length === 0) {
-                            loadingDiv = $('<div />').css({
-                                width: '120px',
-                                height: '40px',
-                                float: 'left',
-                                'line-height': '40px',
-                                'padding-left': '40px',
-                                'text-align': 'left',
-                                'background-position': 'left center'
-                            }).attr('class', 'info-div').prependTo(buttonPanel);
-                        }
-
-                        $.ajax({
-                            type: 'POST',
-                            url: `${url}prod/tools/thumb-extractor/apply/`,
-                            data: {
-                                sub_def: subDefs,
-                                record_id: record_id,
-                                sbas_id: sbas_id
-                            },
-                            beforeSend: function () {
-                                disableConfirmButton(confirmDialog);
-                                loadingDiv.empty().addClass('loading').append(data.translations.processing);
-                            },
-                            success: function (data) {
-                                loadingDiv.empty().removeClass('loading');
-
-                                if (data.success) {
-                                    confirmDialog.close();
-                                    dialog.get(1).close();
-                                } else {
-                                    loadingDiv.append(content);
-                                    enableConfirmButton(confirmDialog);
-                                }
+                    buttons = [
+                        {
+                            text: localeService.t('cancel'),
+                            click: function(){
+                                $(this).dialog('close');
                             }
-                        });
-                    };
+                        },
+                        {
+                            text: localeService.t('valider'),
+                            click: function () {
+                                let confirmDialog = dialog.get(2);
+                                var buttonPanel = confirmDialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane');
+                                var loadingDiv = buttonPanel.find('.info-div');
+
+                                if (loadingDiv.length === 0) {
+                                    loadingDiv = $('<div />').css({
+                                        width: '120px',
+                                        height: '40px',
+                                        float: 'left',
+                                        'line-height': '40px',
+                                        'padding-left': '40px',
+                                        'text-align': 'left',
+                                        'background-position': 'left center'
+                                    }).attr('class', 'info-div').prependTo(buttonPanel);
+                                }
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: `${url}prod/tools/thumb-extractor/apply/`,
+                                    data: {
+                                        sub_def: subDefs,
+                                        record_id: record_id,
+                                        sbas_id: sbas_id
+                                    },
+                                    beforeSend: function () {
+                                        disableConfirmButton(confirmDialog);
+                                        loadingDiv.empty().addClass('loading').append(data.translations.processing);
+                                    },
+                                    success: function (data) {
+                                        loadingDiv.empty().removeClass('loading');
+
+                                        if (data.success) {
+                                            confirmDialog.close();
+                                            dialog.get(1).close();
+                                        } else {
+                                            loadingDiv.append(content);
+                                            enableConfirmButton(confirmDialog);
+                                        }
+                                    }
+                                });
+                            },
+                        }
+                    ];
 
                     // show confirm box, content is loaded here /prod/tools/thumb-extractor/confirm-box/
                     var validationDialog = dialog.create(services, {
-                        size: 'Small',
+                        size: 'Custom',
+                        customWidth: 360,
+                        customHeight: 285,
                         title: data.translations.thumbnailTitle,
                         cancelButton: true,
                         buttons: buttons
                     }, 2);
 
+                    validationDialog.getDomElement().closest('.ui-dialog').addClass('screenCapture_validate_dialog')
+
                     var datas = {
-                        image: $('.selected', $sliderWrapper).attr('src'),
+                        image: $('.selected', $gridContainer).find('img').attr('src'),
                         sbas_id: sbas_id,
                         record_id: record_id
                     };
@@ -200,6 +229,35 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
         }
     }
 
+    const downloadThumbnail = (element, $container) => {
+        var imageInBase64 = element.find('img').attr('src');
+        var mimeInfo = base64MimeType(imageInBase64);
+        var ext = mimeInfo.split('/').pop();
+        var filename = "preview" + element.find('img').attr('alt') + "." + ext;
+        download(imageInBase64, filename, mimeInfo);
+
+    }
+
+    const deleteThumbnail = (element, $container, ThumbEditor) => {
+        var imgWrapper = element;
+        var id = imgWrapper.attr('id').split('_').pop();
+        var previous = imgWrapper.parent().prev();
+        var next = imgWrapper.parent().next();
+
+        if (previous.length > 0) {
+            previous.find('.grid-wrapper').trigger('click');
+        } else if (next.length > 0) {
+            next.find('.grid-wrapper').trigger('click');
+        } else {
+            $('#thumb_delete_button', $container).hide();
+            $('#thumb_download_button', $container).hide();
+            ThumbEditor.resetCanva();
+        }
+
+        imgWrapper.parent().remove();
+        ThumbEditor.store.remove(id);
+    }
+
     const disableConfirmButton = (dialog) => {
         dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
             return $(this).text() === localeService.t('valider');
@@ -211,6 +269,18 @@ const videoScreenCapture = (services, datas, activeTab = false) => {
         dialog.getDomElement().closest('.ui-dialog').find('.ui-dialog-buttonpane button').filter(function () {
             return $(this).text() === localeService.t('valider');
         }).removeClass('ui-state-disabled').attr('disabled', false);
+    }
+
+    const base64MimeType = (encoded) => {
+        let result = null;
+        if (typeof encoded !== 'string') {
+            return result;
+        }
+        let mime = encoded.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+        if (mime && mime.length) {
+            result = mime[1];
+        }
+        return result;
     }
 
     return {

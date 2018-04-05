@@ -10,26 +10,33 @@ const Component = videojs.getComponent('Component');
 let rangeItemTemplate = (model, frameRate) => {
     let image = '';
     if (model.image.src !== '') {
-        image = `<div class="range-item-screenshot"><div><img src="${model.image.src}" style="height: auto;width:100%;"></div></div>`;
+        image = `<div class="range-item-screenshot"><div><img src="${model.image.src}" style="height: 60px;width:auto;"></div></div>`;
     }
 
-    return `${image}
-
+    return `
+    <div class="range-item-index-div">
 <span class="range-item-index">${model.index + 1}</span>
+</div>
+${image}
 <div class="range-item-time-data">
-    <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
-    <span class="display-time">${formatTime(model.startPosition, 'hms', frameRate)}</span>
-    <span class="display-time">${formatTime(model.endPosition, 'hms', frameRate)}</span>
-    <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
-    <br>
+    <span class="range-item-title">
+     <input class="range-title range-input" type="text" value="${model.title}" placeholder="entrez un titre">
+    </span>
+    <div class="display-time-container">
+      <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
+      <span class="display-time">${formatTime(model.startPosition, 'hms', frameRate)}</span>
+      <span class="display-time">${formatTime(model.endPosition, 'hms', frameRate)}</span>
+      <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
+    </div>
     <div class="progress-container">
     <div class="progress-bar" style="left:${model.handlePositions.left}%;width:${model.handlePositions.right - model.handlePositions.left}%; height: 100%"></div>
     <div class="progress-value">${formatTime(model.endPosition - model.startPosition, 'hms', frameRate)}</div>
     </div>
 </div>
-<span class="range-item-title">
-<input class="range-title range-input" type="text" value="${model.title}" placeholder="entrez un titre">
-</span>`;
+<div class="range-item-close">
+    <div class="remove-range"></div>
+</div>
+`;
     // <button class="control-button remove-range"><svg class="icon icon-trash"><use xlink:href="#icon-trash"></use></svg><span class="icon-label"> remove</span></button>
 };
 class RangeItem extends Component {
