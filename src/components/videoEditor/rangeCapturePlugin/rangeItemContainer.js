@@ -13,8 +13,9 @@ class RangeItemContainer extends Component {
     constructor(player, settings) {
         super(player);
         this.settings = settings;
+        this.$el = this.renderHeaderContent();
         this.rangeCollection = this.addChild('RangeCollection', settings);
-        this.$el = this.renderElContent();
+        this.$el = this.renderButtonsContent();
 
         this.$el.on('click', '.add-range', (event) => {
             event.preventDefault();
@@ -52,7 +53,18 @@ class RangeItemContainer extends Component {
         return this.container;
     }
 
-    renderElContent() {
+    renderHeaderContent() {
+        $(this.el()).append(`
+        <div class="header-chapters">
+            <h4>
+            ${this.player_.localize('Chapters')}
+</h2>
+<span class="checkbox-chapters"><input type="checkbox" name="hover-chapters" value="hover"><span>${this.player_.localize('No hover to chapter')}</span></span>
+</div>`);
+        return $(this.el_);
+    }
+
+    renderButtonsContent() {
         $(this.el()).append(`
 <div class="btn-container">
     <button class="btn add-range" type="button"><i class="fa fa-plus" aria-hidden="true"></i> ${this.player_.localize('Add new range')}</button>

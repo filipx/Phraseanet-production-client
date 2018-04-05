@@ -22,11 +22,12 @@ ${image}
     <span class="range-item-title">
      <input class="range-title range-input" type="text" value="${model.title}" placeholder="entrez un titre">
     </span>
-    <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
-    <span class="display-time">${formatTime(model.startPosition, 'hms', frameRate)}</span>
-    <span class="display-time">${formatTime(model.endPosition, 'hms', frameRate)}</span>
-    <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
-    <br>
+    <div class="display-time-container">
+      <span class="icon-container small-icon"><svg class="icon icon-cue-start"><use xlink:href="#icon-cue-start"></use></svg></span> 
+      <span class="display-time">${formatTime(model.startPosition, 'hms', frameRate)}</span>
+      <span class="display-time">${formatTime(model.endPosition, 'hms', frameRate)}</span>
+      <span class="icon-container small-icon"><svg class="icon icon-cue-end"><use xlink:href="#icon-cue-end"></use></svg></span> 
+    </div>
     <div class="progress-container">
     <div class="progress-bar" style="left:${model.handlePositions.left}%;width:${model.handlePositions.right - model.handlePositions.left}%; height: 100%"></div>
     <div class="progress-value">${formatTime(model.endPosition - model.startPosition, 'hms', frameRate)}</div>
