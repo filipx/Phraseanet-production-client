@@ -30,6 +30,7 @@ class RangeCollection extends Component {
     rangeCollection = [];
     rangeItemComponentCollection = [];
     currentRange = false;
+    lastKnownEndPosition = null;
 
     constructor(player, settings) {
         super(player, settings);
@@ -52,7 +53,7 @@ class RangeCollection extends Component {
     }
 
     addRangeEvent() {
-        let newRange = this.addRange(this.defaultRange);
+        let newRange = this.addNewRange(this.defaultRange);
         this.player_.rangeStream.onNext({
             action: 'create',
             range: newRange
@@ -143,6 +144,41 @@ class RangeCollection extends Component {
         this.rangeCollection.push(newRange);
         this.refreshRangeCollection();
         return newRange;
+    }
+
+    addNewRange(range) {
+        let rangeDuration = this.player_.duration()/5;
+        let lastId = this.uid = this.uid + 1;
+        let newRange = _.extend({}, this.defaultRange, range, {id: lastId});
+        newRange = this.setHandlePositions(newRange);
+        newRange.startPosition = this.getLastKnownPosition();
+        newRange.endPosition = this.getLastKnownEndPosition(rangeDuration);
+        this.rangeCollection.push(newRange);
+        this.refreshRangeCollection();
+        return newRange;
+    }
+
+    getLastKnownPosition() {
+        //first time
+        if(this.lastKnownEndPosition == null) {
+            this.lastKnownEndPosition = this.player_.currentTime();
+        }else {
+            if((this.lastKnownEndPosition + 0.001) >= this.player_.duration()) {
+                this.lastKnownEndPosition == this.player_.duration();
+            }else {
+               this.lastKnownEndPosition += 0.001;
+            }
+        }
+        return this.lastKnownEndPosition;
+    }
+
+    getLastKnownEndPosition(rangeDuration) {
+        let endPosition = this.lastKnownEndPosition + rangeDuration;
+        if(endPosition >= this.player_.duration()) {
+            endPosition == this.player_.duration();
+        }
+        this.lastKnownEndPosition = endPosition;
+        return endPosition;
     }
 
     updateRange(range) {
