@@ -83,17 +83,14 @@ class RangeBar extends Component {
             let oldRange = _.extend({}, this.activeRange);
             let newStartPosition = (handlePositions[0] / 100) * videoDuration;
             let newEndPosition = (handlePositions[1] / 100) * videoDuration;
-            if (oldRange.startPosition !== newStartPosition || oldRange.endPosition !== newEndPosition) {
-                this.activeRange.startPosition = newStartPosition;
-                this.activeRange.endPosition = newEndPosition;
-                this.activeHandlePositions = handlePositions;
-                this.player_.rangeStream.onNext({
-                    action: 'drag-update',
-                    handle: activeHandle === 1 ? 'end' : 'start',
-                    range: this.activeRange
-                });
-            }
-
+            this.activeRange.startPosition = newStartPosition;
+            this.activeRange.endPosition = newEndPosition;
+            this.activeHandlePositions = handlePositions;
+            this.player_.rangeStream.onNext({
+                action: 'drag-update',
+                handle: activeHandle === 1 ? 'end' : 'start',
+                range: this.activeRange
+            });
         }
     }
 
