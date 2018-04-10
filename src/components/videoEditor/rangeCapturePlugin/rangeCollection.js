@@ -153,7 +153,7 @@ class RangeCollection extends Component {
     addNewRange(range) {
         let lastId = this.uid = this.uid + 1;
         let newRange = _.extend({}, this.defaultRange, range, {id: lastId});
-        newRange.startPosition = this.getLastKnownPosition();
+        newRange.startPosition = this.getStartingPosition();
         newRange.endPosition = this.getEndPosition(newRange.startPosition);
         newRange = this.setHandlePositions(newRange);
         this.rangeCollection.push(newRange);
@@ -161,22 +161,35 @@ class RangeCollection extends Component {
         return newRange;
     }
 
-    getLastKnownPosition() {
-        //first time
-        let lastKnownEndPosition = this.player_.currentTime();
+    getStartingPosition() {
+        //tracker is at ending of previous range
+        let lastKnownPosition = null;
+        let gap = 0.01;
+        let lastRange = this.rangeCollection.length > 0 ?
+            this.rangeCollection[this.rangeCollection.length -1] : null;
 
-        if((lastKnownEndPosition + 0.001) < this.player_.duration()) {
-            lastKnownEndPosition += 0.001;
-            return lastKnownEndPosition;
+        if(lastRange != null) {
+            lastKnownPosition = lastRange.endPosition + gap <= this.player_.duration()
+                ? lastRange.endPosition + gap
+                : this.player_.duration();
+        }else {
+            lastKnownPosition = this.player_.currentTime() + gap <= this.player_.duration()
+                ? this.player_.currentTime() + gap
+                : this.player_.duration();
         }
-        return lastKnownEndPosition;
+        return lastKnownPosition;
     }
 
     getEndPosition(startPosition) {
+        let gap = 0.01;
         let rangeDuration = this.player_.duration()/10;
-        let endPosition = startPosition + rangeDuration;
-        if(endPosition >= this.player_.duration()) {
-            endPosition = this.player_.duration();
+        let endPosition = null;
+        if(startPosition == this.player_.currentTime() + gap) {
+            endPosition = startPosition + rangeDuration <= this.player_.duration()
+                ? startPosition + rangeDuration
+                : this.player_.duration();
+        }else {
+            endPosition = this.player_.currentTime() + gap;
         }
         return endPosition;
     }
