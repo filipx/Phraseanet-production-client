@@ -106,6 +106,10 @@ class RangeCollection extends Component {
         return updatedRange;
     }
 
+    updatingByDragging(range) {
+        this.syncRange(range);
+    }
+
     isExist(range) {
         if (range.id === undefined) {
             return false;
@@ -207,6 +211,41 @@ class RangeCollection extends Component {
         this.refreshRangeCollection();
         return range;
     }
+
+    syncRange(range) { 
+        let gap = 0.001;
+        if (range.id !== undefined) {
+            let index = _.findIndex(this.rangeCollection, (rangeData) => {
+                return rangeData.id == range.id;
+            });
+
+            if(index !== null) {
+                if(index == range.id) {
+                    let newRange = this.setHandlePositions(range);
+                    this.rangeCollection[index] = newRange;
+                }
+
+                if(index < this.rangeCollection.length-1) {
+                    //update next range
+                    let rangeToUpdate = this.rangeCollection[index+1];
+                    rangeToUpdate.startPosition = range.endPosition + gap <= rangeToUpdate.endPosition
+                        ? range.endPosition + gap : rangeToUpdate.endPosition;
+                    let newRange = this.setHandlePositions(rangeToUpdate);
+                    this.rangeCollection[index+1] = newRange;
+                }
+                if (index > 0) {
+                    //update previous range
+                    let rangeToUpdate = this.rangeCollection[index-1];
+                    rangeToUpdate.endPosition = range.startPosition - gap >= rangeToUpdate.startPosition
+                        ? range.startPosition - gap : rangeToUpdate.startPosition;
+                    let newRange = this.setHandlePositions(rangeToUpdate);
+                    this.rangeCollection[index-1] = newRange;
+                }
+            }
+        }
+        this.refreshRangeCollection();
+     }
+
 
     setHandlePositions(range) {
         let videoDuration = this.player_.duration();

@@ -154,7 +154,7 @@ const plugin = function (options) {
             case 'drag-update':
                 // if changes come from range bar
                 this.rangeControlBar.refreshRangePosition(params.range, params.handle);
-                this.rangeCollection.update(params.range);
+                this.rangeCollection.updatingByDragging(params.range);
 
                 // setting currentTime may take some additionnal time,
                 // so let's wait:
