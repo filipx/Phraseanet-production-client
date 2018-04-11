@@ -36,6 +36,10 @@ class RangeItemContainer extends Component {
                 this.rangeCollection.exportVTTRangeEvent();
             });
         }
+
+        this.$el.on('click', 'input[name=hover-chapters]', () => {
+            this.rangeCollection.setHoverChapter($(this).is(':checked'));
+        });
     }
 
     /**
