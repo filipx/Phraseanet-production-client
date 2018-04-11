@@ -57,4 +57,8 @@ const formatTime = (currentTime, format, frameRate) => {
     }
 }
 
-export {formatMilliseconds, formatTime}
+const formatToFixedDecimals = (currentTime, decimalsPoints = 2) => {
+    return parseFloat(currentTime.toFixed(decimalsPoints));
+}
+
+export {formatMilliseconds, formatTime, formatToFixedDecimals}

@@ -2,7 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import videojs from 'video.js';
 import RangeItem from './rangeItem';
-import {formatTime} from './utils';
+import {formatTime, formatToFixedDecimals} from './utils';
 import Alerts from '../../utils/alert';
 import dialog from 'phraseanet-common/src/components/dialog';
 
@@ -57,21 +57,21 @@ class RangeCollection extends Component {
         this.player_.rangeStream.onNext({
             action: 'create',
             range: newRange
-        })
+        });
     }
 
     exportRangeEvent() {
         this.player_.rangeStream.onNext({
             action: 'export-ranges',
             ranges: this.exportRanges()
-        })
+        });
     }
 
     exportVTTRangeEvent() {
         this.player_.rangeStream.onNext({
             action: 'export-vtt-ranges',
             data: this.exportVttRanges()
-        })
+        });
     }
 
     setHoverChapter(isChecked) {
@@ -107,7 +107,11 @@ class RangeCollection extends Component {
     }
 
     updatingByDragging(range) {
-        this.syncRange(range);
+        if(this.isHoverChapterSelected) { 
+            this.syncRange(range); 
+        }else { 
+            this.updateRange(range); 
+        }
     }
 
     isExist(range) {
@@ -167,35 +171,48 @@ class RangeCollection extends Component {
 
     getStartingPosition() {
         //tracker is at ending of previous range
-        let lastKnownPosition = null;
-        let gap = 0.01;
-        let lastRange = this.rangeCollection.length > 0 ?
-            this.rangeCollection[this.rangeCollection.length -1] : null;
+        let lastKnownPosition = this.player_.currentTime();
 
-        if(lastRange != null) {
-            lastKnownPosition = lastRange.endPosition + gap <= this.player_.duration()
-                ? lastRange.endPosition + gap
-                : this.player_.duration();
-        }else {
-            lastKnownPosition = this.player_.currentTime() + gap <= this.player_.duration()
-                ? this.player_.currentTime() + gap
-                : this.player_.duration();
+        if((lastKnownPosition + 0.001) < this.player_.duration()) {
+            lastKnownPosition += 0.001;
+            return lastKnownPosition;
         }
         return lastKnownPosition;
+        // let gap = 0.01;
+        // let lastRange = this.rangeCollection.length > 0 ?
+        //     this.rangeCollection[this.rangeCollection.length -1] : null;
+        //
+        // if(lastRange != null ||
+        //     formatToFixedDecimals(this.player_.currentTime()) < formatToFixedDecimals(lastRange.endPosition)) {
+        //     lastKnownPosition = lastRange.endPosition + gap <= this.player_.duration()
+        //         ? lastRange.endPosition + gap
+        //         : this.player_.duration();
+        // }else {
+        //     lastKnownPosition = this.player_.currentTime() + gap <= this.player_.duration()
+        //         ? this.player_.currentTime() + gap
+        //         : this.player_.duration();
+        // }
+        // return lastKnownPosition;
     }
 
     getEndPosition(startPosition) {
-        let gap = 0.01;
         let rangeDuration = this.player_.duration()/10;
-        let endPosition = null;
-        if(startPosition == this.player_.currentTime() + gap) {
-            endPosition = startPosition + rangeDuration <= this.player_.duration()
-                ? startPosition + rangeDuration
-                : this.player_.duration();
-        }else {
-            endPosition = this.player_.currentTime() + gap;
+        let endPosition = startPosition + rangeDuration;
+        if(endPosition >= this.player_.duration()) {
+            endPosition == this.player_.duration();
         }
         return endPosition;
+        // let gap = 0.01;
+        // let rangeDuration = this.player_.duration()/10;
+        // let endPosition = null;
+        // if(formatToFixedDecimals(startPosition) >= formatToFixedDecimals(this.player_.currentTime() + gap)) {
+        //     endPosition = startPosition + rangeDuration <= this.player_.duration()
+        //         ? startPosition + rangeDuration
+        //         : this.player_.duration();
+        // }else {
+        //     endPosition = this.player_.currentTime() + gap;
+        // }
+        // return endPosition;
     }
 
     updateRange(range) {

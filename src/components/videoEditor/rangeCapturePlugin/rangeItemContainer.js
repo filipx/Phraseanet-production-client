@@ -37,8 +37,9 @@ class RangeItemContainer extends Component {
             });
         }
 
-        this.$el.on('click', 'input[name=hover-chapters]', () => {
-            this.rangeCollection.setHoverChapter($(this).is(':checked'));
+        this.$el.on('click', 'input[name=hover-chapters]', (event) => {
+            let $el = $(event.currentTarget);
+            this.rangeCollection.setHoverChapter($el.is(':checked'));
         });
     }
 
