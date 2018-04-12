@@ -41,6 +41,8 @@ class RangeCollection extends Component {
             this.currentRange = params.activeRange;
             this.refreshRangeCollection()
         });
+
+        this.isHoverChapterSelected = settings.preferences.overlapChapters == 1 ? true : false;
     }
 
     initDefaultRange() {
@@ -76,6 +78,10 @@ class RangeCollection extends Component {
 
     setHoverChapter(isChecked) {
         this.isHoverChapterSelected = isChecked;
+        this.player_.rangeStream.onNext({ 
+            action: 'saveRangeCollectionPref', 
+            data: isChecked 
+        });
     }
 
     /**

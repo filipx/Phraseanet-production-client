@@ -11,6 +11,7 @@ import RangeControlBar from './rangeControlBar';
 import {WebVTT} from 'videojs-vtt.js';
 import {overrideHotkeys, hotkeys} from './hotkeys';
 import RangeItemContainer from './rangeItemContainer';
+import * as appCommons from 'phraseanet-common';
 
 // import rangeControls from './oldControlBar';
 
@@ -173,6 +174,9 @@ const plugin = function (options) {
             case 'resize':
                 this.setEditorWidth();
                 break;
+            case 'saveRangeCollectionPref': 
+                this.saveRangeCollectionPref(params.data);
+                break;
             default:
         }
         console.log('<<< =================== RANGE EVENT COMPLETE')
@@ -310,6 +314,10 @@ const plugin = function (options) {
 
     // init a default range once every components are ready:
     this.rangeCollection.initDefaultRange();
+
+    this.saveRangeCollectionPref = (isChecked) => { 
+        appCommons.userModule.setPref('overlapChapters', (isChecked ? '1' : '0')); 
+    }
 }
 videojs.plugin('rangeCapturePlugin', plugin);
 export default plugin;

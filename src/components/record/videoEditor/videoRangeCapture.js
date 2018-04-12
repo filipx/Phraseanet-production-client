@@ -43,6 +43,7 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
         options.databoxId = initData.databoxId;
         options.translations = initData.translations;
         options.services = params.services;
+        options.preferences = initData.preferences;
 
         // get default videoTextTrack value
         if (options.vttFieldName !== false) {
