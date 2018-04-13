@@ -37,8 +37,9 @@ class RangeItemContainer extends Component {
             });
         }
 
-        this.$el.on('click', 'input[name=hover-chapters]', () => {
-            this.rangeCollection.setHoverChapter($(this).is(':checked'));
+        this.$el.on('click', 'input[name=hover-chapters]', (event) => {
+            let $el = $(event.currentTarget);
+            this.rangeCollection.setHoverChapter($el.is(':checked'));
         });
     }
 
@@ -58,12 +59,13 @@ class RangeItemContainer extends Component {
     }
 
     renderHeaderContent() {
+        var checkedValue = this.settings.preferences.overlapChapters == 1 ? 'checked' : '';
         $(this.el()).append(`
         <div class="header-chapters">
             <h4>
             ${this.player_.localize('Chapters')}
 </h2>
-<span class="checkbox-chapters"><input type="checkbox" name="hover-chapters" value="hover"><span>${this.player_.localize('No hover to chapter')}</span></span>
+<span class="checkbox-chapters"><input type="checkbox" name="hover-chapters" ${checkedValue} value="hover"><span>${this.player_.localize('No hover to chapter')}</span></span>
 </div>`);
         return $(this.el_);
     }

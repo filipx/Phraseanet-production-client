@@ -282,6 +282,10 @@ class RangeControlBar extends Component {
         }
     }
 
+    setRangePositonToBeginning(range) {
+        this.player_.currentTime(range.startPosition);
+    }
+
     updateRangeDisplay(scope, currentTime) {
 
         let format = formatMilliseconds(currentTime, this.frameRate);

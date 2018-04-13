@@ -2,7 +2,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import videojs from 'video.js';
 import RangeItem from './rangeItem';
-import {formatTime} from './utils';
+import {formatTime, formatToFixedDecimals} from './utils';
 import Alerts from '../../utils/alert';
 import dialog from 'phraseanet-common/src/components/dialog';
 
@@ -41,6 +41,8 @@ class RangeCollection extends Component {
             this.currentRange = params.activeRange;
             this.refreshRangeCollection()
         });
+
+        this.isHoverChapterSelected = settings.preferences.overlapChapters == 1 ? true : false;
     }
 
     initDefaultRange() {
@@ -57,25 +59,29 @@ class RangeCollection extends Component {
         this.player_.rangeStream.onNext({
             action: 'create',
             range: newRange
-        })
+        });
     }
 
     exportRangeEvent() {
         this.player_.rangeStream.onNext({
             action: 'export-ranges',
             ranges: this.exportRanges()
-        })
+        });
     }
 
     exportVTTRangeEvent() {
         this.player_.rangeStream.onNext({
             action: 'export-vtt-ranges',
             data: this.exportVttRanges()
-        })
+        });
     }
 
     setHoverChapter(isChecked) {
         this.isHoverChapterSelected = isChecked;
+        this.player_.rangeStream.onNext({ 
+            action: 'saveRangeCollectionPref', 
+            data: isChecked 
+        });
     }
 
     /**
@@ -104,6 +110,14 @@ class RangeCollection extends Component {
             updatedRange = this.updateRange(range);
         }
         return updatedRange;
+    }
+
+    updatingByDragging(range) {
+        if(this.isHoverChapterSelected) { 
+            this.syncRange(range); 
+        }else { 
+            this.updateRange(range); 
+        }
     }
 
     isExist(range) {
@@ -163,35 +177,49 @@ class RangeCollection extends Component {
 
     getStartingPosition() {
         //tracker is at ending of previous range
-        let lastKnownPosition = null;
-        let gap = 0.01;
-        let lastRange = this.rangeCollection.length > 0 ?
-            this.rangeCollection[this.rangeCollection.length -1] : null;
+        let gap = _.first(this.settings.record.sources).framerate * 0.001;
+        let lastKnownPosition = this.player_.currentTime();
 
-        if(lastRange != null) {
-            lastKnownPosition = lastRange.endPosition + gap <= this.player_.duration()
-                ? lastRange.endPosition + gap
-                : this.player_.duration();
-        }else {
-            lastKnownPosition = this.player_.currentTime() + gap <= this.player_.duration()
-                ? this.player_.currentTime() + gap
-                : this.player_.duration();
+        if((lastKnownPosition + gap) < this.player_.duration()) {
+            lastKnownPosition += gap;
+            return lastKnownPosition;
         }
         return lastKnownPosition;
+        // let gap = 0.01;
+        // let lastRange = this.rangeCollection.length > 0 ?
+        //     this.rangeCollection[this.rangeCollection.length -1] : null;
+        //
+        // if(lastRange != null ||
+        //     formatToFixedDecimals(this.player_.currentTime()) < formatToFixedDecimals(lastRange.endPosition)) {
+        //     lastKnownPosition = lastRange.endPosition + gap <= this.player_.duration()
+        //         ? lastRange.endPosition + gap
+        //         : this.player_.duration();
+        // }else {
+        //     lastKnownPosition = this.player_.currentTime() + gap <= this.player_.duration()
+        //         ? this.player_.currentTime() + gap
+        //         : this.player_.duration();
+        // }
+        // return lastKnownPosition;
     }
 
     getEndPosition(startPosition) {
-        let gap = 0.01;
         let rangeDuration = this.player_.duration()/10;
-        let endPosition = null;
-        if(startPosition == this.player_.currentTime() + gap) {
-            endPosition = startPosition + rangeDuration <= this.player_.duration()
-                ? startPosition + rangeDuration
-                : this.player_.duration();
-        }else {
-            endPosition = this.player_.currentTime() + gap;
+        let endPosition = startPosition + rangeDuration;
+        if(endPosition >= this.player_.duration()) {
+            endPosition == this.player_.duration();
         }
         return endPosition;
+        // let gap = 0.01;
+        // let rangeDuration = this.player_.duration()/10;
+        // let endPosition = null;
+        // if(formatToFixedDecimals(startPosition) >= formatToFixedDecimals(this.player_.currentTime() + gap)) {
+        //     endPosition = startPosition + rangeDuration <= this.player_.duration()
+        //         ? startPosition + rangeDuration
+        //         : this.player_.duration();
+        // }else {
+        //     endPosition = this.player_.currentTime() + gap;
+        // }
+        // return endPosition;
     }
 
     updateRange(range) {
@@ -207,6 +235,40 @@ class RangeCollection extends Component {
         this.refreshRangeCollection();
         return range;
     }
+
+    syncRange(range) { 
+        let gap = _.first(this.settings.record.sources).framerate * 0.001;
+        if (range.id !== undefined) {
+            let index = _.findIndex(this.rangeCollection, (rangeData) => {
+                return rangeData.id == range.id;
+            });
+
+            if(index !== null) {
+                if(index < this.rangeCollection.length-1) {
+                    //update next range
+                    let rangeToUpdate = this.rangeCollection[index+1];
+                    rangeToUpdate.startPosition = range.endPosition + gap <= rangeToUpdate.endPosition
+                        ? range.endPosition + gap : rangeToUpdate.endPosition;
+                    let newRange = this.setHandlePositions(rangeToUpdate);
+                    this.rangeCollection[index+1] = newRange;
+                }
+                if (index > 0) {
+                    //update previous range
+                    let rangeToUpdate = this.rangeCollection[index-1];
+                    rangeToUpdate.endPosition = range.startPosition - gap >= rangeToUpdate.startPosition
+                        ? range.startPosition - gap : rangeToUpdate.startPosition;
+                    let newRange = this.setHandlePositions(rangeToUpdate);
+                    this.rangeCollection[index-1] = newRange;
+                }
+
+                let newRange = this.setHandlePositions(range);
+                this.rangeCollection[index] = newRange;
+            }
+        }
+        this.refreshRangeCollection();
+        return range;
+     }
+
 
     setHandlePositions(range) {
         let videoDuration = this.player_.duration();

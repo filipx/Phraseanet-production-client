@@ -11,6 +11,7 @@ import RangeControlBar from './rangeControlBar';
 import {WebVTT} from 'videojs-vtt.js';
 import {overrideHotkeys, hotkeys} from './hotkeys';
 import RangeItemContainer from './rangeItemContainer';
+import * as appCommons from 'phraseanet-common';
 
 // import rangeControls from './oldControlBar';
 
@@ -121,9 +122,22 @@ const plugin = function (options) {
                 this.rangeCollection.update(params.range);
                 break;
             case 'select':
-            case 'create':
             case 'change':
+                params.range = this.takeSnapshot(params.range);
+                this.activeRange = this.rangeCollection.update(params.range);
+
+                this.activeRangeStream.onNext({
+                    activeRange: this.activeRange
+                });
+
+                this.rangeBarCollection.refreshRangeSliderPosition(this.activeRange);
+                this.rangeControlBar.refreshRangePosition(this.activeRange, params.handle);
+                setTimeout(() => {
+                    this.rangeControlBar.setRangePositonToBeginning(params.range);
+                }, 300);
+                break;
             // flow through update:
+            case 'create':
             case 'update':
                 params.range = this.takeSnapshot(params.range);
                 this.activeRange = this.rangeCollection.update(params.range);
@@ -154,7 +168,7 @@ const plugin = function (options) {
             case 'drag-update':
                 // if changes come from range bar
                 this.rangeControlBar.refreshRangePosition(params.range, params.handle);
-                this.rangeCollection.update(params.range);
+                this.rangeCollection.updatingByDragging(params.range);
 
                 // setting currentTime may take some additionnal time,
                 // so let's wait:
@@ -172,6 +186,9 @@ const plugin = function (options) {
                 break;
             case 'resize':
                 this.setEditorWidth();
+                break;
+            case 'saveRangeCollectionPref': 
+                this.saveRangeCollectionPref(params.data);
                 break;
             default:
         }
@@ -310,6 +327,10 @@ const plugin = function (options) {
 
     // init a default range once every components are ready:
     this.rangeCollection.initDefaultRange();
+
+    this.saveRangeCollectionPref = (isChecked) => { 
+        appCommons.userModule.setPref('overlapChapters', (isChecked ? '1' : '0')); 
+    }
 }
 videojs.plugin('rangeCapturePlugin', plugin);
 export default plugin;
