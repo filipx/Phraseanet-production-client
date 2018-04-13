@@ -68,7 +68,7 @@ const markerCollection = (services) => {
         $content.on('click', '.edit-position', (event) => {
             let $el = $(event.currentTarget);
             let marker = getMarker($el.data('marker-id'));
-            marker._originalPosition = marker.getLatLng();
+            marker._originalPosition = marker.getLatLng().wrap();
             marker.dragging.enable();
             $content.find('.view-mode').hide();
             $content.find('.edit-mode').show();
@@ -83,8 +83,8 @@ const markerCollection = (services) => {
             $content.find('.view-mode').show();
             $content.find('.help').hide();
             $content.find('.edit-mode').hide();
-            marker._originalPosition = marker.getLatLng();
-            eventEmitter.emit('markerChange', {marker, position: marker.getLatLng()});
+            marker._originalPosition = marker.getLatLng().wrap();
+            eventEmitter.emit('markerChange', {marker, position: marker.getLatLng().wrap()});
         });
 
 
@@ -101,7 +101,7 @@ const markerCollection = (services) => {
         marker.bindPopup($content.get(0));
 
         marker.on('dragend', () => {
-            let position = marker.getLatLng();
+            let position = marker.getLatLng().wrap();
             $content.find('.updated-position').html(`${position.lat}<br>${position.lng}`);
             $content.find('.edit-mode').show();
             marker.bindPopup($content.get(0));
