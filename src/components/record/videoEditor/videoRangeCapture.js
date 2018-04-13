@@ -40,6 +40,7 @@ const videoRangeCapture = (services, datas, activeTab = false) => {
         options.techOrder = ['html5', 'flash'];
 
         options.recordId = initData.recordId;
+        options.record = initData.records[0];
         options.databoxId = initData.databoxId;
         options.translations = initData.translations;
         options.services = params.services;

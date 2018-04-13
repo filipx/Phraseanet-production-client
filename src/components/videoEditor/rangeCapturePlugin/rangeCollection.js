@@ -177,10 +177,11 @@ class RangeCollection extends Component {
 
     getStartingPosition() {
         //tracker is at ending of previous range
+        let gap = _.first(this.settings.record.sources).framerate * 0.001;
         let lastKnownPosition = this.player_.currentTime();
 
-        if((lastKnownPosition + 0.001) < this.player_.duration()) {
-            lastKnownPosition += 0.001;
+        if((lastKnownPosition + gap) < this.player_.duration()) {
+            lastKnownPosition += gap;
             return lastKnownPosition;
         }
         return lastKnownPosition;
@@ -236,18 +237,13 @@ class RangeCollection extends Component {
     }
 
     syncRange(range) { 
-        let gap = 0.001;
+        let gap = _.first(this.settings.record.sources).framerate * 0.001;
         if (range.id !== undefined) {
             let index = _.findIndex(this.rangeCollection, (rangeData) => {
                 return rangeData.id == range.id;
             });
 
             if(index !== null) {
-                if(index == range.id) {
-                    let newRange = this.setHandlePositions(range);
-                    this.rangeCollection[index] = newRange;
-                }
-
                 if(index < this.rangeCollection.length-1) {
                     //update next range
                     let rangeToUpdate = this.rangeCollection[index+1];
@@ -264,9 +260,13 @@ class RangeCollection extends Component {
                     let newRange = this.setHandlePositions(rangeToUpdate);
                     this.rangeCollection[index-1] = newRange;
                 }
+
+                let newRange = this.setHandlePositions(range);
+                this.rangeCollection[index] = newRange;
             }
         }
         this.refreshRangeCollection();
+        return range;
      }
 
 

@@ -32,7 +32,7 @@ const formatTime = (currentTime, format, frameRate) => {
         minutes = Math.floor(s / 60);
         seconds = Math.floor(s - minutes * 60);
         // keep only milliseconds rest ()
-        milliseconds = currentTime - (Math.floor(currentTime));
+        milliseconds = (currentTime - (Math.floor(currentTime))).toFixed(3);
         frames = Math.round(frameRate * milliseconds);
         // if( currentFrames >= )
     }

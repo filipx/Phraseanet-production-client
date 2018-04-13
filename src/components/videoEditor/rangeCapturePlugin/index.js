@@ -122,9 +122,22 @@ const plugin = function (options) {
                 this.rangeCollection.update(params.range);
                 break;
             case 'select':
-            case 'create':
             case 'change':
+                params.range = this.takeSnapshot(params.range);
+                this.activeRange = this.rangeCollection.update(params.range);
+
+                this.activeRangeStream.onNext({
+                    activeRange: this.activeRange
+                });
+
+                this.rangeBarCollection.refreshRangeSliderPosition(this.activeRange);
+                this.rangeControlBar.refreshRangePosition(this.activeRange, params.handle);
+                setTimeout(() => {
+                    this.rangeControlBar.setRangePositonToBeginning(params.range);
+                }, 300);
+                break;
             // flow through update:
+            case 'create':
             case 'update':
                 params.range = this.takeSnapshot(params.range);
                 this.activeRange = this.rangeCollection.update(params.range);
