@@ -24,7 +24,7 @@ const recordVideoEditorModal = (services, datas, activeTab = false) => {
     const openModal = (datas, activeTab) => {
         $dialog = dialog.create(services, {
             size: 'Custom',
-            customWidth: 1060,
+            customWidth: 1100,
             customHeight: 700,
             title: localeService.t('videoEditor'),
             loading: true

@@ -25,7 +25,8 @@ class RangeCollection extends Component {
             src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFkAAAAyCAYAAAA3OHc2AAAAuElEQVR4Xu3UwQkAIAwEwdh/0Qr2kH2NBWRhODwzc8dbFTiQV33/ccj7xpADY8iQC4Gg4U+GHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgECUuGHAgEiQftoTIBhrHr1wAAAABJRU5ErkJggg==',
             width: 89,
             height: 50
-        }
+        },
+        manualSnapShot: false
     };
     rangeCollection = [];
     rangeItemComponentCollection = [];
@@ -311,6 +312,7 @@ class RangeCollection extends Component {
 
             if (this.rangeCollection[i].image.src !== '') {
                 exportableData.image = this.rangeCollection[i].image.src;
+                exportableData.manualSnapShot = this.rangeCollection[i].manualSnapShot || false;
             }
 
             exportedRanges.push(`${i + 1}
