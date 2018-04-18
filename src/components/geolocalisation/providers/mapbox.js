@@ -30,6 +30,7 @@ const leafletMap = (services) => {
     let searchable;
     let drawnItems;
     let activeProvider = {};
+    let recordConfig = {};
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
         tabOptions = options.tabOptions || false;
@@ -38,6 +39,7 @@ const leafletMap = (services) => {
         drawable = options.drawable || false;
         searchable = options.searchable || false;
         drawnItems = options.drawnItems || false;
+        recordConfig = parentOptions.recordConfig || false;
 
         mapUID = 'leafletMap' + generateRandStr(5);
 
@@ -455,7 +457,7 @@ const leafletMap = (services) => {
         }
     };
     const getMappedFields = (position) => {
-        let fieldMapping = activeProvider.provider['position-fields'];
+        let fieldMapping = activeProvider.provider['position-fields'] !== undefined ? activeProvider.provider['position-fields'] : [];
         let mappedFields = {};
         if (fieldMapping.length > 0) {
 
@@ -469,6 +471,9 @@ const leafletMap = (services) => {
                     mappedFields[mapping.name] = `${position.lng}`;
                 }
             });
+        } else {
+            mappedFields["meta.Latitude"] = `${position.lat}`;
+            mappedFields["meta.Longitude"] = `${position.lng}`;
         }
         return mappedFields;
     }
