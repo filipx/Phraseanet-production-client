@@ -22,8 +22,9 @@ const provider = (services) => {
                 accessToken = provider['public-key'];
                 let fieldMapping = provider['position-fields'] !== undefined ? provider['position-fields'] : [];
 
+                fieldPosition = {};
+
                 if (fieldMapping.length > 0) {
-                    fieldPosition = {};
                     _.each(fieldMapping, (mapping) => {
                         // latitude and longitude are combined in a composite field
                         if (mapping.type === 'latlng') {
@@ -42,6 +43,12 @@ const provider = (services) => {
                     if (fieldPosition.latitude !== undefined && fieldPosition.longitude !== undefined) {
                         isValid = true;
                     }
+                } else {
+                    fieldPosition = {
+                        latitude: (poi) => getCoordinatesFromTechnicalInfo(poi, 'lat'),
+                        longitude: (poi) => getCoordinatesFromTechnicalInfo(poi, 'lng')
+                    };
+                    isValid = true;
                 }
                 // set default values:
                 defaultPosition = provider['default-position'];
@@ -54,6 +61,17 @@ const provider = (services) => {
             isValid = false;
         }
         return isValid;
+    }
+
+    const getCoordinatesFromTechnicalInfo = (poi, fieldMapping) => {
+        if (poi["technicalInfo"] !== undefined) {
+            if (fieldMapping == 'lat') {
+                return isNaN(parseFloat(poi["technicalInfo"].latitude, 10)) ? false : parseFloat(poi["technicalInfo"].latitude, 10)
+            } else {
+                return isNaN(parseFloat(poi["technicalInfo"].longitude, 10)) ? false : parseFloat(poi["technicalInfo"].longitude, 10)
+            }
+        }
+        return false;
     }
 
     /**

@@ -1753,6 +1753,11 @@ const recordEditorService = services => {
             if (!record._selected) {
                 continue;
             }
+            for (var _recordIndex in options.recordConfig.records) {
+                if (options.recordConfig.records[_recordIndex].id === record.rid) {
+                    recordFieldValue["technicalInfo"] = options.recordConfig.records[_recordIndex].technicalInfo;
+                }
+            }
             for (let fieldIndex in fields) {
                 let field = options.fieldCollection.getFieldByIndex(fieldIndex);
                 let value = null;
