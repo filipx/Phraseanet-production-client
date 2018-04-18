@@ -299,8 +299,20 @@
     }
     .range-item-screenshot {
       padding: 0 10px 0 0;
+      position: relative;
         img {
             min-width: 90px;
+        }
+        #capture-thumbnail-icon {
+            background-image: url("/assets/common/images/icons/capture-chapter.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 36px;
+            height: 36px;
+            position: absolute;
+            right: 4px;
+            display: none;
         }
     }
     .range-item-index {
@@ -333,12 +345,17 @@
       // border: 2px solid rgba(255,255,255,0.1);
       //box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 30px rgba(0,0,0, 0.7) inset;
       border-color: #000\9;
-      background-color: rgba(137, 76, 148, 0.4);
+      background-color: rgba(137, 76, 148, 0.6);
       .progress-bar {
           background-color: #aa46bb;
       }
       span {
           color: #FFF;
+      }
+      .range-item-screenshot {
+         #capture-thumbnail-icon {
+             display: block;
+         }
       }
     }
     .icon-container {
