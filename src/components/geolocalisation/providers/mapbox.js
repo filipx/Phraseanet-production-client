@@ -31,6 +31,8 @@ const leafletMap = (services) => {
     let drawnItems;
     let activeProvider = {};
     let recordConfig = {};
+    let currentZoomLevel = 0;
+    let shouldUpdateZoom = false;
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
         tabOptions = options.tabOptions || false;
@@ -127,6 +129,7 @@ const leafletMap = (services) => {
 
             L.mapbox.accessToken = activeProvider.accessToken;
             map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
+            shouldUpdateZoom = false;
             map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
             if (searchable) {
                 map.addControl(L.mapbox.geocoderControl('mapbox.places'));
@@ -141,6 +144,14 @@ const leafletMap = (services) => {
             L.control.layers(layers).addTo(map);
 
             geocoder = L.mapbox.geocoder('mapbox.places');
+
+            currentZoomLevel = activeProvider.markerDefaultZoom;
+
+            map.on('zoomend', function () {
+                if (shouldUpdateZoom) {
+                    currentZoomLevel = map.getZoom();
+                }
+            });
 
             if (drawable) {
                 addDrawableLayers();
@@ -314,9 +325,11 @@ const leafletMap = (services) => {
                 markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
 
                 if (featureLayer.getLayers().length > 0) {
-                    map.fitBounds(featureLayer.getBounds(), {maxZoom: activeProvider.markerDefaultZoom});
+                    shouldUpdateZoom = true;
+                    map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
                 } else {
                     // set default position
+                    shouldUpdateZoom = false;
                     map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
                 }
             }
@@ -427,9 +440,11 @@ const leafletMap = (services) => {
         if (map !== null) {
             map.invalidateSize();
             if (featureLayer.getLayers().length > 0) {
-                map.fitBounds(featureLayer.getBounds(), {maxZoom: activeProvider.markerDefaultZoom});
+                shouldUpdateZoom = true;
+                map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
             } else {
                 // set default position
+                shouldUpdateZoom = false;
                 map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
             }
         }
