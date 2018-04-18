@@ -123,7 +123,7 @@ const plugin = function (options) {
                 break;
             case 'select':
             case 'change':
-                params.range = this.takeSnapshot(params.range);
+                params.range = this.shouldTakeSnapShot(params.range, false);
                 this.activeRange = this.rangeCollection.update(params.range);
 
                 this.activeRangeStream.onNext({
@@ -139,7 +139,7 @@ const plugin = function (options) {
             // flow through update:
             case 'create':
             case 'update':
-                params.range = this.takeSnapshot(params.range);
+                params.range = this.shouldTakeSnapShot(params.range, false);
                 this.activeRange = this.rangeCollection.update(params.range);
 
                 this.activeRangeStream.onNext({
@@ -174,7 +174,7 @@ const plugin = function (options) {
                 // so let's wait:
                 setTimeout(() => {
                     if (params.handle === 'start') {
-                        params.range = this.takeSnapshot(params.range);
+                        params.range = this.shouldTakeSnapShot(params.range, false);
                         this.rangeCollection.update(params.range);
                     }
                 }, 900);
@@ -190,6 +190,13 @@ const plugin = function (options) {
             case 'saveRangeCollectionPref': 
                 this.saveRangeCollectionPref(params.data);
                 break;
+            case 'capture':
+                // if a range is specified remove it from collection:
+                if (params.range !== undefined) {
+                    params.range = this.shouldTakeSnapShot(params.range, true);
+                    this.rangeCollection.update(params.range);
+                }
+                break;
             default:
         }
         console.log('<<< =================== RANGE EVENT COMPLETE')
@@ -197,10 +204,21 @@ const plugin = function (options) {
 
     });
 
-    this.takeSnapshot = (range) => {
-        if (Math.round(range.startPosition) !== Math.round(this.currentTime())) {
+    this.shouldTakeSnapShot = (range, atCurrentPosition) => {
+        if(atCurrentPosition) {
+            this.takeSnapshot(range);
+            range.manualSnapShot = true;
             return range;
         }
+        else if (Math.round(range.startPosition) == Math.round(this.currentTime()) && !range.manualSnapShot) {
+            this.takeSnapshot(range);
+            return range;
+        } else {
+            return range;
+        }
+    }
+
+    this.takeSnapshot = (range) => {
         let video = this.el().querySelector('video');
         let canvas = document.createElement('canvas');
         let ratio = settings.ratios[this.cache_.src];
@@ -219,6 +237,7 @@ const plugin = function (options) {
             width: canvas.width,
             height: canvas.height
         }
+
         return range;
     }
 
@@ -256,7 +275,8 @@ const plugin = function (options) {
                     title: parsedCue.title,
                     image: {
                         src: parsedCue.image || ''
-                    }
+                    },
+                    manualSnapShot: parsedCue.manualSnapShot
 
                 });
 

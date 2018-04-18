@@ -10,7 +10,12 @@ const Component = videojs.getComponent('Component');
 let rangeItemTemplate = (model, frameRate) => {
     let image = '';
     if (model.image.src !== '') {
-        image = `<div class="range-item-screenshot"><div><img src="${model.image.src}" style="height: 60px;width:auto;"></div></div>`;
+        image = `<div class="range-item-screenshot">
+<div>
+<div id="capture-thumbnail-icon"/>
+<img src="${model.image.src}" style="height: 60px;width:auto;">
+</div>
+</div>`;
     }
 
     return `
@@ -50,6 +55,15 @@ class RangeItem extends Component {
         this.settings = settings;
         this.$el = this.renderElContent();
 
+        this.$el.on('click', '#capture-thumbnail-icon', (event) => {
+            event.preventDefault();
+            this.player_.rangeStream.onNext({
+                action: 'capture',
+                range: rangeOptions.model
+            });
+            // don't trigger other events
+            event.stopPropagation();
+        });
 
         this.$el.on('click', (event) => {
             // event.preventDefault();
