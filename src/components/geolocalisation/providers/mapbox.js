@@ -9,6 +9,7 @@ import leafletLocaleFr from './locales/fr';
 import merge from 'lodash.merge';
 require('mapbox.js/theme/style.css');
 require('./mapbox.css');
+require('mapbox-gl/dist/mapbox-gl.css');
 require('leaflet-draw/dist/leaflet.draw.css');
 require('leaflet-contextmenu/dist/leaflet.contextmenu.css');
 const leafletMap = (services) => {
@@ -19,6 +20,7 @@ const leafletMap = (services) => {
     let mapOptions = {};
     let mapUID;
     let mapbox;
+    let mapboxgl;
     let leafletDraw;
     let featureLayer = null;
     let map = null;
@@ -103,6 +105,7 @@ const leafletMap = (services) => {
             mapbox = require('mapbox.js');
             leafletDraw = require('leaflet-draw');
             require('leaflet-contextmenu');
+            mapboxgl = require('mapbox-gl');
 
             $container.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
@@ -127,23 +130,36 @@ const leafletMap = (services) => {
                 }
             }
 
-            L.mapbox.accessToken = activeProvider.accessToken;
-            map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
-            shouldUpdateZoom = false;
-            map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
-            if (searchable) {
-                map.addControl(L.mapbox.geocoderControl('mapbox.places'));
+            if (!mapboxgl.supported()) {
+                L.mapbox.accessToken = activeProvider.accessToken;
+                map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
+                shouldUpdateZoom = false;
+                map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                if (searchable) {
+                    map.addControl(L.mapbox.geocoderControl('mapbox.places'));
+                }
+                var layers = {
+                    Streets: L.mapbox.tileLayer('mapbox.streets'),
+                    Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
+                    Satellite: L.mapbox.tileLayer('mapbox.satellite')
+                };
+
+                layers.Streets.addTo(map);
+                L.control.layers(layers).addTo(map);
+                geocoder = L.mapbox.geocoder('mapbox.places');
+            } else {
+                mapboxgl.accessToken = activeProvider.accessToken;
+                map = new mapboxgl.Map({
+                    container: mapUID,
+                    style: 'mapbox://styles/mapbox/streets-v9',
+                    center: activeProvider.defaultPosition, // format different lng/lat
+                    zoom: activeProvider.defaultZoom
+                });
+
+                shouldUpdateZoom = false;
+                map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
             }
-            var layers = {
-                Streets: L.mapbox.tileLayer('mapbox.streets'),
-                Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
-                Satellite: L.mapbox.tileLayer('mapbox.satellite')
-            };
 
-            layers.Streets.addTo(map);
-            L.control.layers(layers).addTo(map);
-
-            geocoder = L.mapbox.geocoder('mapbox.places');
 
             currentZoomLevel = activeProvider.markerDefaultZoom;
 
@@ -153,11 +169,11 @@ const leafletMap = (services) => {
                 }
             });
 
-            if (drawable) {
-                addDrawableLayers();
-            }
-            addMarkersLayers();
-            refreshMarkers(pois);
+            // if (drawable) {
+            //     addDrawableLayers();
+            // }
+            // addMarkersLayers();
+            // refreshMarkers(pois);
         });
     };
 
@@ -502,7 +518,6 @@ const leafletMap = (services) => {
         }
         return mappedPositions;
     }
-
 
     eventEmitter.listenAll({
         'recordSelection.changed': onRecordSelectionChanged,
