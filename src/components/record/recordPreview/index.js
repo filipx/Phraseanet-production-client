@@ -150,12 +150,15 @@ const previewRecordService = services => {
                         closePreview();
                         break;
                     case 32:
-                        if (options.slideShow) {
-                            stopSlide();
-                        } else {
-                            startSlide();
+                        var videoElement = $('#PREVIEWIMGCONT iframe').contents().find('video');
+                        if (videoElement.length > 0) {
+                            if (videoElement.get(0).paused == true) {
+                                videoElement.get(0).play();
+                            } else {
+                                videoElement.get(0).pause();
+                            }
+                            specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                         }
-                        specialKeyState.isCancelKey = specialKeyState.isShortcutKey = true;
                         break;
                     default:
                 }
