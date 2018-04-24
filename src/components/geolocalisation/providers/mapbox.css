@@ -75,3 +75,13 @@
 .ui-widget-content .leaflet-container form {
     margin-top: 0;
 }
+
+.mapboxgl-popup-content {
+    background: #555555;
+    width: 200px;
+    font-size: 15px;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+    border-top-color: #555555;
+}
