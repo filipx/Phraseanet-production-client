@@ -345,6 +345,10 @@ const leafletMap = (services) => {
             id: 'points',
             source: 'data',
             type: 'symbol',
+            layout: {
+                "icon-image": "{marker-symbol}",
+                "icon-size": 1.5
+            },
         });
     }
 
@@ -436,8 +440,8 @@ const leafletMap = (services) => {
                     properties: {
                         recordIndex: poiIndex,
                         'marker-color': '0c4554',
-                        'marker-zoom': '5',
-                        'marker-symbol': "harbor-15",
+                        'marker-zoom': currentZoomLevel,
+                        'marker-symbol': "star-15",
                         title: `${poiTitle}`
                     }
                 });
@@ -476,7 +480,9 @@ const leafletMap = (services) => {
                 if (data.features.length > 0) {
                     let bestResult = data.features[0];
                     bestResult.properties.recordIndex = poiIndex;
-                    bestResult.properties['marker-zoom'] = 5;
+                    bestResult.properties['marker-zoom'] = currentZoomLevel;
+                    bestResult.properties['marker-symbol'] = "star-15";
+                    bestResult.properties['marker-color'] = "0c4554";
                     bestResult.properties.title = `${poiTitle}`;
                     geoJsonPoiCollection.push(bestResult);
                 }
@@ -509,7 +515,7 @@ const leafletMap = (services) => {
 
                     let bestResult = data.results.features[0];
                     bestResult.properties.recordIndex = poiIndex;
-                    bestResult.properties['marker-zoom'] = 5;
+                    bestResult.properties['marker-zoom'] = currentZoomLevel;
                     bestResult.properties.title = `${poiTitle}`;
                     geoJsonPoiCollection.push(bestResult);
                 }
