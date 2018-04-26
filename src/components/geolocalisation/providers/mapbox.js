@@ -81,7 +81,14 @@ const leafletMap = (services) => {
         }
         let {selection} = params;
 
-        refreshMarkers(selection);
+        if (shouldUseMapboxGl() && !map.loaded()) {
+            //refresh marker after 2 sec
+            setTimeout(function () {
+                refreshMarkers(selection);
+            }, 2000);
+        } else {
+            refreshMarkers(selection);
+        }
     };
 
     const onTabAdded = (params) => {
@@ -136,7 +143,7 @@ const leafletMap = (services) => {
                 }
             }
 
-            if (!mapboxgl.supported()) {
+            if (!shouldUseMapboxGl()) {
                 L.mapbox.accessToken = activeProvider.accessToken;
                 map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
                 shouldUpdateZoom = false;
@@ -346,7 +353,7 @@ const leafletMap = (services) => {
             source: 'data',
             type: 'symbol',
             layout: {
-                "icon-image": "{marker-symbol}",
+                "icon-image": "star-15",
                 "icon-size": 1.5
             },
         });
@@ -375,7 +382,7 @@ const leafletMap = (services) => {
 
         return buildGeoJson(pois).then((geoJsonPoiCollection) => {
             if(map != null) {
-                if (mapboxgl.supported) {
+                if (shouldUseMapboxGl()) {
                     geojson = {
                         type: 'FeatureCollection',
                         features: geoJsonPoiCollection
@@ -441,7 +448,6 @@ const leafletMap = (services) => {
                         recordIndex: poiIndex,
                         'marker-color': '0c4554',
                         'marker-zoom': currentZoomLevel,
-                        'marker-symbol': "star-15",
                         title: `${poiTitle}`
                     }
                 });
@@ -453,7 +459,7 @@ const leafletMap = (services) => {
                 query += poi.Country !== undefined && poi.Country !== null ? `, ${poi.Country} ` : '';
 
                 if (query !== '') {
-                    if (mapboxgl.supported) {
+                    if (shouldUseMapboxGl()) {
                         getDataForMapboxGl(asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection);
                     } else {
                         getDataForMapbox(asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection);
@@ -481,7 +487,6 @@ const leafletMap = (services) => {
                     let bestResult = data.features[0];
                     bestResult.properties.recordIndex = poiIndex;
                     bestResult.properties['marker-zoom'] = currentZoomLevel;
-                    bestResult.properties['marker-symbol'] = "star-15";
                     bestResult.properties['marker-color'] = "0c4554";
                     bestResult.properties.title = `${poiTitle}`;
                     geoJsonPoiCollection.push(bestResult);
@@ -492,7 +497,7 @@ const leafletMap = (services) => {
         asyncQueries.push(geoPromise);
     }
 
-    const getDataForMapbox = (query) => {
+    const getDataForMapbox = (asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection) => {
         let geoPromise = $.Deferred();
         geocoder.query(query, (err, data) => {
             // take the first feature if exists
@@ -544,7 +549,7 @@ const leafletMap = (services) => {
             return;
         }
         if (map !== null) {
-            if (mapboxgl.supported) {
+            if (shouldUseMapboxGl()) {
                 map.resize();
                 if (geojson.features.length > 0) {
                     shouldUpdateZoom = true;
@@ -621,6 +626,13 @@ const leafletMap = (services) => {
             }
         }
         return mappedPositions;
+    }
+
+    const shouldUseMapboxGl = () => {
+        if (activeProvider.defaultMapProvider === "mapboxWebGL" && mapboxgl !== undefined && mapboxgl.supported()) {
+            return true;
+        }
+        return false;
     }
 
     eventEmitter.listenAll({

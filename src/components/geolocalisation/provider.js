@@ -12,6 +12,7 @@ const provider = (services) => {
     let markerDefaultZoom;
     let activeProvider;
     let fieldPosition;
+    let defaultMapProvider;
     const initialize = () => {
         let isValid = false;
         // select geocoding provider:
@@ -54,7 +55,7 @@ const provider = (services) => {
                 defaultPosition = provider['default-position'];
                 defaultZoom = provider['default-zoom'] || 2;
                 markerDefaultZoom = provider['marker-default-zoom'] || 12;
-
+                defaultMapProvider = provider['map-provider'] || "mapboxWebGL";
             }
         });
         if (accessToken === undefined) {
@@ -110,6 +111,7 @@ const provider = (services) => {
             markerDefaultZoom,
             fieldPosition,
             accessToken,
+            defaultMapProvider,
             provider: activeProvider
         }
     };
