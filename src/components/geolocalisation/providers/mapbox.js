@@ -3,11 +3,13 @@
 import $ from 'jquery';
 import _ from 'underscore';
 import markerCollection from './markerCollection';
+import markerGLCollection from './markerGLCollection';
 import {generateRandStr} from '../../utils/utils';
 import provider from '../provider';
 import leafletLocaleFr from './locales/fr';
 import merge from 'lodash.merge';
 require('mapbox.js/theme/style.css');
+require('mapbox-gl/dist/mapbox-gl.css');
 require('./mapbox.css');
 require('leaflet-draw/dist/leaflet.draw.css');
 require('leaflet-contextmenu/dist/leaflet.contextmenu.css');
@@ -19,10 +21,12 @@ const leafletMap = (services) => {
     let mapOptions = {};
     let mapUID;
     let mapbox;
+    let mapboxgl;
     let leafletDraw;
     let featureLayer = null;
     let map = null;
     let geocoder = null;
+    let mapboxClient = null;
     let $tabContent;
     let tabContainerName = 'leafletTabContainer';
     let editable;
@@ -33,6 +37,9 @@ const leafletMap = (services) => {
     let recordConfig = {};
     let currentZoomLevel = 0;
     let shouldUpdateZoom = false;
+    let features = null;
+    let geojson = {};
+    //let markerMapboxGl = {};
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
         tabOptions = options.tabOptions || false;
@@ -90,10 +97,10 @@ const leafletMap = (services) => {
 
     const appendMapContent = (params) => {
         let {selection} = params;
-        loadLeaflet(selection);
+        initializeMap(selection);
     }
 
-    const loadLeaflet = (pois) => {
+    const initializeMap = (pois) => {
         // if not access token provided - stop mapbox loading
         if (activeProvider.accessToken === undefined) {
             throw new Error('MapBox require an access token');
@@ -103,6 +110,8 @@ const leafletMap = (services) => {
             mapbox = require('mapbox.js');
             leafletDraw = require('leaflet-draw');
             require('leaflet-contextmenu');
+            mapboxgl = require('mapbox-gl');
+            let MapboxClient = require('mapbox');
 
             $container.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
@@ -127,23 +136,56 @@ const leafletMap = (services) => {
                 }
             }
 
-            L.mapbox.accessToken = activeProvider.accessToken;
-            map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
-            shouldUpdateZoom = false;
-            map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
-            if (searchable) {
-                map.addControl(L.mapbox.geocoderControl('mapbox.places'));
+            if (!mapboxgl.supported()) {
+                L.mapbox.accessToken = activeProvider.accessToken;
+                map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
+                shouldUpdateZoom = false;
+                map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                if (searchable) {
+                    map.addControl(L.mapbox.geocoderControl('mapbox.places'));
+                }
+                var layers = {
+                    Streets: L.mapbox.tileLayer('mapbox.streets'),
+                    Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
+                    Satellite: L.mapbox.tileLayer('mapbox.satellite')
+                };
+
+                layers.Streets.addTo(map);
+                L.control.layers(layers).addTo(map);
+                geocoder = L.mapbox.geocoder('mapbox.places');
+
+                if (drawable) {
+                    addDrawableLayers();
+                }
+                addMarkersLayers();
+                refreshMarkers(pois);
+            } else {
+                mapboxgl.accessToken = activeProvider.accessToken;
+                map = new mapboxgl.Map({
+                    container: mapUID,
+                    style: 'mapbox://styles/mapbox/streets-v9',
+                    center: activeProvider.defaultPosition.reverse(), // format different lng/lat
+                    zoom: activeProvider.defaultZoom
+                });
+
+                map.addControl(new mapboxgl.NavigationControl());
+
+                //markerMapboxGl = new mapboxgl.Marker();
+
+                shouldUpdateZoom = false;
+
+                mapboxClient = new MapboxClient(mapboxgl.accessToken);
+
+                map.on('load', function () {
+                    geojson = {
+                        type: 'FeatureCollection',
+                        features: []
+                    };
+                    addMarkersLayersGL(geojson);
+                    refreshMarkers(pois);
+                });
             }
-            var layers = {
-                Streets: L.mapbox.tileLayer('mapbox.streets'),
-                Outdoors: L.mapbox.tileLayer('mapbox.outdoors'),
-                Satellite: L.mapbox.tileLayer('mapbox.satellite')
-            };
 
-            layers.Streets.addTo(map);
-            L.control.layers(layers).addTo(map);
-
-            geocoder = L.mapbox.geocoder('mapbox.places');
 
             currentZoomLevel = activeProvider.markerDefaultZoom;
 
@@ -153,11 +195,6 @@ const leafletMap = (services) => {
                 }
             });
 
-            if (drawable) {
-                addDrawableLayers();
-            }
-            addMarkersLayers();
-            refreshMarkers(pois);
         });
     };
 
@@ -296,6 +333,25 @@ const leafletMap = (services) => {
             eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, recordIndex: poiIndex});
         });
     }
+
+    const addMarkersLayersGL = (geojson) => {
+
+        map.addSource('data', {
+            type: 'geojson',
+            data: geojson
+        });
+
+        map.addLayer({
+            id: 'points',
+            source: 'data',
+            type: 'symbol',
+            layout: {
+                "icon-image": "{marker-symbol}",
+                "icon-size": 1.5
+            },
+        });
+    }
+
     const addMarkersLayers = () => {
         if (featureLayer !== null) {
             featureLayer.clearLayers();
@@ -319,18 +375,42 @@ const leafletMap = (services) => {
 
         return buildGeoJson(pois).then((geoJsonPoiCollection) => {
             if(map != null) {
-                addMarkersLayers();
+                if (mapboxgl.supported) {
+                    geojson = {
+                        type: 'FeatureCollection',
+                        features: geoJsonPoiCollection
+                    };
 
-                let markerColl = markerCollection(services);
-                markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
+                    map.getSource('data').setData(geojson);
 
-                if (featureLayer.getLayers().length > 0) {
-                    shouldUpdateZoom = true;
-                    map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
+                    let markerGlColl = markerGLCollection(services);
+                    markerGlColl.initialize({map, geojson, editable});
+
+                    if (geojson.features.length > 0) {
+                        shouldUpdateZoom = true;
+                        // var popup = new mapboxgl.Popup()
+                        //     .setText(geojson.features[0].properties.title);
+                        //markerMapboxGl.setLngLat(geojson.features[0].geometry.coordinates).setPopup(popup).addTo(map);
+                        map.flyTo({center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel});
+                    } else {
+                        shouldUpdateZoom = false;
+                        //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
+                        map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
+                    }
                 } else {
-                    // set default position
-                    shouldUpdateZoom = false;
-                    map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                    addMarkersLayers();
+
+                    let markerColl = markerCollection(services);
+                    markerColl.initialize({map, featureLayer, geoJsonPoiCollection, editable});
+
+                    if (featureLayer.getLayers().length > 0) {
+                        shouldUpdateZoom = true;
+                        map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
+                    } else {
+                        // set default position
+                        shouldUpdateZoom = false;
+                        map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                    }
                 }
             }
         })
@@ -349,7 +429,7 @@ const leafletMap = (services) => {
         for (let poiIndex in pois) {
             let poi = pois[poiIndex];
             let poiCoords = extractCoords(poi);
-            let poiTitle = poi.FileName || poi.Filename || poi.Title;
+            let poiTitle = poi.FileName || poi.Filename || poi.Title || poi.NomDeFichier;
             if (poiCoords[0] !== false && poiCoords[1] !== false) {
                 geoJsonPoiCollection.push({
                     type: 'Feature',
@@ -360,7 +440,8 @@ const leafletMap = (services) => {
                     properties: {
                         recordIndex: poiIndex,
                         'marker-color': '0c4554',
-                        'marker-zoom': '5',
+                        'marker-zoom': currentZoomLevel,
+                        'marker-symbol': "star-15",
                         title: `${poiTitle}`
                     }
                 });
@@ -372,39 +453,11 @@ const leafletMap = (services) => {
                 query += poi.Country !== undefined && poi.Country !== null ? `, ${poi.Country} ` : '';
 
                 if (query !== '') {
-                    let geoPromise = $.Deferred();
-                    geocoder.query(query, (err, data) => {
-                        // take the first feature if exists
-                        if (data.results !== undefined) {
-                            if (data.results.features.length > 0) {
-
-                                /*let circleArea = {
-                                 type: 'Feature',
-                                 geometry: {
-                                 type: 'Point',
-                                 coordinates: data.results.features[0].center //[[ data.bounds ]]
-                                 },
-                                 properties: {
-                                 title: `${poi.FileName}`
-                                 }
-                                 };
-                                 circleArea.properties['marker-zoom'] = 5;
-                                 circleArea.properties.radius = 50;
-
-                                 geoJsonPoiCollection.push(circleArea);*/
-
-                                let bestResult = data.results.features[0];
-                                bestResult.properties.recordIndex = poiIndex;
-                                bestResult.properties['marker-zoom'] = 5;
-                                bestResult.properties.title = `${poiTitle}`;
-                                geoJsonPoiCollection.push(bestResult);
-                            }
-
-                        }
-
-                        geoPromise.resolve(geoJsonPoiCollection)
-                    });
-                    asyncQueries.push(geoPromise);
+                    if (mapboxgl.supported) {
+                        getDataForMapboxGl(asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection);
+                    } else {
+                        getDataForMapbox(asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection);
+                    }
                 }
             }
         }
@@ -418,6 +471,59 @@ const leafletMap = (services) => {
         }
         return geoJsonPromise.promise();
     };
+
+    const getDataForMapboxGl = (asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection) => {
+        let geoPromise = $.Deferred();
+        mapboxClient.geocodeForward(query, (err, data) => {
+            // take the first feature if exists
+            if (data !== undefined) {
+                if (data.features.length > 0) {
+                    let bestResult = data.features[0];
+                    bestResult.properties.recordIndex = poiIndex;
+                    bestResult.properties['marker-zoom'] = currentZoomLevel;
+                    bestResult.properties['marker-symbol'] = "star-15";
+                    bestResult.properties['marker-color'] = "0c4554";
+                    bestResult.properties.title = `${poiTitle}`;
+                    geoJsonPoiCollection.push(bestResult);
+                }
+            }
+            geoPromise.resolve(geoJsonPoiCollection)
+        });
+        asyncQueries.push(geoPromise);
+    }
+
+    const getDataForMapbox = (query) => {
+        let geoPromise = $.Deferred();
+        geocoder.query(query, (err, data) => {
+            // take the first feature if exists
+            if (data.results !== undefined) {
+                if (data.results.features.length > 0) {
+
+                    /*let circleArea = {
+                     type: 'Feature',
+                     geometry: {
+                     type: 'Point',
+                     coordinates: data.results.features[0].center //[[ data.bounds ]]
+                     },
+                     properties: {
+                     title: `${poi.FileName}`
+                     }
+                     };
+                     circleArea.properties['marker-zoom'] = 5;
+                     circleArea.properties.radius = 50;
+                     geoJsonPoiCollection.push(circleArea);*/
+
+                    let bestResult = data.results.features[0];
+                    bestResult.properties.recordIndex = poiIndex;
+                    bestResult.properties['marker-zoom'] = currentZoomLevel;
+                    bestResult.properties.title = `${poiTitle}`;
+                    geoJsonPoiCollection.push(bestResult);
+                }
+            }
+            geoPromise.resolve(geoJsonPoiCollection)
+        });
+        asyncQueries.push(geoPromise);
+    }
 
     const extractCoords = (poi) => {
         if (poi !== undefined) {
@@ -438,15 +544,29 @@ const leafletMap = (services) => {
             return;
         }
         if (map !== null) {
-            map.invalidateSize();
-            if (featureLayer.getLayers().length > 0) {
-                shouldUpdateZoom = true;
-                map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
+            if (mapboxgl.supported) {
+                map.resize();
+                if (geojson.features.length > 0) {
+                    shouldUpdateZoom = true;
+                    //markerMapboxGl.setLngLat(geojson.features[0].geometry.coordinates).addTo(map);
+                    map.flyTo({center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel});
+                } else {
+                    shouldUpdateZoom = false;
+                    //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
+                    map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
+                }
             } else {
-                // set default position
-                shouldUpdateZoom = false;
-                map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                map.invalidateSize();
+                if (featureLayer.getLayers().length > 0) {
+                    shouldUpdateZoom = true;
+                    map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
+                } else {
+                    // set default position
+                    shouldUpdateZoom = false;
+                    map.setView(activeProvider.defaultPosition, activeProvider.defaultZoom);
+                }
             }
+
         }
     };
 
@@ -502,7 +622,6 @@ const leafletMap = (services) => {
         }
         return mappedPositions;
     }
-
 
     eventEmitter.listenAll({
         'recordSelection.changed': onRecordSelectionChanged,
