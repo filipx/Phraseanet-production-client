@@ -81,7 +81,7 @@ const leafletMap = (services) => {
         }
         let {selection} = params;
 
-        if (mapboxgl !== undefined && mapboxgl.supported() && !map.loaded()) {
+        if (shouldUseMapboxGl() && !map.loaded()) {
             //refresh marker after 2 sec
             setTimeout(function () {
                 refreshMarkers(selection);
@@ -143,7 +143,7 @@ const leafletMap = (services) => {
                 }
             }
 
-            if (!mapboxgl.supported()) {
+            if (!shouldUseMapboxGl()) {
                 L.mapbox.accessToken = activeProvider.accessToken;
                 map = L.mapbox.map(mapUID, 'mapbox.streets', mapOptions);
                 shouldUpdateZoom = false;
@@ -382,7 +382,7 @@ const leafletMap = (services) => {
 
         return buildGeoJson(pois).then((geoJsonPoiCollection) => {
             if(map != null) {
-                if (mapboxgl.supported()) {
+                if (shouldUseMapboxGl()) {
                     geojson = {
                         type: 'FeatureCollection',
                         features: geoJsonPoiCollection
@@ -459,7 +459,7 @@ const leafletMap = (services) => {
                 query += poi.Country !== undefined && poi.Country !== null ? `, ${poi.Country} ` : '';
 
                 if (query !== '') {
-                    if (mapboxgl.supported()) {
+                    if (shouldUseMapboxGl()) {
                         getDataForMapboxGl(asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection);
                     } else {
                         getDataForMapbox(asyncQueries, query, poiIndex, poiTitle, geoJsonPoiCollection);
@@ -549,7 +549,7 @@ const leafletMap = (services) => {
             return;
         }
         if (map !== null) {
-            if (mapboxgl.supported()) {
+            if (shouldUseMapboxGl()) {
                 map.resize();
                 if (geojson.features.length > 0) {
                     shouldUpdateZoom = true;
@@ -626,6 +626,13 @@ const leafletMap = (services) => {
             }
         }
         return mappedPositions;
+    }
+
+    const shouldUseMapboxGl = () => {
+        if (activeProvider.defaultMapProvider === "mapboxWebGL" && mapboxgl !== undefined && mapboxgl.supported()) {
+            return true;
+        }
+        return false;
     }
 
     eventEmitter.listenAll({
