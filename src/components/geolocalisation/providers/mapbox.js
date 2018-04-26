@@ -183,11 +183,15 @@ const leafletMap = (services) => {
 
                 mapboxClient = new MapboxClient(mapboxgl.accessToken);
 
-                map.on('load', function () {
+                map.on('load', function (e) {
                     geojson = {
                         type: 'FeatureCollection',
                         features: []
                     };
+
+                    let controlContainer = $(e.target.getContainer()).find('.mapboxgl-control-container');
+                    addMapLayerControl(controlContainer);
+
                     addMarkersLayersGL(geojson);
                     refreshMarkers(pois);
                 });
@@ -204,6 +208,44 @@ const leafletMap = (services) => {
 
         });
     };
+
+    const addMapLayerControl = (controlContainer) => {
+        let mapSelectionButton =
+            $('<div class="dropdown map-selection-container"><button class="map-drop-btn"></button><div id="mapSelectionDropDown" class="map-dropdown-content"></div>');
+        $(controlContainer).append(mapSelectionButton);
+
+        //add layers
+        var layerArray = [{name: 'basic', value: 'mapbox://styles/mapbox/basic-v9'},
+            {name: 'basic', value: 'mapbox://styles/mapbox/streets-v9'},
+            {name: 'basic', value: 'mapbox://styles/mapbox/satellite-v9'}];
+
+        _.each(layerArray, (layer, index) => {
+            var div_layer = document.createElement('div');
+            //add checked attr for first element
+            var isChecked = index == 0 ? "checked=checked" : "";
+            $(div_layer).append(`<label><input id=${layer.name} type='radio' name='rtoggle' value=${layer.value} ${isChecked}>
+            <span for=${layer.name}>${layer.name}</span></label>`);
+            $('#mapSelectionDropDown').append(div_layer);
+        });
+
+        $('.map-drop-btn').on('click', () => {
+            $("#mapSelectionDropDown").get(0).classList.toggle("show");
+        })
+
+        $('body').on('click', (event) => {
+            if (!event.target.matches('.map-drop-btn')) {
+
+                var dropdowns = $("#mapSelectionDropDown");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.get(0).classList.contains('show')) {
+                        openDropdown.get(0).classList.remove('show');
+                    }
+                }
+            }
+        });
+    }
 
     const addDrawableLayers = () => {
 
