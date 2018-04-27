@@ -39,6 +39,7 @@ const leafletMap = (services) => {
     let shouldUpdateZoom = false;
     let features = null;
     let geojson = {};
+    let layerArray = null;
     //let markerMapboxGl = {};
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
@@ -168,20 +169,31 @@ const leafletMap = (services) => {
                 refreshMarkers(pois);
             } else {
                 mapboxgl.accessToken = activeProvider.accessToken;
+
+                //add layers
+                layerArray = [{name: 'basic', value: 'mapbox://styles/mapbox/basic-v9'},
+                    {name: 'streets', value: 'mapbox://styles/mapbox/streets-v9'},
+                    {name: 'satellite', value: 'mapbox://styles/mapbox/satellite-v9'}];
+
                 map = new mapboxgl.Map({
                     container: mapUID,
-                    style: 'mapbox://styles/mapbox/streets-v9',
+                    style: layerArray[0].value,
                     center: activeProvider.defaultPosition.reverse(), // format different lng/lat
                     zoom: activeProvider.defaultZoom
                 });
 
                 map.addControl(new mapboxgl.NavigationControl());
-
                 //markerMapboxGl = new mapboxgl.Marker();
 
                 shouldUpdateZoom = false;
 
                 mapboxClient = new MapboxClient(mapboxgl.accessToken);
+
+
+                map.on('style.load', function () {
+                    // Triggered when `setStyle` is called.
+                    if (geojson.hasOwnProperty('features')) addMarkersLayersGL(geojson);
+                });
 
                 map.on('load', function (e) {
                     geojson = {
@@ -189,8 +201,7 @@ const leafletMap = (services) => {
                         features: []
                     };
 
-                    let controlContainer = $(e.target.getContainer()).find('.mapboxgl-control-container');
-                    addMapLayerControl(controlContainer);
+                    addMapLayerControl();
 
                     addMarkersLayersGL(geojson);
                     refreshMarkers(pois);
@@ -209,42 +220,58 @@ const leafletMap = (services) => {
         });
     };
 
-    const addMapLayerControl = (controlContainer) => {
-        let mapSelectionButton =
-            $('<div class="dropdown map-selection-container"><button class="map-drop-btn"></button><div id="mapSelectionDropDown" class="map-dropdown-content"></div>');
-        $(controlContainer).append(mapSelectionButton);
+    const addMapLayerControl = () => {
+        let controlContainerList = $('.mapboxgl-control-container');
 
-        //add layers
-        var layerArray = [{name: 'basic', value: 'mapbox://styles/mapbox/basic-v9'},
-            {name: 'basic', value: 'mapbox://styles/mapbox/streets-v9'},
-            {name: 'basic', value: 'mapbox://styles/mapbox/satellite-v9'}];
+        _.each(controlContainerList, (controlContainer) => {
+            if ($(controlContainer).find('.map-selection-container').length > 0) {
+                $(controlContainer).find('.map-selection-container').remove();
+            }
 
-        _.each(layerArray, (layer, index) => {
-            var div_layer = document.createElement('div');
-            //add checked attr for first element
-            var isChecked = index == 0 ? "checked=checked" : "";
-            $(div_layer).append(`<label><input id=${layer.name} type='radio' name='rtoggle' value=${layer.value} ${isChecked}>
+            let mapSelectionButton =
+                $('<div class="dropdown map-selection-container"><button class="map-drop-btn"><i class="fa fa-map" aria-hidden="true"></i></button><div id="mapSelectionDropDown" class="map-dropdown-content"></div>');
+            $(controlContainer).append(mapSelectionButton);
+
+
+            var map_list_div = document.createElement('div');
+            _.each(layerArray, (layer, index) => {
+                var div_layer = document.createElement('div');
+                //add checked attr for first element
+                var isChecked = index == 0 ? "checked=checked" : "";
+                $(div_layer).append(`<label><input id=${layer.name} name="mapradio" type='radio' value=${layer.value} ${isChecked}>
             <span for=${layer.name}>${layer.name}</span></label>`);
-            $('#mapSelectionDropDown').append(div_layer);
-        });
+                $(map_list_div).append(div_layer);
+            });
+            var $mapboxSelection = $(controlContainer).find('#mapSelectionDropDown');
 
-        $('.map-drop-btn').on('click', () => {
-            $("#mapSelectionDropDown").get(0).classList.toggle("show");
-        })
+            $mapboxSelection.empty().append(map_list_div);
+            $mapboxSelection.on('click', 'input[name="mapradio"]', function (e) {
+                switchLayer($(e.target));
+            });
 
-        $('body').on('click', (event) => {
-            if (!event.target.matches('.map-drop-btn')) {
+            $(controlContainer).on('click', '.map-drop-btn i', function () {
+                $mapboxSelection.get(0).classList.toggle("show");
+            });
 
-                var dropdowns = $("#mapSelectionDropDown");
-                var i;
-                for (i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.get(0).classList.contains('show')) {
-                        openDropdown.get(0).classList.remove('show');
+            $('body').on('click', function (event) {
+                if (!event.target.matches('.map-drop-btn i')) {
+
+                    var dropdowns = $mapboxSelection;
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
                     }
                 }
-            }
+            });
         });
+
+    }
+
+    const switchLayer = ($elem) => {
+        map.setStyle($elem.val());
     }
 
     const addDrawableLayers = () => {
@@ -593,7 +620,7 @@ const leafletMap = (services) => {
         if (map !== null) {
             if (shouldUseMapboxGl()) {
                 map.resize();
-                if (geojson.features.length > 0) {
+                if (geojson.hasOwnProperty('features') && geojson.features.length > 0) {
                     shouldUpdateZoom = true;
                     //markerMapboxGl.setLngLat(geojson.features[0].geometry.coordinates).addTo(map);
                     map.flyTo({center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel});

@@ -137,7 +137,7 @@
 
 .map-dropdown-content {
     display: none;
-    width: 140px;
+    min-width: 80px;
     position: absolute;
     right: 0;
     background: #FFF;
@@ -146,4 +146,34 @@
     -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.map-dropdown-content label {
+    color: #555555;
+    display: block;
+    font-size: 13px;
+}
+
+.map-drop-btn {
+    background: transparent;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.map-drop-btn i {
+    padding: 8px;
+    margin: 0;
+}
+
+.map-dropdown-content label input[type="radio"] {
+    margin: 0px 0 0 0;
+    padding: 0;
+}
+
+.map-dropdown-content.show {
+    display: block;
 }
