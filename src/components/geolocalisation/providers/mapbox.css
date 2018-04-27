@@ -129,6 +129,7 @@
     border: 2px solid #ccc;
     background-color: #fff;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .map-selection-container:hover {
@@ -165,7 +166,7 @@
 }
 
 .map-drop-btn i {
-    padding: 8px;
+    padding: 6px;
     margin: 0;
 }
 

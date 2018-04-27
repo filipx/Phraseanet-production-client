@@ -39,7 +39,8 @@ const leafletMap = (services) => {
     let shouldUpdateZoom = false;
     let features = null;
     let geojson = {};
-    let layerArray = null;
+    let labelLayerId;
+
     //let markerMapboxGl = {};
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
@@ -170,14 +171,9 @@ const leafletMap = (services) => {
             } else {
                 mapboxgl.accessToken = activeProvider.accessToken;
 
-                //add layers
-                layerArray = [{name: 'basic', value: 'mapbox://styles/mapbox/basic-v9'},
-                    {name: 'streets', value: 'mapbox://styles/mapbox/streets-v9'},
-                    {name: 'satellite', value: 'mapbox://styles/mapbox/satellite-v9'}];
-
                 map = new mapboxgl.Map({
                     container: mapUID,
-                    style: layerArray[0].value,
+                    style: activeProvider.mapLayers[0].value,
                     center: activeProvider.defaultPosition.reverse(), // format different lng/lat
                     zoom: activeProvider.defaultZoom
                 });
@@ -192,16 +188,33 @@ const leafletMap = (services) => {
 
                 map.on('style.load', function () {
                     // Triggered when `setStyle` is called.
+                    if (map.getStyle().name == "Mapbox Streets" || map.getStyle().name == "Mapbox Light") {
+                        add3DBuildingsLayersGL();
+                    }
+
                     if (geojson.hasOwnProperty('features')) addMarkersLayersGL(geojson);
+
                 });
 
-                map.on('load', function (e) {
+                map.on('load', function () {
+
+                    var layers = map.getStyle().layers;
+
+                    for (var i = 0; i < layers.length; i++) {
+                        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                            labelLayerId = layers[i].id;
+                            break;
+                        }
+                    }
+
                     geojson = {
                         type: 'FeatureCollection',
                         features: []
                     };
 
-                    addMapLayerControl();
+                    if (activeProvider.mapLayers.length > 1) {
+                        addMapLayerControl(activeProvider.mapLayers);
+                    }
 
                     addMarkersLayersGL(geojson);
                     refreshMarkers(pois);
@@ -220,7 +233,7 @@ const leafletMap = (services) => {
         });
     };
 
-    const addMapLayerControl = () => {
+    const addMapLayerControl = (layerArray) => {
         let controlContainerList = $('.mapboxgl-control-container');
 
         _.each(controlContainerList, (controlContainer) => {
@@ -245,11 +258,12 @@ const leafletMap = (services) => {
             var $mapboxSelection = $(controlContainer).find('#mapSelectionDropDown');
 
             $mapboxSelection.empty().append(map_list_div);
-            $mapboxSelection.on('click', 'input[name="mapradio"]', function (e) {
-                switchLayer($(e.target));
+            $mapboxSelection.on('click', 'input[name="mapradio"]', function (event) {
+                switchLayer($(event.target));
             });
 
-            $(controlContainer).on('click', '.map-drop-btn i', function () {
+            $(document).on('click', '.map-drop-btn i', function (event) {
+                event.preventDefault();
                 $mapboxSelection.get(0).classList.toggle("show");
             });
 
@@ -408,6 +422,34 @@ const leafletMap = (services) => {
             map.contextmenu.disable();
             eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, recordIndex: poiIndex});
         });
+    }
+
+    const add3DBuildingsLayersGL = () => {
+        map.addLayer({
+            'id': '3d-buildings',
+            'source': 'composite',
+            'source-layer': 'building',
+            'filter': ['==', 'extrude', 'true'],
+            'type': 'fill-extrusion',
+            'minzoom': 15,
+            'paint': {
+                'fill-extrusion-color': '#aaa',
+
+                // use an 'interpolate' expression to add a smooth transition effect to the
+                // buildings as the user zooms in
+                'fill-extrusion-height': [
+                    "interpolate", ["linear"], ["zoom"],
+                    15, 0,
+                    15.05, ["get", "height"]
+                ],
+                'fill-extrusion-base': [
+                    "interpolate", ["linear"], ["zoom"],
+                    15, 0,
+                    15.05, ["get", "min_height"]
+                ],
+                'fill-extrusion-opacity': .6
+            }
+        }, labelLayerId);
     }
 
     const addMarkersLayersGL = (geojson) => {
