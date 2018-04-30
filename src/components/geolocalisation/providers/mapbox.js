@@ -40,6 +40,7 @@ const leafletMap = (services) => {
     let features = null;
     let geojson = {};
     let labelLayerId;
+    let mapboxGLDefaultPosition
 
     //let markerMapboxGl = {};
     const initialize = (options) => {
@@ -121,6 +122,7 @@ const leafletMap = (services) => {
             require('leaflet-contextmenu');
             mapboxgl = require('mapbox-gl');
             let MapboxClient = require('mapbox');
+            let MapboxLanguage = require('@mapbox/mapbox-gl-language');
 
             $container.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
@@ -169,14 +171,20 @@ const leafletMap = (services) => {
                 addMarkersLayers();
                 refreshMarkers(pois);
             } else {
-                mapboxgl.accessToken = activeProvider.accessToken;
-
+                mapboxgl.accessToken = activeProvider.accessToken
+                if (mapboxGLDefaultPosition == null) {
+                    mapboxGLDefaultPosition = activeProvider.defaultPosition;
+                    mapboxGLDefaultPosition.reverse();
+                }
                 map = new mapboxgl.Map({
                     container: mapUID,
                     style: activeProvider.mapLayers[0].value,
-                    center: activeProvider.defaultPosition.reverse(), // format different lng/lat
+                    center: mapboxGLDefaultPosition, // format different lng/lat
                     zoom: activeProvider.defaultZoom
                 });
+
+                var language = new MapboxLanguage({defaultLanguage: $('html').attr('lang') || 'en'});
+                map.addControl(language);
 
                 map.addControl(new mapboxgl.NavigationControl());
                 //markerMapboxGl = new mapboxgl.Marker();
@@ -517,7 +525,7 @@ const leafletMap = (services) => {
                     } else {
                         shouldUpdateZoom = false;
                         //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                        map.flyTo({center: activeProvider.defaultPosition.reverse(), zoom: activeProvider.defaultZoom});
+                        map.flyTo({center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom});
                     }
                 } else {
                     addMarkersLayers();
@@ -673,7 +681,7 @@ const leafletMap = (services) => {
                 } else {
                     shouldUpdateZoom = false;
                     //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                    map.flyTo({center: activeProvider.defaultPosition.reverse(), zoom: activeProvider.defaultZoom});
+                    map.flyTo({center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom});
                 }
             } else {
                 map.invalidateSize();
