@@ -39,6 +39,8 @@ const leafletMap = (services) => {
     let shouldUpdateZoom = false;
     let features = null;
     let geojson = {};
+    let labelLayerId;
+
     //let markerMapboxGl = {};
     const initialize = (options) => {
         let initWith = {$container, parentOptions} = options;
@@ -168,26 +170,52 @@ const leafletMap = (services) => {
                 refreshMarkers(pois);
             } else {
                 mapboxgl.accessToken = activeProvider.accessToken;
+
                 map = new mapboxgl.Map({
                     container: mapUID,
-                    style: 'mapbox://styles/mapbox/streets-v9',
+                    style: activeProvider.mapLayers[0].value,
                     center: activeProvider.defaultPosition.reverse(), // format different lng/lat
                     zoom: activeProvider.defaultZoom
                 });
 
                 map.addControl(new mapboxgl.NavigationControl());
-
                 //markerMapboxGl = new mapboxgl.Marker();
 
                 shouldUpdateZoom = false;
 
                 mapboxClient = new MapboxClient(mapboxgl.accessToken);
 
+
+                map.on('style.load', function () {
+                    // Triggered when `setStyle` is called.
+                    if (map.getStyle().name == "Mapbox Streets" || map.getStyle().name == "Mapbox Light") {
+                        add3DBuildingsLayersGL();
+                    }
+
+                    if (geojson.hasOwnProperty('features')) addMarkersLayersGL(geojson);
+
+                });
+
                 map.on('load', function () {
+
+                    var layers = map.getStyle().layers;
+
+                    for (var i = 0; i < layers.length; i++) {
+                        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+                            labelLayerId = layers[i].id;
+                            break;
+                        }
+                    }
+
                     geojson = {
                         type: 'FeatureCollection',
                         features: []
                     };
+
+                    if (activeProvider.mapLayers.length > 1) {
+                        addMapLayerControl(activeProvider.mapLayers);
+                    }
+
                     addMarkersLayersGL(geojson);
                     refreshMarkers(pois);
                 });
@@ -204,6 +232,65 @@ const leafletMap = (services) => {
 
         });
     };
+
+    const addMapLayerControl = (layerArray) => {
+        let controlContainerList = $('.mapboxgl-control-container');
+
+        _.each(controlContainerList, (controlContainer) => {
+            if ($(controlContainer).find('.map-selection-container').length > 0) {
+                $(controlContainer).find('.map-selection-container').remove();
+            }
+
+            let mapSelectionContainer =
+                $('<div class="dropdown map-selection-container"><button class="map-drop-btn"><i class="fa fa-map" aria-hidden="true"></i></button><div id="mapSelectionDropDown" class="map-dropdown-content"></div></div>');
+
+            var $mapSelectionDropDown = mapSelectionContainer.find('#mapSelectionDropDown');
+
+            $(controlContainer).append(mapSelectionContainer);
+
+            $(controlContainer).on('click', 'button', function (event) {
+                $mapSelectionDropDown.get(0).classList.toggle("show");
+            });
+
+
+            var map_list_div = document.createElement('div');
+            _.each(layerArray, (layer, index) => {
+                var div_layer = document.createElement('div');
+                //add checked attr for first element
+                var isChecked = index == 0 ? "checked=checked" : "";
+                $(div_layer).append(`<label><input id=${layer.name} name="mapradio" type='radio' value=${layer.value} ${isChecked}>
+            <span for=${layer.name}>${layer.name}</span></label>`);
+                $(map_list_div).append(div_layer);
+            });
+
+            $mapSelectionDropDown.empty().append(map_list_div);
+            $(controlContainer).on('click', 'input[name="mapradio"]', function (event) {
+                switchLayer($(event.target));
+            });
+
+
+            $('body').on('click', function (event) {
+                if (event.target.matches('button.map-drop-btn') ||
+                    event.target.matches('button.map-drop-btn i')) {
+                    return;
+                } else {
+                    var dropdowns = $mapSelectionDropDown;
+                    var i;
+                    for (i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            });
+        });
+
+    }
+
+    const switchLayer = ($elem) => {
+        map.setStyle($elem.val());
+    }
 
     const addDrawableLayers = () => {
 
@@ -341,6 +428,34 @@ const leafletMap = (services) => {
         });
     }
 
+    const add3DBuildingsLayersGL = () => {
+        map.addLayer({
+            'id': '3d-buildings',
+            'source': 'composite',
+            'source-layer': 'building',
+            'filter': ['==', 'extrude', 'true'],
+            'type': 'fill-extrusion',
+            'minzoom': 15,
+            'paint': {
+                'fill-extrusion-color': '#aaa',
+
+                // use an 'interpolate' expression to add a smooth transition effect to the
+                // buildings as the user zooms in
+                'fill-extrusion-height': [
+                    "interpolate", ["linear"], ["zoom"],
+                    15, 0,
+                    15.05, ["get", "height"]
+                ],
+                'fill-extrusion-base': [
+                    "interpolate", ["linear"], ["zoom"],
+                    15, 0,
+                    15.05, ["get", "min_height"]
+                ],
+                'fill-extrusion-opacity': .6
+            }
+        }, labelLayerId);
+    }
+
     const addMarkersLayersGL = (geojson) => {
 
         map.addSource('data', {
@@ -402,7 +517,7 @@ const leafletMap = (services) => {
                     } else {
                         shouldUpdateZoom = false;
                         //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                        map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
+                        map.flyTo({center: activeProvider.defaultPosition.reverse(), zoom: activeProvider.defaultZoom});
                     }
                 } else {
                     addMarkersLayers();
@@ -551,14 +666,14 @@ const leafletMap = (services) => {
         if (map !== null) {
             if (shouldUseMapboxGl()) {
                 map.resize();
-                if (geojson.features.length > 0) {
+                if (geojson.hasOwnProperty('features') && geojson.features.length > 0) {
                     shouldUpdateZoom = true;
                     //markerMapboxGl.setLngLat(geojson.features[0].geometry.coordinates).addTo(map);
                     map.flyTo({center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel});
                 } else {
                     shouldUpdateZoom = false;
                     //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                    map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
+                    map.flyTo({center: activeProvider.defaultPosition.reverse(), zoom: activeProvider.defaultZoom});
                 }
             } else {
                 map.invalidateSize();

@@ -13,6 +13,7 @@ const provider = (services) => {
     let activeProvider;
     let fieldPosition;
     let defaultMapProvider;
+    let mapLayers = [{name: 'streets', value: 'mapbox://styles/mapbox/streets-v9'}];
     const initialize = () => {
         let isValid = false;
         // select geocoding provider:
@@ -56,6 +57,10 @@ const provider = (services) => {
                 defaultZoom = provider['default-zoom'] || 2;
                 markerDefaultZoom = provider['marker-default-zoom'] || 12;
                 defaultMapProvider = provider['map-provider'] || "mapboxWebGL";
+                if (provider['map-layers'] && provider['map-layers'].length > 0) {
+                    //update map layer;
+                    mapLayers = provider['map-layers'];
+                }
             }
         });
         if (accessToken === undefined) {
@@ -112,6 +117,7 @@ const provider = (services) => {
             fieldPosition,
             accessToken,
             defaultMapProvider,
+            mapLayers,
             provider: activeProvider
         }
     };
