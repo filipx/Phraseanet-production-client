@@ -517,7 +517,7 @@ const leafletMap = (services) => {
                     } else {
                         shouldUpdateZoom = false;
                         //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                        map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
+                        map.flyTo({center: activeProvider.defaultPosition.reverse(), zoom: activeProvider.defaultZoom});
                     }
                 } else {
                     addMarkersLayers();
@@ -673,7 +673,7 @@ const leafletMap = (services) => {
                 } else {
                     shouldUpdateZoom = false;
                     //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                    map.flyTo({center: activeProvider.defaultPosition, zoom: activeProvider.defaultZoom});
+                    map.flyTo({center: activeProvider.defaultPosition.reverse(), zoom: activeProvider.defaultZoom});
                 }
             } else {
                 map.invalidateSize();
