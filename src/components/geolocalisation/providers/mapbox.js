@@ -241,9 +241,16 @@ const leafletMap = (services) => {
                 $(controlContainer).find('.map-selection-container').remove();
             }
 
-            let mapSelectionButton =
-                $('<div class="dropdown map-selection-container"><button class="map-drop-btn"><i class="fa fa-map" aria-hidden="true"></i></button><div id="mapSelectionDropDown" class="map-dropdown-content"></div>');
-            $(controlContainer).append(mapSelectionButton);
+            let mapSelectionContainer =
+                $('<div class="dropdown map-selection-container"><button class="map-drop-btn"><i class="fa fa-map" aria-hidden="true"></i></button><div id="mapSelectionDropDown" class="map-dropdown-content"></div></div>');
+
+            var $mapSelectionDropDown = mapSelectionContainer.find('#mapSelectionDropDown');
+
+            $(controlContainer).append(mapSelectionContainer);
+
+            $(controlContainer).on('click', 'button', function (event) {
+                $mapSelectionDropDown.get(0).classList.toggle("show");
+            });
 
 
             var map_list_div = document.createElement('div');
@@ -255,22 +262,19 @@ const leafletMap = (services) => {
             <span for=${layer.name}>${layer.name}</span></label>`);
                 $(map_list_div).append(div_layer);
             });
-            var $mapboxSelection = $(controlContainer).find('#mapSelectionDropDown');
 
-            $mapboxSelection.empty().append(map_list_div);
-            $mapboxSelection.on('click', 'input[name="mapradio"]', function (event) {
+            $mapSelectionDropDown.empty().append(map_list_div);
+            $(controlContainer).on('click', 'input[name="mapradio"]', function (event) {
                 switchLayer($(event.target));
             });
 
-            $(document).on('click', '.map-drop-btn i', function (event) {
-                event.preventDefault();
-                $mapboxSelection.get(0).classList.toggle("show");
-            });
 
             $('body').on('click', function (event) {
-                if (!event.target.matches('.map-drop-btn i')) {
-
-                    var dropdowns = $mapboxSelection;
+                if (event.target.matches('button.map-drop-btn') ||
+                    event.target.matches('button.map-drop-btn i')) {
+                    return;
+                } else {
+                    var dropdowns = $mapSelectionDropDown;
                     var i;
                     for (i = 0; i < dropdowns.length; i++) {
                         var openDropdown = dropdowns[i];
