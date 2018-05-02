@@ -13,6 +13,7 @@ const provider = (services) => {
     let activeProvider;
     let fieldPosition;
     let defaultMapProvider;
+    let transitionOptions = Object.create(null);
     let mapLayers = [{name: 'streets', value: 'mapbox://styles/mapbox/streets-v9'}];
     const initialize = () => {
         let isValid = false;
@@ -60,6 +61,12 @@ const provider = (services) => {
                 if (provider['map-layers'] && provider['map-layers'].length > 0) {
                     //update map layer;
                     mapLayers = provider['map-layers'];
+                }
+                if (provider['transition-mapboxgl'] !== undefined) {
+                    var options = provider['transition-mapboxgl'][0] || [];
+                    transitionOptions.animate = options['animate'] !== undefined ? options['animate'] : true;
+                    transitionOptions.speed = options['speed'] || 1.2;
+                    transitionOptions.curve = options['curve'] || 1.42;
                 }
             }
         });
@@ -118,7 +125,8 @@ const provider = (services) => {
             accessToken,
             defaultMapProvider,
             mapLayers,
-            provider: activeProvider
+            provider: activeProvider,
+            transitionOptions
         }
     };
 

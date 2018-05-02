@@ -1,6 +1,6 @@
 {
   "name": "phraseanet-production-client",
-    "version": "0.33.28",
+    "version": "0.33.29",
   "description": "Phraseanet frontend dependencies",
   "scripts": {
     "clean": "rimraf dist",

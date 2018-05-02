@@ -521,11 +521,17 @@ const leafletMap = (services) => {
                         // var popup = new mapboxgl.Popup()
                         //     .setText(geojson.features[0].properties.title);
                         //markerMapboxGl.setLngLat(geojson.features[0].geometry.coordinates).setPopup(popup).addTo(map);
-                        map.flyTo({center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel});
+                        map.flyTo({
+                            center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel,
+                            ...activeProvider.transitionOptions
+                        });
                     } else {
                         shouldUpdateZoom = false;
                         //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                        map.flyTo({center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom});
+                        map.flyTo({
+                            center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom,
+                            ...activeProvider.transitionOptions
+                        });
                     }
                 } else {
                     addMarkersLayers();
@@ -677,11 +683,17 @@ const leafletMap = (services) => {
                 if (geojson.hasOwnProperty('features') && geojson.features.length > 0) {
                     shouldUpdateZoom = true;
                     //markerMapboxGl.setLngLat(geojson.features[0].geometry.coordinates).addTo(map);
-                    map.flyTo({center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel});
+                    map.flyTo({
+                        center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel,
+                        ...activeProvider.transitionOptions
+                    });
                 } else {
                     shouldUpdateZoom = false;
                     //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
-                    map.flyTo({center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom});
+                    map.flyTo({
+                        center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom,
+                        ...activeProvider.transitionOptions
+                    });
                 }
             } else {
                 map.invalidateSize();
