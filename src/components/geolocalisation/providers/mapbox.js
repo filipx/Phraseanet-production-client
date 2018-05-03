@@ -40,7 +40,7 @@ const leafletMap = (services) => {
     let features = null;
     let geojson = {};
     let labelLayerId;
-    let mapboxGLDefaultPosition
+    let mapboxGLDefaultPosition;
 
     //let markerMapboxGl = {};
     const initialize = (options) => {
@@ -173,7 +173,7 @@ const leafletMap = (services) => {
             } else {
                 mapboxgl.accessToken = activeProvider.accessToken
                 if (mapboxGLDefaultPosition == null) {
-                    mapboxGLDefaultPosition = activeProvider.defaultPosition;
+                    mapboxGLDefaultPosition = $.extend([], activeProvider.defaultPosition);
                     mapboxGLDefaultPosition.reverse();
                 }
                 map = new mapboxgl.Map({
@@ -186,13 +186,31 @@ const leafletMap = (services) => {
                 var language = new MapboxLanguage({defaultLanguage: $('html').attr('lang') || 'en'});
                 map.addControl(language);
 
-                map.addControl(new mapboxgl.NavigationControl());
                 //markerMapboxGl = new mapboxgl.Marker();
 
                 shouldUpdateZoom = false;
 
                 mapboxClient = new MapboxClient(mapboxgl.accessToken);
 
+                if (drawable) {
+                    // disable map rotation using right click + drag
+                    map.dragRotate.disable();
+                    // disable map rotation using touch rotation gesture
+                    map.touchZoomRotate.disableRotation();
+                    map.addControl(new mapboxgl.NavigationControl({
+                        showCompass: false
+                    }));
+
+                    map.on('moveend', calculateBounds).on('zoomend', calculateBounds);
+
+                    $('.map_search_dialog .ui-icon-closethick').on('click', function () {
+                        eventEmitter.emit('shapeRemoved', {shapes: {}, drawnItems: {}});
+                        $('.submit-geo-search-action').trigger('click');
+                    });
+
+                } else {
+                    map.addControl(new mapboxgl.NavigationControl());
+                }
 
                 map.on('style.load', function () {
                     // Triggered when `setStyle` is called.
@@ -240,6 +258,31 @@ const leafletMap = (services) => {
 
         });
     };
+
+    const calculateBounds = () => {
+        //get visible bounds of map
+        var bounds = map.getBounds();
+        var refactoredBoundsCoordinates = refactoredBounds(bounds);
+        var shapesWebGl = {};
+        shapesWebGl['0'] = {
+            type: 'rectangle',
+            latlng: refactoredBoundsCoordinates,
+            bounds: getMappedFieldsCollection(refactoredBoundsCoordinates)
+        };
+        eventEmitter.emit('shapeCreated', {shapes: shapesWebGl, drawnItems: shapesWebGl});
+    }
+
+    const refactoredBounds = (bounds) => {
+        if (bounds !== undefined) {
+            var LngLat = [];
+            var sw = bounds._sw;
+            var nw = {lng: bounds._sw.lng, lat: bounds._ne.lat};
+            var ne = bounds._ne;
+            var se = {lng: bounds._ne.lng, lat: bounds._sw.lat};
+            var LngLat = [sw, nw, ne, se];
+            return LngLat;
+        }
+    }
 
     const addMapLayerControl = (layerArray) => {
         let controlContainerList = $('.mapboxgl-control-container');
