@@ -34,11 +34,7 @@ const searchGeoForm = (services) => {
 
         $container.on('click', '.submit-geo-search-action', (event) => {
             event.preventDefault();
-            appEvents.emit('search.updateSearchValue', {
-                searchValue: searchQuery,
-                reset: true,
-                submit: true
-            });
+            updateSearchValue();
             // searchQuery
             $dialog.close();
         });
@@ -52,6 +48,14 @@ const searchGeoForm = (services) => {
         });
         mapBoxService.appendMapContent({selection: []});
 
+    }
+
+    const updateSearchValue = () => {
+        appEvents.emit('search.updateSearchValue', {
+            searchValue: searchQuery,
+            reset: true,
+            submit: true
+        });
     }
 
     const renderModal = () => {
@@ -130,7 +134,8 @@ const searchGeoForm = (services) => {
     appEvents.listenAll({
         shapeCreated: onShapeCreated,
         shapeEdited: onShapeEdited,
-        shapeRemoved: onShapeDeleted
+        shapeRemoved: onShapeDeleted,
+        updateSearchValue: updateSearchValue,
     })
 
     return {openModal};

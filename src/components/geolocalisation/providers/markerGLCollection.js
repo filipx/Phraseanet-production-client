@@ -83,7 +83,7 @@ const markerGLCollection = (services) => {
             $content.find('.edit-mode').hide();
 
             var popup = document.getElementsByClassName('mapboxgl-popup');
-            if (popup[0]) popup[0].remove();
+            if (popup[0]) popup[0].parentElement.removeChild(popup[0]);
 
             marker.lngLat = {
                 lng: cachedGeoJson.features[0].geometry.coordinates[0],
@@ -103,7 +103,7 @@ const markerGLCollection = (services) => {
             $content.find('.help').hide();
 
             var popup = document.getElementsByClassName('mapboxgl-popup');
-            if (popup[0]) popup[0].remove();
+            if (popup[0]) popup[0].parentElement.removeChild(popup[0]);
 
             cachedGeoJson.features[0].geometry.coordinates = [marker._originalPosition.lng, marker._originalPosition.lat];
             map.getSource('data').setData(cachedGeoJson);
@@ -138,7 +138,7 @@ const markerGLCollection = (services) => {
 
             var popup = document.getElementsByClassName('mapboxgl-popup');
             // Check if there is already a popup on the map and if so, remove it
-            if (popup[0]) popup[0].remove();
+            if (popup[0]) popup[0].parentElement.removeChild(popup[0]);
 
             new mapboxgl.Popup({closeOnClick: false}).setLngLat(coordinates)
                 .setDOMContent($content.get(0))
@@ -158,7 +158,7 @@ const markerGLCollection = (services) => {
             map.once('mouseup', onUp);
 
             var popup = document.getElementsByClassName('mapboxgl-popup');
-            if (popup[0]) popup[0].remove();
+            if (popup[0]) popup[0].parentElement.removeChild(popup[0]);
         }
 
         function onMove(e) {
