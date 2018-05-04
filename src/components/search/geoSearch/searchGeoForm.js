@@ -25,6 +25,7 @@ const searchGeoForm = (services) => {
         $dialog = dialog.create(services, options);
         $dialog.setContent(renderModal());
         $container = $dialog.getDomElement();
+        $container.closest('.ui-dialog').addClass('map_search_dialog');
         onModalReady(options)
 
     };
