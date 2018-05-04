@@ -41,6 +41,7 @@ const leafletMap = (services) => {
     let geojson = {};
     let labelLayerId;
     let mapboxGLDefaultPosition;
+    let shapesWebGl = {};
 
     //let markerMapboxGl = {};
     const initialize = (options) => {
@@ -183,8 +184,11 @@ const leafletMap = (services) => {
                     zoom: activeProvider.defaultZoom
                 });
 
-                var language = new MapboxLanguage({defaultLanguage: $('html').attr('lang') || 'en'});
-                map.addControl(language);
+                if (!isIE()) {
+                    //use mapboxlanguage if not IE11. Waiting for PR to be merged here https://github.com/mapbox/mapbox-gl-language/pulls
+                    var language = new MapboxLanguage({defaultLanguage: $('html').attr('lang') || 'en'});
+                    map.addControl(language);
+                }
 
                 //markerMapboxGl = new mapboxgl.Marker();
 
@@ -201,11 +205,11 @@ const leafletMap = (services) => {
                         showCompass: false
                     }));
 
-                    map.on('moveend', calculateBounds).on('zoomend', calculateBounds);
-
-                    $('.map_search_dialog .ui-icon-closethick').on('click', function () {
+                    $('.map_search_dialog .ui-dialog-titlebar-close').on('click', function (event) {
+                        event.preventDefault();
+                        $('#EDIT_query').val('');
                         eventEmitter.emit('shapeRemoved', {shapes: {}, drawnItems: {}});
-                        $('.submit-geo-search-action').trigger('click');
+                        eventEmitter.emit('updateSearchValue');
                     });
 
                 } else {
@@ -242,8 +246,22 @@ const leafletMap = (services) => {
                         addMapLayerControl(activeProvider.mapLayers);
                     }
 
-                    addMarkersLayersGL(geojson);
-                    refreshMarkers(pois);
+                    if (!drawable) {
+                        addMarkersLayersGL(geojson);
+                        refreshMarkers(pois);
+                    } else {
+                        //if bounds exist, move to bounds
+                        if (!_.isEmpty(drawnItems)) {
+                            map.fitBounds(drawnItems[0].originalBounds);
+                        } else {
+                            map.flyTo({
+                                center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom,
+                                ...activeProvider.transitionOptions
+                            });
+                        }
+
+                        map.on('moveend', calculateBounds).on('zoomend', calculateBounds);
+                    }
                 });
             }
 
@@ -263,11 +281,11 @@ const leafletMap = (services) => {
         //get visible bounds of map
         var bounds = map.getBounds();
         var refactoredBoundsCoordinates = refactoredBounds(bounds);
-        var shapesWebGl = {};
         shapesWebGl['0'] = {
             type: 'rectangle',
             latlng: refactoredBoundsCoordinates,
-            bounds: getMappedFieldsCollection(refactoredBoundsCoordinates)
+            bounds: getMappedFieldsCollection(refactoredBoundsCoordinates),
+            originalBounds: bounds
         };
         eventEmitter.emit('shapeCreated', {shapes: shapesWebGl, drawnItems: shapesWebGl});
     }
@@ -321,8 +339,8 @@ const leafletMap = (services) => {
 
 
             $('body').on('click', function (event) {
-                if (event.target.matches('button.map-drop-btn') ||
-                    event.target.matches('button.map-drop-btn i')) {
+                if ($(event.target).is('button.map-drop-btn') ||
+                    $(event.target).is('button.map-drop-btn i')) {
                     return;
                 } else {
                     var dropdowns = $mapSelectionDropDown;
@@ -811,6 +829,14 @@ const leafletMap = (services) => {
             return true;
         }
         return false;
+    }
+
+    const isIE = () => {
+        let ua = navigator.userAgent;
+        /* MSIE used to detect old browsers and Trident used to newer ones*/
+        var is_ie = ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1;
+
+        return is_ie;
     }
 
     eventEmitter.listenAll({
