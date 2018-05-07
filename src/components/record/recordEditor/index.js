@@ -463,7 +463,7 @@ const recordEditorService = services => {
                 let suggestedValuesCollection = options.recordCollection.getFieldSuggestedValues(); //{};
 
                 if (!_.isEmpty(suggestedValuesCollection[fieldIndex])) {
-                    var selectElement = $('<select><option selected disabled>Suggested values</option> </select>');
+                    var selectElement = $('<select><option selected disabled>' + localeService.t("suggested_values") + '</option> </select>');
                     var selectIdValue = "idSelectSuggestedValues_" + fieldIndex;
                     selectElement.attr('id', selectIdValue);
 
