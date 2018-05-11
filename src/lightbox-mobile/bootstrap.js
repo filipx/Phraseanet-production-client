@@ -3,8 +3,8 @@ import ConfigService from './../components/core/configService';
 import LocaleService from '../components/locale';
 import defaultConfig from './config';
 import Emitter from '../components/core/emitter';
-import lightbox from './../components/lightbox/index';
-import mainMenu from './../components/mainMenu';
+// import lightbox from './../components/lightbox/index';
+// import mainMenu from './../components/mainMenu';
 import merge from 'lodash.merge';
 require('phraseanet-common/src/components/tooltip');
 require('phraseanet-common/src/components/vendors/contextMenu');
@@ -53,19 +53,19 @@ class Bootstrap {
          */
 
         $(document).ready(() => {
-            let $body = $('body');
-            window.bodySize.y = $body.height();
-            window.bodySize.x = $body.width();
-
-            this.appLightbox = lightbox(this.appServices);
-            this.appLightbox.initialize({$container: $body});
-            mainMenu(this.appServices).initialize({$container: $body});
+            // let $body = $('body');
+            // window.bodySize.y = $body.height();
+            // window.bodySize.x = $body.width();
+            //
+            // this.appLightbox = lightbox(this.appServices);
+            // this.appLightbox.initialize({$container: $body});
+            //mainMenu(this.appServices).initialize({$container: $body});
             this.mobileValidator();
-            this.isReleasable = this.configService.get('releasable');
-
-            if (this.isReleasable !== null) {
-                this.appLightbox.setReleasable(this.isReleasable);
-            }
+            // this.isReleasable = this.configService.get('releasable');
+            //
+            // if (this.isReleasable !== null) {
+            //     this.appLightbox.setReleasable(this.isReleasable);
+            // }
         });
 
     }
@@ -104,7 +104,7 @@ class Bootstrap {
                     }
                     if (!data.error) {
                         this.isReleasable = false;
-                        this.appLightbox.setReleasable(this.isReleasable);
+                        //this.appLightbox.setReleasable(this.isReleasable);
                     }
 
                     return;
@@ -149,7 +149,7 @@ class Bootstrap {
                             return;
                         }
                         this.isReleasable = datas.release;
-                        this.appLightbox.setReleasable(this.isReleasable);
+                        //this.appLightbox.setReleasable(this.isReleasable);
                     } else {
                         alert(datas.datas);
                     }
