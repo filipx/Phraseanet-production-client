@@ -459,6 +459,55 @@ const recordEditorService = services => {
                       '<span style="font-weight:bold;font-size:16px;"> * </span>'
                     : field.label;
                 $('#idFieldNameEdit', options.$container).html(name);
+
+                let suggestedValuesCollection = options.recordCollection.getFieldSuggestedValues(); //{};
+
+                if (!_.isEmpty(suggestedValuesCollection[fieldIndex])) {
+                    var selectElement = $('<select><option selected disabled>' + localeService.t("suggested_values") + '</option> </select>');
+                    var selectIdValue = "idSelectSuggestedValues_" + fieldIndex;
+                    selectElement.attr('id', selectIdValue);
+
+                    $.each(suggestedValuesCollection[fieldIndex], function (key, value) {
+                        var optionElement = $("<option></option>");
+                        optionElement.attr("value", key);
+                        optionElement.text(key);
+                        selectElement.append(optionElement);
+                    });
+
+                    selectElement.on('change', function (e) {
+                        if (field.multi === true) {
+                            $editMultiValTextArea.val($(this).val());
+                            $editMultiValTextArea.trigger('keyup.maxLength');
+                            addValueInMultivaluedField({
+                                value: $editMultiValTextArea.val()
+                            });
+                        } else {
+                            if (appCommons.utilsModule.is_ctrl_key(e)) {
+                                var t = $editTextArea.val();
+                                $editTextArea.val(t + (t ? ' ; ' : '') + $(this).val());
+                            } else {
+                                $editTextArea.val($(this).val());
+                            }
+                            $editTextArea.trigger('keyup.maxLength');
+                            options.textareaIsDirty = true;
+                            if (field._status !== 2) {
+                                validateFieldChanges(evt, 'ask_ok');
+                            }
+                        }
+                    });
+
+                    $('#idFieldSuggestedValues', options.$container).empty().append(selectElement);
+
+                    $('#idFieldSuggestedValues', options.$container).css('visibility', 'visible');
+                    $('.edit-zone-title', options.$container).css('height', 80);
+                    $('#EDIT_EDIT', options.$container).css('top', 80);
+
+                } else {
+                    $('#idFieldSuggestedValues', options.$container).css('visibility', 'hidden');
+                    $('.edit-zone-title', options.$container).css('height', 45);
+                    $('#EDIT_EDIT', options.$container).css('top', 45);
+                }
+
                 // attachFieldVocabularyAutocomplete
                 $($editTextArea, $editMultiValTextArea).autocomplete({
                     minLength: 2,
@@ -655,74 +704,6 @@ const recordEditorService = services => {
                 $('.somestatus, .displaystatus', status_box).show();
             }
         }
-
-        // calcul des valeurs suggerees COMMUNES aux records (collections) selectionnes //
-        // tous les champs de la base
-
-        /**
-         * Handle common suggested value context menu for a selected field for 1 or n record
-         */
-        let suggestedValuesCollection = options.recordCollection.getFieldSuggestedValues(); //{};
-
-        for (let f in suggestedValuesCollection) {
-            let contextMenu = [];
-            let $contextMenu = $('#editSGtri_' + f, options.$container);
-
-            for (let sv in suggestedValuesCollection[f]) {
-                // if (predefinedMultivaluesCollection[f][sv] === ncolsel) {
-                contextMenu.push({
-                    label: sv,
-                    onclick: function (menuItem, menu, e, label) {
-                        let currentField = options.fieldCollection.getActiveField();
-
-                        if (currentField.multi === true) {
-                            $editMultiValTextArea.val(label);
-                            $editMultiValTextArea.trigger('keyup.maxLength');
-                            addValueInMultivaluedField({
-                                value: $editMultiValTextArea.val()
-                            });
-                        } else {
-                            if (appCommons.utilsModule.is_ctrl_key(e)) {
-                                var t = $editTextArea.val();
-                                $editTextArea.val(t + (t ? ' ; ' : '') + label);
-                            } else {
-                                $editTextArea.val(label);
-                            }
-                            $editTextArea.trigger('keyup.maxLength');
-                            options.textareaIsDirty = true;
-                            if (currentField._status !== 2) {
-                                validateFieldChanges(evt, 'ask_ok');
-                            }
-                        }
-                    }
-                });
-                //}
-            }
-            if (contextMenu.length > 0) {
-                $contextMenu.css('visibility', 'visible');
-                $contextMenu.unbind();
-                $contextMenu.contextMenu(contextMenu, {
-                    theme: 'vista',
-                    openEvt: 'click',
-                    beforeShow: function (a, b, c, d) {
-                        var fid = this.target.getAttribute('id').substr(10);
-                        if (
-                            !options.textareaIsDirty ||
-                            validateFieldChanges(null, 'ask_ok') === true
-                        ) {
-                            onSelectField(null, fid);
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                });
-            } else {
-                $contextMenu.css('visibility', 'hidden');
-            }
-        }
-
-        // $('#idFrameE .ww_status', editor.$container).html(nrecsel + " record(s) selected for editing");
 
         populateFields();
         let fieldIndex = options.fieldCollection.getActiveFieldIndex();
