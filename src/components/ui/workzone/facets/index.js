@@ -81,6 +81,8 @@ const workzoneFacets = services => {
             treeSource = _shouldFilterSingleContent(treeSource);
         }
 
+        treeSource = _parseColors(treeSource);
+
         return _getFacetsTree().reload(treeSource)
             .done(function () {
                 _.each($('#proposals').find('.fancytree-expanded'), function (element) {
@@ -88,6 +90,35 @@ const workzoneFacets = services => {
                 });
             });
     };
+
+    function _parseColors(source) {
+        _.forEach(source, function (facet) {
+            if (!_.isUndefined(facet.children) && (facet.children.length > 0)) {
+                _.forEach(facet.children, function (child) {
+                    var title = child.title;
+                    child.title = _formatColorText(title);
+                });
+            }
+        });
+        return source;
+    }
+
+    function _formatColorText(string) {
+        //get color code from text if exist
+        var regexp = /^(.*)\[#([0-9a-fA-F]{6})] (.*)$/;
+
+
+        var match = string.match(regexp);
+        if (match && match[2] != null) {
+            var colorCode = '#' + match[2];
+            // //add color circle and re move color code from text;
+            var textWithoutColorCode = string.replace('[' + colorCode + ']', '');
+            return '<span class="color-dot" style="background-color: ' + colorCode + '"></span>' + ' ' + textWithoutColorCode;
+        }
+
+        return string;
+    }
+
 
     // from stackoverflow
     // http://stackoverflow.com/questions/979256/sorting-an-array-of-javascript-objects/979325#979325
