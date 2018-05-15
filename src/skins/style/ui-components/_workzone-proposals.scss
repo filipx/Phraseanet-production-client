@@ -76,11 +76,25 @@ $proposalsFacetHoverColor: #FFF !default;
     }
     .fancytree-title {
       font-size: $xmediumFontSize;
-      margin-left: 10px;
+        margin-left: 16px;
       float: left;
       width: 30%;
       line-height: 49px;
     }
+      .mask-facets-btn {
+          position: absolute;
+          display: none;
+          height: 50px;
+          width: 15px;
+          a {
+              position: absolute;
+              cursor: pointer;
+              background: url(/assets/common/images/icons/bgd_facetFilter.png) 0px 5px no-repeat;
+              height: 24px;
+              width: 14px;
+              top: 13px;
+          }
+      }
     &:hover {
       border-left: 4px solid $proposalColor;
       color: $proposalsTitleHoverColor;

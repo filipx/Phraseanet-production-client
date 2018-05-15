@@ -286,6 +286,10 @@ const searchAdvancedForm = (services) => {
         }
     };
 
+    const saveHiddenFacetsList = (hiddenFacetsList) => {
+        user.setPref('hiddenFacetsList', JSON.stringify(hiddenFacetsList));
+    }
+
     // @TODO seem to be never used
     const resetSearch = () => {
         var container = $('#ADVSRCH_OPTIONS_ZONE');
@@ -310,6 +314,7 @@ const searchAdvancedForm = (services) => {
         'search.doSelectDatabase': selectDatabase,
         'search.activateDatabase': (params) => activateDatabase(params.databases),
         'search.doToggleCollection': toggleCollection,
+        'search.saveHiddenFacetsList': saveHiddenFacetsList
     })
     return {initialize};
 };

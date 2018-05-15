@@ -22,6 +22,8 @@ const workzoneFacets = services => {
 
     let selectedFacetValues = [];
     let facetStatus = $.parseJSON(sessionStorage.getItem('facetStatus')) || [];
+    let hiddenFacetsList = [];
+
 
     /*var getSelectedFacets = function() {
      return selectedFacetValues;
@@ -34,6 +36,7 @@ const workzoneFacets = services => {
 
 
     var loadFacets = function (data) {
+        hiddenFacetsList = data.hiddenFacetsList;
 
         function sortIteration(i) {
             switch(data.facetValueOrder) {
@@ -79,6 +82,10 @@ const workzoneFacets = services => {
 
         if(data.filterFacet == true) {
             treeSource = _shouldFilterSingleContent(treeSource);
+        }
+
+        if (hiddenFacetsList.length > 0) {
+            treeSource = _shouldMaskNodes(treeSource, hiddenFacetsList);
         }
 
         treeSource = _parseColors(treeSource);
@@ -132,6 +139,21 @@ const workzoneFacets = services => {
             let B = key(b);
             return (A < B ? -1 : A > B ? 1 : 0) * [-1, 1][+!!reverse];
         };
+    }
+
+    function _shouldMaskNodes(source, facetsList) {
+        let filteredSource = source.slice();
+        _.each(facetsList, function (facetsValue, index) {
+            for (let i = filteredSource.length - 1; i > -1; --i) {
+                let facet = filteredSource[i];
+                if (facet['name'] !== undefined) {
+                    if (facet['name'] === facetsValue.name) {
+                        filteredSource.splice(i, 1);
+                    }
+                }
+            }
+        });
+        return filteredSource;
     }
 
     function _shouldFilterSingleContent(source) {
@@ -225,6 +247,39 @@ const workzoneFacets = services => {
                 },
                 renderNode: function (event, data) {
                     var facetFilter = "";
+                    var node = data.node;
+                    var $nodeSpan = $(node.span);
+
+                    // check if span of node already rendered
+                    if (!$nodeSpan.data('rendered')) {
+
+                        var deleteButton = $('<div class="mask-facets-btn"><a></a></div>');
+
+                        $nodeSpan.append(deleteButton);
+
+                        deleteButton.hide();
+
+                        $nodeSpan.hover(function () {
+                            // mouse over
+                            deleteButton.show();
+
+                        }, function () {
+
+                            // mouse out
+                            deleteButton.hide();
+                        });
+
+                        deleteButton.click(function () {
+                            var nodeObj = {name: node.data.name, title: node.title};
+                            hiddenFacetsList.push(nodeObj);
+                            node.remove();
+                            appEvents.emit('search.saveHiddenFacetsList', hiddenFacetsList);
+                        });
+
+                        // span rendered
+                        $nodeSpan.data('rendered', true);
+                    }
+
                     if (data.node.folder && !_.isUndefined(selectedFacetValues[data.node.title])) {
                         if ($(".fancytree-folder", data.node.li).find('.dataNode').length == 0) {
                             var dataNode = document.createElement('div');
@@ -236,6 +291,7 @@ const workzoneFacets = services => {
                             //remove existing facets
                             $(".dataNode", data.node.li).empty();
                         }
+
                         _.each(selectedFacetValues[data.node.title], function (facetValue) {
 
                             facetFilter = facetValue.value.label;
