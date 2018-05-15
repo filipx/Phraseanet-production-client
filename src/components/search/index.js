@@ -365,6 +365,11 @@ const search = services => {
             facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val(),
             hiddenFacetsList: savedHiddenFacetsList
         });
+    };
+
+    const reloadHiddenFacetList = (hiddenFacetsList) => {
+        savedHiddenFacetsList = hiddenFacetsList;
+        updateHiddenFacetsListInPrefsScreen();
     }
 
     appEvents.listenAll({
@@ -374,6 +379,7 @@ const search = services => {
         'search.doClearSearch': clearAnswers,
         'search.doNavigate': navigate,
         'search.updateFacetData': updateFacetData,
+        'search.reloadHiddenFacetList': reloadHiddenFacetList
     });
 
     return { initialize, getResultSelectionStream, getResultNavigationStream };

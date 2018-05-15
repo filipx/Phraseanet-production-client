@@ -274,6 +274,7 @@ const workzoneFacets = services => {
                             hiddenFacetsList.push(nodeObj);
                             node.remove();
                             appEvents.emit('search.saveHiddenFacetsList', hiddenFacetsList);
+                            appEvents.emit('search.reloadHiddenFacetList', hiddenFacetsList);
                         });
 
                         // span rendered
@@ -412,7 +413,7 @@ const workzoneFacets = services => {
 
     appEvents.listenAll({
         'facets.doLoadFacets': loadFacets,
-        'facets.doResetSelectedFacets': resetSelectedFacets
+        'facets.doResetSelectedFacets': resetSelectedFacets,
     });
 
     return {
