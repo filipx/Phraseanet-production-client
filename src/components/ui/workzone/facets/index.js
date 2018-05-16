@@ -94,6 +94,7 @@ const workzoneFacets = services => {
             .done(function () {
                 _.each($('#proposals').find('.fancytree-expanded'), function (element) {
                     $(element).find('.fancytree-title, .fancytree-expander').css('line-height', $(element)[0].offsetHeight + 'px');
+                    $(element).find('.mask-facets-btn, .fancytree-expander').css('height', $(element)[0].offsetHeight + 'px');
                 });
             });
     };
