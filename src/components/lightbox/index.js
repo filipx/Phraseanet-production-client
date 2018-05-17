@@ -345,6 +345,10 @@ const lightbox = services => {
                     .append(data.selector_html)
                     .append(data.note_html);
 
+                if ($('.lightbox_container', container).hasClass('note_editing')) {
+                    $('.lightbox_container', container).removeClass('note_editing');
+                }
+
                 if ($template.hasClass('documentTips')) {
                     activeThumbnailFrame = new pym.Parent(customId, src);
                     activeThumbnailFrame.iframe.setAttribute(
