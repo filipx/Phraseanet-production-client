@@ -76,11 +76,29 @@ $proposalsFacetHoverColor: #FFF !default;
     }
     .fancytree-title {
       font-size: $xmediumFontSize;
-      margin-left: 10px;
+        margin-left: 16px;
       float: left;
       width: 30%;
       line-height: 49px;
     }
+      .mask-facets-btn {
+          position: absolute;
+          display: none;
+          height: 50px;
+          width: 15px;
+          a {
+              position: absolute;
+              cursor: pointer;
+              background: url(/assets/common/images/icons/bgd_facetFilter.png) 0px 5px no-repeat;
+              height: 25px;
+              width: 14px;
+              top: 0;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              margin: auto;
+          }
+      }
     &:hover {
       border-left: 4px solid $proposalColor;
       color: $proposalsTitleHoverColor;
@@ -183,6 +201,12 @@ $proposalsFacetHoverColor: #FFF !default;
     margin-right: 10px;
     //margin-top: 11px;
     overflow: hidden;
+      .buttons-span {
+          background-color: $proposalColor_AND;
+      }
+      .facetFilter-inverse {
+          background: url('#{$iconsPath}inverse-negative.png') 10px 2px no-repeat;
+      }
   }
 
   .facetFilter_EXCEPT {
@@ -204,6 +228,12 @@ $proposalsFacetHoverColor: #FFF !default;
     float: right;
     margin-right: 10px;
     overflow: hidden;
+      .buttons-span {
+          background-color: $proposalColor_EXCEPT;
+      }
+      .facetFilter-inverse {
+          background: url('#{$iconsPath}inverse-positive.png') 10px 2px no-repeat;
+      }
   }
 
   .facetFilter-label {
@@ -220,12 +250,32 @@ $proposalsFacetHoverColor: #FFF !default;
     right: 0;
   }
 
+    .buttons-span {
+        position: absolute;
+        top: 2px;
+        bottom: 2px;
+        left: 0;
+        right: 0;
+        margin: 0;
+        display: none;
+    }
+
   .facetFilter-closer {
     position: absolute;
-    right: 13px;
+      right: 4px;
     cursor: pointer;
-    background: url('#{$iconsPath}bgd_facetFilter.png') 0 5px no-repeat;
-    height: 25px;
-    width: 14px;
+      background: url('#{$iconsPath}bgd_facetFilter.png') 12px 4px no-repeat;
+      height: 21px;
+      width: 37px;
+      border-left: 1px solid #FFF;
   }
+
+    .facetFilter-inverse {
+        position: absolute;
+        right: 42px;
+        cursor: pointer;
+        height: 21px;
+        width: 37px;
+        border-left: 1px solid #FFF;
+    }
 }

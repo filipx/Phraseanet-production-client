@@ -29,6 +29,8 @@ const search = services => {
     let resultInfoView;
     let facets = null;
     var lastFilterResults = [];
+    let savedHiddenFacetsList = configService.get('savedHiddenFacetsList') ? JSON.parse(configService.get('savedHiddenFacetsList')) : [];
+
 
     const initialize = () => {
         $searchForm = $('#searchForm');
@@ -163,7 +165,8 @@ const search = services => {
                         facets: lastFilterResults,
                         filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
                         facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
-                        facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val()
+                        facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val(),
+                        hiddenFacetsList: savedHiddenFacetsList
                     });
                 } else {
                     lastFilterResults = datas.facets;
@@ -171,7 +174,8 @@ const search = services => {
                         facets: datas.facets,
                         filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
                         facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
-                        facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val()
+                        facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val(),
+                        hiddenFacetsList: savedHiddenFacetsList
                     });
                 }
 
@@ -220,9 +224,36 @@ const search = services => {
                     $('#PREV_PAGE').unbind('click');
                 }
 
+                updateHiddenFacetsListInPrefsScreen();
+
                 afterSearch();
             }
         });
+    };
+
+    const updateHiddenFacetsListInPrefsScreen = () => {
+        const $hiddenFacetsContainer = $('#look_box_settings').find('.hiddenFiltersListContainer');
+        if (savedHiddenFacetsList.length > 0) {
+            $hiddenFacetsContainer.empty();
+            _.each(savedHiddenFacetsList, function (value) {
+                var $html = $('<span class="facetFilter" data-name="' + value.name + '"><span class="facetFilter-label" title="'
+                    + value.title + '">' + value.title
+                    + '<span class="facetFilter-gradient">&nbsp;</span></span><a class="remove-btn"></a></span>');
+
+                $hiddenFacetsContainer.append($html);
+
+                $('.remove-btn').on('click', function () {
+                    let name = $(this).parent().data("name");
+                    savedHiddenFacetsList = _.reject(savedHiddenFacetsList, function (obj) {
+                        return (obj.name == name);
+                    });
+                    $(this).parent().remove();
+                    appEvents.emit('search.saveHiddenFacetsList', savedHiddenFacetsList);
+                    updateFacetData();
+                });
+            });
+        }
+
     };
 
     const beforeSearch = () => {
@@ -331,8 +362,14 @@ const search = services => {
             facets: facets,
             filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
             facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
-            facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val()
+            facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val(),
+            hiddenFacetsList: savedHiddenFacetsList
         });
+    };
+
+    const reloadHiddenFacetList = (hiddenFacetsList) => {
+        savedHiddenFacetsList = hiddenFacetsList;
+        updateHiddenFacetsListInPrefsScreen();
     }
 
     appEvents.listenAll({
@@ -342,6 +379,7 @@ const search = services => {
         'search.doClearSearch': clearAnswers,
         'search.doNavigate': navigate,
         'search.updateFacetData': updateFacetData,
+        'search.reloadHiddenFacetList': reloadHiddenFacetList
     });
 
     return { initialize, getResultSelectionStream, getResultNavigationStream };

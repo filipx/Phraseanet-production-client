@@ -22,6 +22,8 @@ const workzoneFacets = services => {
 
     let selectedFacetValues = [];
     let facetStatus = $.parseJSON(sessionStorage.getItem('facetStatus')) || [];
+    let hiddenFacetsList = [];
+
 
     /*var getSelectedFacets = function() {
      return selectedFacetValues;
@@ -34,6 +36,7 @@ const workzoneFacets = services => {
 
 
     var loadFacets = function (data) {
+        hiddenFacetsList = data.hiddenFacetsList;
 
         function sortIteration(i) {
             switch(data.facetValueOrder) {
@@ -81,12 +84,17 @@ const workzoneFacets = services => {
             treeSource = _shouldFilterSingleContent(treeSource);
         }
 
+        if (hiddenFacetsList.length > 0) {
+            treeSource = _shouldMaskNodes(treeSource, hiddenFacetsList);
+        }
+
         treeSource = _parseColors(treeSource);
 
         return _getFacetsTree().reload(treeSource)
             .done(function () {
                 _.each($('#proposals').find('.fancytree-expanded'), function (element) {
                     $(element).find('.fancytree-title, .fancytree-expander').css('line-height', $(element)[0].offsetHeight + 'px');
+                    $(element).find('.mask-facets-btn, .fancytree-expander').css('height', $(element)[0].offsetHeight + 'px');
                 });
             });
     };
@@ -132,6 +140,21 @@ const workzoneFacets = services => {
             let B = key(b);
             return (A < B ? -1 : A > B ? 1 : 0) * [-1, 1][+!!reverse];
         };
+    }
+
+    function _shouldMaskNodes(source, facetsList) {
+        let filteredSource = source.slice();
+        _.each(facetsList, function (facetsValue, index) {
+            for (let i = filteredSource.length - 1; i > -1; --i) {
+                let facet = filteredSource[i];
+                if (facet['name'] !== undefined) {
+                    if (facet['name'] === facetsValue.name) {
+                        filteredSource.splice(i, 1);
+                    }
+                }
+            }
+        });
+        return filteredSource;
     }
 
     function _shouldFilterSingleContent(source) {
@@ -225,78 +248,104 @@ const workzoneFacets = services => {
                 },
                 renderNode: function (event, data) {
                     var facetFilter = "";
-                    if (data.node.folder && !_.isUndefined(selectedFacetValues[data.node.title])) {
-                        if ($(".fancytree-folder", data.node.li).find('.dataNode').length == 0) {
-                            var dataNode = document.createElement('div');
-                            dataNode.setAttribute("class", "dataNode");
-                            $(".fancytree-folder", data.node.li).append(
-                                dataNode
-                            );
-                        } else {
-                            //remove existing facets
-                            $(".dataNode", data.node.li).empty();
-                        }
-                        _.each(selectedFacetValues[data.node.title], function (facetValue) {
+                    var node = data.node;
+                    var $nodeSpan = $(node.span);
 
-                            facetFilter = facetValue.value.label;
+                    // check if span of node already rendered
+                    if (!$nodeSpan.data('rendered')) {
+                        var deleteButton = $('<div class="mask-facets-btn"><a></a></div>');
+                        $nodeSpan.append(deleteButton);
+                        deleteButton.hide();
 
-                            var s_label = document.createElement("SPAN");
-                            s_label.setAttribute("class", "facetFilter-label");
-                            s_label.setAttribute("title", facetFilter);
+                        $nodeSpan.hover(function () {
+                            deleteButton.show();
+                        }, function () {
+                            deleteButton.hide();
+                        });
 
-                            var length = 15;
-                            var facetFilterString = facetFilter;
-                            if (facetFilterString.length > length) {
-                                facetFilterString = facetFilterString.substring(0, length) + '…';
+                        deleteButton.click(function () {
+                            var nodeObj = {name: node.data.name, title: node.title};
+                            hiddenFacetsList.push(nodeObj);
+                            node.remove();
+                            appEvents.emit('search.saveHiddenFacetsList', hiddenFacetsList);
+                            appEvents.emit('search.reloadHiddenFacetList', hiddenFacetsList);
+                        });
+
+                        // span rendered
+                        $nodeSpan.data('rendered', true);
+
+                        if (data.node.folder && !_.isUndefined(selectedFacetValues[data.node.title])) {
+                            if ($(".fancytree-folder", data.node.li).find('.dataNode').length == 0) {
+                                var dataNode = document.createElement('div');
+                                dataNode.setAttribute("class", "dataNode");
+                                $(".fancytree-folder", data.node.li).append(
+                                    dataNode
+                                );
+                            } else {
+                                //remove existing facets
+                                $(".dataNode", data.node.li).empty();
                             }
-                            s_label.appendChild(document.createTextNode(facetFilterString));
 
-                            var s_closer = document.createElement("A");
-                            s_closer.setAttribute("class", "facetFilter-closer");
+                            _.each(selectedFacetValues[data.node.title], function (facetValue) {
 
-                            var s_gradient = document.createElement("SPAN");
-                            s_gradient.setAttribute("class", "facetFilter-gradient");
-                            s_gradient.appendChild(document.createTextNode("\u00A0"));
+                                facetFilter = facetValue.value.label;
 
-                            s_label.appendChild(s_gradient);
+                                var s_label = document.createElement("SPAN");
+                                s_label.setAttribute("class", "facetFilter-label");
+                                s_label.setAttribute("title", facetFilter);
 
-                            var s_facet = document.createElement("SPAN");
-                            s_facet.setAttribute("class", "facetFilter" + '_' + facetValue.mode);
-                            s_facet.appendChild(s_label);
-                            s_closer = $(s_facet.appendChild(s_closer));
-
-                            s_closer.click(
-                                function (event) {
-                                    event.stopPropagation();
-                                    var facetTitle = $(this).parent().data("facetTitle");
-                                    var facetFilter = $(this).parent().data("facetFilter");
-                                    var mode = $(this).parent().hasClass("facetFilter_EXCEPT") ? "EXCEPT" : "AND";
-                                    selectedFacetValues[facetTitle] = _.reject(selectedFacetValues[facetTitle], function (obj) {
-                                        return (obj.value.label == facetFilter && obj.mode == mode);
-                                    });
-                                    //delete selectedFacetValues[facetTitle];
-                                    _facetCombinedSearch();
-                                    return false;
+                                var length = 15;
+                                var facetFilterString = facetFilter;
+                                if (facetFilterString.length > length) {
+                                    facetFilterString = facetFilterString.substring(0, length) + '…';
                                 }
-                            );
+                                s_label.appendChild(document.createTextNode(facetFilterString));
 
-                            var newNode = document.createElement('div');
-                            newNode.setAttribute("class", "newNode");
-                            s_facet = $(newNode.appendChild(s_facet));
-                            s_facet.data("facetTitle", data.node.title);
-                            s_facet.data("facetFilter", facetFilter);
+                                var buttonsSpan = document.createElement("SPAN");
+                                buttonsSpan.setAttribute("class", "buttons-span");
 
-                            $(".fancytree-folder .dataNode", data.node.li).append(
-                                newNode
-                            );
+                                var s_inverse = document.createElement("A");
+                                s_inverse.setAttribute("class", "facetFilter-inverse");
 
-                            s_facet.click(
-                                function (event) {
-                                    if (event.altKey) {
+                                var s_closer = document.createElement("A");
+                                s_closer.setAttribute("class", "facetFilter-closer");
+
+                                var s_gradient = document.createElement("SPAN");
+                                s_gradient.setAttribute("class", "facetFilter-gradient");
+                                s_gradient.appendChild(document.createTextNode("\u00A0"));
+
+                                s_label.appendChild(s_gradient);
+
+                                var s_facet = document.createElement("SPAN");
+                                s_facet.setAttribute("class", "facetFilter" + '_' + facetValue.mode);
+                                s_facet.appendChild(s_label);
+                                s_facet.appendChild(buttonsSpan);
+                                buttonsSpan.appendChild(s_inverse);
+                                buttonsSpan.appendChild(s_closer);
+
+                                $(s_closer).on('click',
+                                    function (event) {
                                         event.stopPropagation();
-                                        var facetTitle = $(this).data("facetTitle");
-                                        var facetFilter = $(this).data("facetFilter");
-                                        var mode = $(this).hasClass("facetFilter_EXCEPT") ? "EXCEPT" : "AND";
+                                        var $facet = $(this).parent().parent();
+                                        var facetTitle = $facet.data("facetTitle");
+                                        var facetFilter = $facet.data("facetFilter");
+                                        var mode = $facet.hasClass("facetFilter_EXCEPT") ? "EXCEPT" : "AND";
+                                        selectedFacetValues[facetTitle] = _.reject(selectedFacetValues[facetTitle], function (obj) {
+                                            return (obj.value.label == facetFilter && obj.mode == mode);
+                                        });
+                                        //delete selectedFacetValues[facetTitle];
+                                        _facetCombinedSearch();
+                                        return false;
+                                    }
+                                );
+
+                                $(s_inverse).on('click',
+                                    function (event) {
+                                        event.stopPropagation();
+                                        var $facet = $(this).parent().parent();
+                                        var facetTitle = $facet.data("facetTitle");
+                                        var facetFilter = $facet.data("facetFilter");
+                                        var mode = $facet.hasClass("facetFilter_EXCEPT") ? "EXCEPT" : "AND";
                                         var found = _.find(selectedFacetValues[facetTitle], function (obj) {
                                             return (obj.value.label == facetFilter && obj.mode == mode);
                                         });
@@ -304,14 +353,30 @@ const workzoneFacets = services => {
                                             var newMode = mode == "EXCEPT" ? "AND" : "EXCEPT";
                                             found.mode = newMode;
                                             //replace class attr
-                                            $(this).filter('.' + "facetFilter" + '_' + mode).removeClass("facetFilter" + '_' + mode).addClass("facetFilter" + '_' + newMode).end();
+                                            $facet.filter('.' + "facetFilter" + '_' + mode).removeClass("facetFilter" + '_' + mode).addClass("facetFilter" + '_' + newMode).end();
                                             _facetCombinedSearch();
                                         }
+                                        return false;
                                     }
-                                    return false;
-                                }
-                            );
-                        });
+                                );
+
+                                var newNode = document.createElement('div');
+                                newNode.setAttribute("class", "newNode");
+                                s_facet = $(newNode.appendChild(s_facet));
+                                s_facet.data("facetTitle", data.node.title);
+                                s_facet.data("facetFilter", facetFilter);
+
+                                s_facet.hover(function () {
+                                    $(buttonsSpan).show();
+                                }, function () {
+                                    $(buttonsSpan).hide();
+                                });
+
+                                $(".fancytree-folder .dataNode", data.node.li).append(
+                                    newNode
+                                );
+                            });
+                        }
                     }
                 }
             });
@@ -356,7 +421,7 @@ const workzoneFacets = services => {
 
     appEvents.listenAll({
         'facets.doLoadFacets': loadFacets,
-        'facets.doResetSelectedFacets': resetSelectedFacets
+        'facets.doResetSelectedFacets': resetSelectedFacets,
     });
 
     return {
