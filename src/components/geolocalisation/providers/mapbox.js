@@ -42,6 +42,21 @@ const leafletMap = (services) => {
     let labelLayerId;
     let mapboxGLDefaultPosition;
     let shapesWebGl = {};
+    let MapboxCircle;
+    let mapboxCircleCollection = [];
+    let shouldDrawCircle = false;
+    let shouldRemoveCircle = false;
+    let turf = null;
+    let editableCircleOpts = {
+        editable: true,
+        minRadius: 10,
+        fillColor: '#000000',
+        fillOpacity: 0.05,
+        strokeColor: '#0000ff',
+        strokeOpacity: 0.25,
+        strokeWeight: 2,
+        debugEl: document.getElementById('debug')
+    };
 
     //let markerMapboxGl = {};
     const initialize = (options) => {
@@ -124,6 +139,8 @@ const leafletMap = (services) => {
             mapboxgl = require('mapbox-gl');
             let MapboxClient = require('mapbox');
             let MapboxLanguage = require('@mapbox/mapbox-gl-language');
+            MapboxCircle = require('mapbox-gl-circle');
+            turf = require('@turf/turf');
 
             $container.empty().append(`<div id="${mapUID}" class="phrasea-popup" style="width: 100%;height:100%; position: absolute;top:0;left:0"></div>`);
 
@@ -208,9 +225,18 @@ const leafletMap = (services) => {
                     $('.map_search_dialog .ui-dialog-titlebar-close').on('click', function (event) {
                         event.preventDefault();
                         $('#EDIT_query').val('');
-                        eventEmitter.emit('shapeRemoved', {shapes: {}, drawnItems: {}});
+                        //eventEmitter.emit('shapeRemoved', {shapes: {}, drawnItems: {}});
+                        eventEmitter.emit('updateCircleGeo', {shapes: [], drawnItems: []});
                         eventEmitter.emit('updateSearchValue');
+                        removeCircleIfExist();
                     });
+
+                    $('.submit-geo-search-action').on('click', function (event) {
+                        removeCircleIfExist();
+                    });
+
+                    addCircleDrawControl();
+                    addCircleGeoDrawing(drawnItems);
 
                 } else {
                     map.addControl(new mapboxgl.NavigationControl());
@@ -250,17 +276,21 @@ const leafletMap = (services) => {
                         addMarkersLayersGL(geojson);
                         refreshMarkers(pois);
                     } else {
+                        map.flyTo({
+                            center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom,
+                            ...activeProvider.transitionOptions
+                        });
                         //if bounds exist, move to bounds
-                        if (!_.isEmpty(drawnItems)) {
-                            map.fitBounds(drawnItems[0].originalBounds);
-                        } else {
-                            map.flyTo({
-                                center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom,
-                                ...activeProvider.transitionOptions
-                            });
-                        }
+                        // if (!_.isEmpty(drawnItems)) {
+                        //     map.fitBounds(drawnItems[0].originalBounds);
+                        // } else {
+                        //     map.flyTo({
+                        //         center: mapboxGLDefaultPosition, zoom: activeProvider.defaultZoom,
+                        //         ...activeProvider.transitionOptions
+                        //     });
+                        // }
 
-                        map.on('moveend', calculateBounds).on('zoomend', calculateBounds);
+                        //map.on('moveend', calculateBounds).on('zoomend', calculateBounds);
                     }
                 });
             }
@@ -274,8 +304,27 @@ const leafletMap = (services) => {
                 }
             });
 
+            map.on('remove', function () {
+                console.log('remove');
+            });
+
         });
     };
+
+    const removeCircleIfExist = () => {
+        if (mapboxCircleCollection.length > 0) {
+            _.each(mapboxCircleCollection, function (circleObj) {
+                circleObj.remove();
+            });
+        }
+    }
+
+    const boundsTo5percentRadius = (bounds) => {
+        // noinspection JSUnresolvedVariable
+        // noinspection JSCheckFunctionSignatures
+        return Math.round(
+            turf.distance(bounds.getSouthWest().toArray(), bounds.getNorthEast().toArray(), {units: 'meters'}) * .05);
+    }
 
     const calculateBounds = () => {
         //get visible bounds of map
@@ -300,6 +349,85 @@ const leafletMap = (services) => {
             var LngLat = [sw, nw, ne, se];
             return LngLat;
         }
+    }
+
+    const addCircleDrawControl = () => {
+        let controlContainerList = $('.mapboxgl-control-container');
+        let $circleControlContainer = $('<div class="circle-control-container"></div>');
+        controlContainerList.append($circleControlContainer);
+        let $toggleDrawCircleButton = $('<button class="draw-icon" id="map-circle-draw-btn"><i class="fa fa-plus-square" aria-hidden="true"></i></button>');
+        let $toggleRemoveCircleButton = $('<button class="draw-icon" id="map-circle-remove-btn"><i class="fa fa-trash" aria-hidden="true"></i></button>');
+        $circleControlContainer.empty().append($toggleDrawCircleButton).append($toggleRemoveCircleButton);
+
+        $toggleDrawCircleButton.on('click', function (event) {
+            $(this).toggleClass('selected');
+            shouldDrawCircle = !shouldDrawCircle;
+            if (shouldDrawCircle) {
+                if ($('#map-circle-remove-btn').hasClass('selected')) {
+                    $('#map-circle-remove-btn').removeClass('selected');
+                    shouldRemoveCircle = !shouldRemoveCircle;
+                }
+            }
+        });
+
+        $toggleRemoveCircleButton.on('click', function (event) {
+            $(this).toggleClass('selected');
+            shouldRemoveCircle = !shouldRemoveCircle;
+            if (shouldRemoveCircle) {
+                if ($('#map-circle-draw-btn').hasClass('selected')) {
+                    $('#map-circle-draw-btn').removeClass('selected');
+                    shouldDrawCircle = !shouldDrawCircle;
+                }
+            }
+        });
+
+        map.on('click', function (e) {
+            if (shouldDrawCircle) {
+                addCircle(e.lngLat, boundsTo5percentRadius(map.getBounds()));
+            }
+        });
+    }
+
+    const addCircleGeoDrawing = (drawnItems) => {
+        _.map(drawnItems, function (items) {
+            var lngLat = {};
+            lngLat['lng'] = items.center.lng;
+            lngLat['lat'] = items.center.lat;
+            addCircle(lngLat, items.radius);
+        });
+    }
+
+    const addCircle = (lngLat, radius) => {
+        var myCircle = new MapboxCircle(lngLat, radius, editableCircleOpts)
+            .once('click', function (mapMouseEvent) {
+                if (shouldRemoveCircle) {
+                    var instanceId = myCircle.__instanceId;
+                    myCircle.remove();
+                    mapboxCircleCollection = _.reject(mapboxCircleCollection, function (circleObj) {
+                        return circleObj.__instanceId === instanceId;
+                    });
+                    eventEmitter.emit('updateCircleGeo', {
+                        shapes: mapboxCircleCollection,
+                        drawnItems: mapboxCircleCollection
+                    });
+                }
+            })
+            .on('centerchanged', function (circleObj) {
+                eventEmitter.emit('updateCircleGeo', {
+                    shapes: mapboxCircleCollection,
+                    drawnItems: mapboxCircleCollection
+                });
+            })
+            .on('radiuschanged', function (circleObj) {
+                eventEmitter.emit('updateCircleGeo', {
+                    shapes: mapboxCircleCollection,
+                    drawnItems: mapboxCircleCollection
+                });
+            })
+            .addTo(map);
+
+        mapboxCircleCollection.push(myCircle);
+        eventEmitter.emit('updateCircleGeo', {shapes: mapboxCircleCollection, drawnItems: mapboxCircleCollection});
     }
 
     const addMapLayerControl = (layerArray) => {

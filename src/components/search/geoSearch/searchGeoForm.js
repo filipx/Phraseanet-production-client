@@ -67,6 +67,18 @@ const searchGeoForm = (services) => {
         </div>`;
     };
 
+    const updateCircleGeo = (params) => {
+        let {shapes} = params;
+        searchQuery = buildCircularSearchQuery(shapes);
+        let circleObjCollection = _.map(params.drawnItems, function (circleObj) {
+            var obj = {};
+            obj['center'] = circleObj.getCenter();
+            obj['radius'] = circleObj.getRadius();
+            return obj;
+        })
+        savePreferences({drawnItems: circleObjCollection});
+    }
+
     const onShapeCreated = (params) => {
         let {shapes} = params;
         searchQuery = buildSearchQuery(shapes);
@@ -84,6 +96,22 @@ const searchGeoForm = (services) => {
         searchQuery = buildSearchQuery(shapes);
         savePreferences({drawnItems: params.drawnItems});
     };
+
+    const buildCircularSearchQuery = (shapes) => {
+        let queryTerms = [];
+        _.each(shapes, (shape) => {
+            let terms = [];
+
+            var distanceInKM = parseFloat(shape.getRadius()) / 1000;
+            terms.push(`geolocation="${shape.getCenter().lat} ${shape.getCenter().lng} ${distanceInKM.toFixed(2)}km"`);
+
+            if (terms.length > 0) {
+                queryTerms.push(` (${terms.join(' AND ')}) `);
+            }
+
+        });
+        return queryTerms.join(' OR ');
+    }
 
     const buildSearchQuery = (shapes) => {
 
@@ -136,6 +164,7 @@ const searchGeoForm = (services) => {
         shapeEdited: onShapeEdited,
         shapeRemoved: onShapeDeleted,
         updateSearchValue: updateSearchValue,
+        updateCircleGeo: updateCircleGeo,
     })
 
     return {openModal};
