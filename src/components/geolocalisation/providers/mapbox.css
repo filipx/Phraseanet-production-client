@@ -170,6 +170,39 @@
     margin: 0;
 }
 
+.circle-control-container {
+    position: absolute;
+    top: 170px;
+    right: 10px;
+}
+
+.draw-icon {
+    margin-bottom: 5px;
+    padding: 0;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: block;
+}
+
+.draw-icon:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.draw-icon.selected {
+    background-color: #aaa;
+}
+
+.draw-icon i {
+    font-size: 20px;
+    line-height: 26px;
+}
+
 .map-dropdown-content label input[type="radio"] {
     margin: 0px 0 0 0;
     padding: 0;

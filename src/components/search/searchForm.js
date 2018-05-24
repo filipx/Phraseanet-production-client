@@ -36,7 +36,7 @@ const searchForm = (services) => {
         $container.on('click', '.geo-search-action-btn', (event) => {
             event.preventDefault();
             geoForm.openModal({
-                drawnItems: searchPreferences.drawnItems || false
+                drawnItems: searchPreferences.drawnItems || false,
             });
         });
 
