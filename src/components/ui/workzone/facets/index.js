@@ -122,12 +122,12 @@ const workzoneFacets = services => {
             // //add color circle and re move color code from text;
             var textWithoutColorCode = string.replace('[' + colorCode + ']', '');
             if (textLimit > 0 && textWithoutColorCode.length > textLimit) {
-                textWithoutColorCode = textWithoutColorCode.substring(0, length) + '…';
+                textWithoutColorCode = textWithoutColorCode.substring(0, textLimit) + '…';
             }
             return '<span class="color-dot" style="background-color: ' + colorCode + '"></span>' + ' ' + textWithoutColorCode;
         } else {
             if (textLimit > 0 && string.length > textLimit) {
-                string = string.substring(0, length) + '…';
+                string = string.substring(0, textLimit) + '…';
             }
             return string;
         }
@@ -300,7 +300,7 @@ const workzoneFacets = services => {
                                 s_label.setAttribute("class", "facetFilter-label");
                                 s_label.setAttribute("title", facetFilter);
 
-                                var length = 12;
+                                var length = 15;
                                 var facetFilterString = _formatColorText(facetFilter, length);
 
                                 _.each($.parseHTML(facetFilterString), function (elem) {
