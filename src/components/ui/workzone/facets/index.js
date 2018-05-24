@@ -111,9 +111,9 @@ const workzoneFacets = services => {
         return source;
     }
 
-    function _formatColorText(string) {
+    function _formatColorText(string, textLimit = 0) {
         //get color code from text if exist
-        var regexp = /^(.*)\[#([0-9a-fA-F]{6})] (.*)$/;
+        var regexp = /^(.*)\[#([0-9a-fA-F]{6})].*$/;
 
 
         var match = string.match(regexp);
@@ -121,10 +121,16 @@ const workzoneFacets = services => {
             var colorCode = '#' + match[2];
             // //add color circle and re move color code from text;
             var textWithoutColorCode = string.replace('[' + colorCode + ']', '');
+            if (textLimit > 0 && textWithoutColorCode.length > textLimit) {
+                textWithoutColorCode = textWithoutColorCode.substring(0, length) + '…';
+            }
             return '<span class="color-dot" style="background-color: ' + colorCode + '"></span>' + ' ' + textWithoutColorCode;
+        } else {
+            if (textLimit > 0 && string.length > textLimit) {
+                string = string.substring(0, length) + '…';
+            }
+            return string;
         }
-
-        return string;
     }
 
 
@@ -294,12 +300,12 @@ const workzoneFacets = services => {
                                 s_label.setAttribute("class", "facetFilter-label");
                                 s_label.setAttribute("title", facetFilter);
 
-                                var length = 15;
-                                var facetFilterString = facetFilter;
-                                if (facetFilterString.length > length) {
-                                    facetFilterString = facetFilterString.substring(0, length) + '…';
-                                }
-                                s_label.appendChild(document.createTextNode(facetFilterString));
+                                var length = 12;
+                                var facetFilterString = _formatColorText(facetFilter, length);
+
+                                _.each($.parseHTML(facetFilterString), function (elem) {
+                                    s_label.appendChild(elem);
+                                });
 
                                 var buttonsSpan = document.createElement("SPAN");
                                 buttonsSpan.setAttribute("class", "buttons-span");
