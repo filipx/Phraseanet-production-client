@@ -104,7 +104,7 @@ const workzoneFacets = services => {
             if (!_.isUndefined(facet.children) && (facet.children.length > 0)) {
                 _.forEach(facet.children, function (child) {
                     var title = child.title;
-                    child.title = _formatColorText(title);
+                    child.title = _formatColorText(title.toString());
                 });
             }
         });
@@ -301,7 +301,7 @@ const workzoneFacets = services => {
                                 s_label.setAttribute("title", facetFilter);
 
                                 var length = 15;
-                                var facetFilterString = _formatColorText(facetFilter, length);
+                                var facetFilterString = _formatColorText(facetFilter.toString(), length);
 
                                 _.each($.parseHTML(facetFilterString), function (elem) {
                                     s_label.appendChild(elem);
