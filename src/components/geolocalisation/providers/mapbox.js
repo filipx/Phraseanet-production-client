@@ -236,6 +236,7 @@ const leafletMap = (services) => {
                     });
 
                     addCircleDrawControl();
+                    addNoticeControl();
                     addCircleGeoDrawing(drawnItems);
 
                 } else {
@@ -349,6 +350,29 @@ const leafletMap = (services) => {
             var LngLat = [sw, nw, ne, se];
             return LngLat;
         }
+    }
+
+    const addNoticeControl = () => {
+        let controlContainerList = $('.mapboxgl-control-container');
+        let $noticeButton = $('<button id="map-notice-btn"><img src="/assets/common/images/icons/button-information-grey.png" width="30" height="30"/></button>');
+        controlContainerList.append($noticeButton);
+
+        let $noticeBox = $('<div id="notice-box"><span class="notice-header"><img src="/assets/common/images/icons/information-grey.png" /><span class="notice-title">' +
+            localeService.t("title notice") + '</span></span><span class="notice-desc">' + localeService.t("description notice") + '</span></div>');
+        controlContainerList.append($noticeBox);
+
+        $noticeButton.on('click', function (event) {
+            $noticeBox.toggle();
+        });
+
+        $noticeButton.on({
+            mouseenter: function (event) {
+                $noticeBox.show();
+            },
+            mouseleave: function (event) {
+                $noticeBox.hide();
+            }
+        });
     }
 
     const addCircleDrawControl = () => {
