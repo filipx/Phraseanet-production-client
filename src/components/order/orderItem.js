@@ -46,7 +46,7 @@ const orderItem = services => {
             $('#notification_trigger').trigger('mousedown');
         }
 
-        $('.order_launcher', $dialog.getDomElement()).bind('click', function () {
+        $('.order_launcher', $dialog.getDomElement()).on('click', function (event) {
             if (readyForValidation) {
                 if (confirm(window.orderItemData.translatedText.message)) {
                     order(services).orderModal(event);
@@ -56,7 +56,7 @@ const orderItem = services => {
             }
         });
 
-        $('#email-btn', $dialog.getDomElement()).bind('click', function () {
+        $('#email-btn', $dialog.getDomElement()).on('click', function () {
             let email = window.orderItemData.userEmail;
             let subject = window.orderItemData.subject;
             let body = window.orderItemData.body;

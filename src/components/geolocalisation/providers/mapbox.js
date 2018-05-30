@@ -236,6 +236,7 @@ const leafletMap = (services) => {
                     });
 
                     addCircleDrawControl();
+                    addNoticeControl();
                     addCircleGeoDrawing(drawnItems);
 
                 } else {
@@ -351,40 +352,67 @@ const leafletMap = (services) => {
         }
     }
 
-    const addCircleDrawControl = () => {
+    const addNoticeControl = () => {
         let controlContainerList = $('.mapboxgl-control-container');
-        let $circleControlContainer = $('<div class="circle-control-container"></div>');
-        controlContainerList.append($circleControlContainer);
-        let $toggleDrawCircleButton = $('<button class="draw-icon" id="map-circle-draw-btn"><i class="fa fa-plus-square" aria-hidden="true"></i></button>');
-        let $toggleRemoveCircleButton = $('<button class="draw-icon" id="map-circle-remove-btn"><i class="fa fa-trash" aria-hidden="true"></i></button>');
-        $circleControlContainer.empty().append($toggleDrawCircleButton).append($toggleRemoveCircleButton);
+        let $noticeButton = $('<button id="map-notice-btn"><img src="/assets/common/images/icons/button-information-grey.png" width="30" height="30"/></button>');
+        controlContainerList.append($noticeButton);
 
-        $toggleDrawCircleButton.on('click', function (event) {
-            $(this).toggleClass('selected');
-            shouldDrawCircle = !shouldDrawCircle;
-            if (shouldDrawCircle) {
-                if ($('#map-circle-remove-btn').hasClass('selected')) {
-                    $('#map-circle-remove-btn').removeClass('selected');
-                    shouldRemoveCircle = !shouldRemoveCircle;
-                }
-            }
+        let $noticeBox = $('<div id="notice-box"><span class="notice-header"><img src="/assets/common/images/icons/information-grey.png" /><span class="notice-title">' +
+            localeService.t("title notice") + '</span></span><span class="notice-desc">' + localeService.t("description notice") + '</span></div>');
+        controlContainerList.append($noticeBox);
+
+        $noticeButton.on('click', function (event) {
+            $noticeBox.toggle();
         });
 
-        $toggleRemoveCircleButton.on('click', function (event) {
-            $(this).toggleClass('selected');
-            shouldRemoveCircle = !shouldRemoveCircle;
-            if (shouldRemoveCircle) {
-                if ($('#map-circle-draw-btn').hasClass('selected')) {
-                    $('#map-circle-draw-btn').removeClass('selected');
-                    shouldDrawCircle = !shouldDrawCircle;
-                }
+        $noticeButton.on({
+            mouseenter: function (event) {
+                $noticeBox.show();
+            },
+            mouseleave: function (event) {
+                $noticeBox.hide();
             }
         });
+    }
 
-        map.on('click', function (e) {
-            if (shouldDrawCircle) {
-                addCircle(e.lngLat, boundsTo5percentRadius(map.getBounds()));
-            }
+    const addCircleDrawControl = () => {
+        // let controlContainerList = $('.mapboxgl-control-container');
+        // let $circleControlContainer = $('<div class="circle-control-container"></div>');
+        // controlContainerList.append($circleControlContainer);
+        // let $toggleDrawCircleButton = $('<button class="draw-icon" id="map-circle-draw-btn"><i class="fa fa-plus-square" aria-hidden="true"></i></button>');
+        // let $toggleRemoveCircleButton = $('<button class="draw-icon" id="map-circle-remove-btn"><i class="fa fa-trash" aria-hidden="true"></i></button>');
+        // $circleControlContainer.empty().append($toggleDrawCircleButton).append($toggleRemoveCircleButton);
+        //
+        // $toggleDrawCircleButton.on('click', function (event) {
+        //     $(this).toggleClass('selected');
+        //     shouldDrawCircle = !shouldDrawCircle;
+        //     if (shouldDrawCircle) {
+        //         if ($('#map-circle-remove-btn').hasClass('selected')) {
+        //             $('#map-circle-remove-btn').removeClass('selected');
+        //             shouldRemoveCircle = !shouldRemoveCircle;
+        //         }
+        //     }
+        // });
+        //
+        // $toggleRemoveCircleButton.on('click', function (event) {
+        //     $(this).toggleClass('selected');
+        //     shouldRemoveCircle = !shouldRemoveCircle;
+        //     if (shouldRemoveCircle) {
+        //         if ($('#map-circle-draw-btn').hasClass('selected')) {
+        //             $('#map-circle-draw-btn').removeClass('selected');
+        //             shouldDrawCircle = !shouldDrawCircle;
+        //         }
+        //     }
+        // });
+        //
+        // map.on('click', function (e) {
+        //     if (shouldDrawCircle) {
+        //         addCircle(e.lngLat, boundsTo5percentRadius(map.getBounds()));
+        //     }
+        // });
+
+        map.on('contextmenu', function (e) {
+            addCircle(e.lngLat, boundsTo5percentRadius(map.getBounds()));
         });
     }
 
@@ -400,17 +428,15 @@ const leafletMap = (services) => {
     const addCircle = (lngLat, radius) => {
         var myCircle = new MapboxCircle(lngLat, radius, editableCircleOpts)
             .once('click', function (mapMouseEvent) {
-                if (shouldRemoveCircle) {
-                    var instanceId = myCircle.__instanceId;
-                    myCircle.remove();
-                    mapboxCircleCollection = _.reject(mapboxCircleCollection, function (circleObj) {
-                        return circleObj.__instanceId === instanceId;
-                    });
-                    eventEmitter.emit('updateCircleGeo', {
-                        shapes: mapboxCircleCollection,
-                        drawnItems: mapboxCircleCollection
-                    });
-                }
+                var instanceId = myCircle.__instanceId;
+                myCircle.remove();
+                mapboxCircleCollection = _.reject(mapboxCircleCollection, function (circleObj) {
+                    return circleObj.__instanceId === instanceId;
+                });
+                eventEmitter.emit('updateCircleGeo', {
+                    shapes: mapboxCircleCollection,
+                    drawnItems: mapboxCircleCollection
+                });
             })
             .on('centerchanged', function (circleObj) {
                 eventEmitter.emit('updateCircleGeo', {
