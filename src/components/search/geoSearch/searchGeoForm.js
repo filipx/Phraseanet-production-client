@@ -19,7 +19,8 @@ const searchGeoForm = (services) => {
     const openModal = (options) => {
         options = _.extend({
             size: (window.bodySize.x - 120) + 'x' + (window.bodySize.y - 120),
-            loading: false
+            loading: false,
+            title: localeService.t('title-map-dialog'),
         }, options);
 
         $dialog = dialog.create(services, options);
