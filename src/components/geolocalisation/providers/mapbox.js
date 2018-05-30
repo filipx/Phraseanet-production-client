@@ -354,24 +354,21 @@ const leafletMap = (services) => {
 
     const addNoticeControl = () => {
         let controlContainerList = $('.mapboxgl-control-container');
-        let $noticeButton = $('<button id="map-notice-btn"><img src="/assets/common/images/icons/button-information-grey.png" width="30" height="30"/></button>');
+        let $noticeButton = $('<button id="map-notice-btn"><img src="/assets/common/images/icons/button-information-grey.png" width="34" height="34"/></button>');
         controlContainerList.append($noticeButton);
 
-        let $noticeBox = $('<div id="notice-box"><span class="notice-header"><img src="/assets/common/images/icons/information-grey.png" /><span class="notice-title">' +
-            localeService.t("title notice") + '</span></span><span class="notice-desc">' + localeService.t("description notice") + '</span></div>');
+        let $noticeBox = $('<div id="notice-box"><span class="notice-header"><img src="/assets/common/images/icons/information-grey.png" width="18" height="18" /><span class="notice-title">' +
+            localeService.t("title notice") + '</span></span><span class="notice-desc">' + localeService.t("description notice") + '</span><span class="notice-close-btn"><img src="/assets/common/images/icons/button-close-gray.png" /></span></div>');
         controlContainerList.append($noticeBox);
 
         $noticeButton.on('click', function (event) {
-            $noticeBox.toggle();
+            $noticeBox.show();
+            $noticeButton.hide();
         });
 
-        $noticeButton.on({
-            mouseenter: function (event) {
-                $noticeBox.show();
-            },
-            mouseleave: function (event) {
-                $noticeBox.hide();
-            }
+        $('.notice-close-btn').on('click', function (event) {
+            $noticeBox.hide();
+            $noticeButton.show();
         });
     }
 
