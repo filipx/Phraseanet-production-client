@@ -10,9 +10,28 @@ const geonameDatasource = (services) => {
     let parentOptions = {};
     let $editTextArea;
     let $tabContent;
+    let geonamesFieldMapping = false;
+    let cityFields = [];
+    let provinceFields;
+    let countryFields;
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
+        let geocodingProviders = configService.get('geocodingProviders');
+        _.each(geocodingProviders, (provider) => {
+            //geoname field mapping
+            if (provider['geonames-field-mapping'] == true) {
+                if (provider['cityfield']) {
+                    cityFields = provider['cityfield'].split(',').map(item => item.trim());
+                }
+                if (provider['provincefield']) {
+                    provinceFields = provider['provincefield'].split(',').map(item => item.trim());
+                }
+                if (provider['countryfields']) {
+                    countryFields = provider['countryfields'].split(',').map(item => item.trim());
+                }
+            }
+        });
         recordEditorEvents.emit('appendTab', {
             tabProperties: {
                 id: tabContainerName,
@@ -22,6 +41,7 @@ const geonameDatasource = (services) => {
         });
         // reset for each fields
         autoActivateTabOnce = true;
+
     };
 
     const onTabAdded = (params) => {
