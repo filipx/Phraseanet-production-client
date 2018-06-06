@@ -12,8 +12,8 @@ const geonameDatasource = (services) => {
     let $tabContent;
     let geonamesFieldMapping = false;
     let cityFields = [];
-    let provinceFields;
-    let countryFields;
+    let provinceFields = [];
+    let countryFields = [];
 
     const initialize = (options) => {
         let initWith = {$container, parentOptions, $editTextArea} = options;
@@ -80,6 +80,7 @@ const geonameDatasource = (services) => {
 
         // the field may have changed over time
         let field = parentOptions.fieldCollection.getActiveField();
+
         switch (field.name) {
             case 'City':
                 value = $el.data('city');
@@ -96,13 +97,19 @@ const geonameDatasource = (services) => {
 
         // send prefill instruction for related fields:
         // send data for all geo fields (same as preset API)
-        let presets = {
-            fields: {
-                City: [$el.data('city')],
-                Country: [$el.data('country')],
-                Province: [$el.data('province')]
-            }
-        };
+        let fields = {};
+        let presets = {};
+        _.each(cityFields, function (field) {
+            fields[field] = [$el.data('city')];
+        });
+        _.each(provinceFields, function (field) {
+            fields[field] = [$el.data('province')];
+        });
+        _.each(countryFields, function (field) {
+            fields[field] = [$el.data('country')];
+        });
+
+        presets.fields = fields;
 
         recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, mode: 'emptyOnly'});
 
@@ -140,23 +147,18 @@ const geonameDatasource = (services) => {
 
         name = terms.pop();
 
-        switch (field.name) {
-            case 'City':
-                searchType = 'city';
-                datas.name = $.trim(name);
-                datas.country = $.trim(country);
-                break;
-            case 'Country':
-                searchType = 'city';
-                datas.country = $.trim(name);
-                break;
-            case 'Province':
-                // @TODO - API can't search by region/province
-                searchType = 'city';
-                datas.province = $.trim(name);
-                // datas.country = $.trim(country);
-                break;
-            default:
+        if (cityFields.filter(item => item.toLowerCase() == field.name.toLowerCase()).length > 0) {
+            searchType = 'city';
+            datas.name = $.trim(name);
+            datas.country = $.trim(country);
+        } else if (provinceFields.filter(item => item.toLowerCase() == field.name.toLowerCase()).length > 0) {
+            // @TODO - API can't search by region/province
+            searchType = 'city';
+            datas.province = $.trim(name);
+            // datas.country = $.trim(country);
+        } else if (countryFields.filter(item => item.toLowerCase() == field.name.toLowerCase()).length > 0) {
+            searchType = 'city';
+            datas.country = $.trim(name);
         }
 
         if (searchType === false) {
