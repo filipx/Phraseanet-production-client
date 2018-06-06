@@ -229,10 +229,12 @@ const leafletMap = (services) => {
                         eventEmitter.emit('updateCircleGeo', {shapes: [], drawnItems: []});
                         eventEmitter.emit('updateSearchValue');
                         removeCircleIfExist();
+                        removeNoticeControl();
                     });
 
                     $('.submit-geo-search-action').on('click', function (event) {
                         removeCircleIfExist();
+                        removeNoticeControl();
                     });
 
                     addCircleDrawControl();
@@ -370,6 +372,13 @@ const leafletMap = (services) => {
             $noticeBox.hide();
             $noticeButton.show();
         });
+    }
+
+    const removeNoticeControl = () => {
+        let controlContainerList = $('.mapboxgl-control-container');
+        if (controlContainerList.find('#notice-box').length > 0) {
+            $('#notice-box').remove();
+        }
     }
 
     const addCircleDrawControl = () => {
