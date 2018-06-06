@@ -111,7 +111,7 @@ const geonameDatasource = (services) => {
 
         presets.fields = fields;
 
-        recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, mode: 'emptyOnly'});
+        recordEditorEvents.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, mode: ''});
 
         // force update on current field:
         recordEditorEvents.emit('recordEditor.addValueFromDataSource', {value: value, field: field});
