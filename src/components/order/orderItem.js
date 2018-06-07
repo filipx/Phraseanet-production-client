@@ -43,7 +43,7 @@ const orderItem = services => {
         let trs = $('.order_list .order_row', $dialog.getDomElement());
         let lastSelectedRow;
         if ($('#notification_box').is(':visible')) {
-            $('#notification_trigger').trigger('mousedown');
+            $('.notification_trigger').trigger('mousedown');
         }
 
         $('.order_launcher', $dialog.getDomElement()).on('click', function (event) {
