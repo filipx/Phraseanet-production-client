@@ -21,11 +21,11 @@ const geonameDatasource = (services) => {
         _.each(geocodingProviders, (provider) => {
             //geoname field mapping
             if (provider['geonames-field-mapping'] == true) {
-                if (provider['cityfield']) {
-                    cityFields = provider['cityfield'].split(',').map(item => item.trim());
+                if (provider['cityfields']) {
+                    cityFields = provider['cityfields'].split(',').map(item => item.trim());
                 }
-                if (provider['provincefield']) {
-                    provinceFields = provider['provincefield'].split(',').map(item => item.trim());
+                if (provider['provincefields']) {
+                    provinceFields = provider['provincefields'].split(',').map(item => item.trim());
                 }
                 if (provider['countryfields']) {
                     countryFields = provider['countryfields'].split(',').map(item => item.trim());
