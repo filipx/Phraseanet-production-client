@@ -237,6 +237,23 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_ppen_btn', function (event) {
             _triggerModal(event, editRecord(services).openModal);
         });
+
+        /**
+         * tools-accordion function
+         */
+
+        $container.on('click', '.tools-accordion', function (event) {
+            $('.rotate').toggleClass("down")  ;
+            this.classList.toggle("active");
+
+            /* Toggle between hiding and showing the active panel */
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight){
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
     };
 
     return {initialize};
