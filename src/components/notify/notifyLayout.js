@@ -6,7 +6,7 @@ import dialog from 'phraseanet-common/src/components/dialog';
 const notifyLayout = (services) => {
     const { configService, localeService, appEvents } = services;
     const $notificationBoxContainer = $('#notification_box');
-    const $notificationTrigger = $('#notification_trigger');
+    const $notificationTrigger = $('.notification_trigger');
     let $notificationDialog = $('#notifications-dialog');
     const initialize = () => {
         $notificationTrigger.on('mousedown', (event) => {
@@ -77,7 +77,7 @@ const notifyLayout = (services) => {
             $('.counter', $notificationTrigger).css('visibility', 'visible');
 
         } else {
-            $('#notification_trigger .counter').css('visibility', 'hidden').empty();
+            $('.notification_trigger .counter').css('visibility', 'hidden').empty();
         }
     };
 
@@ -97,9 +97,16 @@ const notifyLayout = (services) => {
 
     const setBoxPosition = () => {
         if ($notificationTrigger.length > 0) {
-            $notificationBoxContainer.css({
-                left: Math.round($notificationTrigger.offset().left - 1)
-            });
+            var leftOffset = Math.round($notificationTrigger.offset().left);
+            if(leftOffset == 0) {
+                $notificationBoxContainer.css({
+                    left: 20
+                });
+            }else {
+                $notificationBoxContainer.css({
+                    left: Math.round($notificationTrigger.offset().left - 1)
+                });
+            }
         }
     };
 
@@ -209,7 +216,7 @@ const notifyLayout = (services) => {
                 notifications: notifications.join('_')
             },
             success: function (data) {
-                $('#notification_trigger .counter').css('visibility', 'hidden').empty();
+                $('.notification_trigger .counter').css('visibility', 'hidden').empty();
             }
         });
     };
@@ -222,7 +229,7 @@ const notifyLayout = (services) => {
         }
 
         unread.removeClass('unread');
-        $('#notification_trigger .counter').css('visibility', 'hidden').empty();
+        $('.notification_trigger .counter').css('visibility', 'hidden').empty();
     };
 
     return {
