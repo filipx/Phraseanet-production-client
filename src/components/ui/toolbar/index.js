@@ -179,7 +179,6 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_chgcoll_btn', function (event) {
             //let moveRecordsInstance = moveRecords(services);
             _triggerModal(event, moveRecords(services).openModal);
-            _closeActionPanel();
         });
 
         /**
@@ -187,7 +186,6 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_chgstatus_btn', function (event) {
             _triggerModal(event, propertyRecord(services).openModal);
-            _closeActionPanel();
         });
 
         /**
@@ -195,7 +193,6 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_pushdoc_btn', function (event) {
             _triggerModal(event, recordPushModal(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Push > Feedback
@@ -203,14 +200,12 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_feedback_btn', function (event) {
 
             _triggerModal(event, recordFeedbackModal(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Tools
          */
         $container.on('click', '.TOOL_imgtools_btn', function (event) {
             _triggerModal(event, recordToolsModal(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Export
@@ -218,43 +213,36 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_disktt_btn', function (event) {
             // can't be fully refactored
             _triggerModal(event, exportRecord(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Export > Print
          */
         $container.on('click', '.TOOL_print_btn', function (event) {
             _triggerModal(event, printRecord(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Push > Bridge
          */
         $container.on('click', '.TOOL_bridge_btn', function (event) {
             _triggerModal(event, bridgeRecord(services).openModal);
-
         });
         /**
          * tools > Push > Publish
          */
         $container.on('click', '.TOOL_publish_btn', function (event) {
             _triggerModal(event, recordPublish(services).openModal);
-            _closeActionPanel();
-
         });
         /**
          * tools > Delete
          */
         $container.on('click', '.TOOL_trash_btn', function (event) {
             _triggerModal(event, deleteRecord(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Edit
          */
         $container.on('click', '.TOOL_ppen_btn', function (event) {
             _triggerModal(event, editRecord(services).openModal);
-            _closeActionPanel();
         });
         /**
          * tools > Delete Selection
@@ -264,13 +252,11 @@ const toolbar = (services) => {
             _.each($diapoContainer.find('.diapo.selected'), function(item) {
                 $(item).find('.WorkZoneElementRemover').trigger('click');
             });
-            _closeActionPanel();
         });
 
         /**
          * tools-accordion function
          */
-
         $container.on('click', '.tools-accordion', function (event) {
             $('.rotate').toggleClass("down");
             this.classList.toggle("active");
@@ -281,6 +267,14 @@ const toolbar = (services) => {
                 panel.style.maxHeight = null;
             } else {
                 panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+
+        $container.on('click', function (event) {
+            if ($(event.target).is('button.tools-accordion')) {
+                return;
+            } else {
+                _closeActionPanel();
             }
         });
     };
