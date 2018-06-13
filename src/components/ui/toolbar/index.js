@@ -106,6 +106,15 @@ const toolbar = (services) => {
         return false;
     };
 
+    const _closeActionPanel = () => {
+        if($('.tools-accordion').hasClass('active')) {
+            $('.rotate').removeClass('down');
+            $('.tools-accordion').removeClass('active');
+            var panel = $('.tools-accordion').next();
+            panel.css('maxHeight', '');
+        }
+    }
+
     const _triggerModal = (event, actionFn) => {
         event.preventDefault();
         const $el = $(event.currentTarget);
@@ -170,6 +179,7 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_chgcoll_btn', function (event) {
             //let moveRecordsInstance = moveRecords(services);
             _triggerModal(event, moveRecords(services).openModal);
+            _closeActionPanel();
         });
 
         /**
@@ -177,6 +187,7 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_chgstatus_btn', function (event) {
             _triggerModal(event, propertyRecord(services).openModal);
+            _closeActionPanel();
         });
 
         /**
@@ -184,6 +195,7 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_pushdoc_btn', function (event) {
             _triggerModal(event, recordPushModal(services).openModal);
+            _closeActionPanel();
         });
         /**
          * tools > Push > Feedback
@@ -191,12 +203,14 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_feedback_btn', function (event) {
 
             _triggerModal(event, recordFeedbackModal(services).openModal);
+            _closeActionPanel();
         });
         /**
          * tools > Tools
          */
         $container.on('click', '.TOOL_imgtools_btn', function (event) {
             _triggerModal(event, recordToolsModal(services).openModal);
+            _closeActionPanel();
         });
         /**
          * tools > Export
@@ -204,12 +218,14 @@ const toolbar = (services) => {
         $container.on('click', '.TOOL_disktt_btn', function (event) {
             // can't be fully refactored
             _triggerModal(event, exportRecord(services).openModal);
+            _closeActionPanel();
         });
         /**
          * tools > Export > Print
          */
         $container.on('click', '.TOOL_print_btn', function (event) {
             _triggerModal(event, printRecord(services).openModal);
+            _closeActionPanel();
         });
         /**
          * tools > Push > Bridge
@@ -223,6 +239,7 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_publish_btn', function (event) {
             _triggerModal(event, recordPublish(services).openModal);
+            _closeActionPanel();
 
         });
         /**
@@ -230,12 +247,24 @@ const toolbar = (services) => {
          */
         $container.on('click', '.TOOL_trash_btn', function (event) {
             _triggerModal(event, deleteRecord(services).openModal);
+            _closeActionPanel();
         });
         /**
          * tools > Edit
          */
         $container.on('click', '.TOOL_ppen_btn', function (event) {
             _triggerModal(event, editRecord(services).openModal);
+            _closeActionPanel();
+        });
+        /**
+         * tools > Delete Selection
+         */
+        $container.on('click', '.TOOL_delete_selection_btn', function (event) {
+            var $diapoContainer = $(this.closest('.content'));
+            _.each($diapoContainer.find('.diapo.selected'), function(item) {
+                $(item).find('.WorkZoneElementRemover').trigger('click');
+            });
+            _closeActionPanel();
         });
 
         /**
@@ -243,7 +272,7 @@ const toolbar = (services) => {
          */
 
         $container.on('click', '.tools-accordion', function (event) {
-            $('.rotate').toggleClass("down")  ;
+            $('.rotate').toggleClass("down");
             this.classList.toggle("active");
 
             /* Toggle between hiding and showing the active panel */
