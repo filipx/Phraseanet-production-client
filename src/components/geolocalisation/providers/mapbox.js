@@ -746,6 +746,11 @@ const leafletMap = (services) => {
                             center: geojson.features[0].geometry.coordinates, zoom: currentZoomLevel,
                             ...activeProvider.transitionOptions
                         });
+                        var position = {};
+                        position.lng = geojson.features[0].geometry.coordinates[0];
+                        position.lat = geojson.features[0].geometry.coordinates[1];
+                        updateMarkerPosition(geojson.features[0].properties.recordIndex, position);
+
                     } else {
                         shouldUpdateZoom = false;
                         //markerMapboxGl.setLngLat(activeProvider.defaultPosition).addTo(map);
@@ -763,6 +768,10 @@ const leafletMap = (services) => {
                     if (featureLayer.getLayers().length > 0) {
                         shouldUpdateZoom = true;
                         map.fitBounds(featureLayer.getBounds(), {maxZoom: currentZoomLevel});
+                        var position = {};
+                        position.lng = featureLayer.getGeoJSON()[0].geometry.coordinates[0];
+                        position.lat = featureLayer.getGeoJSON()[0].geometry.coordinates[1];
+                        updateMarkerPosition(featureLayer.getGeoJSON()[0].properties.recordIndex, position);
                     } else {
                         // set default position
                         shouldUpdateZoom = false;
@@ -935,23 +944,26 @@ const leafletMap = (services) => {
         let {marker, position} = params;
 
         if (editable) {
-            let mappedFields = getMappedFields(position);
-            let wrappedMappedFields = {};
-            // values needs to be wrapped in a array:
-            for (let mappedFieldIndex in mappedFields) {
-                if (mappedFields.hasOwnProperty(mappedFieldIndex)) {
-                    wrappedMappedFields[mappedFieldIndex] = [mappedFields[mappedFieldIndex]]
-                }
-            }
-
-            let presets = {
-                fields: wrappedMappedFields //presetFields
-            };
-            let recordIndex = marker.feature.properties.recordIndex;
-
-            eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, recordIndex});
+            updateMarkerPosition(marker.feature.properties.recordIndex, position);
         }
     };
+
+    const updateMarkerPosition = (recordIndex, position) => {
+        let mappedFields = getMappedFields(position);
+        let wrappedMappedFields = {};
+        // values needs to be wrapped in a array:
+        for (let mappedFieldIndex in mappedFields) {
+            if (mappedFields.hasOwnProperty(mappedFieldIndex)) {
+                wrappedMappedFields[mappedFieldIndex] = [mappedFields[mappedFieldIndex]]
+            }
+        }
+
+        let presets = {
+            fields: wrappedMappedFields //presetFields
+        };
+
+        eventEmitter.emit('recordEditor.addPresetValuesFromDataSource', {data: presets, recordIndex});
+}
     const getMappedFields = (position) => {
         let fieldMapping = activeProvider.provider['position-fields'] !== undefined ? activeProvider.provider['position-fields'] : [];
         let mappedFields = {};
