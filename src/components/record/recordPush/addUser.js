@@ -35,11 +35,13 @@ const pushAddUser = (services) => {
 
     const openModal = (options = {}) => {
         const url = configService.get('baseUrl');
-        let dialogOptions = merge({
-            size: 'Medium',
-            loading: false
-        }, options);
+        let dialogOptions = {
+            size: '558x260',
+            loading: false,
+            title: localeService.t('create new user'),
+        };
         const $dialog = dialog.create(services, dialogOptions, 2);
+        $dialog.getDomElement().closest('.ui-dialog').addClass('dialog_container');
 
         return $.get(`${url}prod/push/add-user/`, function (data) {
             $dialog.setContent(data);

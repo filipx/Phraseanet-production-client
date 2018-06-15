@@ -1,6 +1,357 @@
+.dialog_container {
+    border-radius: 6px !important;
+    background-color: #ffffff !important;
+    .ui-dialog-title {
+        font-family: Roboto;
+        font-size: 18px;
+        font-weight: 500;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: normal;
+        color: #4a4a4a;
+    }
+    .ui-dialog-titlebar-close {
+        border: none;
+        margin-right: 4px;
+    }
+    .ui-icon.ui-icon-closethick {
+        background-image: url("/assets/common/images/icons/cross-white.png");
+        background-position: center;
+        background-size: cover;
+    }
+    .ui-dialog-buttonpane {
+        border-top: solid 1px #979797;
+    }
+    .ui-dialog-buttonpane .ui-button {
+        border-radius: 15px;
+        background-color: #ffffff;
+        border: solid 1px #2196f3;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: normal;
+        color: #2196f3;
+        height: 30px;
+        min-width: 135px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    .ui-dialog-buttonpane .ui-button:hover {
+        background-color: #2196f3;
+        color: #FFFFFF;
+    }
+    .ui-dialog-buttonpane .ui-button:nth-child(2) {
+        background-color: #2196f3;
+        color: #FFFFFF;
+    }
+    .ui-button-icon-only {
+        text-indent: -9999px;
+        background: transparent;
+    }
+    .ui-dialog-buttonpane .ui-dialog-buttonset {
+        float: none;
+        text-align: center;
+    }
+    .ui-widget-content {
+        label {
+            font-family: Roboto;
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+        input {
+            font-family: Roboto;
+            font-size: 14px;
+            background-color: #e7e7e7;
+            border: none;
+            border-radius: 0;
+        }
+        input[type=text]::-webkit-input-placeholder, textarea::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+            font-family: Roboto;
+            font-size: 14px;
+            color: #484848;
+        }
+        input[type=text]::-moz-placeholder, textarea::-moz-placeholder { /* Firefox 19+ */
+            font-family: Roboto;
+            font-size: 14px;
+            color: #484848;
+        }
+        input[type=text]:-ms-input-placeholder, textarea:-ms-input-placeholder { /* IE 10+ */
+            font-family: Roboto;
+            font-size: 14px;
+            color: #484848;
+        }
+        input[type=text]:-ms-input-placeholder, textarea:-ms-input-placeholder { /* Firefox 18- */
+            font-family: Roboto;
+            font-size: 14px;
+            color: #484848;
+        }
+        textarea {
+            font-family: Roboto;
+            font-size: 14px;;
+            background-color: #e7e7e7;
+            border: none;
+            border-radius: 0;
+        }
+    }
+}
+
 /** PUSH BOX */
+.push_dialog_container {
+    background: #282828;
+}
+.push_dialog_container .ui-dialog-title {
+    font-family: Roboto;
+    font-size: 21px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0px;
+    color: #ffffff;
+}
+
+.push_dialog_container .ui-widget-content {
+    background-color: #4f4f4f;
+}
+
+.push_dialog_container .ui-dialog-titlebar-close {
+    border: none;
+    margin-right: 4px;
+}
+
+.push_dialog_container .ui-icon.ui-icon-closethick {
+    background-image: url("/assets/common/images/icons/picto-close-window.png");
+    background-position: center;
+    background-size: cover;
+}
+
+.PushBox .round-blue-border-btn {
+    height: 27px;
+    border-radius: 13.5px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.18);
+    background-color: #ffffff;
+    border: solid 1px #2196f3;
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #2196f3;
+    padding: 0px 20px;
+}
+
+.PushBox .delete-selection {
+    margin-left: 30px;
+    height: 27px;
+    border-radius: 13.5px;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.18);
+    border: none;
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #ffffff;
+    padding: 0px 20px;
+    background: #676767;
+}
+
+.PushBox .delete-selection:hover {
+    background: #333333;
+}
+
+.PushBox .round-blue-border-btn:hover {
+    border: solid 2px #2196f3;
+}
+
+.PushBox .FeedbackSend {
+    width: 180px;
+    height: 24px;
+    border-radius: 6px;
+    background-color: #2196f3;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.33);
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #ffffff;
+    border: none;
+    padding: 4px 0px;
+    margin-left: 20px;
+    margin-top: 7px;
+}
+
+.PushBox .FeedbackSend:hover {
+    background-color: #53b3fc;
+}
+
+.PushBox .saveList {
+    width: 180px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.33);
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #2196f3;
+    border: none;
+    padding: 4px 0px;
+    margin-left: 4px;
+    img {
+        width: 16px;
+        height: 16px;
+        margin-right: 10px;
+    }
+    span {
+        vertical-align: middle
+    }
+    .image-normal {
+        display: inline;
+    }
+    .image-hover {
+        display: none;
+    }
+}
+
+.PushBox .saveList:hover {
+    background-color: #2196f3;
+    color: #ffffff;
+    .image-normal {
+        display: none;
+    }
+    .image-hover {
+        display: inline;
+    }
+}
+
+.PushBox #info-box-trigger {
+    float: right;
+    margin-top: 6px;
+    cursor: pointer;
+}
+
+.PushBox #info-box {
+    z-index: 1;
+    width: 400px;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    border-radius: 8px;
+    background-color: #ededed;
+    padding: 6px;
+    font-family: Roboto;
+    font-size: 10px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.4;
+    letter-spacing: 0px;
+    color: #000000;
+    p {
+        margin: 0;
+    }
+}
+
+.PushBox .push-add-user {
+    height: 26px;
+    border-radius: 17px;
+    background-color: #f7f7f7;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.13);
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    color: #2196f3;
+    line-height: 26px;
+    padding: 0px 16px;
+    margin-top: 2px;
+    margin-left: 16px;
+    img {
+        width: 16px;
+        height: 16px;
+    }
+    span {
+        line-height: 28px;
+        vertical-align: middle;
+        margin-left: 10px;
+    }
+    .image-normal {
+        display: inline;
+    }
+    .image-hover {
+        display: none;
+    }
+}
+
+.PushBox .push-add-user:hover {
+   .image-normal {
+        display: none;
+   }
+   .image-hover {
+       display: inline;
+   }
+   transition: none;
+   background-position: 0 30px;
+   color: #f7f7f7;
+   background-color: #2196f3;
+}
+
 .PushBox .content {
-    background-color: $mediumBackgroundColor;
+    border-radius: 5px;
+    background-color: #c8c8c8;
+    .list-container {
+        position: absolute;
+        top: 80px;
+        bottom: 70px;
+        right: 0px;
+        left: 0px;
+        padding: 10px;
+        ul {
+            overflow-y: auto;
+            margin: 0;
+            height: 100%;
+        }
+    }
+    .main-title {
+        font-family: Roboto;
+        font-size: 16px;
+        font-weight: 500;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 2px;
+        letter-spacing: 0px;
+        color: #4a4a4a;
+        margin-top: 10px;
+        img {
+            width: 16px;
+            margin-right: 5px;
+            margin-bottom: 3px;
+        }
+    }
+}
+
+.PushBox .user_content {
+    border-radius: 5px;
+    background-color: #868686;
 }
 
 .PushBox .LeftColumn h1 {
@@ -31,6 +382,16 @@
     height: 35px;
     right: 20px;
     bottom: auto;
+    .text {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.08;
+        letter-spacing: 0px;
+        color: #ffffff;
+    }
 }
 
 .PushBox .user_content .footer {
@@ -52,17 +413,26 @@
 }
 
 .PushBox .user_content .badges .badge .deleter {
-    float: right;
+    position: absolute;
+    right: 0;
+    i {
+        color: #4f4f4f;
+        font-size: 20px;
+        padding: 4px;
+    }
 }
 
 .PushBox .user_content .badges .badge {
-    width: 230px;
-    height: 80px;
+    width: 220px;
+    height: 79px;
     margin: 10px;
     display: inline-block;
-    background-color: $pushboxBadgeColor;
-    border: 3px solid $pushboxBadgeColor;
-    padding: 3px;
+    border: 3px solid #868686;
+    background-color: #f7f7f7;
+    padding: 0px;
+    border-radius: 10px;
+    position: relative;
+
 }
 
 .PushBox .user_content .badges .badge.selected {
@@ -86,8 +456,9 @@
 }
 
 .PushBox .user_content .badges .badge .icon {
-    width: 80px;
-    background-color: $darkerBorderColor;
+    width: 70px;
+    background-color: #2196f3;
+    border-radius: 7px 0px 0px 7px;
 }
 
 .PushBox .user_content .badges .badge .infos {
@@ -109,23 +480,39 @@
 
 .PushBox .user_content .badges .badge .infos tr.toggles {
     height: 25px;
-    text-align: center;
+    text-align: left;
 }
 
 .PushBox .user_content .badges .badge .icon img {
-    margin: 7px;
+    margin: 15px;
 }
 
 .PushBox .user_content .badges .badge .name {
-    font-weight: bold;
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #000000;
     white-space: pre-line;
     display: block;
-    font-size: $mediumFontSize;
+    margin-top: 5px;
+    text-shadow: none;
 }
 
 .PushBox .user_content .badges .badge .subtite {
     display: block;
-    font-size: 10px;
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #000000;
+    text-shadow: none;
 }
 
 .PushBox .user_content .header .options {
@@ -162,6 +549,47 @@
 
 .PushBox .lists .list {
     padding: 3px 0;
+}
+
+.PushBox .LeftColumn .content ul.list li {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0px;
+    color: #000000;
+    .list-trash-btn {
+        float: right;
+        background: none;
+        border: none;
+        padding: 4px;
+        position: absolute;
+        right: 8px;
+        top: 0;
+        img {
+            margin: 0;
+        }
+        .image-normal {
+            display: inline;
+        }
+        .image-hover {
+            display: none;
+        }
+    }
+}
+
+.PushBox .LeftColumn .content ul.list li:hover {
+    background-color: #b8b8b8;
+    //.list-trash-btn {
+    //    .image-normal {
+    //        display: none;
+    //    }
+    //    .image-hover {
+    //        display: inline;
+    //    }
+    //}
 }
 
 .PushBox .welcome {
@@ -234,7 +662,7 @@
 }
 
 #ListManager .content.readonly .badge .deleter {
-    float: right;
+    right: 0;
 }
 
 #ListManager .content.readonly .badge table {
@@ -257,10 +685,92 @@
     margin-top: 5px;
 }
 
+#PushBox .general_togglers {
+    margin-right: 5px;
+    vertical-align: middle;
+    margin-bottom: 3px;
+}
+
 #PushBox .general_togglers button {
     margin: 0;
-    padding: 4px 5px;
     width: 100%;
+    height: 28px;
+    border-radius: 17px;
+    background-color: #f7f7f7;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.13);
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: normal;
+    color: #2196f3;
+    line-height: 28px;
+    padding: 0px 12px;
+    border-width: 0;
+    img {
+        width: 16px;
+        height: 16px;
+    }
+    .image-normal {
+        display: inline;
+    }
+    .image-hover {
+        display: none;
+    }
+}
+
+#PushBox .general_togglers button:hover {
+    background-color: #2196f3;
+    color: #f7f7f7;
+    .image-normal {
+        display: none;
+    }
+    .image-hover {
+        display: inline;
+    }
+}
+
+
+#PushBox .list_manager {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: 500;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0px;
+    color: #ffffff;
+    padding: 6px 8px;
+    position: absolute;
+    bottom: 15px;
+    left: 10px;
+    right: 10px;
+    img {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+#PushBox .list_manager:hover {
+    background-color: #FD9326;
+    transition: none;
+    background-position: 0 30px;
+}
+
+#PushBox .list_loader {
+    font-family: Roboto;
+    font-size: 13px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0px;
+    color: #000000;
+    width: 100%;
+    img {
+        float: right;
+    }
 }
 
 #PushBox .general_togglers button .ui-button-text {
@@ -268,15 +778,17 @@
 }
 
 #PushBox .content .list_saver {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    display: block;
+    margin: 0;
+    display: inline-block;
+    .btn-toolbar {
+        margin: 0;
+    }
 }
 
 #PushBox .content .list_saver input {
     margin: 0;
-    padding: 4px 2px;
-    width: 115px;
+    padding: 2px 2px;
+    width: 180px;
 }
 
 #PushBox .content .list_saver .btn {
@@ -287,6 +799,65 @@
 
 #find-user {
     line-height: 15px;
+    input[type=text] {
+        width: 180px;
+        border-radius: 5px;
+        background-color: #2196f3;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0);
+        border: none;
+        font-family: Helvetica;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: normal;
+        letter-spacing: 0px;
+        color: #ffffff;
+    }
+    input[type=text]::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+        color: #ffffff;
+    }
+    input[type=text]::-moz-placeholder { /* Firefox 19+ */
+        color: #ffffff;
+    }
+    input[type=text]:-ms-input-placeholder { /* IE 10+ */
+        color: #ffffff;
+    }
+    input[type=text]:-moz-placeholder { /* Firefox 18- */
+        color: #ffffff;
+    }
+    //input[type=text]:hover {
+    //    background-color: #f7f7f7;
+    //    color: #2196f3;
+    //}
+    //input[type=text]::-webkit-input-placeholder:hover { /* Chrome/Opera/Safari */
+    //    color: #2196f3;
+    //}
+    //input[type=text]::-moz-placeholder:hover { /* Firefox 19+ */
+    //    color: #2196f3;
+    //}
+    //input[type=text]:-ms-input-placeholder:hover { /* IE 10+ */
+    //    color: #2196f3;
+    //}
+    //input[type=text]:-moz-placeholder:hover { /* Firefox 18- */
+    //    color: #2196f3;
+    //}
+    .search {
+        padding-right: 25px;
+        padding-left: 6px;
+        background-image: url(/assets/common/images/icons/white-search.png);
+        background-repeat: no-repeat;
+        background-size: 16px;
+        background-position: right 8px center;
+    }
+    //.search:hover {
+    //    padding-right: 25px;
+    //    padding-left: 4px;
+    //    background-image: url(/assets/common/images/icons/blue-search.png);
+    //    background-repeat: no-repeat;
+    //    background-size: 16px;
+    //    background-position: right 8px center;
+    //}
 }
 
 #ListManager .content .lists span.action {
@@ -306,25 +877,62 @@
     text-decoration: none;
 }
 
-#QuickAddUser table {
+#quickAddUser form {
+    margin: 0;
+}
+
+#quickAddUser table {
     width: 100%;
     table-layout: auto;
 }
 
-#QuickAddUser table tr td {
+#quickAddUser table tr td {
     padding: 5px;
 }
 
-#QuickAddUser table td:last-child {
+#quickAddUser table td:last-child {
     text-align: left;
 }
 
-#QuickAddUser input {
-    border: 1px solid #cccccc;
-    border-radius: $defaultBorderRadius;
-    box-shadow: 0 1px 1px #eeeeee;
+#quickAddUser input {
+    //border: 1px solid #cccccc;
+    //border-radius: $defaultBorderRadius;
+    //box-shadow: 0 1px 1px #eeeeee;
     display: inline-block;
     margin: 0 5px 0 0;
     padding: 4px;
     width: 95%;
+}
+
+#quickAddUser input[name=email] {
+    width: 97.5%;
+}
+
+#quickAddUser button {
+    border-radius: 15px;
+    background-color: #ffffff;
+    border: solid 1px #2196f3;
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #2196f3;
+    height: 30px;
+    min-width: 135px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#quickAddUser button:hover {
+    background-color: #2196f3;
+    color: #FFFFFF;
+}
+#quickAddUser button:nth-child(2) {
+    background-color: #2196f3;
+    color: #FFFFFF;
 }

@@ -36,6 +36,18 @@ const Feedback = function (services, options) {
         $this.selection.empty();
     });
 
+    this.container.on('click', '.content .options .delete-selection', function (event) {
+        _.each($('.badges.selectionnable').children(), function(item) {
+            var $elem = $(item);
+            if($elem.hasClass('selected')) {
+                $elem.fadeOut(function () {
+                    $elem.remove();
+                });
+            }
+        });
+        return false;
+    });
+
     $('.UserTips', this.container).tooltip();
 
     /*this.container.on('click', '.user_adder', function (event) {
@@ -160,6 +172,10 @@ const Feedback = function (services, options) {
 
         var buttons = {};
 
+        buttons[localeService.t('annuler')] = function () {
+            $dialog.close();
+        };
+
         buttons[localeService.t('send')] = function () {
             if ($.trim($('input[name="name"]', $dialog.getDomElement()).val()) === '') {
                 var options = {
@@ -184,15 +200,16 @@ const Feedback = function (services, options) {
             $FeedBackForm.trigger('submit');
         };
         var options = {
-            size: 'Medium',
+            size: '558x360',
             buttons: buttons,
             loading: true,
             title: localeService.t('send'),
             closeOnEscape: true,
-            cancelButton: true
         };
 
         var $dialog = dialog.create(services, options, 2);
+
+        $dialog.getDomElement().closest('.ui-dialog').addClass('dialog_container');
 
 
         var $FeedBackForm = $('form[name="FeedBackForm"]', $container);
@@ -222,6 +239,14 @@ const Feedback = function (services, options) {
         $this.find('input').val($this.hasClass('status_on') ? '1' : '0');
 
         return false;
+    });
+
+    this.container.on('mouseenter', '#info-box-trigger', function(event) {
+        $('#info-box').show();
+    });
+
+    this.container.on('mouseleave', '#info-box-trigger', function(event) {
+        $('#info-box').hide();
     });
 
     // toggle feature state of selected users
