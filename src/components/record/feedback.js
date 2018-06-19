@@ -14,6 +14,8 @@ const recordFeedbackModal = (services, datas) => {
             title: localeService.t('feedback')
         });
 
+        $dialog.getDomElement().closest('.ui-dialog').addClass('feedback_dialog_container');
+
         $.post(`${url}prod/push/validateform/`, datas, function (data) {
             // data content's javascript can't be fully refactored
             $dialog.setContent(data);

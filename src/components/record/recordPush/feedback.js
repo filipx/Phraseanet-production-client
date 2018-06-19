@@ -28,6 +28,26 @@ const Feedback = function (services, options) {
 
     var $this = this;
 
+    this.container.on('mouseenter', '.list-trash-btn', function (event) {
+        var $el = $(event.currentTarget);
+        $el.find('.image-normal').hide();
+        $el.find('.image-hover').show();
+        ;    });
+
+    this.container.on('mouseleave', '.list-trash-btn', function (event) {
+        var $el = $(event.currentTarget);
+        $el.find('.image-normal').show();
+        $el.find('.image-hover').hide();
+    });
+
+    this.container.on('click', '.list-trash-btn', function (event) {
+        var $el = $(event.currentTarget);
+        var list_id = $el.parent().data('list-id');
+
+        appEvents.emit('push.removeList', {list_id: list_id});
+    });
+
+
     this.container.on('click', '.content .options .select-all', function (event) {
         $this.selection.selectAll();
     });
@@ -164,7 +184,7 @@ const Feedback = function (services, options) {
         return false;
     });
 
-    $('.FeedbackSend', this.container).bind('click', function () {
+    $('.FeedbackSend', this.container).bind('click', function (event) {
         if ($('.badges .badge', $container).length === 0) {
             alert(localeService.t('FeedBackNoUsersSelected'));
             return;
@@ -199,6 +219,8 @@ const Feedback = function (services, options) {
 
             $FeedBackForm.trigger('submit');
         };
+
+
         var options = {
             size: '558x360',
             buttons: buttons,
@@ -207,9 +229,17 @@ const Feedback = function (services, options) {
             closeOnEscape: true,
         };
 
+        const $el = $(event.currentTarget);
+        if($el.hasClass('validation')) {
+            options.isValidation = true;
+        }
+
         var $dialog = dialog.create(services, options, 2);
 
         $dialog.getDomElement().closest('.ui-dialog').addClass('dialog_container');
+        if(options.isValidation) {
+            $dialog.getDomElement().closest('.ui-dialog').addClass('validation');
+        }
 
 
         var $FeedBackForm = $('form[name="FeedBackForm"]', $container);

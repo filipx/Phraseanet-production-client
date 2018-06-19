@@ -1,3 +1,6 @@
+$pushThemeColor: #2196f3;
+$feedbackThemeColor: #8bc34a;
+
 .dialog_container {
     border-radius: 6px !important;
     background-color: #ffffff !important;
@@ -26,7 +29,7 @@
     .ui-dialog-buttonpane .ui-button {
         border-radius: 15px;
         background-color: #ffffff;
-        border: solid 1px #2196f3;
+        border: solid 1px $pushThemeColor;
         font-family: Roboto;
         font-size: 14px;
         font-weight: normal;
@@ -34,7 +37,7 @@
         font-stretch: normal;
         line-height: normal;
         letter-spacing: normal;
-        color: #2196f3;
+        color: $pushThemeColor;
         height: 30px;
         min-width: 135px;
         padding-left: 20px;
@@ -43,11 +46,11 @@
         margin-right: 10px;
     }
     .ui-dialog-buttonpane .ui-button:hover {
-        background-color: #2196f3;
+        background-color: $pushThemeColor;
         color: #FFFFFF;
     }
     .ui-dialog-buttonpane .ui-button:nth-child(2) {
-        background-color: #2196f3;
+        background-color: $pushThemeColor;
         color: #FFFFFF;
     }
     .ui-button-icon-only {
@@ -101,11 +104,27 @@
     }
 }
 
+.dialog_container.validation {
+    .ui-dialog-buttonpane .ui-button {
+        background-color: #ffffff;
+        border: solid 1px $feedbackThemeColor;
+        color: $feedbackThemeColor;
+    }
+    .ui-dialog-buttonpane .ui-button:hover {
+        background-color: $feedbackThemeColor;
+        color: #FFFFFF;
+    }
+    .ui-dialog-buttonpane .ui-button:nth-child(2) {
+        background-color: $feedbackThemeColor;
+        color: #FFFFFF;
+    }
+}
+
 /** PUSH BOX */
-.push_dialog_container {
+.push_dialog_container, .feedback_dialog_container {
     background: #282828;
 }
-.push_dialog_container .ui-dialog-title {
+.push_dialog_container .ui-dialog-title, .feedback_dialog_container .ui-dialog-title {
     font-family: Roboto;
     font-size: 21px;
     font-weight: bold;
@@ -116,19 +135,71 @@
     color: #ffffff;
 }
 
-.push_dialog_container .ui-widget-content {
+.push_dialog_container .ui-widget-content, .feedback_dialog_container .ui-widget-content {
     background-color: #4f4f4f;
 }
 
-.push_dialog_container .ui-dialog-titlebar-close {
+.push_dialog_container .ui-dialog-titlebar-close, .feedback_dialog_container .ui-dialog-titlebar-close {
     border: none;
     margin-right: 4px;
 }
 
-.push_dialog_container .ui-icon.ui-icon-closethick {
+.push_dialog_container .ui-icon.ui-icon-closethick, .feedback_dialog_container .ui-icon.ui-icon-closethick {
     background-image: url("/assets/common/images/icons/picto-close-window.png");
     background-position: center;
     background-size: cover;
+}
+
+.feedback_dialog_container {
+    .PushBox .round-blue-border-btn {
+        border: solid 1px $feedbackThemeColor;
+        color: $feedbackThemeColor;
+    }
+    .PushBox .round-blue-border-btn:hover {
+        border: solid 2px $feedbackThemeColor;
+    }
+    .PushBox .FeedbackSend {
+        background-color: $feedbackThemeColor;
+    }
+    .PushBox .FeedbackSend:hover {
+        background-color: #A3DD63;
+    }
+    .PushBox .saveList {
+        color: $feedbackThemeColor;
+    }
+    .PushBox .saveList:hover {
+        background-color: $feedbackThemeColor;
+    }
+    .PushBox .push-add-user {
+        color: $feedbackThemeColor;
+    }
+    .PushBox .push-add-user:hover {
+        background-color: $feedbackThemeColor;
+    }
+    .PushBox .user_content .badges .badge .icon {
+        background-color: $feedbackThemeColor;
+    }
+    #PushBox .general_togglers button {
+        color: $feedbackThemeColor;
+    }
+    #PushBox .general_togglers button:hover {
+        background-color: $feedbackThemeColor;
+    }
+    #find-user input[type=text] {
+        background-color: $feedbackThemeColor;
+    }
+    #quickAddUser button {
+        border: solid 1px $feedbackThemeColor;
+        color: $feedbackThemeColor;
+
+    }
+
+    #quickAddUser button:hover {
+        background-color: $feedbackThemeColor;
+    }
+    #quickAddUser button:nth-child(2) {
+        background-color: $feedbackThemeColor;
+    }
 }
 
 .PushBox .round-blue-border-btn {
@@ -136,7 +207,7 @@
     border-radius: 13.5px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.18);
     background-color: #ffffff;
-    border: solid 1px #2196f3;
+    border: solid 1px $pushThemeColor;
     font-family: Roboto;
     font-size: 12px;
     font-weight: 500;
@@ -144,7 +215,7 @@
     font-stretch: normal;
     line-height: normal;
     letter-spacing: normal;
-    color: #2196f3;
+    color: $pushThemeColor;
     padding: 0px 20px;
 }
 
@@ -171,14 +242,14 @@
 }
 
 .PushBox .round-blue-border-btn:hover {
-    border: solid 2px #2196f3;
+    border: solid 2px $pushThemeColor;
 }
 
 .PushBox .FeedbackSend {
     width: 180px;
     height: 24px;
     border-radius: 6px;
-    background-color: #2196f3;
+    background-color: $pushThemeColor;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.33);
     font-family: Roboto;
     font-size: 12px;
@@ -210,7 +281,7 @@
     font-stretch: normal;
     line-height: normal;
     letter-spacing: normal;
-    color: #2196f3;
+    color: $pushThemeColor;
     border: none;
     padding: 4px 0px;
     margin-left: 4px;
@@ -231,7 +302,7 @@
 }
 
 .PushBox .saveList:hover {
-    background-color: #2196f3;
+    background-color: #A3DD63;
     color: #ffffff;
     .image-normal {
         display: none;
@@ -280,7 +351,7 @@
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-    color: #2196f3;
+    color: $pushThemeColor;
     line-height: 26px;
     padding: 0px 16px;
     margin-top: 2px;
@@ -312,7 +383,11 @@
    transition: none;
    background-position: 0 30px;
    color: #f7f7f7;
-   background-color: #2196f3;
+   background-color: $pushThemeColor;
+}
+
+.feedback_dialog_container .PushBox .content .list-container {
+    top: 140px;
 }
 
 .PushBox .content {
@@ -452,12 +527,16 @@
 }
 
 .PushBox .user_content .badges .badge td.toggle {
-    vertical-align: bottom;
+    img {
+        width: auto;
+        height: 20px;
+    }
+    vertical-align: middle;
 }
 
 .PushBox .user_content .badges .badge .icon {
     width: 70px;
-    background-color: #2196f3;
+    background-color: $pushThemeColor;
     border-radius: 7px 0px 0px 7px;
 }
 
@@ -692,6 +771,7 @@
 }
 
 #PushBox .general_togglers button {
+    position: relative;
     margin: 0;
     width: 100%;
     height: 28px;
@@ -704,11 +784,14 @@
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
-    color: #2196f3;
+    color: $pushThemeColor;
     line-height: 28px;
     padding: 0px 12px;
     border-width: 0;
     img {
+        position: absolute;
+        left: 10px;
+        top: 5px;
         width: 16px;
         height: 16px;
     }
@@ -721,7 +804,7 @@
 }
 
 #PushBox .general_togglers button:hover {
-    background-color: #2196f3;
+    background-color: $pushThemeColor;
     color: #f7f7f7;
     .image-normal {
         display: none;
@@ -802,7 +885,7 @@
     input[type=text] {
         width: 180px;
         border-radius: 5px;
-        background-color: #2196f3;
+        background-color: $pushThemeColor;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0);
         border: none;
         font-family: Helvetica;
@@ -911,7 +994,7 @@
 #quickAddUser button {
     border-radius: 15px;
     background-color: #ffffff;
-    border: solid 1px #2196f3;
+    border: solid 1px $pushThemeColor;
     font-family: Roboto;
     font-size: 14px;
     font-weight: normal;
@@ -919,7 +1002,7 @@
     font-stretch: normal;
     line-height: normal;
     letter-spacing: normal;
-    color: #2196f3;
+    color: $pushThemeColor;
     height: 30px;
     min-width: 135px;
     padding-left: 20px;
@@ -929,10 +1012,28 @@
 }
 
 #quickAddUser button:hover {
-    background-color: #2196f3;
+    background-color: $pushThemeColor;
     color: #FFFFFF;
 }
 #quickAddUser button:nth-child(2) {
-    background-color: #2196f3;
+    background-color: $pushThemeColor;
     color: #FFFFFF;
+}
+
+.validation {
+    #quickAddUser button {
+        background-color: #ffffff;
+        border: solid 1px $feedbackThemeColor;
+        color: $feedbackThemeColor;
+    }
+
+    #quickAddUser button:hover {
+        background-color: $feedbackThemeColor;
+        color: #FFFFFF;
+    }
+    #quickAddUser button:nth-child(2) {
+        background-color: $feedbackThemeColor;
+        color: #FFFFFF;
+    }
+
 }

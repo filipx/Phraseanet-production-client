@@ -29,19 +29,27 @@ const pushAddUser = (services) => {
                 dialogOptions.title = $el.html;
             }
 
+            if($el.hasClass('validation')) {
+                dialogOptions.isValidation = true;
+            }
+
             openModal(dialogOptions);
         });
     };
 
     const openModal = (options = {}) => {
         const url = configService.get('baseUrl');
-        let dialogOptions = {
-            size: '558x260',
+        let dialogOptions = merge({
+            size: '558x284',
             loading: false,
             title: localeService.t('create new user'),
-        };
+        }, options);
         const $dialog = dialog.create(services, dialogOptions, 2);
         $dialog.getDomElement().closest('.ui-dialog').addClass('dialog_container');
+
+        if(dialogOptions.isValidation) {
+            $dialog.getDomElement().closest('.ui-dialog').addClass('validation');
+        }
 
         return $.get(`${url}prod/push/add-user/`, function (data) {
             $dialog.setContent(data);
