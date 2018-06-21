@@ -28,12 +28,44 @@ const Feedback = function (services, options) {
 
     var $this = this;
 
+    this.container.on('mouseenter', '.list-trash-btn', function (event) {
+        var $el = $(event.currentTarget);
+        $el.find('.image-normal').hide();
+        $el.find('.image-hover').show();
+        ;    });
+
+    this.container.on('mouseleave', '.list-trash-btn', function (event) {
+        var $el = $(event.currentTarget);
+        $el.find('.image-normal').show();
+        $el.find('.image-hover').hide();
+    });
+
+    this.container.on('click', '.list-trash-btn', function (event) {
+        var $el = $(event.currentTarget);
+        var list_id = $el.parent().data('list-id');
+
+        appEvents.emit('push.removeList', {list_id: list_id});
+    });
+
+
     this.container.on('click', '.content .options .select-all', function (event) {
         $this.selection.selectAll();
     });
 
     this.container.on('click', '.content .options .unselect-all', function (event) {
         $this.selection.empty();
+    });
+
+    this.container.on('click', '.content .options .delete-selection', function (event) {
+        _.each($('.badges.selectionnable').children(), function(item) {
+            var $elem = $(item);
+            if($elem.hasClass('selected')) {
+                $elem.fadeOut(function () {
+                    $elem.remove();
+                });
+            }
+        });
+        return false;
     });
 
     $('.UserTips', this.container).tooltip();
@@ -152,13 +184,17 @@ const Feedback = function (services, options) {
         return false;
     });
 
-    $('.FeedbackSend', this.container).bind('click', function () {
+    $('.FeedbackSend', this.container).bind('click', function (event) {
         if ($('.badges .badge', $container).length === 0) {
             alert(localeService.t('FeedBackNoUsersSelected'));
             return;
         }
 
         var buttons = {};
+
+        buttons[localeService.t('annuler')] = function () {
+            $dialog.close();
+        };
 
         buttons[localeService.t('send')] = function () {
             if ($.trim($('input[name="name"]', $dialog.getDomElement()).val()) === '') {
@@ -183,16 +219,27 @@ const Feedback = function (services, options) {
 
             $FeedBackForm.trigger('submit');
         };
+
+
         var options = {
-            size: 'Medium',
+            size: '558x360',
             buttons: buttons,
             loading: true,
             title: localeService.t('send'),
             closeOnEscape: true,
-            cancelButton: true
         };
 
+        const $el = $(event.currentTarget);
+        if($el.hasClass('validation')) {
+            options.isValidation = true;
+        }
+
         var $dialog = dialog.create(services, options, 2);
+
+        $dialog.getDomElement().closest('.ui-dialog').addClass('dialog_container');
+        if(options.isValidation) {
+            $dialog.getDomElement().closest('.ui-dialog').addClass('validation');
+        }
 
 
         var $FeedBackForm = $('form[name="FeedBackForm"]', $container);
@@ -222,6 +269,14 @@ const Feedback = function (services, options) {
         $this.find('input').val($this.hasClass('status_on') ? '1' : '0');
 
         return false;
+    });
+
+    this.container.on('mouseenter', '#info-box-trigger', function(event) {
+        $('#info-box').show();
+    });
+
+    this.container.on('mouseleave', '#info-box-trigger', function(event) {
+        $('#info-box').hide();
     });
 
     // toggle feature state of selected users

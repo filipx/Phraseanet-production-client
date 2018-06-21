@@ -316,7 +316,10 @@ ListManager.prototype = {
         this.userList.create(name, function (list) {
             list.addUsers(collection);
         });
-
+    },
+    removeList: function (list_id, callback) {
+        this.list = new List(list_id);
+        this.list.remove(callback);
     }
 };
 

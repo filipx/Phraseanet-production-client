@@ -31,12 +31,46 @@ const pushRecord = (services) => {
 
     }
 
+    function removeList(list_id) {
+        var makeDialog = function (box) {
+
+            var buttons = {};
+
+            buttons[localeService.t('valider')] = function () {
+
+                var callbackOK = function () {
+                    $('.list-container ul.list').children().each(function() {
+                        if($(this).data('list-id') == list_id.list_id) {
+                            $(this).remove();
+                        }
+                    });
+                    dialog.get(2).close();
+                };
+
+                listManagerInstance.removeList(list_id.list_id, callbackOK);
+            };
+
+            var options = {
+                cancelButton: true,
+                buttons: buttons,
+                size: 'Alert'
+            };
+
+            dialog.create(services, options, 2).setContent(box);
+        };
+
+        var html = _.template($('#list_editor_dialog_delete_tpl').html());
+
+        makeDialog(html);
+    }
+
     appEvents.listenAll({
         // 'push.doInitialize': initialize,
         'push.addUser': Feedback.addUser,
         'push.setActiveList': setActiveList,
         'push.createList': createList,
-        'push.reload': reloadBridge
+        'push.reload': reloadBridge,
+        'push.removeList': removeList
     });
 
     return {
