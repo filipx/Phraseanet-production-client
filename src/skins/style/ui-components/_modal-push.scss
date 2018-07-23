@@ -501,9 +501,21 @@ input.text_input_white {
 .btn.btn-orange-inverse {
     background-color: $orangeThemeColor;
     color: $textInverseColor;
+    .image-normal {
+         display: none;
+     }
+     .image-hover {
+         display: inline;
+     }
     &:hover {
         color: $orangeThemeColor;
         background-color: #fff;
+        .image-normal {
+             display: inline;
+         }
+         .image-hover {
+             display: none;
+         }
     }
 }
 
