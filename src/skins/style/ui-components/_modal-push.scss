@@ -229,6 +229,13 @@ input.text_input_white {
       background-color: $orangeThemeColor;
       color: $textInverseColor;
     }
+    .btn.btn-push-orange.btn-orange-inverse {
+      color: $textInverseColor;
+    }
+    .btn.btn-push-orange.btn-orange-inverse:hover {
+      background-color: $textInverseColor;
+      color: $orangeThemeColor;
+    }
 }
 
 .PushBox .round-blue-border-btn {
@@ -775,11 +782,11 @@ input.text_input_white {
     overflow: auto;
 }
 
-.PushBox .LeftColumn .content ul.list li:nth-child(odd) {
+.PushBox .LeftColumn .content ul.lists li:nth-child(odd) {
     background-color: none;
 }
 
-.PushBox .LeftColumn .content ul.list li:nth-child(even) {
+.PushBox .LeftColumn .content ul.lists li:nth-child(even) {
     background-color: #515150;
 }
 
@@ -791,7 +798,7 @@ input.text_input_white {
 //     background-color: #515150;
 // }
 
-.PushBox .LeftColumn .content ul.list li.selected {
+.PushBox .LeftColumn .content ul.lists li.selected {
     background-color: #aaa;
 }
 
@@ -804,7 +811,7 @@ input.text_input_white {
     padding: 3px 0;
 }
 
-.PushBox .LeftColumn .content ul.list li {
+.PushBox .LeftColumn .content ul.lists li {
     font-family: Roboto;
     font-size: 13px;
     font-weight: normal;
@@ -833,7 +840,7 @@ input.text_input_white {
     }
 }
 
-.PushBox .LeftColumn .content ul.list li:hover {
+.PushBox .LeftColumn .content ul.lists li:hover {
     background-color: #b8b8b8;
     //.list-trash-btn {
     //    .image-normal {
@@ -1172,8 +1179,12 @@ input.text_input_white {
     width: 100%;
 }
 
-#ListManager .content ul.list li:nth-child(even) {
+#ListManager .content ul.lists li:nth-child(even) {
     background-color: #c8c8c8;
+}
+
+#ListManager .content ul.lists li.selected:nth-child(even) {
+    background-color: #aaa;
 }
 
 #ListManager .editor {
@@ -1218,6 +1229,8 @@ input.text_input_white {
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
         overflow: hidden;
+        font-size: 12px;
+        color: #000;
     }
     .list_editor_selector td select::-webkit-scrollbar-track {
         background-color: #ffffff;

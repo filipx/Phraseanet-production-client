@@ -147,8 +147,8 @@ const ListManager = function (services, options) {
             event.preventDefault();
             let $el = $(event.currentTarget);
             const listId = $el.data('list-id');
-            $el.closest('.lists').find('.list.selected').removeClass('selected');
-            $el.parent('li.list').addClass('selected');
+            $el.closest('.lists').find('.list').removeClass('selected');
+            $el.parent().addClass('selected');
 
             $.ajax({
                 type: 'GET',
