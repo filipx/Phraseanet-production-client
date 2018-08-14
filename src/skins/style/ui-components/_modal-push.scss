@@ -525,6 +525,10 @@ input.text_input_white {
          }
     }
 }
+.select-all, .unselect-all {
+    border-radius: 17px;
+    padding: 0px 16px;
+}
 
 .list_refresh {
     width: 20px;
