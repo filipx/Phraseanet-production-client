@@ -19,6 +19,8 @@ const ListManager = function (services, options) {
 
     pushAddUser(services).initialize({$container: this.container});
 
+    var _this = this;
+
     $container.on('click', '.back_link', function () {
             $('#PushBox').show();
             $('#ListManager').hide();
@@ -311,10 +313,10 @@ const ListManager = function (services, options) {
             },
             select: function (event, ui) {
                 if (ui.item.type === 'USER') {
-                    this.selectUser(ui.item);
+                    _this.selectUser(ui.item);
                 } else if (ui.item.type === 'LIST') {
                     for (let e in ui.item.entries) {
-                        this.selectUser(ui.item.entries[e].User);
+                        _this.selectUser(ui.item.entries[e].User);
                     }
                 }
                 return false;

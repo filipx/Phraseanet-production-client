@@ -1337,4 +1337,17 @@ input.text_input_white {
         color: #FFFFFF;
     }
 
+}.push-add-user-listmanager {
+    #quickAddUser button {
+        border: solid 1px $orangeThemeColor;
+        color: $orangeThemeColor;
+    }
+    #quickAddUser button:hover {
+        background-color: $orangeThemeColor;
+        color: #FFFFFF;
+    }
+    #quickAddUser button:nth-child(2) {
+        background-color: $orangeThemeColor;
+        color: #FFFFFF;
+    }
 }
