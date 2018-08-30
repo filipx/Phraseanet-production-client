@@ -126,7 +126,8 @@ $answersInfoLabelColor: #949494 !default;
         font-size: 11px;
         line-height: 12px;
         border-right: 1px solid $answersDocInfoBorder;
-        .detailed_info_btn {
+        position: relative;
+        .detailed_info_holder {
             position: absolute;
             top: 20px;
             right: 10px;
@@ -145,16 +146,15 @@ $answersInfoLabelColor: #949494 !default;
                     display: block;
                 }
             }
-            &:hover + .detailed_info {
+            &:hover .detailed_info {
                 display: block;
             }
         }
         .detailed_info {
             display: none;
             position: absolute;
-            bottom: 45px;
+            bottom: 27px;
             min-width: 240px;
-            left: 110px;
             background-color: #1B6577;
             padding: 10px;
             border-radius: 5px;
