@@ -77,7 +77,7 @@ input.text_input_white {
         text-align: center;
     }
     .ui-widget-content {
-        label {
+        label, p {
             font-family: Roboto;
             font-size: 14px;
             color: #4a4a4a;
@@ -133,6 +133,166 @@ input.text_input_white {
         background-color: $feedbackThemeColor;
         color: #FFFFFF;
     }
+}
+
+.dialog_container.dialog_add_list {
+    border: 0 none;
+    -webkit-box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    .ui-dialog-content form {
+        margin: 0;
+        label {
+            font-size: 12px;
+        }
+        input {
+            margin: 10px 0 0;
+            width: calc(100% - 10px);
+        }
+    }
+    .ui-dialog-buttonpane {
+        border-top: 0 none;
+        margin-top: 0;
+        button.ui-button {
+            background-color: #ffffff;
+            border: solid 1px $orangeThemeColor;
+            color: $orangeThemeColor;
+            min-width: 115px;
+        }
+        button.ui-button:hover {
+            background-color: $orangeThemeColor;
+            color: #FFFFFF;
+        }
+        button.ui-button:first-child {
+            float: right;   
+            background-color: $orangeThemeColor;
+            color: #FFFFFF;
+        }
+    }
+}
+
+.dialog_container.dialog_delete_list {
+    border: 0 none;
+    -webkit-box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    .ui-dialog-content form {
+        margin: 0;
+        label {
+            font-size: 12px;
+        }
+        input {
+            margin: 10px 0 0;
+            width: calc(100% - 10px);
+        }
+    }
+    .ui-dialog-buttonpane {
+        border-top: 0 none;
+        margin-top: 0;
+        button.ui-button {
+            background-color: #ffffff;
+            border: solid 1px $pushThemeColor;
+            color: $pushThemeColor;
+            min-width: 115px;
+        }
+        button.ui-button:hover {
+            background-color: $pushThemeColor;
+            color: #FFFFFF;
+        }
+        button.ui-button:first-child {
+            float: right;   
+            background-color: $pushThemeColor;
+            color: #FFFFFF;
+        }
+    }
+}
+.dialog_container.dialog_delete_list_listmanager {
+    .ui-dialog-buttonpane {
+        button.ui-button {
+            border: solid 1px $orangeThemeColor;
+            color: $orangeThemeColor;
+        }
+        button.ui-button:hover {
+            background-color: $orangeThemeColor;
+        }
+        button.ui-button:first-child {
+            float: right;   
+            background-color: $orangeThemeColor;
+        }
+    }
+}
+
+.dialog_container.dialog_share_list {
+    border: 0 none;
+    -webkit-box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    .ui-dialog-content form {
+        label {
+            font-size: 12px;
+            display: inline;
+        }
+        input {
+            margin: 10px 0 0;
+            width: calc(100% - 10px);
+        }
+        select {
+            width: auto;
+            height: 20px;
+            line-height: 20px;
+            font-size: 12px;
+        }
+    }
+    .ui-dialog-buttonpane {
+        border-top: 0 none;
+        margin-top: 0;
+        button.ui-button {
+            background-color: #ffffff;
+            border: solid 1px $orangeThemeColor;
+            color: $orangeThemeColor;
+            min-width: 115px;
+            &:hover {
+                background-color: $orangeThemeColor;
+                color: #FFFFFF;
+            }
+            &:first-child {
+                float: right;   
+                background-color: $orangeThemeColor;
+                color: #FFFFFF;
+            }
+        }
+    }
+    .ui-dialog-content form.list_share_user {
+        input[type=text] {
+            width: 250px;
+            height: 26px;
+            border-radius: 5px;
+            background-color: $orangeThemeColor;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0);
+            border: none;
+            font-family: Helvetica;
+            font-size: 12px;
+            color: #ffffff;
+            padding-left: 6px;
+            background-image: url("/assets/common/images/icons/white-search.png");
+            background-repeat: no-repeat;
+            background-size: 20px;
+            background-position: right 8px center;
+        }
+        input[type=text]::-webkit-input-placeholder {
+            /* Chrome/Opera/Safari */
+            color: #ffffff;
+            font-size: 12px;
+        }
+    }
+    .ui-dialog-content td {
+        color: #000000;
+    }
+    .ui-dialog-content td.listmanager_badge_img {
+        width: 28px;
+        padding: 7px 7px;
+        background-color: $orangeThemeColor;
+    }
+    .ui-dialog-content td.listmanager_badge_img img {
+        width: 28px;
+      }
 }
 
 /** PUSH BOX */
@@ -935,10 +1095,39 @@ input.text_input_white {
     display: inline;
 }
 
-#ListShare table {
-    width: 100%;
-    margin: 5px;
-    background-color: #505050;
+#ListShare {
+    .info-box-share-holder {
+        position: fixed;
+        margin: -35px 0 0 115px;
+        
+        #info-box-trigger {
+            cursor: pointer;
+        }
+        #info-box-trigger:hover + #info-box {
+            display: block !important;
+        }
+        #info-box {
+            width: 250px;
+            border-radius: 8px;
+            background-color: #ededed;
+            padding: 8px 12px;
+            p {
+                margin: 0;
+                font-family: Roboto;
+                font-size: 12px;
+                font-weight: normal;
+                font-style: normal;
+                font-stretch: normal;
+                line-height: 1.4;
+                letter-spacing: 0px;
+                color: #000000;
+            }
+        }
+    }
+    table {
+        width: 100%;
+        margin: 12px 0;
+    }
 }
 
 #ListManager .content.readonly .badge {
