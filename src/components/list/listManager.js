@@ -87,18 +87,25 @@ const ListManager = function (services, options) {
 
     var initLeft = () => {
         $container.on('click', '.push-refresh-list-action', (event) => {
+            event.preventDefault();
+
             //$('a.list_refresh', $container).bind('click', (event) => {
             // /prod/lists/all/
-            var callback = function (datas) {
+            var selectedList = $('.lists_manager_list.selected').data('list-id')
+
+            var callback = function (datas, selected) {
                 $('.all-lists', $container).removeClass('loading').append(datas);
-                initLeft();
+
+                if (typeof selected === 'number') {
+                    $('.all-lists').find('.lists_manager_list[data-list-id="' + selected + '"]').addClass('selected');
+                }
+                // initLeft();
             };
 
             $('.all-lists', $container).empty().addClass('loading');
 
-            this.userList.get(callback, 'html');
+            this.userList.get(callback, 'html', selected);
 
-            return false;
         });
 
         $container.on('click', '.push-add-list-action', (event) => {
