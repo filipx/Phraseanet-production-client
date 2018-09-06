@@ -27,7 +27,7 @@ const ListManager = function (services, options) {
 
             listShare(services).openModal({
                 listId, modalOptions: {
-                    size: 'Small',
+                    size: '350x500',
                     closeButton: true,
                     title: $el.attr('title')
                 }, modalLevel: 2
@@ -78,7 +78,12 @@ const ListManager = function (services, options) {
         .on('click', '.list-trash-btn', function (event) {
             var $el = $(event.currentTarget);
             var list_id = $el.parent().data('list-id');
-            appEvents.emit('push.removeList', {list_id: list_id});
+            appEvents.emit('push.removeList', {
+                    list_id: list_id, 
+                    container: containerId
+                }
+            );
+
         });
 
     var initLeft = () => {
@@ -123,10 +128,14 @@ const ListManager = function (services, options) {
                 var options = {
                     cancelButton: true,
                     buttons: buttons,
-                    size: '700x170'
+                    title: localeService.t('New list'),
+                    size: '315x170'
                 };
 
-                dialog.create(services, options, 2).setContent(box);
+                const $dialog = dialog.create(services, options, 2);
+                $dialog.getDomElement().closest('.ui-dialog').addClass('dialog_container dialog_add_list')
+                    .find('.ui-dialog-buttonset button:first-child .ui-button-text').text('Add');
+                $dialog.setContent(box);
             };
 
             var html = _.template($('#list_editor_dialog_add_tpl').html());
