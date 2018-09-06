@@ -3,6 +3,7 @@ import {Lists, List} from './model/index';
 import listEditor from './listEditor';
 import listShare from './listShare';
 import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
+import pushAddUser from '../record/recordPush/addUser';
 import * as _ from 'underscore';
 const humane = require('humane-js');
 
@@ -11,10 +12,14 @@ const ListManager = function (services, options) {
     const { containerId } = options;
     const url = configService.get('baseUrl');
     let $container;
+    const _this = this;
 
     this.list = null;
     this.container = $container = $(containerId);
     this.userList = new Lists();
+
+    pushAddUser(services).initialize({$container: this.container});
+
     $container.on('click', '.back_link', function () {
             $('#PushBox').show();
             $('#ListManager').hide();
@@ -305,6 +310,51 @@ const ListManager = function (services, options) {
 
             return false;
         });
+
+        $('input[name="users-search"]', $container).autocomplete({
+            minLength: 2,
+            source: function (request, response) {
+                $.ajax({
+                    url: `${url}prod/push/search-user/`,
+                    dataType: 'json',
+                    data: {
+                        query: request.term
+                    },
+                    success: function (data) {
+                        response(data);
+                    }
+                });
+            },
+            focus: function (event, ui) {
+                $('input[name="users-search"]').val(ui.item.label);
+            },
+            select: function (event, ui) {
+                if (ui.item.type === 'USER') {
+                    _this.selectUser(ui.item);
+                } else if (ui.item.type === 'LIST') {
+                    for (let e in ui.item.entries) {
+                        _this.selectUser(ui.item.entries[e].User);
+                    }
+                }
+                return false;
+            }
+        })
+        .data('ui-autocomplete')._renderItem = function (ul, item) {
+            var html = '';
+    
+            if (item.type === 'USER') {
+                html = _.template($('#list_user_tpl').html())({
+    
+                    item: item
+                });
+            } else if (item.type === 'LIST') {
+                html = _.template($('#list_list_tpl').html())({
+                    item: item
+                });
+            }
+    
+            return $(html).data('ui-autocomplete-item', item).appendTo(ul);
+        };
     };
 
     initLeft();
@@ -329,9 +379,31 @@ const ListManager = function (services, options) {
         return false;
     });
 
+    return this;
+
 };
 
 ListManager.prototype = {
+    selectUser: function (user) {
+        if (typeof user !== 'object') {
+            if (window.console) {
+                console.log('trying to select a user with wrong datas');
+            }
+        }
+        if ($('.badge_' + user.usr_id, this.container).length > 0) {
+            humane.info('User already selected');
+            return;
+        }
+        else {
+            var html = _.template($('#list_manager_badge_tpl').html())({
+                user: user
+            });
+    
+            // p4.Feedback.appendBadge(html);
+            this.getList().addUser(user.usr_id);
+            this.appendBadge(html);
+        }
+    },
     workOn: function (list_id) {
         this.list = new List(list_id);
     },
