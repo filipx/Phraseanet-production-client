@@ -38,7 +38,7 @@ Lists.prototype = {
         });
 
     },
-    get: function (callback, type) {
+    get: function (callback, type, selectedList) {
 
         type = typeof type === 'undefined' ? 'json' : type;
 
@@ -61,7 +61,7 @@ Lists.prototype = {
                     }
                 } else {
                     if (typeof callback === 'function') {
-                        callback(data);
+                        callback(data, selectedList);
                     }
                 }
             }
