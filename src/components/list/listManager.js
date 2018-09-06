@@ -202,8 +202,8 @@ const ListManager = function (services, options) {
 
         var $container = $('#ListManager .editor');
 
-        $('form[name="list-editor-search"]', $container).bind('submit', function () {
-
+        $('form[name="list-editor-search"]', $container).bind('submit', function (event) {
+            event.preventDefault();
             var $this = $(this);
             var dest = $('.list-editor-results', $container);
 
@@ -216,11 +216,12 @@ const ListManager = function (services, options) {
                     dest.empty().addClass('loading');
                 },
                 success: function (datas) {
-
                     dest.empty().removeClass('loading').append(datas);
+                    listEditor(services, {
+                        $container, listManagerInstance: this
+                    });
                 }
             });
-            return false;
         });
 
         $('form[name="list-editor-search"] select, form[name="list-editor-search"] input[name="ListUser"]', $container).bind('change', function () {
