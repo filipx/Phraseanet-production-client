@@ -679,6 +679,12 @@ input.text_input_white {
         }
     }
 }
+
+.select-all, .unselect-all {
+    border-radius: 17px;
+    padding: 0px 16px;
+}
+
  .list_refresh {
     width: 20px;
     height: 20px;
@@ -1512,5 +1518,19 @@ input.text_input_white {
         background-color: $feedbackThemeColor;
         color: #FFFFFF;
     }
+}
 
+.push-add-user-listmanager {
+    #quickAddUser button {
+        border: solid 1px $orangeThemeColor;
+        color: $orangeThemeColor;
+    }
+    #quickAddUser button:hover {
+        background-color: $orangeThemeColor;
+        color: #FFFFFF;
+    }
+    #quickAddUser button:nth-child(2) {
+        background-color: $orangeThemeColor;
+        color: #FFFFFF;
+    }
 }
