@@ -180,7 +180,7 @@ const ListManager = function (services, options) {
                     $('.editor', $container).removeClass('loading').append(data);
                     initRight();
                     listEditor(services, {
-                        $container, listManagerInstance: this
+                        $container, listManagerInstance: _this
                     });
                 },
                 beforeSend: function () {
