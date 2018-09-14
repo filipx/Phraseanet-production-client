@@ -3,6 +3,7 @@ import {Lists, List} from './model/index';
 import listEditor from './listEditor';
 import listShare from './listShare';
 import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
+import Selectable from '../utils/selectable';
 import pushAddUser from '../record/recordPush/addUser';
 import * as _ from 'underscore';
 const humane = require('humane-js');
@@ -18,8 +19,13 @@ const ListManager = function (services, options) {
     this.container = $container = $(containerId);
     this.userList = new Lists();
 
-    pushAddUser(services).initialize({$container: this.container});
+    this.removeUserItemsArray = [];
+    this.addUserItemsArray = [];
+    this.removeUserMethod = '';
+    this.addUserMethod = '';
 
+    pushAddUser(services).initialize({$container: this.container});
+    
     $container.on('click', '.back_link', function () {
             $('#PushBox').show();
             $('#ListManager').hide();
@@ -166,8 +172,21 @@ const ListManager = function (services, options) {
          });*/
         $container.on('click', '.list-edit-action', (event) => {
             event.preventDefault();
+            _this.removeUserItemsArray = [];
+            _this.addUserItemsArray = [];
+            _this.removeUserMethod = '';
+            _this.addUserMethod = '';
+
             let $el = $(event.currentTarget);
             const listId = $el.data('list-id');
+            const el_url = $el.attr('href');
+
+            const callbackList = function (list) {
+                for (let i in list.entries) {
+                    this.selectUser(list.entries[i].User);
+                }
+            };
+
             $el.closest('.lists').find('.list').removeClass('selected');
             $el.parent().addClass('selected');
 
@@ -178,6 +197,7 @@ const ListManager = function (services, options) {
                 success: (data) => {
                     this.workOn(listId);
                     $('.editor', $container).removeClass('loading').append(data);
+                    this.loadList(el_url, callbackList);
                     initRight();
                     listEditor(services, {
                         $container, listManagerInstance: this
@@ -204,8 +224,10 @@ const ListManager = function (services, options) {
     };
 
     var initRight = function () {
-
         var $container = $('#ListManager .editor');
+        var selection = new Selectable(services, $('.user_content .badges', _this.container), {
+            selector: '.badge'
+        });
 
         $('form[name="list-editor-search"]', $container).bind('submit', function (event) {
             event.preventDefault();
@@ -223,7 +245,7 @@ const ListManager = function (services, options) {
                 success: function (datas) {
                     dest.empty().removeClass('loading').append(datas);
                     listEditor(services, {
-                        $container, listManagerInstance: this
+                        $container, listManagerInstance: _this
                     });
                 }
             });
@@ -233,13 +255,13 @@ const ListManager = function (services, options) {
             $(this).closest('form').trigger('submit');
         });
 
-        $('.EditToggle', $container).bind('click', function () {
-            $('.content.readonly, .content.readwrite', $('#ListManager')).toggle();
-            return false;
+        $('.EditToggle', $container).bind('click', function (event) {
+            event.preventDefault();
+            $('.content.readselect, .content.readwrite, .editor_header', $('#ListManager')).toggle();
         });
-        $('.Refresher', $container).bind('click', function () {
+        $('.Refresher', $container).bind('click', function (event) {
+            event.preventDefault();
             $('#ListManager ul.lists .list.selected a').trigger('click');
-            return false;
         });
 
         $('form[name="SaveName"]', $container).bind('submit', function () {
@@ -275,41 +297,41 @@ const ListManager = function (services, options) {
             return false;
         });
 
-        //button.deleter
-        $('.listmanager-delete-list-action', $container).bind('click', function (event) {
+        // //button.deleter
+        // $('.listmanager-delete-list-action', $container).bind('click', function (event) {
 
-            var list_id = $(this).data('list-id');
+        //     var list_id = $(this).data('list-id');
 
-            var makeDialog = function (box) {
+        //     var makeDialog = function (box) {
 
-                var buttons = {};
+        //         var buttons = {};
 
-                buttons[localeService.t('valider')] = function () {
+        //         buttons[localeService.t('valider')] = function () {
 
-                    var callbackOK = function () {
-                        $('#ListManager .all-lists a.list_refresh').trigger('click');
-                        dialog.get(2).close();
-                    };
+        //             var callbackOK = function () {
+        //                 $('#ListManager .all-lists a.list_refresh').trigger('click');
+        //                 dialog.get(2).close();
+        //             };
 
-                    var List = new List(list_id);
-                    List.remove(callbackOK);
-                };
+        //             var List = new List(list_id);
+        //             List.remove(callbackOK);
+        //         };
 
-                var options = {
-                    cancelButton: true,
-                    buttons: buttons,
-                    size: 'Alert'
-                };
+        //         var options = {
+        //             cancelButton: true,
+        //             buttons: buttons,
+        //             size: 'Alert'
+        //         };
 
-                dialog.create(services, options, 2).setContent(box);
-            };
+        //         dialog.create(services, options, 2).setContent(box);
+        //     };
 
-            var html = _.template($('#list_editor_dialog_delete_tpl').html());
+        //     var html = _.template($('#list_editor_dialog_delete_tpl').html());
 
-            makeDialog(html);
+        //     makeDialog(html);
 
-            return false;
-        });
+        //     return false;
+        // });
 
         $('input[name="users-search"]', $container).autocomplete({
             minLength: 2,
@@ -331,11 +353,15 @@ const ListManager = function (services, options) {
             select: function (event, ui) {
                 if (ui.item.type === 'USER') {
                     _this.selectUser(ui.item);
+                    _this.updateUsersHandler('add', ui.item.usr_id);
                 } else if (ui.item.type === 'LIST') {
                     for (let e in ui.item.entries) {
                         _this.selectUser(ui.item.entries[e].User);
+                        _this.updateUsersHandler('add', ui.item.entries[e].User.usr_id);
                     }
                 }
+                $('#saveListFooter').show();
+
                 return false;
             }
         })
@@ -355,29 +381,144 @@ const ListManager = function (services, options) {
     
             return $(html).data('ui-autocomplete-item', item).appendTo(ul);
         };
+
+        $('.user_content .badges', _this.container).disableSelection();
+
+        $container.on('click', '.content .options .select-all', function () {
+            selection.selectAll();
+        });
+
+        $container.on('click', '.content .options .unselect-all', function () {
+            selection.empty();
+        });
+
+        $container.on('click', '.content .options .delete-selection', function () {
+            var $elems = $('#ListManager .badges.selectionnable .badge.selected');
+            _.each($elems, function(item) {
+                var $elem = $(item);
+                var $elemID = $elem.find('input[name=id]').val();
+                if($elem.hasClass('selected') 
+                && _this.removeUserItemsArray.indexOf($elemID) === -1) {
+                    _this.updateUsersHandler('remove', $elemID);
+                }
+            });
+
+            $elems.fadeOut(300, 'swing', function() {
+                $(this).remove();
+                $('#saveListFooter').show();
+            });
+        });
+        $container.on('submit', 'form.list_saver', function (event) {
+            event.preventDefault();
+            var $form = $(event.currentTarget);
+            var name = $('.header h2', $container).text();
+            var users = _this.getUsers();
+
+            if (users.length === 0) {
+                humane.error('No users');
+                return false;
+            }
+            else {
+                if (_this.removeUserMethod === 'remove' && _this.removeUserItemsArray.length > 0) {
+                    var $editor = $('#list-editor-search-results');
+
+                    _.each(_this.removeUserItemsArray, function (item) {
+ 
+                        $('tbody tr', $editor).each(function(i, el) {
+                            var $el = $(el);
+                            var $elID = $('input[name="usr_id"]', $el).val();
+                            if(item === $elID) 
+                                $el.removeClass('selected');
+                        });
+
+                        _this.getList().removeUser(item);
+                    });
+
+                    var ListCounter = $('#ListManager .counter.current, #ListManager .lists .list.selected .counter');
+                    
+                    ListCounter.each(function (i, el) {
+                        var n = parseInt($(el).text(), 10);
+                        if($(el).hasClass('current')) 
+                            $(el).text(n - _this.removeUserItemsArray.length + ' people');
+                        else 
+                            $(el).text(n - _this.removeUserItemsArray.length);
+                    });
+ 
+                    $('#saveListFooter').hide();
+                    _this.removeUserItemsArray = [];
+                    _this.removeUserMethod = '';
+                }
+                else if (_this.addUserMethod === 'add' && _this.addUserItemsArray.length > 0) { 
+                    var $editor = $('#list-editor-search-results');
+ 
+                    _.each(_this.addUserItemsArray, function (item) {
+ 
+                        $('tbody tr', $editor).each(function(i, el) {
+ 
+                            var $el = $(el);
+                            var $elID = $('input[name="usr_id"]', $el).val();
+                            
+                            if(item === $elID) 
+                                $el.addClass('selected');
+                        });
+ 
+                        _this.getList().addUser(item);
+                    });
+    
+                    var ListCounter = $('#ListManager .counter.current, #ListManager .lists .list.selected .counter');
+                    
+                    ListCounter.each(function (i, el) {
+                        var n = parseInt($(el).text(), 10);
+                        
+                        if($(el).hasClass('current')) 
+                            $(el).text(n + _this.addUserItemsArray.length + ' people');
+                        else 
+                            $(el).text(n + _this.addUserItemsArray.length);
+                    });
+
+                    $('#saveListFooter').hide();
+                    _this.addUserItemsArray = [];
+                    _this.addUserMethod = '';
+                }
+            }
+
+        });
+
+        $container.on('click', '.badges a.deleter', function (event) {
+            var badge = $(event.currentTarget).closest('.badge');
+            var usr_id = badge.find('input[name="id"]').val();
+            var ListCounter = $('#ListManager .counter.current, #ListManager .lists .list.selected .counter');
+            var $editor = $('#list-editor-search-results');
+    
+            var callback = function callback(list, datas) {
+                ListCounter.each(function (i, el) {
+                    var n = parseInt($(el).text(), 10);
+                    
+                    if($(el).hasClass('current'))
+                        $(el).text(n - 1 + ' people');
+                    else
+                        $(el).text(n - 1);
+                });
+                badge.fadeOut('300', 'swing', function() {
+                    badge.remove();
+                });
+            };
+    
+            _this.getList().removeUser(usr_id, callback);
+
+            $('tbody tr', $editor).each(function(i, el) {
+                var $el = $(el);
+                var $elID = $('input[name="usr_id"]', $el).val();
+                
+                if(usr_id === $elID)
+                    $el.removeClass('selected');
+            });
+                    
+            return false;
+        });
     };
 
     initLeft();
-
-    $('.badges a.deleter', this.container).on('click', (event) => {
-        let $this = $(event.currentTarget);
-        var badge = $this.closest('.badge');
-
-        var usr_id = badge.find('input[name="id"]').val();
-
-
-        var callback = function (list, datas) {
-            $('.counter.current, .list.selected .counter', $('#ListManager')).each(function () {
-                $this.text(parseInt($this.text(), 10) - 1);
-            });
-
-            badge.remove();
-        };
-
-        this.getList().removeUser(usr_id, callback);
-
-        return false;
-    });
 
     return this;
 
@@ -400,7 +541,7 @@ ListManager.prototype = {
             });
     
             // p4.Feedback.appendBadge(html);
-            this.getList().addUser(user.usr_id);
+            // this.getList().addUser(user.usr_id);
             this.appendBadge(html);
         }
     },
@@ -423,6 +564,40 @@ ListManager.prototype = {
     removeList: function (list_id, callback) {
         this.list = new List(list_id);
         this.list.remove(callback);
+    },
+    loadList: function (url, callback) {
+        var $this = this;
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            success: function (data) {
+                if (typeof callback === 'function') {
+                    callback.call($this, data);
+                }
+            }
+        });
+    },
+    updateUsers: function (action) {
+        if(action === 'remove') {
+ 
+        }
+        return removedItems;
+    },
+    getUsers: function () {
+        return $('.user_content .badge', this.container).map(function () {
+            return $('input[name="id"]', $(this)).val();
+        });
+    },
+    updateUsersHandler: function (method, item) {
+        if (method === 'remove') {
+            this.removeUserItemsArray.push(item);
+            this.removeUserMethod = method;
+        }
+        else if (method === 'add') {
+            this.addUserItemsArray.push(item);
+            this.addUserMethod = method;
+        }
     }
 };
 

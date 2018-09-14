@@ -51,8 +51,11 @@ const listEditor = (services, options) => {
             listManagerInstance.getList().removeUser(usr_id);
 
             counters.each(function (i, el) {
-                let n = parseInt($(el).text(), 10);
-                $(el).text(n - 1);
+                let n = parseInt($(el).text().split(' ')[0], 10);
+                if($(el).hasClass('current')) 
+                    $(el).text(n - 1 + ' people');
+                else 
+                    $(el).text(n - 1);
             });
         } else {
             $this.addClass('selected');
@@ -60,7 +63,11 @@ const listEditor = (services, options) => {
 
             counters.each(function (i, el) {
                 let n = parseInt($(el).text(), 10);
-                $(el).text(n + 1);
+
+                if($(el).hasClass('current')) 
+                    $(el).text(n + 1 + ' people');
+                else 
+                    $(el).text(n + 1);
             });
         }
 
