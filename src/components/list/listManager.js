@@ -427,7 +427,7 @@ const ListManager = function (services, options) {
                         $('tbody tr', $editor).each(function(i, el) {
                             var $el = $(el);
                             var $elID = $('input[name="usr_id"]', $el).val();
-                            if(item === $elID) 
+                            if(item == $elID) 
                                 $el.removeClass('selected');
                         });
 
@@ -458,7 +458,7 @@ const ListManager = function (services, options) {
                             var $el = $(el);
                             var $elID = $('input[name="usr_id"]', $el).val();
                             
-                            if(item === $elID) 
+                            if(item == $elID) 
                                 $el.addClass('selected');
                         });
  
