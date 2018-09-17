@@ -44,7 +44,7 @@ const pushAddUser = (services) => {
     const openModal = (options = {}) => {
         const url = configService.get('baseUrl');
         let dialogOptions = merge({
-            size: '558x284',
+            size: '558x305',
             loading: false,
             title: localeService.t('create new user'),
         }, options);
