@@ -624,7 +624,7 @@ input.text_input_white {
     &:hover {
      }
 }
- .btn.btn-push-orange {
+.btn.btn-push-orange {
     color: $orangeThemeColor;
     border: 0 none;
     margin: 0;
@@ -655,11 +655,11 @@ input.text_input_white {
         }
     }
 }
- .btn.btn-push-orange > img {
+.btn.btn-push-orange > img {
     margin-right: 20px !important;
     margin-left: -20px;
 }
- .btn.btn-orange-inverse {
+.btn.btn-orange-inverse {
     background-color: $orangeThemeColor;
     color: $textInverseColor;
     .image-normal {
@@ -685,7 +685,7 @@ input.text_input_white {
     padding: 0px 16px;
 }
 
- .list_refresh {
+.list_refresh {
     width: 20px;
     height: 20px;
     padding: 0;
@@ -713,15 +713,19 @@ input.text_input_white {
      }
     background: $orangeThemeColor;
 }
- .list_link {
+.list_link {
     height: 40px;
     line-height: 40px;
     display: block;
     padding-left: 33px;
     color: #000000 !important;
 }
-.list_link:hover {
+.lists_manager_list:hover .list_link {
     background-color: #b8b8b8;
+}
+
+.lists_manager_list:hover .list-trash-btn {
+    display: block !important;
 }
 
 .feedback_dialog_container .PushBox .content .list-container {
@@ -1010,7 +1014,7 @@ input.text_input_white {
     //}
 }
 .all-lists .list-trash-btn {
-    padding: 10px 4px !important;
+    padding: 7px 4px 12px !important;
 }
 .PushBox .all-lists .push-add-user {
     margin: 0;
@@ -1128,7 +1132,7 @@ input.text_input_white {
     }
 }
 
-#ListManager .content.readonly .badge {
+#ListManager .content.readselect .badge {
     width: 250px;
     display: inline-block;
     margin: 5px;
@@ -1151,7 +1155,7 @@ input.text_input_white {
     }
 }
 
-#ListManager .content.readonly .badge.listmanager_badge {
+#ListManager .content.readselect .badge.listmanager_badge {
     font-weight: normal;
     font-size: 12px;
     height: 77px;
@@ -1400,6 +1404,13 @@ input.text_input_white {
             .image-hover {
                 display: inline;
             }
+        }
+    }
+    .footer .saveList {
+        width: 150px;
+        padding: 4px 0px 4px 0;
+        img {
+            margin-right: 15px;
         }
     }
     #find-user input[type=text] {
