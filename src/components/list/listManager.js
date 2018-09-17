@@ -38,7 +38,7 @@ const ListManager = function (services, options) {
 
             listShare(services).openModal({
                 listId, modalOptions: {
-                    size: '350x500',
+                    size: '288x500',
                     closeButton: true,
                     title: $el.attr('title')
                 }, modalLevel: 2
