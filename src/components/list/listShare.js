@@ -45,7 +45,7 @@ const listShare = (services, options) => {
 
             return false;
         });
-        $container.on('click', '.listmanager-share-delete-user-action', () => {
+        $container.on('click', '.listmanager-share-delete-user-action', (event) => {
             event.preventDefault();
             let $el = $(event.currentTarget);
             const userId = $el.data('user-id');
@@ -75,7 +75,9 @@ const listShare = (services, options) => {
                         humane.info(data.message);
                     } else {
                         humane.error(data.message);
-                    }
+                    }                    
+                    
+                    $('.push-list-share-action').trigger('click');
                     $dialog.refresh();
 
                     return;
