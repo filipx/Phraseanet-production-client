@@ -51,6 +51,7 @@ const pushRecord = (services) => {
             };
 
             var options = {
+                title: localeService.t('Delete the list'),
                 cancelButton: true,
                 buttons: buttons,
                 size: 'Alert'
