@@ -731,6 +731,11 @@ input.text_input_white {
     padding-left: 33px;
     color: #000000 !important;
 }
+
+.list_link:focus {
+    text-decoration: none;
+  }
+  
 .lists_manager_list:hover .list_link {
     background-color: #b8b8b8;
 }
