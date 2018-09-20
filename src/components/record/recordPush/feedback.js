@@ -226,7 +226,7 @@ const Feedback = function (services, options) {
 
 
         var options = {
-            size: '558x360',
+            size: '558x352',
             buttons: buttons,
             loading: true,
             title: localeService.t('send'),
@@ -236,6 +236,7 @@ const Feedback = function (services, options) {
         const $el = $(event.currentTarget);
         if($el.hasClass('validation')) {
             options.isValidation = true;
+            options.size = '558x415'
         }
 
         var $dialog = dialog.create(services, options, 2);

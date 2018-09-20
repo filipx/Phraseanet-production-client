@@ -16,6 +16,7 @@ input.text_input_white {
 }
 
 .dialog_container {
+    border: 0 none !important;
     border-radius: 6px !important;
     background-color: #ffffff !important;
     .ui-dialog-title {
@@ -38,7 +39,9 @@ input.text_input_white {
         background-size: cover;
     }
     .ui-dialog-buttonpane {
-        border-top: solid 1px #979797;
+        margin-top: 0;
+        padding-top: 0;
+        border: 0 none;
     }
     .ui-dialog-buttonpane .ui-button {
         border-radius: 15px;
@@ -80,6 +83,7 @@ input.text_input_white {
         label, p {
             font-family: Roboto;
             font-size: 14px;
+            color: #4a4a4a;
         }
         input {
             font-family: Roboto;
@@ -87,6 +91,7 @@ input.text_input_white {
             background-color: #e7e7e7;
             border: none;
             border-radius: 0;
+            box-shadow: none;
         }
         input[type=text]::-webkit-input-placeholder, textarea::-webkit-input-placeholder { /* Chrome/Opera/Safari */
             font-family: Roboto;
@@ -112,8 +117,12 @@ input.text_input_white {
             font-family: Roboto;
             font-size: 14px;;
             background-color: #e7e7e7;
-            border: none;
             border-radius: 0;
+            border: none;
+            resize: none;
+            box-shadow: none;
+            padding: 4px 6px;
+            min-height: 150px;
         }
     }
     .ui-autocomplete.ui-widget-content {
@@ -341,6 +350,7 @@ input.text_input_white {
     }
     .PushBox .round-blue-border-btn:hover {
         border: solid 2px $feedbackThemeColor;
+        background-color: $feedbackThemeColor;
     }
     .PushBox .FeedbackSend {
         background-color: $feedbackThemeColor;
@@ -349,9 +359,6 @@ input.text_input_white {
         background-color: #A3DD63;
     }
     .PushBox .saveList {
-        color: $feedbackThemeColor;
-    }
-    .PushBox .saveList:hover {
         background-color: $feedbackThemeColor;
     }
     .PushBox .push-add-user {
@@ -372,6 +379,7 @@ input.text_input_white {
     }
     .general_togglers button {
         color: $feedbackThemeColor;
+        padding-left: 35px;
     }
     .general_togglers button:hover {
         background-color: $feedbackThemeColor;
@@ -410,7 +418,6 @@ input.text_input_white {
 .PushBox .round-blue-border-btn {
     height: 27px;
     border-radius: 13.5px;
-    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.18);
     background-color: #ffffff;
     border: 0 none;
     font-family: Roboto;
@@ -422,7 +429,8 @@ input.text_input_white {
     letter-spacing: normal;
     color: $pushThemeColor;
     padding: 0px 20px;
-    box-shadow: 0 0 0 1px $pushThemeColor, 0 0 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    border: 1px solid $pushThemeColor;
 }
 
 .PushBox .round-blue-border-btn:hover {
@@ -492,7 +500,6 @@ input.text_input_white {
     color: #fff;
     border: 0 none;
     height: 30px;
-    margin-left: 4px;
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
     box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2);
@@ -1242,13 +1249,16 @@ input.text_input_white {
 }
 
 #PushBox .general_togglers li {
-    margin-top: 5px;
+    margin-top: 12px;
 }
 
 #PushBox .general_togglers {
     margin-right: 5px;
     vertical-align: middle;
     margin-bottom: 3px;
+    button {
+        padding-left: 35px;
+    }
 }
 
 .general_togglers button {
@@ -1270,11 +1280,10 @@ input.text_input_white {
     padding: 0px 12px;
     border-width: 0;
     img {
-        // position: absolute;
-        // left: 10px;
-        // top: 5px;
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        position: absolute;
+        left: 15px;
+        top: 6px;
     }
     .image-normal {
         display: inline;
@@ -1313,6 +1322,7 @@ input.text_input_white {
     img {
         width: 16px;
         height: 16px;
+        margin-right: 5px;
     }
 }
 
