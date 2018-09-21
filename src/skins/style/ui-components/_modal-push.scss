@@ -344,6 +344,9 @@ input.text_input_white {
 }
 
 .feedback_dialog_container {
+    #PushBox .list_refresh:hover {
+        background: $feedbackThemeColor;
+    }
     .PushBox .round-blue-border-btn {
         border: solid 1px $feedbackThemeColor;
         color: $feedbackThemeColor;
@@ -376,6 +379,9 @@ input.text_input_white {
     }
     .PushBox .user_content .badges .badge .icon {
         background-color: $feedbackThemeColor;
+    }
+    .PushBox .user_content .badges .badge.selected {
+        border-color: $feedbackThemeColor;
     }
     .general_togglers button {
         color: $feedbackThemeColor;
@@ -721,7 +727,6 @@ input.text_input_white {
      .image-hover {
          display: inline;
      }
-    background: $orangeThemeColor;
 }
 .list_link {
     height: 40px;
@@ -872,7 +877,7 @@ input.text_input_white {
 }
 
 .PushBox .user_content .badges .badge.selected {
-    border: 3px solid #efefef;
+    border: 3px solid $pushThemeColor;
 }
 
 .PushBox .user_content .badges .badge .toggles .status_on .toggle_off {
@@ -896,7 +901,8 @@ input.text_input_white {
 }
 
 .PushBox .user_content .badges .badge .icon {
-    width: 70px;
+    width: 42px;
+    padding: 0 7px;
     background-color: $pushThemeColor;
     border-radius: 7px 0px 0px 7px;
 }
@@ -907,7 +913,7 @@ input.text_input_white {
 }
 
 .PushBox .user_content .badges .badge table {
-    width: 95%;
+    width: 93%;
 }
 
 .PushBox .user_content .badges .badge .infos table {
@@ -915,7 +921,7 @@ input.text_input_white {
 }
 
 .PushBox .user_content .badges .badge .infos tr {
-    height: 20px;
+    height: 15px;
 }
 
 .PushBox .user_content .badges .badge .infos tr.toggles {
@@ -924,7 +930,7 @@ input.text_input_white {
 }
 
 .PushBox .user_content .badges .badge .icon img {
-    margin: 15px;
+    margin-top: 15px;
 }
 
 .PushBox .user_content .badges .badge .name {
@@ -1210,7 +1216,7 @@ input.text_input_white {
         display: inline-flex;
     }
     table {
-        width: auto;
+        // width: auto;
         table-layout: fixed;
     }
     .infos {
@@ -1218,7 +1224,7 @@ input.text_input_white {
         vertical-align: top;
         span {
             display: block;
-            line-height: 25px;
+            line-height: 20px;
         }
     }
 }
@@ -1351,31 +1357,35 @@ input.text_input_white {
     font-weight: lighter;
 }
 
-#PushBox .content .list_saver {
-    margin: 0;
-    display: inline-block;
-    .btn-toolbar {
+#PushBox .content {
+    .list_saver {
         margin: 0;
+        display: inline-block;
+        .btn-toolbar {
+            margin: 0;
+        }
+        input {
+            margin: 0;
+            padding: 2px 2px 2px 10px;
+            width: 260px;
+            height: 26px;
+            border: 0 none;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .btn {
+            margin: 0;
+            padding: 0;
+            height: 23px;
+        }
     }
-}
+    .list_refresh:hover {
+        background: $pushThemeColor;
+    }
+} 
 
-#PushBox .content .list_saver input {
-    margin: 0;
-    padding: 2px 2px 2px 10px;
-    width: 260px;
-    height: 26px;
-    border: 0 none;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-#PushBox .content .list_saver .btn {
-    margin: 0;
-    padding: 0;
-    height: 23px;
-}
 
 #find-user {
     line-height: 15px;
@@ -1465,6 +1475,7 @@ input.text_input_white {
         font-weight: normal;
         line-height: 19px;
         border-radius: 5px;
+        background-color: #f7f7f7;
         .image-normal {
             display: inline;
         }
@@ -1476,7 +1487,7 @@ input.text_input_white {
         }
         &:hover {
             color: #fff !important;
-            background-color: $orangeThemeColor;
+            background-color: $orangeThemeColor !important;
             .image-normal {
                 display: none;
             }
@@ -1488,6 +1499,7 @@ input.text_input_white {
     .footer .saveList {
         width: 150px;
         padding: 4px 0px 4px 0;
+        background-color: #f7f7f7;
         img {
             margin-right: 15px;
         }
@@ -1537,6 +1549,13 @@ input.text_input_white {
         margin-left: 30px;
         margin-top: 2px;
         border: 0 none;
+    }
+    .list_refresh:hover {
+        background: $orangeThemeColor;
+    }
+    .push-back-link:hover {
+        color: #444444;
+        background-color: #f7f7f7;
     }
 }
 
@@ -1674,7 +1693,7 @@ input.text_input_white {
 .ui-menu .ui-menu-item a.ui-state-active {
     margin: 0 !important;
 }
-.ui-menu .ui-menu-item li.list-item a .icon {
+.ui-menu .ui-menu-item.list-item a .icon {
     .image-normal {
         display: block;
     }
@@ -1682,7 +1701,7 @@ input.text_input_white {
         display: none;
     }
 }
-.ui-menu .ui-menu-item li.list-item:hover {
+.ui-menu .ui-menu-item.list-item:hover {
     background: #646464;
     a {
         background: #646464;
@@ -1699,7 +1718,7 @@ input.text_input_white {
 
 @media screen and (max-width: 1200px) {
     .PushBox .user_content .badges {
-        top: 110px;
+        top: 110px !important;
     }
     .PushBox .user_content .header > div:first-child {
         margin-bottom: 15px;
