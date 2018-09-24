@@ -66,7 +66,7 @@ const Feedback = function (services, options) {
 
         $('.LeftColumn .content .lists', $container).empty().addClass('loading');
 
-        _this.userList.get(callback, 'html');
+        $this.userList.get(callback, 'html');
     });
 
 
@@ -409,15 +409,19 @@ const Feedback = function (services, options) {
                 item: item
             });
 
-            if (_this.Context === 'Push') {
-                $('img[src="/assets/common/images/icons/user-orange.png"]')
-                .attr('src', '/assets/common/images/icons/user-blue.png')
+            if ($this.Context === 'Push') {
+                setTimeout(() => {
+                    $('.ui-menu .ui-menu-item a').css('box-shadow', 'inset 0 -1px #2196f3');
+                    $('img[src="/assets/common/images/icons/user-orange.png"]').attr('src', '/assets/common/images/icons/user-blue.png');
+                }, 100);
             }
-            else if (_this.Context === 'Feedback') {
-                $('img[src="/assets/common/images/icons/user-orange.png"]')
-                .attr('src', '/assets/common/images/icons/user-green.png')
+            else if ($this.Context === 'Feedback') {
+                setTimeout(() => {
+                    $('.ui-menu .ui-menu-item a').css('box-shadow', 'inset 0 -1px #8bc34a');
+                    $('img[src="/assets/common/images/icons/user-orange.png"]').attr('src', '/assets/common/images/icons/user-green.png');
+                }, 100);
             }
-        } 
+        }
         else if (item.type === 'LIST') {
             html = _.template($('#list_list_tpl').html())({
                 item: item
