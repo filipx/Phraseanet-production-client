@@ -344,7 +344,7 @@ input.text_input_white {
 }
 
 .feedback_dialog_container {
-    #PushBox .list_refresh:hover {
+    #PushBox .content .list_refresh:hover {
         background: $feedbackThemeColor;
     }
     .PushBox .round-blue-border-btn {
@@ -389,6 +389,12 @@ input.text_input_white {
     }
     .general_togglers button:hover {
         background-color: $feedbackThemeColor;
+    }
+    .general_togglers li:nth-child(2) button img {
+        width: 23px;
+    }
+    .general_togglers li:nth-child(3) button img {
+        width: 19px;
     }
     #find-user input[type=text] {
         background-color: $feedbackThemeColor;
