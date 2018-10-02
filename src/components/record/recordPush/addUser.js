@@ -33,7 +33,7 @@ const pushAddUser = (services) => {
                 dialogOptions.isValidation = true;
             }
 
-            if($el.hasClass('push-add-user-listmanager')) {
+            if($el.hasClass('listmanager-add-user')) {
                 dialogOptions.isListManager = true;
             }
 

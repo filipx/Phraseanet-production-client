@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { Lists } from '../../list/model/index';
 import dialog from '../../../../node_modules/phraseanet-common/src/components/dialog';
 import Selectable from '../../utils/selectable';
 import pushAddUser from './addUser';
@@ -14,6 +15,7 @@ const Feedback = function (services, options) {
 
     this.url = url;
     this.container = $container = $(containerId);
+    this.userList = new Lists();
 
     this.Context = context;
 
@@ -49,6 +51,22 @@ const Feedback = function (services, options) {
                 container: containerId
             }
         );
+    });
+
+    this.container.on('click', '.push-refresh-list-action', function (event) {
+        event.preventDefault();
+
+        var callback = function callback(datas) {
+            var context = $(datas);
+            var dataList = $(context).find('.lists').prop('outerHTML');
+                        
+            var refreshContent = $('.LeftColumn .content .lists', $container);
+            refreshContent.removeClass('loading').append(dataList);
+        };
+
+        $('.LeftColumn .content .lists', $container).empty().addClass('loading');
+
+        $this.userList.get(callback, 'html');
     });
 
 
@@ -226,7 +244,7 @@ const Feedback = function (services, options) {
 
 
         var options = {
-            size: '558x360',
+            size: '558x352',
             buttons: buttons,
             loading: true,
             title: localeService.t('send'),
@@ -236,6 +254,7 @@ const Feedback = function (services, options) {
         const $el = $(event.currentTarget);
         if($el.hasClass('validation')) {
             options.isValidation = true;
+            options.size = '558x415'
         }
 
         var $dialog = dialog.create(services, options, 2);
@@ -342,7 +361,8 @@ const Feedback = function (services, options) {
             return false;
         }
 
-        appEvents.emit('push.createList', {name: $input.val(), collection: users});
+        // appEvents.emit('push.createList', {name: $input.val(), collection: users});
+        $this.createList({ name: $input.val(), collection: users });
         $input.val('');
         /*
          p4.Lists.create($input.val(), function (list) {
@@ -368,7 +388,7 @@ const Feedback = function (services, options) {
                 });
             },
             focus: function (event, ui) {
-                $('input[name="users-search"]').val(ui.item.label);
+                // $('input[name="users-search"]').val(ui.item.label);
             },
             select: function (event, ui) {
                 if (ui.item.type === 'USER') {
@@ -386,10 +406,23 @@ const Feedback = function (services, options) {
 
         if (item.type === 'USER') {
             html = _.template($('#list_user_tpl').html())({
-
                 item: item
             });
-        } else if (item.type === 'LIST') {
+
+            if ($this.Context === 'Push') {
+                setTimeout(() => {
+                    $('.ui-menu .ui-menu-item a').css('box-shadow', 'inset 0 -1px #2196f3');
+                    $('img[src="/assets/common/images/icons/user-orange.png"]').attr('src', '/assets/common/images/icons/user-blue.png');
+                }, 100);
+            }
+            else if ($this.Context === 'Feedback') {
+                setTimeout(() => {
+                    $('.ui-menu .ui-menu-item a').css('box-shadow', 'inset 0 -1px #8bc34a');
+                    $('img[src="/assets/common/images/icons/user-orange.png"]').attr('src', '/assets/common/images/icons/user-green.png');
+                }, 100);
+            }
+        }
+        else if (item.type === 'LIST') {
             html = _.template($('#list_list_tpl').html())({
                 item: item
             });
@@ -434,6 +467,13 @@ Feedback.prototype = {
                     callback.call($this, data);
                 }
             }
+        });
+    },
+    createList: function (options) {
+        let { name, collection } = options;
+
+        this.userList.create(name, function (list) {
+            list.addUsers(collection);
         });
     },
     loadList: function (url, callback) {
