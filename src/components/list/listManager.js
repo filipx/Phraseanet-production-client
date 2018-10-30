@@ -348,7 +348,7 @@ const ListManager = function (services, options) {
                 });
             },
             focus: function (event, ui) {
-                $('input[name="users-search"]').val(ui.item.label);
+                // $('input[name="users-search"]').val(ui.item.label);
             },
             select: function (event, ui) {
                 if (ui.item.type === 'USER') {
