@@ -9,6 +9,8 @@ const searchAdvancedForm = (services) => {
     let $container = null;
     const initialize = (options) => {
         let initWith = {$container} = options;
+        let previousVal;
+        const multi_term_select_html = $('.term_select_wrapper').html();
 
 
         // advanced
@@ -39,6 +41,65 @@ const searchAdvancedForm = (services) => {
 
         $container.on('click', '.search-reset-action', () => {
             resetSearch();
+        });
+
+        $(document).on('focus', 'select.term_select_field', (event) => {
+            previousVal = $(event.currentTarget).val();
+        });
+        $(document).on('change', 'select.term_select_field', (event) => {
+            const $this = $(event.currentTarget);
+    
+            // if option is selected
+            if($this.val()) {
+                $this.siblings().prop('disabled', false);
+    
+                $('.term_select_multiple option').each((index, el) => {
+                    let $el = $(el);
+                    if($this.val() === $el.val()) {
+                        $el.prop('selected', true);
+                    }
+                    else if (previousVal === $el.val()) {
+                        $el.prop('selected', false);
+                    }
+                });
+            }
+            else {
+                $this.siblings().prop('disabled', 'disabled');
+    
+                $('.term_select_multiple option').each((index, el) => {
+                    let $el = $(el);
+                    if(previousVal === $el.val()) {
+                        $el.prop('selected', false);
+                    }
+                });
+            }
+            $this.blur();
+            checkFilters(true);
+        });
+
+        $(document).on('click', '.term_deleter', (event) => {
+            event.preventDefault();
+            let $this = $(event.currentTarget);
+            let rowOption = $this.siblings('.term_select_field');
+            
+            $('.term_select_multiple option').each((index, el) => {
+                let $el = $(el);
+                if(rowOption.val() == $el.val()) {
+                    $el.prop('selected', false);
+                }
+            });
+            checkFilters(true);
+            $this.closest('.term_select_wrapper').remove();
+        });
+
+        $('.add_new_term').on('click', (event) => {
+            event.preventDefault();
+            if ($('select.term_select_field').length === 0) {
+                $('.term_select').prepend('<div class="term_select_wrapper">' + multi_term_select_html + '</div>');
+            }
+            else if ($('select.term_select_field').last().val() !== '') {
+                $('.term_select_wrapper').last().after('<div class="term_select_wrapper">' + multi_term_select_html + '</div>');
+            }
         });
 
         // @TODO - check if usefull
@@ -117,8 +178,9 @@ const searchAdvancedForm = (services) => {
         var container = $('#ADVSRCH_OPTIONS_ZONE');
         var fieldsSort = $('#ADVSRCH_SORT_ZONE select[name=sort]', container);
         var fieldsSortOrd = $('#ADVSRCH_SORT_ZONE select[name=ord]', container);
-        var fieldsSelect = $('#ADVSRCH_FIELDS_ZONE select', container);
-        var statusFilters = $('#ADVSRCH_SB_ZONE .status-section-title', container);
+        var fieldsSelect = $('#ADVSRCH_FIELDS_ZONE select.term_select_multiple', container);
+        var fieldsSelectFake = $('#ADVSRCH_FIELDS_ZONE select.term_select_field', container);
+        var statusFilters = $('#ADVSRCH_SB_ZONE .status-section-title .danger_indicator', container);
         var dateFilterSelect = $('#ADVSRCH_DATE_ZONE select', container);
         var scroll = fieldsSelect.scrollTop();
 
@@ -127,15 +189,16 @@ const searchAdvancedForm = (services) => {
 
         // hide all the fields in the "fields" select, so only the relevant ones will be shown again
         $('option.dbx', fieldsSelect).hide().prop('disabled', true);     // option[0] is "all fields"
+        $("option.dbx", fieldsSelectFake).hide().prop("disabled", true);
 
         // hide all the fields in the "date field" select, so only the relevant ones will be shown again
         $('option.dbx', dateFilterSelect).hide().prop('disabled', true);   // dbx = all "field" entries in the select = all except the firstt
 
-        statusFilters.removeClass('danger_indicator danger');
+        statusFilters.removeClass('danger');
         $.each($('#ADVSRCH_SB_ZONE .field_switch'), function(index,el){
             if( $(el).prop('checked') === true ) {
                 danger = true;
-                statusFilters.addClass('danger_indicator danger');
+                statusFilters.addClass('danger');
             }
         });
 
@@ -158,14 +221,23 @@ const searchAdvancedForm = (services) => {
             });
 
             // display the number of selected colls for the databox
-            $('.infos_sbas_' + sbas_id).empty().append(nbSelectedColls + '/' + nbCols);
+            if (nbSelectedColls == nbCols) {
+                $('.infos_sbas_' + sbas_id).empty().append(nbCols);
+                $(this).siblings(".clksbas").removeClass("danger");
+                $(this).siblings(".clksbas").find(".custom_checkbox_label input").prop("checked", "checked");
+            }
+            else {
+                $('.infos_sbas_' + sbas_id).empty().append('<span style="color:#2096F3;font-size: 20px;">' + nbSelectedColls + '</span> / ' + nbCols);
+                $(this).siblings(".clksbas").addClass("danger");
+            }
 
             // if one coll is not checked, show danger
             if (nbSelectedColls !== nbCols) {
-                $('#ADVSRCH_SBAS_LABEL_' + sbas_id).addClass('danger');
+                $('#ADVSRCH_SBAS_ZONE').addClass('danger');
                 danger = true;
-            } else {
-                $('#ADVSRCH_SBAS_LABEL_' + sbas_id).removeClass('danger');
+            } 
+            else if (nbSelectedColls === nbCols && danger === false) {
+                $('#ADVSRCH_SBAS_ZONE').removeClass('danger');
             }
 
             if (nbSelectedColls === 0) {
@@ -180,6 +252,7 @@ const searchAdvancedForm = (services) => {
                 $('.db_' + sbas_id, fieldsSort).show().prop('disabled', false);
                 // show again the relevant fields in "from fields" select
                 $('.db_' + sbas_id, fieldsSelect).show().prop('disabled', false);
+                $('.db_' + sbas_id, fieldsSelectFake).show().prop("disabled", false);
                 // show the sb
                 $('#ADVSRCH_SB_ZONE_' + sbas_id, container).show();
                 // show again the relevant fields in "date field" select
