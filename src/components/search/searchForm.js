@@ -29,22 +29,22 @@ const searchForm = (services) => {
             event.preventDefault();
             openAdvancedForm();
         });
-
+        
         toggleSearchState();
         appEvents.emit('search.doCheckFilters');
-
+        
         $container.on('click', '.geo-search-action-btn', (event) => {
             event.preventDefault();
             geoForm.openModal({
                 drawnItems: searchPreferences.drawnItems || false,
             });
         });
-
-
+        
+        
         $container.on('click', 'input[name=search_type]', (event) => {
             let $el = $(event.currentTarget);
             let $record_types = $('#recordtype_sel');
-
+            
             if ($el.hasClass('mode_type_reg')) {
                 $record_types.css('visibility', 'hidden');  // better than hide because does not change layout
                 $record_types.prop('selectedIndex', 0);
@@ -113,7 +113,7 @@ const searchForm = (services) => {
      */
     const openAdvancedForm = () => {
         let $searchFormContainer = $container.parent();
-
+        
         var options = {
             size: (window.bodySize.x - 120) + 'x' + (window.bodySize.y - 120),
             loading: false,
@@ -129,6 +129,7 @@ const searchForm = (services) => {
         };
 
         $dialog = dialog.create(services, options);
+        $dialog.getDomElement().closest('.ui-dialog').addClass('advanced_search_dialog_container');
 
         // move all content into dialog:
         $dialog.getDomElement().append($container);
