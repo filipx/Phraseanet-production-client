@@ -44,7 +44,7 @@ const resultInfos = (services) => {
         const url = configService.get('baseUrl');
 
         let dialogOptions = merge({
-            size: 'Medium',
+            size: '600x600',
             loading: false
         }, options);
 
