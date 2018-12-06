@@ -81,10 +81,14 @@ DIV.myexplain {
     }
     .esqueryDataDiv {
         clear: both;
-        height: 350px;
+        height: 250px;
         textarea {
             width: 100%;
             height: 100%;
+        }
+        textarea#esqueryDataPaths {
+            display:block;
+            height: 180px;
         }
     }
 }
