@@ -1,5 +1,6 @@
 import * as Rx from 'rx';
 import $ from 'jquery';
+import dialog from '../../../node_modules/phraseanet-common/src/components/dialog';
 import merge from 'lodash.merge';
 import resultInfos from './resultInfos';
 import Selectable from '../utils/selectable';
@@ -98,6 +99,9 @@ const search = services => {
                     }
                 }
             });
+
+        window.searchResult = searchResult;
+        window.dialog = dialog;
     };
 
     const getResultSelectionStream = () => searchResult.selection.stream;
