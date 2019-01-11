@@ -291,7 +291,7 @@ const lightbox = services => {
 
         var sselcont_id = $('.basket_element', el).attr('id').split('_').pop();
         var ssel_id = $('#navigation').val();
-
+        var url = $(el).attr('href');
         var container = $('#sc_container');
 
         var request = container.data('request');
@@ -299,7 +299,7 @@ const lightbox = services => {
             request.abort();
         }
 
-        request = _loadBasketElement($(el).attr('href'));
+        request = _loadBasketElement(url, compare, sselcont_id);
         container.data('request', request);
     }
 
