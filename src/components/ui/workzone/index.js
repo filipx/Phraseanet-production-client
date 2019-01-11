@@ -602,6 +602,7 @@ const workzone = (services) => {
 
                     }
                 });
+                window.workzoneOptions = workzoneOptions;
                 appEvents.emit('ui.answerSizer');
                 return;
             }
