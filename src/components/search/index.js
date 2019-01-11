@@ -2,6 +2,7 @@ import * as Rx from 'rx';
 import $ from 'jquery';
 import merge from 'lodash.merge';
 import resultInfos from './resultInfos';
+import workzoneFacets from '../ui/workzone/facets/index';
 import Selectable from '../utils/selectable';
 let lazyload = require('jquery-lazyload');
 require('phraseanet-common/src/components/tooltip');
@@ -28,6 +29,7 @@ const search = services => {
     let answAjaxrunning = false;
     let resultInfoView;
     let facets = null;
+    let selectedFacetValues = [];
     var lastFilterResults = [];
     let savedHiddenFacetsList = configService.get('savedHiddenFacetsList') ? JSON.parse(configService.get('savedHiddenFacetsList')) : [];
 
@@ -128,12 +130,24 @@ const search = services => {
      *
      */
     const onRefreshSearchState = () => {
+        appEvents.emit('facets.doLoadFacets', {
+            facets: lastFilterResults,
+            filterFacet: $('#look_box_settings input[name=filter_facet]').prop('checked'),
+            facetOrder: $('#look_box_settings select[name=orderFacet]').val(),
+            facetValueOrder: $('#look_box_settings select[name=facetValuesOrder]').val(),
+            hiddenFacetsList: savedHiddenFacetsList
+        });
+
         let data = $searchForm.serializeArray();
+        
+        var jsonData = workzoneFacets(services).serializeJSON(data, selectedFacetValues, facets);
+        console.log(jsonData);
+
         let searchPromise = {};
         searchPromise = $.ajax({
             type: 'POST',
             url: `${url}prod/query/`,
-            data: data,
+            data: jsonData,
             dataType: 'json',
             beforeSend: function (formData) {
                 if (answAjaxrunning && searchPromise.abort !== undefined) {
@@ -372,6 +386,11 @@ const search = services => {
         updateHiddenFacetsListInPrefsScreen();
     }
 
+    const getSelectedFacetValues = (facets) => {
+        selectedFacetValues = facets;
+        
+    }
+
     appEvents.listenAll({
         'search.doRefreshState': onRefreshSearchState,
         'search.doNewSearch': newSearch,
@@ -379,7 +398,8 @@ const search = services => {
         'search.doClearSearch': clearAnswers,
         'search.doNavigate': navigate,
         'search.updateFacetData': updateFacetData,
-        'search.reloadHiddenFacetList': reloadHiddenFacetList
+        'search.reloadHiddenFacetList': reloadHiddenFacetList,
+        'search.getSelectedFacetValues': getSelectedFacetValues
     });
 
     return { initialize, getResultSelectionStream, getResultNavigationStream };
