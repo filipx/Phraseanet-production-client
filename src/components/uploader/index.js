@@ -289,7 +289,7 @@ const uploader = (services) => {
                         var formatedFile = {
                             id: 'file-' + index,
                             size: typeof file.size !== 'undefined' ? uploaderInstance.Formater.size(file.size) : '',
-                            name: file.name,
+                            name: encodeURI(file.name),
                             type: typeof file.type !== 'undefined' ? file.type : '',
                             uploadIndex: uploaderInstance.getUploadIndex()
                         };
@@ -373,7 +373,7 @@ const uploader = (services) => {
 
             // Set new context in download-box
             $.each(data.files, function (index, file) {
-                let params = $.extend({}, file, {id: 'file-' + index});
+                let params = $.extend({}, file, {id: 'file-' + index, name: encodeURI(file.name)});
                 let html = _.template($('#download_items_tpl').html())(params);
 
                 uploaderInstance.getDownloadBox().append(html);
